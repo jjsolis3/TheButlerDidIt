@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+src/ButlerDidIt.Api/wwwroot/
+tests/
+.git/
+.github/
+.env
+*.md
+!README.md
