@@ -50,6 +50,7 @@ export function CuePlayer({
   const [shot, setShot] = useState<Shot>({ src: null, caption: null, effect: 'kenburns' })
   const [subtitle, setSubtitle] = useState<{ text: string; speaker: string | null } | null>(null)
   const [video, setVideo] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ text: string; alternative: string | null } | null>(null)
   const [playing, setPlaying] = useState(false)
   const [replayCount, setReplayCount] = useState(0)
   const runId = useRef(0)
@@ -89,6 +90,15 @@ export function CuePlayer({
             else if (narrator.supported && !mutedRef.current) await narrator.speak(cue.text ?? '', cue.voice)
             else await wait(Math.max(3000, (cue.text?.length ?? 0) * 55)) // reading time when silent
             await wait(500)
+            break
+          }
+          case 'toast': {
+            // A drinking-game moment: big on screen, with the non-alcoholic option beside it.
+            setSubtitle(null)
+            setToast({ text: cue.text ?? '', alternative: cue.alternative })
+            if (narrator.supported && !mutedRef.current) await narrator.speak(cue.text ?? '', cue.voice)
+            await wait(4000)
+            setToast(null)
             break
           }
           case 'music':
@@ -147,6 +157,13 @@ export function CuePlayer({
           <video ref={videoRef} src={video} className="aspect-video w-full rounded-2xl bg-black" playsInline />
         ) : (
           <SceneCard key={shot.src ?? shot.caption ?? ''} src={shot.src} caption={subtitle ? null : shot.caption} effect={shot.effect} />
+        )}
+        {toast && (
+          <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 rounded-2xl border-2 border-accent bg-black/85 p-6 text-center shadow-2xl sm:inset-x-20">
+            <p className="text-4xl">🥂</p>
+            <p className="font-display mt-2 text-2xl text-accent sm:text-3xl">{toast.text}</p>
+            {toast.alternative && <p className="mt-3 text-sm text-muted">{toast.alternative}</p>}
+          </div>
         )}
         {subtitle && (
           <div className="absolute right-4 bottom-4 left-4 rounded-xl bg-black/75 px-5 py-4 backdrop-blur-sm sm:right-10 sm:left-10">

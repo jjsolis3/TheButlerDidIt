@@ -21,6 +21,9 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly string _database = $"butler_test_{Guid.NewGuid():N}";
 
+    /// <summary>A throwaway folder for generated and uploaded files.</summary>
+    public string MediaRoot { get; } = Path.Combine(Path.GetTempPath(), $"butler_media_{Guid.NewGuid():N}");
+
     private static string ServerConnection =>
         Environment.GetEnvironmentVariable("TEST_DATABASE_URL")
         ?? "Host=localhost;Port=5432;Username=butler;Password=butler;Database=postgres";
@@ -34,6 +37,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:Default", ConnectionString);
         builder.UseSetting("Auth:AllowRegistration", AllowRegistration.ToString());
+        builder.UseSetting("Media:Root", MediaRoot);
         foreach (var (key, value) in ExtraSettings) builder.UseSetting(key, value);
     }
 
@@ -55,6 +59,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         await conn.OpenAsync();
         await using var cmd = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{_database}\" WITH (FORCE)", conn);
         await cmd.ExecuteNonQueryAsync();
+        if (Directory.Exists(MediaRoot)) Directory.Delete(MediaRoot, recursive: true);
     }
 
     /// <summary>Registers a host account and returns a client that sends its auth cookie, plus the cookie itself for hub connections.</summary>
@@ -112,6 +117,10 @@ public class FakeAiFactory : ApiFactory
         ("Ai:Roles:Actor:Model", "fake-model"),
         ("Ai:Roles:Inspector:Provider", "Fake"),
         ("Ai:Roles:Inspector:Model", "fake-model"),
+        ("Ai:Roles:Voice:Provider", "Fake"),
+        ("Ai:Roles:Voice:Model", "fake-voice"),
+        ("Ai:Roles:Illustrator:Provider", "Fake"),
+        ("Ai:Roles:Illustrator:Model", "fake-image"),
     ];
 }
 

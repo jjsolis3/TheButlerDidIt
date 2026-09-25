@@ -12,6 +12,9 @@ The hand-written flagship mystery is **Death at Blackwood Manor** (1920s country
 - let guests question characters nobody is playing
 - get private hints from the Inspector
 - hear a personalised verdict at the reveal
+- hear real voices for the narrator and NPCs, and see generated portraits and scene art
+
+Hosts can also print a party kit (invitations with QR codes, name tags, character booklets, clue cards), guests can upload costume selfies, and adult parties can switch on toast prompts with themed cocktails and mocktails.
 
 See [docs/ai-setup.md](docs/ai-setup.md).
 
@@ -20,7 +23,8 @@ See [docs/ai-setup.md](docs/ai-setup.md).
 | Part | Technology |
 |---|---|
 | Game rules | C# class library (`ButlerDidIt.Game`): pure functions, no web or database code |
-| AI | `ButlerDidIt.Ai` on Microsoft.Extensions.AI `IChatClient`: Anthropic, OpenAI, Gemini, Ollama |
+| AI | `ButlerDidIt.Ai` on Microsoft.Extensions.AI `IChatClient`: Anthropic, OpenAI, Gemini, Ollama; OpenAI for voices and pictures |
+| Media | QuestPDF + QRCoder (printable kit), SkiaSharp (selfies) |
 | Server | ASP.NET Core 10, SignalR (real-time), EF Core + PostgreSQL, ASP.NET Core Identity |
 | Front end | React 19 + TypeScript, Vite, Tailwind CSS |
 | Tests | xUnit (engine + API against real Postgres), Playwright (full parties in real browsers) |
@@ -82,6 +86,6 @@ docs/                   architecture, deployment and scenario-writing guides
 The roadmap, feature requests and known issues are tracked in [GitHub Issues](https://github.com/jjsolis3/TheButlerDidIt/issues), with one roadmap issue per phase.
 
 1. **Playable core**: done. Parties, join codes, stage + dossiers, pass-and-play, one hand-written mystery.
-2. **AI game master** (#2): multi-provider AI, generated mysteries, NPC questioning, hints, verdicts, cost controls.
-3. **Media pipeline** (#8): character voices, generated portraits and scene art, printable party kits, costume selfies.
+2. **AI game master** (#2): done. Multi-provider AI, generated mysteries, NPC questioning, hints, verdicts, cost controls.
+3. **Media pipeline** (#8): character voices, generated portraits and scene art, printable party kits, costume selfies, toast prompts.
 4. **Polish and scale** (#14): recap page, S3 storage, multi-instance scaling, scenario editor, more themes.

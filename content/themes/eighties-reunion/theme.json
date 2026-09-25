@@ -4,7 +4,19 @@
   "tagline": "Big hair, bigger grudges. Somebody never got over high school.",
   "era": "1980s high school reunion",
   "description": "Twenty years on, the class of '86 returns to the gym for a reunion. The prom queen, the jock, the nerd-turned-billionaire and the teacher who knew too much. When the former class president is found under the bleachers, old rivalries turn deadly.",
-  "palette": { "background": "#0e0b16", "surface": "#1d1530", "accent": "#ff5fa2", "ink": "#f4ecff" },
+  "palette": {
+    "background": "#0e0b16",
+    "surface": "#1d1530",
+    "accent": "#ff5fa2",
+    "ink": "#f4ecff"
+  },
   "artStyle": "1980s neon synthwave, VHS grain, bold magenta and cyan",
-  "sortOrder": 8
+  "sortOrder": 8,
+  "cocktails": [
+    {
+      "name": "Neon Prom Punch",
+      "recipe": "Vodka, blue curaçao and lemonade.",
+      "mocktail": "Lemonade with a splash of blue sports drink."
+    }
+  ]
 }

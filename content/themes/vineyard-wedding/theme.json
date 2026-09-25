@@ -4,7 +4,19 @@
   "tagline": "A Tuscan wedding, a vintage to die for, and a toast nobody will forget.",
   "era": "Modern day Tuscan vineyard",
   "description": "Sun-drenched vines, a feuding wine dynasty, and a wedding that half the guests want stopped. When the father of the bride drops dead after the toast, the family's bitter secrets pour out.",
-  "palette": { "background": "#120d0c", "surface": "#241816", "accent": "#c98d6b", "ink": "#f7ebe2" },
+  "palette": {
+    "background": "#120d0c",
+    "surface": "#241816",
+    "accent": "#c98d6b",
+    "ink": "#f7ebe2"
+  },
   "artStyle": "Golden-hour Italian countryside, watercolour and ink, rich wine reds",
-  "sortOrder": 6
+  "sortOrder": 6,
+  "cocktails": [
+    {
+      "name": "Tuscan Spritz",
+      "recipe": "Prosecco, Aperol and soda with an orange slice.",
+      "mocktail": "Sparkling water, blood-orange juice and a sprig of rosemary."
+    }
+  ]
 }

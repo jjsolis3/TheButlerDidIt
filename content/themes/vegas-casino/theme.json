@@ -4,7 +4,19 @@
   "tagline": "The house always wins. Tonight, the house killed.",
   "era": "1960s Las Vegas casino",
   "description": "High rollers, showgirls and the mob's accountant, all at one high-stakes poker table. When the casino owner collapses over a royal flush, everyone at the table is holding a motive.",
-  "palette": { "background": "#0a0f0c", "surface": "#122019", "accent": "#e3c15f", "ink": "#f2efe4" },
+  "palette": {
+    "background": "#0a0f0c",
+    "surface": "#122019",
+    "accent": "#e3c15f",
+    "ink": "#f2efe4"
+  },
   "artStyle": "1960s Vegas neon signage, green felt tables, retro pulp illustration",
-  "sortOrder": 5
+  "sortOrder": 5,
+  "cocktails": [
+    {
+      "name": "High Roller",
+      "recipe": "Bourbon, ginger ale and a lime wedge.",
+      "mocktail": "Ginger ale, lime and a dash of vanilla."
+    }
+  ]
 }

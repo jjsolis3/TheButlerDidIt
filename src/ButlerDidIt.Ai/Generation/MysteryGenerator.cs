@@ -229,7 +229,8 @@ public sealed class MysteryGenerator(AiGateway ai)
           "puzzle": {"prompt": "riddle", "answers": ["accepted answer"], "hint": "...", "solvedText": "what it reveals"}.
         - 4-6 motives and 4-5 methods; the solution's motiveId and methodId must be among them.
         - Every character has a non-empty publicBio and alibi. The murderer has "required": true.
-        - Cue "type" is one of: narration, image, line (with "speaker" = character id), music, sfx, video. Leave out "src" (media is added later).
+        - Cue "type" is one of: narration, image, line (with "speaker" = character id), music, sfx, video, toast. Leave out "src" (media is added later).
+        - Add one playful "toast" cue per act for parties that switch on drinking games, e.g. {"type": "toast", "text": "Raise a glass to...", "alternative": "the non-alcoholic version"}.{{(r.ContentRating == ContentRating.Family ? " For this family-friendly mystery, keep toasts about lemonade and cake, never alcohol." : "")}}
         Reply with the JSON object only, no commentary.
         """;
 }

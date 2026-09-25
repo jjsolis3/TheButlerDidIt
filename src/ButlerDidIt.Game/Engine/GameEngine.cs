@@ -67,6 +67,9 @@ public static partial class GameEngine
             case CompleteHint c: RequireHint(s, c.Id).Text = Clip(c.Text, 1000); break;
             case CancelHint c: s.Hints.RemoveAll(h => h.Id == c.Id && h.Text is null); break;
             case SetVerdicts c: SetVerdicts(s, c); break;
+            case SetPartyOptions c: RequirePhase(s, Phase.Lobby); s.Options = c.Options; break;
+            case SetPlayerPhoto c: RequirePlayer(s, c.SeatId).PhotoUrl = c.PhotoUrl; break;
+            case SetInterrogationAudio c: RequireInterrogation(s, c.Id).AudioUrl = c.AudioUrl; break;
             default: throw new ArgumentOutOfRangeException(nameof(command), command.GetType().Name, "Unknown command.");
         }
 

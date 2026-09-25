@@ -54,6 +54,9 @@ public sealed class AiModelPriceEntity
 
     public decimal InputPerMillion { get; set; }
     public decimal OutputPerMillion { get; set; }
+
+    /// <summary>A flat price per call, e.g. per generated image.</summary>
+    public decimal PerRequest { get; set; }
 }
 
 /// <summary>One row per AI call: the basis for cost reports and monthly budgets.</summary>

@@ -29,7 +29,8 @@ public sealed record StageView(
     RevealView? Reveal,
     AwardsView? Awards,
     AiFeatures Ai,
-    IReadOnlyList<InterrogationView> Interrogations);
+    IReadOnlyList<InterrogationView> Interrogations,
+    PartyOptions Options);
 
 /// <summary>A question to an NPC and its answer. Public: the whole room hears the interrogation.</summary>
 public sealed record InterrogationView(
@@ -40,7 +41,8 @@ public sealed record InterrogationView(
     string CharacterName,
     string Question,
     string? Answer,
-    VoiceProfile? Voice);
+    VoiceProfile? Voice,
+    string? AudioUrl);
 
 public sealed record HintView(Guid Id, int Act, string? Text);
 
@@ -65,7 +67,7 @@ public sealed record ScenarioSummary(
 /// </summary>
 public sealed record TimerView(DateTimeOffset ServerNow, DateTimeOffset? EndsAt, bool Paused, int? PausedRemainingSeconds);
 
-public sealed record CueView(CueType Type, string? Text, string? Src, string? Speaker, string? SpeakerName, string? Effect, VoiceProfile? Voice);
+public sealed record CueView(CueType Type, string? Text, string? Src, string? Speaker, string? SpeakerName, string? Effect, VoiceProfile? Voice, string? Alternative);
 
 public sealed record CastMember(
     string CharacterId,
@@ -80,7 +82,7 @@ public sealed record CastMember(
     bool IsNpc,
     VoiceProfile Voice);
 
-public sealed record PlayerSummary(Guid SeatId, string Name, string? CharacterId, bool IsHost, bool IsLocal, bool Ready, bool HasAccused);
+public sealed record PlayerSummary(Guid SeatId, string Name, string? CharacterId, bool IsHost, bool IsLocal, bool Ready, bool HasAccused, string? PhotoUrl);
 
 public sealed record ClueView(
     string Id,

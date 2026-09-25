@@ -11,5 +11,17 @@
     "ink": "#f3ead8"
   },
   "artStyle": "1920s oil-painted portraiture, candlelit chiaroscuro, deep greens and burgundies, gilt frames, slightly noir",
-  "sortOrder": 1
+  "sortOrder": 1,
+  "cocktails": [
+    {
+      "name": "The Butler's Revenge",
+      "recipe": "Gin, dry vermouth and a dash of orange bitters, stirred and served with a twist.",
+      "mocktail": "Tonic, a splash of elderflower cordial and a twist of orange."
+    },
+    {
+      "name": "Port in a Storm",
+      "recipe": "Ruby port topped with soda water over ice.",
+      "mocktail": "Red grape juice topped with soda water and a slice of lemon."
+    }
+  ]
 }

@@ -16,6 +16,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<AiModelPriceEntity> AiModelPrices => Set<AiModelPriceEntity>();
     public DbSet<AiUsageEntity> AiUsage => Set<AiUsageEntity>();
     public DbSet<GenerationJobEntity> GenerationJobs => Set<GenerationJobEntity>();
+    public DbSet<ScenarioMediaEntity> ScenarioMedia => Set<ScenarioMediaEntity>();
+    public DbSet<MediaJobEntity> MediaJobs => Set<MediaJobEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -61,6 +63,17 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         {
             e.Property(x => x.InputPerMillion).HasPrecision(12, 4);
             e.Property(x => x.OutputPerMillion).HasPrecision(12, 4);
+            e.Property(x => x.PerRequest).HasPrecision(12, 4);
+        });
+        b.Entity<ScenarioMediaEntity>(e =>
+        {
+            e.HasKey(x => new { x.ScenarioId, x.Key });
+        });
+        b.Entity<MediaJobEntity>(e =>
+        {
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+            e.HasIndex(x => new { x.Status, x.CreatedAt });
+            e.HasIndex(x => x.ScenarioId);
         });
         b.Entity<AiUsageEntity>(e =>
         {

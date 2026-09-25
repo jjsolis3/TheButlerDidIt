@@ -31,7 +31,7 @@ public static class ViewProjector
             Prompts: act is not null && s.ActStep == ActStep.Mingle ? act.Prompts : [],
             Cast: cast,
             Players: s.Players.Select(p => new PlayerSummary(
-                p.SeatId, p.Name, p.CharacterId, p.IsHost, p.IsLocal, p.Ready, s.Accusations.ContainsKey(p.SeatId))).ToList(),
+                p.SeatId, p.Name, p.CharacterId, p.IsHost, p.IsLocal, p.Ready, s.Accusations.ContainsKey(p.SeatId), p.PhotoUrl)).ToList(),
             Clues: s.DroppedClues
                 .Where(d => d.RecipientSeatId is null || d.SharedPublicly)
                 .Select(d => ClueFor(s, scenario, d))
@@ -51,8 +51,9 @@ public static class ViewProjector
             Interrogations: s.Interrogations.TakeLast(30).Select(i =>
             {
                 var npc = scenario.FindCharacter(i.CharacterId);
-                return new InterrogationView(i.Id, i.Act, i.AskerName, i.CharacterId, npc?.Name ?? i.CharacterId, i.Question, i.Answer, npc?.Voice);
-            }).ToList());
+                return new InterrogationView(i.Id, i.Act, i.AskerName, i.CharacterId, npc?.Name ?? i.CharacterId, i.Question, i.Answer, npc?.Voice, i.AudioUrl);
+            }).ToList(),
+            Options: s.Options);
     }
 
     public static PlayerView Player(GameState s, Scenario scenario, Guid seatId, DateTimeOffset now)
@@ -130,12 +131,14 @@ public static class ViewProjector
 
         // Line cues are only voiced on stage when the speaker is an NPC. When a
         // guest plays that character, the line is on their phone to perform.
+        // Toasts only appear when the host switched on drinking prompts.
         return cues
             .Where(c => c.Type != CueType.Line || (c.Speaker is not null && s.NpcCharacterIds.Contains(c.Speaker)))
+            .Where(c => c.Type != CueType.Toast || s.Options.DrinkingPrompts)
             .Select(c =>
             {
                 var speaker = c.Speaker is null ? null : scenario.FindCharacter(c.Speaker);
-                return new CueView(c.Type, c.Text, c.Src, c.Speaker, speaker?.Name, c.Effect, speaker?.Voice);
+                return new CueView(c.Type, c.Text, c.Src, c.Speaker, speaker?.Name, c.Effect, speaker?.Voice, c.Alternative);
             })
             .ToList();
     }
@@ -149,9 +152,13 @@ public static class ViewProjector
         {
             var npc = scenario.FindCharacter(npcId);
             if (npc is null || !npc.Private.Lines.TryGetValue(act.Id, out var lines)) continue;
-            foreach (var line in lines)
+            for (var i = 0; i < lines.Count; i++)
             {
-                yield return new Cue { Type = CueType.Line, Speaker = npcId, Text = line };
+                yield return new Cue
+                {
+                    Type = CueType.Line, Speaker = npcId, Text = lines[i],
+                    Src = npc.Private.LineAudio.GetValueOrDefault($"{act.Id}/{i}"),
+                };
             }
         }
     }

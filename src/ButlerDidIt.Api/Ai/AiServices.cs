@@ -92,7 +92,7 @@ public sealed class DbAiUsageSink(IServiceScopeFactory scopes) : IAiUsageSink
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var price = await db.AiModelPrices.AsNoTracking().FirstOrDefaultAsync(p => p.Model == r.Model, ct);
         var free = r.ProviderKind is AiProviderKind.Ollama or AiProviderKind.Fake;
-        var cost = price is null ? 0m : new AiModelPrice(price.InputPerMillion, price.OutputPerMillion).Cost(r.InputTokens, r.OutputTokens);
+        var cost = price is null || !r.Success ? 0m : new AiModelPrice(price.InputPerMillion, price.OutputPerMillion, price.PerRequest).Cost(r.InputTokens, r.OutputTokens);
 
         db.AiUsage.Add(new AiUsageEntity
         {

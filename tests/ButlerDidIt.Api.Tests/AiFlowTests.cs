@@ -43,10 +43,13 @@ public class AiFlowTests(FakeAiFactory app) : IClassFixture<FakeAiFactory>
             new GenerateRequest("speakeasy", 4, ContentRating.Family, MysteryLength.Short, "a stolen trumpet"), GameJson.Options));
         Assert.Equal(GenerationStatus.Queued, job.Status);
 
-        // Run the background worker once, synchronously.
-        await app.Services.GetRequiredService<GenerationWorker>().RunNextAsync(CancellationToken.None);
-
-        var done = await Read<GenerationJobView>(await host.GetAsync($"/api/generation/{job.Id}"));
+        // The background worker picks the job up within a couple of seconds.
+        var done = job;
+        for (var i = 0; i < 100 && done.Status is not (GenerationStatus.Succeeded or GenerationStatus.Failed); i++)
+        {
+            await Task.Delay(200);
+            done = await Read<GenerationJobView>(await host.GetAsync($"/api/generation/{job.Id}"));
+        }
         Assert.Equal(GenerationStatus.Succeeded, done.Status);
         Assert.StartsWith("ai-speakeasy-", done.ScenarioId);
 

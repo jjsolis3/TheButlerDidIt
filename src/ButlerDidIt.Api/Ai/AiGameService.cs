@@ -16,24 +16,46 @@ namespace ButlerDidIt.Api.Ai;
 ///   2. Call the AI outside the party lock, so the game never freezes while it thinks.
 ///   3. Complete* stores the answer, or Cancel* returns the slot if the AI failed.
 /// </summary>
-public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQueue verdicts, ILogger<AiGameService> log)
+public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQueue verdicts, ButlerDidIt.Api.Media.MediaService media, ILogger<AiGameService> log)
 {
     public async Task AskNpcAsync(Guid partyId, Guid seatId, string characterId, string question, CancellationToken ct = default)
     {
         var id = Guid.NewGuid();
         var snapshot = await parties.ExecuteAsync(partyId, (_, now) => new BeginNpcQuestion(now, id, seatId, characterId, question), ct: ct);
+        var completed = false;
         try
         {
             var asker = snapshot.State.FindPlayer(seatId)?.Name ?? "A guest";
             var (system, conversation) = NpcPrompt.Build(snapshot.Scenario, snapshot.State, characterId, asker, question.Trim(), snapshot.Party.ContentLevel);
             var answer = await ai.CompleteAsync(AiRole.Actor, system, conversation,
                 new AiCallContext(snapshot.Party.HostUserId, partyId, Purpose: "npc-answer"), maxOutputTokens: 400, ct: ct);
-            await parties.ExecuteAsync(partyId, (_, now) => new CompleteNpcQuestion(now, id, answer), ct: ct);
+            var answered = await parties.ExecuteAsync(partyId, (_, now) => new CompleteNpcQuestion(now, id, answer), ct: ct);
+            completed = true;
+            if (answered.State.Ai.Voices) await VoiceAnswerAsync(answered, id, characterId, answer, ct);
         }
-        catch
+        catch when (!completed)
         {
             await parties.ExecuteAsync(partyId, (_, now) => new CancelNpcQuestion(now, id), ct: CancellationToken.None);
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Speaks the answer in the NPC's voice. The text is already on every screen, so
+    /// if this fails, the stage simply falls back to the browser's voice.
+    /// </summary>
+    private async Task VoiceAnswerAsync(PartySnapshot snapshot, Guid interrogationId, string characterId, string answer, CancellationToken ct)
+    {
+        try
+        {
+            var npc = snapshot.Scenario.FindCharacter(characterId)!;
+            var assetId = await media.SpeechAsync(answer, ButlerDidIt.Ai.Media.VoiceCasting.For(npc.Id, npc.Voice),
+                new AiCallContext(snapshot.Party.HostUserId, snapshot.Party.Id, Purpose: "npc-voice"), ct);
+            await parties.ExecuteAsync(snapshot.Party.Id, (_, now) => new SetInterrogationAudio(now, interrogationId, ButlerDidIt.Api.Media.MediaStore.Url(assetId)), ct: ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            log.LogWarning(ex, "Could not voice the NPC answer {Id}", interrogationId);
         }
     }
 

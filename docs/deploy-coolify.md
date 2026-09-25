@@ -40,6 +40,8 @@ The compose file already sets `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`. This t
 ### Optional: AI game master
 To switch on AI (generated mysteries, NPCs you can question, hints and verdicts), add `AI_PROVIDER_NAME`, `AI_PROVIDER_KIND`, `AI_PROVIDER_API_KEY` and the three `AI_*_MODEL` variables, as in `.env.example`. You can also skip these and set everything up later on the **Admin → AI** page. See [ai-setup.md](ai-setup.md).
 
+For **voices and pictures**, also add `AI_MEDIA_PROVIDER_NAME` (e.g. `OpenAI`), `AI_MEDIA_API_KEY`, `AI_VOICE_MODEL` (`tts-1`) and `AI_IMAGE_MODEL` (`dall-e-3`). These use OpenAI even if your main provider is Claude, Gemini or Ollama.
+
 To use **local models with Ollama**, deploy Ollama as another Coolify resource (or add it to the compose file). Then set the provider type to `Ollama` and the base URL to its internal address, e.g. `http://ollama:11434`.
 
 ## 4. Deploy
@@ -67,7 +69,7 @@ The compose file declares three named volumes, which Coolify keeps across redepl
 |---|---|
 | `pgdata` | the PostgreSQL database |
 | `keys` | ASP.NET Data Protection keys. Without these, every redeploy would sign every host out. |
-| `media` | generated images and voices (from milestone 3) |
+| `media` | generated pictures and voice clips, and guests' costume selfies. Back it up along with the database: the database only stores where each file is. |
 
 To back up the database, add a **Scheduled Task** in Coolify on the `db` service, for example nightly:
 

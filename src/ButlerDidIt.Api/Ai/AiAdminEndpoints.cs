@@ -14,10 +14,10 @@ public sealed record ProviderView(Guid Id, string Name, AiProviderKind Kind, str
 public sealed record ProviderRequest(string Name, AiProviderKind Kind, string? BaseUrl, string? ApiKey);
 public sealed record RoleView(AiRole Role, Guid? ProviderId, string? ProviderName, string? Model, int? MaxOutputTokens, float? Temperature);
 public sealed record RoleRequest(Guid ProviderId, string Model, int? MaxOutputTokens, float? Temperature);
-public sealed record PriceView(string Model, decimal InputPerMillion, decimal OutputPerMillion);
+public sealed record PriceView(string Model, decimal InputPerMillion, decimal OutputPerMillion, decimal PerRequest = 0m);
 public sealed record TestRequest(string Model);
 public sealed record TestResult(bool Ok, string Message, long Milliseconds);
-public sealed record AiStatus(bool Storyteller, bool Actor, bool Inspector, decimal BudgetUsd, decimal SpentThisMonthUsd, bool IsAdmin);
+public sealed record AiStatus(bool Storyteller, bool Actor, bool Inspector, bool Voice, bool Illustrator, decimal BudgetUsd, decimal SpentThisMonthUsd, bool IsAdmin);
 
 public static class AiAdminEndpoints
 {
@@ -32,6 +32,7 @@ public static class AiAdminEndpoints
             var roles = await db.AiRoles.AsNoTracking().Select(r => r.Role).ToListAsync(ct);
             return Results.Ok(new AiStatus(
                 roles.Contains(AiRole.Storyteller), roles.Contains(AiRole.Actor), roles.Contains(AiRole.Inspector),
+                roles.Contains(AiRole.Voice), roles.Contains(AiRole.Illustrator),
                 options.Value.MonthlyBudgetUsd, await DbAiBudget.SpentThisMonthAsync(db, user.Id, clock, ct), user.IsAdmin));
         }).RequireAuthorization(AuthPolicies.Host);
 
@@ -114,7 +115,11 @@ public static class AiAdminEndpoints
         admin.MapPut("/roles/{role}", async (AiRole role, RoleRequest req, AppDbContext db, CancellationToken ct) =>
         {
             if (string.IsNullOrWhiteSpace(req.Model)) return Results.Problem("Enter a model name, e.g. claude-opus-5 or gpt-5.", statusCode: 400);
-            if (!await db.AiProviders.AnyAsync(p => p.Id == req.ProviderId, ct)) return Results.Problem("Unknown provider.", statusCode: 400);
+            var provider = await db.AiProviders.AsNoTracking().FirstOrDefaultAsync(p => p.Id == req.ProviderId, ct);
+            if (provider is null) return Results.Problem("Unknown provider.", statusCode: 400);
+            // Voices and pictures use media APIs that only OpenAI (or compatible servers) offer so far.
+            if (role is AiRole.Voice or AiRole.Illustrator && provider.Kind is not (AiProviderKind.OpenAI or AiProviderKind.Fake))
+                return Results.Problem($"The {role} role needs an OpenAI provider (other voice and image providers can be added later).", statusCode: 400);
             var row = await db.AiRoles.FindAsync([role], ct);
             if (row is null)
             {
@@ -137,11 +142,11 @@ public static class AiAdminEndpoints
 
         admin.MapGet("/prices", async (AppDbContext db, CancellationToken ct) =>
             await db.AiModelPrices.AsNoTracking().OrderBy(p => p.Model)
-                .Select(p => new PriceView(p.Model, p.InputPerMillion, p.OutputPerMillion)).ToListAsync(ct));
+                .Select(p => new PriceView(p.Model, p.InputPerMillion, p.OutputPerMillion, p.PerRequest)).ToListAsync(ct));
 
         admin.MapPut("/prices", async (PriceView req, AppDbContext db, CancellationToken ct) =>
         {
-            if (string.IsNullOrWhiteSpace(req.Model) || req.InputPerMillion < 0 || req.OutputPerMillion < 0)
+            if (string.IsNullOrWhiteSpace(req.Model) || req.InputPerMillion < 0 || req.OutputPerMillion < 0 || req.PerRequest < 0)
                 return Results.Problem("Enter a model name and non-negative prices.", statusCode: 400);
             var row = await db.AiModelPrices.FindAsync([req.Model.Trim()], ct);
             if (row is null)
@@ -151,6 +156,7 @@ public static class AiAdminEndpoints
             }
             row.InputPerMillion = req.InputPerMillion;
             row.OutputPerMillion = req.OutputPerMillion;
+            row.PerRequest = req.PerRequest;
             await db.SaveChangesAsync(ct);
             return Results.NoContent();
         });

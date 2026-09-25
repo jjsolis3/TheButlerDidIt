@@ -80,6 +80,9 @@ public sealed class GameState
     /// <summary>Which AI features this party uses. Set by the server when the party is created.</summary>
     public AiFeatures Ai { get; set; } = new();
 
+    /// <summary>Host choices for this party that change what is shown.</summary>
+    public PartyOptions Options { get; set; } = new();
+
     /// <summary>Questions guests put to NPCs, and the NPCs' answers. Public: everyone hears them.</summary>
     public List<Interrogation> Interrogations { get; set; } = [];
 
@@ -124,6 +127,9 @@ public sealed class PlayerState
     public bool IsLocal { get; set; }
 
     public bool Ready { get; set; }
+
+    /// <summary>A costume selfie the guest uploaded, used as their avatar.</summary>
+    public string? PhotoUrl { get; set; }
 }
 
 public sealed class DroppedClue
@@ -178,6 +184,15 @@ public sealed class AiFeatures
     public bool Hints { get; set; }
     public int HintsPerAct { get; set; } = 1;
     public bool Verdicts { get; set; }
+
+    /// <summary>NPC answers are also turned into speech with the Voice role (otherwise the browser voice reads them).</summary>
+    public bool Voices { get; set; }
+}
+
+public sealed class PartyOptions
+{
+    /// <summary>Show toast cues and themed cocktails. Off by default, never on for Family parties.</summary>
+    public bool DrinkingPrompts { get; set; }
 }
 
 public sealed class Interrogation
@@ -192,6 +207,9 @@ public sealed class Interrogation
 
     /// <summary>Null while the NPC is still "thinking".</summary>
     public string? Answer { get; set; }
+
+    /// <summary>The answer spoken in the NPC's voice, when a Voice provider is set up.</summary>
+    public string? AudioUrl { get; set; }
 }
 
 public sealed class HintEntry

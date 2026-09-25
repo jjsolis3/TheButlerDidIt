@@ -8,8 +8,8 @@ import { api } from '../lib/api'
 import { useParty } from '../lib/hub'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
-import { useThemePalette } from '../lib/theme'
-import type { InterrogationView, PartyInfo, StageView } from '../lib/types'
+import { useThemePalette, useThemes } from '../lib/theme'
+import type { InterrogationView, MediaJob, PartyInfo, StageView } from '../lib/types'
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
@@ -52,7 +52,7 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
   const [begun, setBegun] = useState(false)
   const [muted, setMuted] = useState(false)
   useThemePalette(info.themeSlug)
-  useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted)
+  useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted, stage?.ai.voices ?? false)
 
   // Keep the TV or laptop from going to sleep mid-mystery.
   useEffect(() => {
@@ -232,6 +232,9 @@ function LobbyView({ stage, info, invoke }: { stage: StageView; info: PartyInfo;
           </div>
         )}
         <ErrorText>{error}</ErrorText>
+        {info.isHost && <MediaPanel code={info.code} />}
+        {info.isHost && <KitPanel code={info.code} />}
+        {stage.options.drinkingPrompts && <Cocktails themeSlug={stage.scenario.themeSlug} />}
       </section>
 
       <section>
@@ -249,7 +252,8 @@ function LobbyView({ stage, info, invoke }: { stage: StageView; info: PartyInfo;
                   <p className="text-xs text-muted">{c.title}</p>
                   <p className="mt-1 text-xs">
                     {player ? (
-                      <span className="text-accent">
+                      <span className="inline-flex items-center gap-1.5 text-accent">
+                        <GuestPhoto url={player.photoUrl} name={player.name} />
                         {player.name}
                         {player.ready ? ' ✓' : ''}
                       </span>
@@ -321,7 +325,10 @@ function CastView({ stage }: { stage: StageView }) {
             <Portrait id={c.characterId} name={c.name} src={c.portrait} size={110} />
             <p className="font-display mt-3 text-lg leading-tight">{c.name}</p>
             <p className="text-xs text-accent">{c.title}</p>
-            <p className="mt-1 text-xs text-muted">{c.isNpc ? 'Played by the narrator' : `Played by ${c.playedBy}`}</p>
+            <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted">
+              {!c.isNpc && <GuestPhoto url={stage.players.find((p) => p.characterId === c.characterId)?.photoUrl ?? null} name={c.playedBy ?? ''} size={28} />}
+              {c.isNpc ? 'Played by the narrator' : `Played by ${c.playedBy}`}
+            </p>
           </div>
         ))}
       </div>
@@ -371,6 +378,7 @@ function MingleView({ stage }: { stage: StageView }) {
         </section>
         <section className="space-y-8">
           {stage.ai.npcQuestions && stage.cast.some((c) => c.isNpc) && <InterrogationRoom stage={stage} />}
+          {stage.options.drinkingPrompts && <Cocktails themeSlug={stage.scenario.themeSlug} />}
           <div>
           <h2 className="font-display mb-3 text-2xl">Secrets exposed</h2>
           {stage.revealedSecrets.length === 0 ? (
@@ -419,9 +427,19 @@ function InterrogationRoom({ stage }: { stage: StageView }) {
   )
 }
 
-/** Reads each newly answered NPC question aloud in that character's voice. */
-function useSpeakNewAnswers(interrogations: InterrogationView[], enabled: boolean) {
+/**
+ * Reads each newly answered NPC question aloud. When a Voice provider is set up,
+ * the recorded clip usually arrives a moment after the text, so wait briefly for
+ * it before falling back to the browser's own voice.
+ */
+function useSpeakNewAnswers(interrogations: InterrogationView[], enabled: boolean, voices: boolean) {
   const spoken = useRef<Set<string> | null>(null)
+  const waiting = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+  const latest = useRef(interrogations)
+  useEffect(() => {
+    latest.current = interrogations
+  }, [interrogations])
+
   useEffect(() => {
     const answered = interrogations.filter((i) => i.answer)
     // The first time we see the list, treat existing answers as already heard.
@@ -429,12 +447,29 @@ function useSpeakNewAnswers(interrogations: InterrogationView[], enabled: boolea
       spoken.current = new Set(answered.map((i) => i.id))
       return
     }
-    for (const i of answered) {
-      if (spoken.current.has(i.id)) continue
-      spoken.current.add(i.id)
-      if (enabled) void narrator.speak(`${i.characterName}: ${i.answer}`, i.voice)
+    const heard = spoken.current
+    const say = (i: InterrogationView) => {
+      heard.add(i.id)
+      clearTimeout(waiting.current.get(i.id))
+      waiting.current.delete(i.id)
+      if (!enabled) return
+      if (i.audioUrl) void new Audio(i.audioUrl).play().catch(() => narrator.speak(`${i.characterName}: ${i.answer}`, i.voice))
+      else void narrator.speak(`${i.characterName}: ${i.answer}`, i.voice)
     }
-  }, [interrogations, enabled])
+    for (const i of answered) {
+      if (heard.has(i.id)) continue
+      if (i.audioUrl || !voices) say(i)
+      else if (!waiting.current.has(i.id)) {
+        waiting.current.set(
+          i.id,
+          setTimeout(() => {
+            const current = latest.current.find((x) => x.id === i.id) ?? i
+            if (!heard.has(i.id)) say(current)
+          }, 8000),
+        )
+      }
+    }
+  }, [interrogations, enabled, voices])
 }
 
 function AccusationView({ stage }: { stage: StageView }) {
@@ -710,4 +745,120 @@ function nextAction(stage: StageView): { label: string; method: string; disabled
     default:
       return null
   }
+}
+
+// ------------------------------------------------------------------ media helpers
+
+function GuestPhoto({ url, name, size = 22 }: { url: string | null; name: string; size?: number }) {
+  if (!url) return null
+  return <img src={url} alt={`${name}'s costume`} width={size} height={size} className="rounded-full border border-accent/60 object-cover" style={{ width: size, height: size }} />
+}
+
+/** Host-only: progress of the AI voices and pictures for this mystery. */
+function MediaPanel({ code }: { code: string }) {
+  const [state, setState] = useState<{ ready: number; job: MediaJob | null } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    let timer: ReturnType<typeof setTimeout>
+    const poll = async () => {
+      try {
+        const next = await api.partyMedia(code)
+        if (!active) return
+        setState(next)
+        if (next.job && (next.job.status === 'queued' || next.job.status === 'running')) timer = setTimeout(poll, 3000)
+      } catch {
+        /* no media features: hide the panel */
+      }
+    }
+    void poll()
+    return () => {
+      active = false
+      clearTimeout(timer)
+    }
+  }, [code])
+
+  if (!state || (!state.job && state.ready === 0)) return null
+  const job = state.job
+  const running = job && (job.status === 'queued' || job.status === 'running')
+  return (
+    <div className="rounded-xl border border-line bg-surface p-4 text-sm">
+      <p className="font-semibold">🎙️🎨 Voices & artwork</p>
+      {running ? (
+        <p className="candle mt-1 text-accent">
+          Preparing… {job.done} of {job.total || '?'} done
+        </p>
+      ) : (
+        <p className="mt-1 text-muted">
+          {state.ready} voice clips and pictures ready{job?.failed ? `, ${job.failed} couldn't be made` : ''}.
+        </p>
+      )}
+      {job?.error && !running && <p className="mt-1 text-xs text-red-300">{job.error}</p>}
+      {!running && (
+        <button
+          className="mt-2 text-xs text-accent underline"
+          onClick={async () => {
+            setError(null)
+            try {
+              const started = await api.prepareMedia(code)
+              setState((s) => ({ ready: s?.ready ?? 0, job: started }))
+              setTimeout(async () => setState(await api.partyMedia(code)), 3000)
+            } catch (e) {
+              setError((e as Error).message)
+            }
+          }}
+        >
+          Fill in anything missing
+        </button>
+      )}
+      <ErrorText>{error}</ErrorText>
+    </div>
+  )
+}
+
+/** Host-only: printable PDFs for an in-person party. */
+function KitPanel({ code }: { code: string }) {
+  const links: { kind: 'invitations' | 'booklets' | 'nametags' | 'clues'; label: string; note?: string }[] = [
+    { kind: 'invitations', label: 'Invitations' },
+    { kind: 'nametags', label: 'Name tags' },
+    { kind: 'booklets', label: 'Character booklets', note: 'every secret' },
+    { kind: 'clues', label: 'Clue cards + sealed solution', note: 'spoilers' },
+  ]
+  return (
+    <details className="rounded-xl border border-line bg-surface p-4 text-sm">
+      <summary className="cursor-pointer font-semibold">🖨️ Printable party kit</summary>
+      <p className="mt-2 text-xs text-muted">For in-person parties. Booklets and clue cards contain spoilers, so if you're playing too, print them without reading.</p>
+      <ul className="mt-2 space-y-1">
+        {links.map((l) => (
+          <li key={l.kind}>
+            <a href={api.kitUrl(code, l.kind)} className="text-accent underline" download>
+              {l.label} (PDF)
+            </a>
+            {l.note && <span className="ml-2 text-xs text-red-300">{l.note}</span>}
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
+/** The theme's cocktails, when the host switched on drinking prompts. */
+function Cocktails({ themeSlug }: { themeSlug: string }) {
+  const { themes } = useThemes()
+  const cocktails = themes?.find((t) => t.theme.slug === themeSlug)?.theme.cocktails ?? []
+  if (cocktails.length === 0) return null
+  return (
+    <div className="rounded-xl border border-accent/40 bg-accent/5 p-4 text-sm">
+      <p className="font-display text-xl text-accent">🍸 Tonight's cocktails</p>
+      <ul className="mt-2 space-y-2">
+        {cocktails.map((c) => (
+          <li key={c.name}>
+            <span className="font-semibold">{c.name}</span>: <span className="text-muted">{c.recipe}</span>
+            {c.mocktail && <span className="block text-xs text-muted">Alcohol-free: {c.mocktail}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }

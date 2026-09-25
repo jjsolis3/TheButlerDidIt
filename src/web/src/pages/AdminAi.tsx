@@ -16,6 +16,8 @@ const ROLES: { id: AiRole; title: string; body: string; tokens: number }[] = [
   { id: 'storyteller', title: 'Storyteller', body: 'Writes whole new mysteries. Use your strongest model; it runs once per mystery.', tokens: 32000 },
   { id: 'actor', title: 'Actor', body: 'Plays NPC characters when guests question them. Runs often, so a fast model helps.', tokens: 400 },
   { id: 'inspector', title: 'Inspector', body: 'Gives hints, checks generated mysteries are solvable, and delivers the closing verdicts.', tokens: 2000 },
+  { id: 'voice', title: 'Voice', body: 'Speaks narration, NPC lines and answers aloud. Needs an OpenAI provider (a text-to-speech model).', tokens: 0 },
+  { id: 'illustrator', title: 'Illustrator', body: "Paints character portraits and scene art in each theme's style. Needs an OpenAI provider (an image model).", tokens: 0 },
 ]
 
 const MODEL_SUGGESTIONS: Record<string, string[]> = {
@@ -315,13 +317,14 @@ function RoleCard({
 }
 
 function Prices({ prices, unpriced, onChange, onError }: { prices: PriceView[]; unpriced: string[] } & SectionProps) {
-  const [draft, setDraft] = useState<PriceView>({ model: '', inputPerMillion: 0, outputPerMillion: 0 })
+  const [draft, setDraft] = useState<PriceView>({ model: '', inputPerMillion: 0, outputPerMillion: 0, perRequest: 0 })
   return (
     <section>
       <h2 className="font-display mb-1 text-2xl">3. Prices</h2>
       <p className="mb-3 text-sm text-muted">
-        US dollars per million tokens, from your provider's price page. Used to estimate cost and enforce each host's monthly budget.
-        Claude prices are filled in; add your other models.
+        US dollars from your provider's price page, used to estimate cost and enforce each host's monthly budget. Chat models: per million
+        tokens. Voice models: put the price per million <em>characters</em> in the Input column. Image models: put the price per image in
+        “Per call”. Claude prices are filled in; add your other models.
       </p>
       {unpriced.length > 0 && (
         <p className="mb-3 rounded-lg border border-accent/50 bg-accent/10 p-3 text-sm">
@@ -335,6 +338,7 @@ function Prices({ prices, unpriced, onChange, onError }: { prices: PriceView[]; 
               <th className="pb-2">Model</th>
               <th className="pb-2">Input $/M</th>
               <th className="pb-2">Output $/M</th>
+              <th className="pb-2">Per call $</th>
               <th />
             </tr>
           </thead>
@@ -344,6 +348,7 @@ function Prices({ prices, unpriced, onChange, onError }: { prices: PriceView[]; 
                 <td className="py-2 font-mono">{p.model}</td>
                 <td>{p.inputPerMillion}</td>
                 <td>{p.outputPerMillion}</td>
+                <td>{p.perRequest || ''}</td>
                 <td className="text-right">
                   <button className="text-xs text-red-300 underline" onClick={() => api.admin.deletePrice(p.model).then(onChange, (e: Error) => onError(e.message))}>
                     Remove
@@ -361,13 +366,16 @@ function Prices({ prices, unpriced, onChange, onError }: { prices: PriceView[]; 
               <td className="pr-2">
                 <input type="number" min={0} step="0.01" className="w-24 rounded border border-line bg-bg px-2 py-1" value={draft.outputPerMillion} onChange={(e) => setDraft({ ...draft, outputPerMillion: Number(e.target.value) })} />
               </td>
+              <td className="pr-2">
+                <input type="number" min={0} step="0.001" className="w-24 rounded border border-line bg-bg px-2 py-1" value={draft.perRequest} onChange={(e) => setDraft({ ...draft, perRequest: Number(e.target.value) })} />
+              </td>
               <td className="text-right">
                 <button
                   className="text-xs text-accent underline"
                   onClick={async () => {
                     try {
                       await api.admin.setPrice(draft)
-                      setDraft({ model: '', inputPerMillion: 0, outputPerMillion: 0 })
+                      setDraft({ model: '', inputPerMillion: 0, outputPerMillion: 0, perRequest: 0 })
                       await onChange()
                     } catch (e) {
                       onError((e as Error).message)

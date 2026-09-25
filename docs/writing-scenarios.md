@@ -77,9 +77,22 @@ A mystery is one JSON file in `content/themes/<theme-slug>/scenarios/`. Use `dea
 | `music` | `src` | Loops quietly under the scene |
 | `sfx` | `src` | One-shot sound |
 | `video` | `src` | Plays full-screen; the scene continues when it ends |
+| `toast` | `text`, `alternative` | A drinking-game moment, shown only when the host turned on toast prompts (never in Family parties). Always give a non-alcoholic `alternative`. One per act is plenty. |
+
+**You don't have to supply media.** If an AI Voice or Illustrator is set up, empty `portrait`, image `src` and narration/line audio are generated automatically when a party is created. Anything you do supply is always used instead.
 
 Media paths are served from the theme's `media/` folder:
 `"src": "/media/themes/the-butler-did-it/scenes/study.jpg"` → `content/themes/the-butler-did-it/media/scenes/study.jpg`.
+
+## Cocktails (theme.json)
+
+Each theme can suggest drinks, shown in the lobby when toast prompts are on:
+
+```json
+"cocktails": [
+  { "name": "The Butler's Revenge", "recipe": "Gin, lemon, honey, a dash of bitters", "mocktail": "Lemon, honey and tonic" }
+]
+```
 
 ## Fairness rules the validator enforces
 

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor, bool UseAi = true);
+public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor, bool UseAi = true, bool DrinkingPrompts = false);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -55,7 +55,7 @@ public static class PartyEndpoints
         }).RequireAuthorization(AuthPolicies.Host);
 
         group.MapPost("/", async (CreatePartyRequest req, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties,
-            AiGateway ai, IOptions<AiOptions> aiOptions, CancellationToken ct) =>
+            AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, IOptions<AiOptions> aiOptions, TimeProvider clock, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
             // AI-generated mysteries belong to the host who generated them.
@@ -80,10 +80,20 @@ public static class PartyEndpoints
                 Status = PartyStatus.Lobby,
                 CreatedAt = parties.Now,
                 ScheduledFor = req.ScheduledFor,
-                State = GameJson.Serialize(new GameState { Ai = await AiFeaturesFor(req.UseAi, ai, aiOptions.Value, ct) }),
+                State = GameJson.Serialize(new GameState
+                {
+                    Ai = await AiFeaturesFor(req.UseAi, ai, media, aiOptions.Value, ct),
+                    // Drinking games are never offered at Family parties.
+                    Options = new PartyOptions { DrinkingPrompts = req.DrinkingPrompts && req.ContentLevel != ContentRating.Family },
+                }),
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);
+
+            // Start preparing voices and pictures for the mystery right away, so they're
+            // ready by the time guests arrive. Already-made files are reused.
+            if (req.UseAi && (await media.VoicesConfiguredAsync(ct) || await media.ImagesConfiguredAsync(ct)))
+                await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, scenario.Id, userId, clock, ct);
             return Results.Ok(await ToInfo(party, db, catalog, isHost: true, ct));
         }).RequireAuthorization(AuthPolicies.Host);
 
@@ -118,7 +128,7 @@ public static class PartyEndpoints
     }
 
     /// <summary>Switch on whichever AI features have a model assigned. With no AI configured, the party plays exactly as before.</summary>
-    private static async Task<AiFeatures> AiFeaturesFor(bool useAi, AiGateway ai, AiOptions options, CancellationToken ct)
+    private static async Task<AiFeatures> AiFeaturesFor(bool useAi, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, AiOptions options, CancellationToken ct)
     {
         if (!useAi) return new AiFeatures();
         var actor = await ai.IsConfiguredAsync(AiRole.Actor, ct);
@@ -128,6 +138,7 @@ public static class PartyEndpoints
             NpcQuestions = actor, QuestionsPerAct = Math.Clamp(options.QuestionsPerAct, 1, 20),
             Hints = inspector, HintsPerAct = Math.Clamp(options.HintsPerAct, 1, 10),
             Verdicts = inspector,
+            Voices = actor && await media.VoicesConfiguredAsync(ct),
         };
     }
 

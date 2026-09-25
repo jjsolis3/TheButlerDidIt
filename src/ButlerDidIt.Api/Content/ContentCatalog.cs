@@ -71,7 +71,7 @@ public sealed class ContentCatalog(IServiceScopeFactory scopes, ILogger<ContentC
                 entity.ContentRating = scenario.ContentRating;
                 entity.Document = json;
                 entity.UpdatedAt = now;
-                _scenarioCache[scenario.Id] = scenario;
+                Invalidate(scenario.Id);
             }
         }
 
@@ -80,13 +80,29 @@ public sealed class ContentCatalog(IServiceScopeFactory scopes, ILogger<ContentC
             themes.Count, themes.Sum(t => t.Scenarios.Count), contentRoot);
     }
 
+    /// <summary>
+    /// The scenario as played: the document plus any generated portraits, scene
+    /// art and voice clips (see MediaOverlay). Cached until <see cref="Invalidate"/>.
+    /// </summary>
     public async Task<Scenario> GetScenarioAsync(AppDbContext db, string id, CancellationToken ct = default)
     {
         if (_scenarioCache.TryGetValue(id, out var cached)) return cached;
+        var scenario = await GetBaseScenarioAsync(db, id, ct);
+        var media = await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == id)
+            .ToDictionaryAsync(m => m.Key, m => Media.MediaStore.Url(m.AssetId), ct);
+        var playable = MediaOverlay.Apply(scenario, media);
+        _scenarioCache[id] = playable;
+        return playable;
+    }
+
+    /// <summary>The scenario exactly as written, without generated media (used to plan what media to create).</summary>
+    public async Task<Scenario> GetBaseScenarioAsync(AppDbContext db, string id, CancellationToken ct = default)
+    {
         var entity = await db.Scenarios.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct)
             ?? throw new KeyNotFoundException($"Scenario '{id}' not found.");
-        var scenario = GameJson.Deserialize<Scenario>(entity.Document);
-        _scenarioCache[id] = scenario;
-        return scenario;
+        return GameJson.Deserialize<Scenario>(entity.Document);
     }
+
+    /// <summary>Forget the cached copy, e.g. after new media was generated.</summary>
+    public void Invalidate(string scenarioId) => _scenarioCache.TryRemove(scenarioId, out _);
 }
