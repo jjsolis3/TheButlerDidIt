@@ -2,6 +2,17 @@
 
 A mystery is one JSON file in `content/themes/<theme-slug>/scenarios/`. Use `death-at-blackwood-manor.json` as a model. When the app starts (and in `dotnet test`), every file is checked by `ScenarioValidator`, and errors are listed by name.
 
+## Editing in the browser
+
+You don't have to edit JSON by hand. Signed-in hosts have **My mysteries** on the home page:
+
+- **Edit** a mystery written by AI, or your own copy. There are forms for the story, characters, clues, acts and scenes, and the solution, plus a **JSON** tab for everything else (voices, puzzles, sound). The server re-checks the mystery as you type, with the same rules as below, and only saves it when it's playable.
+- **Duplicate** makes an editable copy. Hand-written mysteries (from `content/`) can only be copied, because they're reloaded from the content folder at every start-up, which would undo an in-place edit.
+- **Play-test** starts a pass-and-play party with the mystery on this device.
+- **Delete** removes a mystery. If parties have already played it, it's hidden instead, so their recaps keep working. It's blocked while a party is using it.
+
+When you change words that have a generated voice or picture, only those are made again; everything else keeps its media.
+
 ## Shape of a scenario
 
 | Field | What it is |

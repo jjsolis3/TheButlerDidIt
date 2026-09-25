@@ -49,6 +49,10 @@ export default function Home() {
             <button className="underline hover:text-ink" onClick={() => api.logout().then(() => setMe(null))}>
               Sign out
             </button>
+            {' · '}
+            <Link to="/mysteries" className="underline hover:text-ink">
+              My mysteries
+            </Link>
             {me.isAdmin && (
               <>
                 {' · '}

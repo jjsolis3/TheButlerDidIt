@@ -7,7 +7,9 @@ import Join from './pages/Join'
 import Login from './pages/Login'
 import NewParty from './pages/NewParty'
 import PassAndPlay from './pages/PassAndPlay'
+import MyMysteries from './pages/MyMysteries'
 import Play from './pages/Play'
+import ScenarioEditor from './pages/ScenarioEditor'
 import Recap from './pages/Recap'
 import Stage from './pages/Stage'
 
@@ -25,6 +27,8 @@ export default function App() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/recap/:slug" element={<Recap />} />
+      <Route path="/mysteries" element={<MyMysteries />} />
+      <Route path="/mysteries/:id" element={<ScenarioEditor />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />
       <Route path="/stage/:code" element={<Stage />} />

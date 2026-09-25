@@ -76,6 +76,7 @@ export default function NewParty() {
               {scenario.estimatedMinutes < 90 ? `${scenario.estimatedMinutes} minutes` : `${Math.round(scenario.estimatedMinutes / 60)} hours`} ·{' '}
               {scenario.contentRating === 'mature' ? 'Mature themes' : 'Family friendly'}
               {scenario.aiGenerated && ' · ✨ written by AI for you'}
+              {scenario.custom && ' · ✏️ your edited copy'}
             </p>
           </button>
         ))}
