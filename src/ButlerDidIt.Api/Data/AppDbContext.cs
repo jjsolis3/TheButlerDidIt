@@ -40,12 +40,14 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
             p.HasIndex(x => x.Code).IsUnique();
             p.HasIndex(x => x.HostUserId);
             p.HasIndex(x => x.NextDueAt);
+            p.HasIndex(x => new { x.Status, x.UpdatedAt }); // the retention job's queries
             p.HasMany(x => x.Seats).WithOne(s => s.Party).HasForeignKey(s => s.PartyId).OnDelete(DeleteBehavior.Cascade);
         });
 
         b.Entity<Seat>().HasIndex(s => s.TokenHash).IsUnique();
         b.Entity<MediaAsset>().HasIndex(m => m.ContentHash).IsUnique();
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
+        b.Entity<MediaAsset>().HasIndex(m => m.PartyId);
         b.Entity<ScenarioEntity>().HasIndex(s => s.OwnerUserId);
 
         b.Entity<AiProviderEntity>(e =>

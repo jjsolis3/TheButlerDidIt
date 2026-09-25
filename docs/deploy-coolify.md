@@ -79,6 +79,17 @@ pg_dump -U butler butlerdidit | gzip > /var/lib/postgresql/data/backup-$(date +%
 
 Copy backups off the server regularly.
 
+### Automatic clean-up
+
+The app tidies up after itself every 6 hours:
+
+| What | When | Setting |
+|---|---|---|
+| Lobbies and games nobody has touched | deleted after 14 days (frees the join code) | `Retention__IdlePartyDays` |
+| Finished parties | seats, private notes and costume selfies removed after 30 days. Old seat links stop working; the party's record is kept. | `Retention__FinishedPartyDays` |
+
+Set either to `0` to keep things forever.
+
 ## Updating
 
 Push to the deployed branch and click **Deploy** (or enable automatic deployments on push). Database migrations run automatically on start.

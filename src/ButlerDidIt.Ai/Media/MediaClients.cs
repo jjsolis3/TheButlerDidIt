@@ -51,7 +51,7 @@ public sealed class MediaClientFactory(bool allowFake) : IMediaClientFactory
 
     public IImageGenerator CreateImages(AiProviderSettings provider, string model) => provider.Kind switch
     {
-        AiProviderKind.OpenAI => new OpenAiImages(OpenAi(provider).GetImageClient(model)),
+        AiProviderKind.OpenAI => new OpenAiImages(OpenAi(provider).GetImageClient(model), model),
         AiProviderKind.Fake when allowFake => new FakeImages(),
         _ => throw new AiUnavailableException($"Images need an OpenAI provider; '{provider.Name}' is {provider.Kind}."),
     };
@@ -77,14 +77,14 @@ internal sealed class OpenAiSpeech(AudioClient client) : ITextToSpeech
     }
 }
 
-internal sealed class OpenAiImages(ImageClient client) : IImageGenerator
+internal sealed class OpenAiImages(ImageClient client, string model) : IImageGenerator
 {
     private static readonly HttpClient Download = new();
 
     public async Task<MediaFile> PaintAsync(string prompt, ImageShape shape, CancellationToken ct)
     {
-        var size = shape == ImageShape.Portrait ? GeneratedImageSize.W1024xH1792 : GeneratedImageSize.W1792xH1024;
-        var result = await client.GenerateImageAsync(prompt, new ImageGenerationOptions { Size = size }, ct);
+        var (width, height) = ImageSizes.For(model, shape);
+        var result = await client.GenerateImageAsync(prompt, new ImageGenerationOptions { Size = new GeneratedImageSize(width, height) }, ct);
         var image = result.Value;
 
         // Newer image models return the bytes directly; older ones return a short-lived URL.
@@ -95,6 +95,22 @@ internal sealed class OpenAiImages(ImageClient client) : IImageGenerator
 }
 
 #pragma warning restore OPENAI001
+
+/// <summary>
+/// Each OpenAI image model accepts its own fixed list of sizes, and rejects any
+/// other with an error, so we pick the closest tall or wide size the model supports.
+/// </summary>
+public static class ImageSizes
+{
+    public static (int Width, int Height) For(string model, ImageShape shape)
+    {
+        var tall = shape == ImageShape.Portrait;
+        if (model.StartsWith("dall-e-3", StringComparison.OrdinalIgnoreCase)) return tall ? (1024, 1792) : (1792, 1024);
+        if (model.StartsWith("dall-e-2", StringComparison.OrdinalIgnoreCase)) return (1024, 1024); // squares only
+        // gpt-image-1 and its successors.
+        return tall ? (1024, 1536) : (1536, 1024);
+    }
+}
 
 /// <summary>A short, valid, silent WAV file. Lets tests exercise the whole voice pipeline without a provider.</summary>
 public sealed class FakeSpeech : ITextToSpeech

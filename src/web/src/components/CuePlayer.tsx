@@ -30,9 +30,9 @@ function playAudio(el: HTMLAudioElement, src: string): Promise<void> {
  *   sfx       → one-shot sound
  *   video     → full-screen clip, waits until it ends
  *
- * `runKey` restarts playback when the scene changes. Each run gets an id; an
- * older run notices it has been superseded and stops, which avoids two
- * narrations talking over each other when the host skips ahead.
+ * `runKey` restarts playback when the scene changes. An older run notices it
+ * has been superseded and stops, which avoids two narrations talking over each
+ * other when the host skips ahead.
  */
 export function CuePlayer({
   cues,
@@ -53,7 +53,13 @@ export function CuePlayer({
   const [toast, setToast] = useState<{ text: string; alternative: string | null } | null>(null)
   const [playing, setPlaying] = useState(false)
   const [replayCount, setReplayCount] = useState(0)
-  const runId = useRef(0)
+  // The latest cues and callback, read when a run starts. Keeping them in a ref (not the
+  // effect's dependencies) means a new array or callback identity from the parent doesn't
+  // restart the scene; only `runKey`, `enabled` or a replay does.
+  const latest = useRef({ cues, onFinished })
+  useEffect(() => {
+    latest.current = { cues, onFinished }
+  })
   const voiceRef = useRef<HTMLAudioElement>(null)
   const musicRef = useRef<HTMLAudioElement>(null)
   const sfxRef = useRef<HTMLAudioElement>(null)
@@ -68,8 +74,11 @@ export function CuePlayer({
 
   useEffect(() => {
     if (!enabled) return
-    const id = ++runId.current
-    const active = () => runId.current === id
+    // Each run has its own flag. The cleanup below sets it when the scene changes, so an
+    // older run notices it was superseded and stops talking over the new one.
+    let cancelled = false
+    const active = () => !cancelled
+    const { cues, onFinished } = latest.current
 
     const run = async () => {
       setPlaying(true)
@@ -143,11 +152,10 @@ export function CuePlayer({
 
     const voice = voiceRef.current
     return () => {
-      runId.current++
+      cancelled = true
       narrator.stop()
       voice?.pause()
     }
-    // onFinished is intentionally excluded: a new callback identity must not restart the scene.
   }, [runKey, enabled, replayCount])
 
   return (

@@ -76,11 +76,9 @@ function LobbyPlayer({
 }) {
   const stage = view.stage
   const mine = view.dossier?.character
-  const [picking, setPicking] = useState(!mine)
-
-  useEffect(() => {
-    if (!mine) setPicking(true)
-  }, [mine])
+  const [wantsToPick, setPicking] = useState(false)
+  // Without a character there's nothing else to show, so the list is always open.
+  const picking = wantsToPick || !mine
 
   return (
     <div className="mx-auto max-w-xl space-y-5 px-4 py-6">
@@ -240,17 +238,18 @@ function InGame({
 }) {
   const stage = view.stage
   const dossier = view.dossier
-  const [tab, setTab] = useState<Tab>('dossier')
+  const [tab, setTab] = useState<Tab>(() => tabForPhase(stage.phase, 'dossier'))
+  const [tabPhase, setTabPhase] = useState(stage.phase)
   const privateClueIds = useRef<Set<string> | null>(null)
   const [newClue, setNewClue] = useState(false)
 
-  // Jump to the tab that matters when the phase changes.
-  useEffect(() => {
-    if (stage.phase === 'accusation') setTab('accuse')
-    else if (stage.phase === 'awards') setTab('vote')
-    else if (stage.phase === 'reveal' || stage.phase === 'finished') setTab('results')
-    else setTab((t) => (t === 'accuse' || t === 'vote' || t === 'results' || (t === 'question' && stage.phase !== 'act') ? 'dossier' : t))
-  }, [stage.phase])
+  // Jump to the tab that matters when the phase changes. This adjusts state during
+  // render (React's recommended pattern for "when a prop changes") rather than in an
+  // effect, so the phone never shows one frame of the old tab.
+  if (tabPhase !== stage.phase) {
+    setTabPhase(stage.phase)
+    setTab(tabForPhase(stage.phase, tab))
+  }
 
   // Buzz the phone when a private clue arrives.
   useEffect(() => {
@@ -321,6 +320,14 @@ function InGame({
       </main>
     </div>
   )
+}
+
+function tabForPhase(phase: StageView['phase'], current: Tab): Tab {
+  if (phase === 'accusation') return 'accuse'
+  if (phase === 'awards') return 'vote'
+  if (phase === 'reveal' || phase === 'finished') return 'results'
+  const stale = current === 'accuse' || current === 'vote' || current === 'results' || (current === 'question' && phase !== 'act')
+  return stale ? 'dossier' : current
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

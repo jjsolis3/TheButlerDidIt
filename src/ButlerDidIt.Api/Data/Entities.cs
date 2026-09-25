@@ -97,6 +97,15 @@ public sealed class Party
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? ScheduledFor { get; set; }
 
+    /// <summary>Last time the game state changed. The retention job uses it to find abandoned and old parties.</summary>
+    public DateTimeOffset UpdatedAt { get; set; }
+
+    /// <summary>
+    /// When the retention job removed this finished party's seats, notes and selfies.
+    /// The party row itself is kept so its recap page keeps working.
+    /// </summary>
+    public DateTimeOffset? PrunedAt { get; set; }
+
     /// <summary>The engine's GameState as jsonb, rewritten after every command.</summary>
     public required string State { get; set; }
 
@@ -159,7 +168,7 @@ public enum MediaKind
     Photo,
 }
 
-/// <summary>Generated or uploaded media. Filled in by the milestone 3 media pipeline; the table exists now so the schema is ready.</summary>
+/// <summary>A generated (voice clip, picture) or uploaded (selfie) file. The bytes live in the media folder; this row says where.</summary>
 public sealed class MediaAsset
 {
     public Guid Id { get; set; }
@@ -182,6 +191,13 @@ public sealed class MediaAsset
 
     public long SizeBytes { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>
+    /// For guest uploads (selfies): the party they belong to, so they can be deleted
+    /// with it. Deliberately not a foreign key: deleting a row must also delete the
+    /// file on disk, which only the retention job can do.
+    /// </summary>
+    public Guid? PartyId { get; set; }
 }
 
 /// <summary>Which generated file fills which slot of a scenario (see MediaOverlay for the keys).</summary>

@@ -30,6 +30,7 @@ builder.Services.Configure<ContentOptions>(config.GetSection("Content"));
 builder.Services.Configure<AuthOptions>(config.GetSection("Auth"));
 builder.Services.Configure<AiOptions>(config.GetSection("Ai"));
 builder.Services.Configure<MediaOptions>(config.GetSection("Media"));
+builder.Services.Configure<RetentionOptions>(config.GetSection("Retention"));
 
 // ---------------------------------------------------------------- database
 builder.Services.AddDbContext<AppDbContext>(o =>
@@ -111,6 +112,8 @@ builder.Services.AddSingleton<ContentCatalog>();
 builder.Services.AddSingleton<PartyLocks>();
 builder.Services.AddScoped<PartyService>();
 builder.Services.AddHostedService<PartyTicker>();
+builder.Services.AddSingleton<RetentionWorker>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetentionWorker>());
 
 // ---------------------------------------------------------------- AI (see docs/ai-setup.md)
 // Every AI call goes through AiGateway, which picks the provider for the role

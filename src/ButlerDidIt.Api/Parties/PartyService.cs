@@ -100,6 +100,7 @@ public sealed class PartyService(
                 _ => PartyStatus.InProgress,
             };
             party.NextDueAt = GameEngine.NextDueAt(next);
+            party.UpdatedAt = now;
 
             var updated = snapshot with { State = next };
             beforeSave?.Invoke(updated);

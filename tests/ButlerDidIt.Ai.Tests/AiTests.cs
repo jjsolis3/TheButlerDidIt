@@ -1,4 +1,5 @@
 using ButlerDidIt.Ai;
+using ButlerDidIt.Ai.Media;
 using ButlerDidIt.Ai.Generation;
 using ButlerDidIt.Ai.Prompts;
 using ButlerDidIt.Game;
@@ -201,4 +202,16 @@ public class PromptTests
         Assert.Equal(3, seats.Count);
         Assert.Contains("3. Cara", system);
     }
+}
+
+public class ImageSizeTests
+{
+    [Theory]
+    [InlineData("dall-e-3", ImageShape.Portrait, 1024, 1792)]
+    [InlineData("dall-e-3", ImageShape.Landscape, 1792, 1024)]
+    [InlineData("dall-e-2", ImageShape.Portrait, 1024, 1024)]
+    [InlineData("gpt-image-1", ImageShape.Portrait, 1024, 1536)]
+    [InlineData("gpt-image-1-mini", ImageShape.Landscape, 1536, 1024)]
+    public void Each_model_gets_a_size_it_accepts(string model, ImageShape shape, int width, int height) =>
+        Assert.Equal((width, height), ImageSizes.For(model, shape));
 }

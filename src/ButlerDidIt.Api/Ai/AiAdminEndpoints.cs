@@ -21,6 +21,12 @@ public sealed record AiStatus(bool Storyteller, bool Actor, bool Inspector, bool
 
 public static class AiAdminEndpoints
 {
+    private static AiRole? ParseRole(string name) =>
+        Enum.TryParse<AiRole>(name, ignoreCase: true, out var role) && Enum.IsDefined(role) ? role : null;
+
+    private static IResult UnknownRole(string name) =>
+        Results.Problem($"Unknown role '{name}'. Use one of: {string.Join(", ", Enum.GetNames<AiRole>())}.", statusCode: 400);
+
     public static void MapAiEndpoints(this IEndpointRouteBuilder app)
     {
         // ---- Any host: what AI can I use, and how much have I spent?
@@ -112,8 +118,12 @@ public static class AiAdminEndpoints
             });
         });
 
-        admin.MapPut("/roles/{role}", async (AiRole role, RoleRequest req, AppDbContext db, CancellationToken ct) =>
+        // The role arrives as text and is parsed here, ignoring case. The browser sends enums in
+        // camelCase ("storyteller"), and ASP.NET Core's automatic enum binding for URL values
+        // is case-sensitive, so binding it directly rejected every save with a bare 400.
+        admin.MapPut("/roles/{roleName}", async (string roleName, RoleRequest req, AppDbContext db, CancellationToken ct) =>
         {
+            if (ParseRole(roleName) is not { } role) return UnknownRole(roleName);
             if (string.IsNullOrWhiteSpace(req.Model)) return Results.Problem("Enter a model name, e.g. claude-opus-5 or gpt-5.", statusCode: 400);
             var provider = await db.AiProviders.AsNoTracking().FirstOrDefaultAsync(p => p.Id == req.ProviderId, ct);
             if (provider is null) return Results.Problem("Unknown provider.", statusCode: 400);
@@ -134,8 +144,9 @@ public static class AiAdminEndpoints
             return Results.NoContent();
         });
 
-        admin.MapDelete("/roles/{role}", async (AiRole role, AppDbContext db, CancellationToken ct) =>
+        admin.MapDelete("/roles/{roleName}", async (string roleName, AppDbContext db, CancellationToken ct) =>
         {
+            if (ParseRole(roleName) is not { } role) return UnknownRole(roleName);
             await db.AiRoles.Where(r => r.Role == role).ExecuteDeleteAsync(ct);
             return Results.NoContent();
         });
