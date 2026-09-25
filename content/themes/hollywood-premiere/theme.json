@@ -1,0 +1,10 @@
+{
+  "slug": "hollywood-premiere",
+  "name": "Murder on the Red Carpet",
+  "tagline": "The stars came out for the premiere. One of them won't be going home.",
+  "era": "1950s Hollywood golden age",
+  "description": "Flashbulbs, furs and fragile egos. The studio's biggest picture premieres tonight, but its leading man has been found dead in his dressing room. Starlets, moguls, gossip columnists and a director with everything to lose.",
+  "palette": { "background": "#100a0c", "surface": "#221419", "accent": "#e0b86a", "ink": "#fbeee6" },
+  "artStyle": "Technicolor 1950s film poster, glamorous soft focus, red carpet spotlights",
+  "sortOrder": 3
+}

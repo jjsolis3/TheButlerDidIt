@@ -1,0 +1,43 @@
+namespace ButlerDidIt.Game.Engine;
+
+// Every change to a game is a Command. The API turns hub calls into commands and
+// hands them to GameEngine.Apply. Who is allowed to send which command (host vs
+// player) is checked by the API before it gets here; the engine checks the game
+// rules (right phase, valid character, and so on).
+//
+// Commands carry `Now` instead of the engine reading the clock itself. That keeps
+// the engine deterministic: the same state + command always gives the same result,
+// which makes the tests simple and repeatable.
+
+public abstract record Command(DateTimeOffset Now);
+
+// ---- Lobby ----
+public sealed record AddPlayer(DateTimeOffset Now, Guid SeatId, string Name, bool IsHost, bool IsLocal) : Command(Now);
+public sealed record RemovePlayer(DateTimeOffset Now, Guid SeatId) : Command(Now);
+public sealed record ChooseCharacter(DateTimeOffset Now, Guid SeatId, string? CharacterId) : Command(Now);
+public sealed record SetReady(DateTimeOffset Now, Guid SeatId, bool Ready) : Command(Now);
+public sealed record AutoAssignCharacters(DateTimeOffset Now) : Command(Now);
+public sealed record StartGame(DateTimeOffset Now) : Command(Now);
+
+// ---- Host controls during play ----
+public sealed record Advance(DateTimeOffset Now) : Command(Now);
+public sealed record DropNextClue(DateTimeOffset Now) : Command(Now);
+public sealed record PauseTimer(DateTimeOffset Now) : Command(Now);
+public sealed record ResumeTimer(DateTimeOffset Now) : Command(Now);
+public sealed record ExtendTimer(DateTimeOffset Now, int Minutes) : Command(Now);
+
+/// <summary>A guest had to leave mid-game; the narrator takes over their character.</summary>
+public sealed record ConvertToNpc(DateTimeOffset Now, Guid SeatId) : Command(Now);
+
+/// <summary>Sent by the server's background ticker so midway clues drop on time.</summary>
+public sealed record Tick(DateTimeOffset Now) : Command(Now);
+
+// ---- Player actions ----
+public sealed record RevealSecret(DateTimeOffset Now, Guid SeatId, string SecretId) : Command(Now);
+public sealed record ShareClue(DateTimeOffset Now, Guid SeatId, string ClueId) : Command(Now);
+public sealed record SolvePuzzle(DateTimeOffset Now, Guid SeatId, string ClueId, string Answer) : Command(Now);
+public sealed record SubmitAccusation(DateTimeOffset Now, Guid SeatId, string SuspectId, string MotiveId, string MethodId) : Command(Now);
+public sealed record CastAwardVote(DateTimeOffset Now, Guid SeatId, string AwardId, Guid NomineeSeatId) : Command(Now);
+
+/// <summary>Thrown when a command breaks a game rule. The message is safe to show to players.</summary>
+public sealed class GameRuleException(string message) : Exception(message);

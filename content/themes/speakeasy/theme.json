@@ -1,0 +1,10 @@
+{
+  "slug": "speakeasy",
+  "name": "Death at the Gin Joint",
+  "tagline": "Jazz, bathtub gin, and a body behind the bar.",
+  "era": "1920s Chicago speakeasy",
+  "description": "Knock three times and whisper the password. Behind the false wall of a barber shop, the band plays hot, the gin is cold, and somebody has just taken a permanent nap in the back room. Flappers, gangsters, crooked cops and a torch singer with a past.",
+  "palette": { "background": "#0d0b10", "surface": "#1b1622", "accent": "#d4a24c", "ink": "#f1e7d2" },
+  "artStyle": "Art deco poster illustration, gold and black geometric lines, smoky jazz club lighting",
+  "sortOrder": 2
+}
