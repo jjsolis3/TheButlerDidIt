@@ -162,8 +162,14 @@ function PhaseView({
     case 'reveal':
       return <RevealView stage={stage} muted={muted} begun={begun} />
     case 'awards':
-    case 'finished':
       return <AwardsView stage={stage} />
+    case 'finished':
+      return (
+        <>
+          <AwardsView stage={stage} />
+          {info.isHost && <RecapPanel code={info.code} />}
+        </>
+      )
   }
 }
 
@@ -862,3 +868,83 @@ function Cocktails({ themeSlug }: { themeSlug: string }) {
     </div>
   )
 }
+
+/**
+ * Host-only, after the party: share the recap page. It's private until shared, and
+ * "Stop sharing" makes the old link stop working.
+ */
+function RecapPanel({ code }: { code: string }) {
+  const [url, setUrl] = useState<string | null>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    api.recap(code).then(
+      (r) => {
+        if (cancelled) return
+        setUrl(r.url)
+        setLoaded(true)
+      },
+      (e: Error) => !cancelled && setError(e.message),
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [code])
+
+  const full = url ? `${window.location.origin}${url}` : null
+  const run = (action: () => Promise<void>) => {
+    setError(null)
+    setCopied(false)
+    action().catch((e: Error) => setError(e.message))
+  }
+
+  return (
+    <section className="mx-auto mt-10 max-w-2xl rounded-2xl border border-line bg-surface p-5 text-left">
+      <h2 className="font-display text-2xl">The recap</h2>
+      <p className="mt-1 text-sm text-muted">
+        A page with the cast, the solution, everyone's secrets, the scores and the costume photos. It stays private unless you share it.
+      </p>
+      {loaded && !full && (
+        <Button className="mt-4" onClick={() => run(async () => setUrl((await api.shareRecap(code)).url))}>
+          Share the recap
+        </Button>
+      )}
+      {full && (
+        <div className="mt-4 space-y-3">
+          <input readOnly value={full} aria-label="Recap link" onFocus={(e) => e.target.select()} className="w-full rounded-lg border border-line bg-bg px-3 py-2 font-mono text-sm" />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() =>
+                run(async () => {
+                  await navigator.clipboard.writeText(full)
+                  setCopied(true)
+                })
+              }
+            >
+              {copied ? 'Copied!' : 'Copy link'}
+            </Button>
+            <a href={full} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-lg border border-line px-4 text-sm hover:border-accent">
+              Open it
+            </a>
+            <Button
+              variant="quiet"
+              onClick={() =>
+                run(async () => {
+                  await api.unshareRecap(code)
+                  setUrl(null)
+                })
+              }
+            >
+              Stop sharing
+            </Button>
+          </div>
+        </div>
+      )}
+      <ErrorText>{error}</ErrorText>
+    </section>
+  )
+}
+

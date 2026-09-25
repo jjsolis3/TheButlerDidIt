@@ -8,6 +8,7 @@ import Login from './pages/Login'
 import NewParty from './pages/NewParty'
 import PassAndPlay from './pages/PassAndPlay'
 import Play from './pages/Play'
+import Recap from './pages/Recap'
 import Stage from './pages/Stage'
 
 // Page map. The same URLs work in production because ASP.NET Core falls back to
@@ -23,6 +24,7 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />
+      <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />
       <Route path="/stage/:code" element={<Stage />} />

@@ -56,6 +56,38 @@ public static class ViewProjector
             Options: s.Options);
     }
 
+    /// <summary>The recap of a finished game. Throws for a game still in progress, so the solution can't leak early.</summary>
+    public static RecapView Recap(GameState s, Scenario scenario, DateTimeOffset now)
+    {
+        if (s.Phase != Phase.Finished) throw new InvalidOperationException("The recap is only available once the game has finished.");
+        var stage = Stage(s, scenario, now);
+        var cast = scenario.Characters.Select(c =>
+        {
+            var player = s.Players.FirstOrDefault(p => p.CharacterId == c.Id);
+            var member = stage.Cast.FirstOrDefault(m => m.CharacterId == c.Id);
+            return new RecapCharacter(
+                c.Id, c.Name, c.Title, c.Portrait, player?.Name, player?.PhotoUrl,
+                IsNpc: member?.IsNpc ?? false,
+                IsMurderer: c.Id == scenario.Solution.MurdererId,
+                Secrets: c.Private.Secrets.Select(x => x.Text).ToList());
+        })
+        // Characters nobody played and nobody met (optional roles left out) aren't part of the story.
+        .Where(c => c.PlayedBy is not null || c.IsNpc)
+        .ToList();
+
+        return new RecapView(
+            stage.Scenario,
+            cast,
+            stage.Reveal!,
+            stage.Awards!,
+            s.Interrogations.Select(i =>
+            {
+                var npc = scenario.FindCharacter(i.CharacterId);
+                return new InterrogationView(i.Id, i.Act, i.AskerName, i.CharacterId, npc?.Name ?? i.CharacterId, i.Question, i.Answer, npc?.Voice, i.AudioUrl);
+            }).ToList(),
+            stage.RevealedSecrets);
+    }
+
     public static PlayerView Player(GameState s, Scenario scenario, Guid seatId, DateTimeOffset now)
     {
         var player = s.FindPlayer(seatId) ?? throw new GameRuleException("You are not seated at this party.");

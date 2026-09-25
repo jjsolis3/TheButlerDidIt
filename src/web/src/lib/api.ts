@@ -6,6 +6,8 @@ import type {
   GenerationJob,
   MediaJob,
   Me,
+  RecapPage,
+  RecapSharing,
   AuthOptions,
   HostView,
   MysteryLength,
@@ -72,6 +74,10 @@ export const api = {
   // ---- Media
   partyMedia: (code: string) => request<{ ready: number; job: MediaJob | null }>('GET', `/api/parties/${encodeURIComponent(code)}/media`),
   prepareMedia: (code: string) => request<MediaJob>('POST', `/api/parties/${encodeURIComponent(code)}/media`),
+  recap: (code: string) => request<RecapSharing>('GET', `/api/parties/${encodeURIComponent(code)}/recap`),
+  shareRecap: (code: string) => request<{ url: string }>('POST', `/api/parties/${encodeURIComponent(code)}/recap/share`),
+  unshareRecap: (code: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}/recap/share`),
+  publicRecap: (slug: string) => request<RecapPage>('GET', `/api/recap/${encodeURIComponent(slug)}`),
   kitUrl: (code: string, kind: 'invitations' | 'booklets' | 'nametags' | 'clues') => `/api/parties/${encodeURIComponent(code)}/kit/${kind}.pdf`,
 
   /** Upload a costume selfie. Uses the seat token, because guests don't have accounts. */

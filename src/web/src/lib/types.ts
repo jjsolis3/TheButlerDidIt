@@ -452,3 +452,38 @@ export interface GenerationJob {
   warnings: string[]
   createdAt: string
 }
+
+/** The after-party page (C# RecapView). Only exists for finished games. */
+export interface RecapView {
+  scenario: ScenarioSummary
+  cast: RecapCharacter[]
+  reveal: RevealView
+  awards: AwardsView
+  interrogations: InterrogationView[]
+  secretsRevealedDuringPlay: SecretView[]
+}
+
+export interface RecapCharacter {
+  characterId: string
+  name: string
+  title: string
+  portrait: string | null
+  playedBy: string | null
+  photoUrl: string | null
+  isNpc: boolean
+  isMurderer: boolean
+  secrets: string[]
+}
+
+export interface RecapPage {
+  recap: RecapView
+  hostName: string
+  playedAt: string
+}
+
+export interface RecapSharing {
+  shared: boolean
+  url: string | null
+  page: RecapPage
+}
+

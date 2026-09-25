@@ -207,6 +207,7 @@ app.UseAuthorization();
 app.MapHealthChecks("/healthz");
 app.MapAuthEndpoints();
 app.MapAdminHostEndpoints();
+app.MapRecapEndpoints();
 app.MapThemeEndpoints();
 app.MapPartyEndpoints();
 app.MapMediaEndpoints();
