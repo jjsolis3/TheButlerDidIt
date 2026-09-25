@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
+import { ConfirmEmailBanner } from './Account'
 import { useThemes } from '../lib/theme'
-import type { AiStatus, ContentRating, GenerationJob, MysteryLength, PartyMode, ThemeCard } from '../lib/types'
+import type { AiStatus, AuthOptions, ContentRating, GenerationJob, MysteryLength, PartyMode, ThemeCard } from '../lib/types'
 import { useMe } from '../lib/useMe'
 
 const MODES: { id: PartyMode; title: string; body: string }[] = [
@@ -16,6 +17,7 @@ export default function NewParty() {
   const { me } = useMe()
   const { themes, reload: reloadThemes } = useThemes()
   const [ai, setAi] = useState<AiStatus | null>(null)
+  const [authOptions, setAuthOptions] = useState<AuthOptions | null>(null)
   const [useAi, setUseAi] = useState(true)
   const [drinking, setDrinking] = useState(false)
   const navigate = useNavigate()
@@ -29,6 +31,7 @@ export default function NewParty() {
   useEffect(() => {
     if (me === null) navigate('/login')
     if (me) api.aiStatus().then(setAi, () => setAi(null))
+    if (me) api.authOptions().then(setAuthOptions, () => setAuthOptions(null))
   }, [me, navigate])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
@@ -55,6 +58,7 @@ export default function NewParty() {
     <Shell>
       <Eyebrow>New party</Eyebrow>
       <Heading className="mt-2 mb-6">Set the scene</Heading>
+      <ConfirmEmailBanner required={!!authOptions?.requireConfirmedEmail && me?.emailConfirmed === false} />
 
       <section className="space-y-3">
         <h2 className="font-display text-xl">1. Choose a mystery</h2>

@@ -55,6 +55,10 @@ export default function Home() {
                 <Link to="/admin/ai" className="underline hover:text-ink">
                   AI settings
                 </Link>
+                {' · '}
+                <Link to="/admin/hosts" className="underline hover:text-ink">
+                  Hosts
+                </Link>
               </>
             )}
           </p>

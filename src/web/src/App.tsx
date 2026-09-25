@@ -1,5 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
+import { ConfirmEmail, ForgotPassword, ResetPassword } from './pages/Account'
 import AdminAi from './pages/AdminAi'
+import AdminHosts from './pages/AdminHosts'
 import Home from './pages/Home'
 import Join from './pages/Join'
 import Login from './pages/Login'
@@ -17,6 +19,10 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/host/new" element={<NewParty />} />
       <Route path="/admin/ai" element={<AdminAi />} />
+      <Route path="/admin/hosts" element={<AdminHosts />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />
       <Route path="/stage/:code" element={<Stage />} />

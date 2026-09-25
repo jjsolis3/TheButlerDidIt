@@ -29,7 +29,8 @@ test('AI game master: generate a mystery, question an NPC, get a hint and hear t
   await host.goto('/login')
   await host.getByRole('button', { name: 'Create an account' }).click()
   await host.getByLabel('Your name').fill('Admin Agatha')
-  await host.getByLabel('Email').fill(`admin-${Date.now()}@example.com`)
+  // Fixed address: each run uses a fresh database, and hosts.spec.ts signs in as this admin.
+  await host.getByLabel('Email').fill('admin@e2e.test')
   await host.getByLabel('Password').fill('password123')
   await host.getByRole('button', { name: 'Create account' }).click()
   await host.waitForURL('**/host/new')

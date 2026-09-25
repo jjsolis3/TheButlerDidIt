@@ -4,6 +4,7 @@ using ButlerDidIt.Game;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -128,4 +129,36 @@ public class FakeAiFactory : ApiFactory
 public sealed class TinyBudgetAiFactory : FakeAiFactory
 {
     protected override string Budget => "0.0001";
+}
+
+/// <summary>Email "sent" in tests is kept here, so a test can read it and click the link.</summary>
+public sealed class CapturingEmailSender : ButlerDidIt.Api.Auth.IEmailSender
+{
+    public System.Collections.Concurrent.ConcurrentQueue<(string To, string Subject, string Text)> Sent { get; } = new();
+    public bool IsConfigured => true;
+
+    public Task SendAsync(string to, string subject, string text, CancellationToken ct)
+    {
+        Sent.Enqueue((to, subject, text));
+        return Task.CompletedTask;
+    }
+}
+
+/// <summary>A server that can send email and requires hosts to confirm their address.</summary>
+public sealed class EmailFactory : ApiFactory
+{
+    public const string PublicUrl = "https://mystery.example.com";
+    public CapturingEmailSender Email { get; } = new();
+
+    protected override IEnumerable<(string Key, string Value)> ExtraSettings =>
+    [
+        ("App:PublicUrl", PublicUrl),
+        ("Auth:RequireConfirmedEmail", "true"),
+    ];
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        builder.ConfigureTestServices(s => s.AddSingleton<ButlerDidIt.Api.Auth.IEmailSender>(Email));
+    }
 }

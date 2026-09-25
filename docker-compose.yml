@@ -18,6 +18,14 @@ services:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       # Set to false after you create your host account to make the server invite-only.
       Auth__AllowRegistration: "${ALLOW_REGISTRATION:-true}"
+      Auth__RequireConfirmedEmail: "${REQUIRE_CONFIRMED_EMAIL:-false}"
+      # Optional email (password reset and sign-up confirmation). Links in emails use PUBLIC_URL.
+      App__PublicUrl: "${PUBLIC_URL:-}"
+      Email__Host: "${SMTP_HOST:-}"
+      Email__Port: "${SMTP_PORT:-587}"
+      Email__Username: "${SMTP_USERNAME:-}"
+      Email__Password: "${SMTP_PASSWORD:-}"
+      Email__From: "${SMTP_FROM:-}"
       # ---- AI game master (optional; see docs/ai-setup.md). You can also set all of
       # this up on the Admin -> AI page instead. Leave blank to skip.
       Ai__MonthlyBudgetUsd: "${AI_MONTHLY_BUDGET_USD:-25}"

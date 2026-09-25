@@ -96,7 +96,7 @@ public static class PartyEndpoints
             if (req.UseAi && (await media.VoicesConfiguredAsync(ct) || await media.ImagesConfiguredAsync(ct)))
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, scenario.Id, userId, clock, ct);
             return Results.Ok(await ToInfo(party, db, catalog, isHost: true, ct));
-        }).RequireAuthorization(AuthPolicies.Host);
+        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
 
         // ---- Public: what a guest sees on the join page
         group.MapGet("/{code}", async (string code, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties, CancellationToken ct) =>

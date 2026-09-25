@@ -337,6 +337,24 @@ export interface Me {
   email: string
   displayName: string
   isAdmin: boolean
+  emailConfirmed: boolean
+}
+
+/** What the sign-in page can offer on this server. */
+export interface AuthOptions {
+  allowRegistration: boolean
+  emailEnabled: boolean
+  requireConfirmedEmail: boolean
+}
+
+export interface HostView {
+  id: string
+  displayName: string
+  email: string
+  emailConfirmed: boolean
+  isAdmin: boolean
+  parties: number
+  lockedOut: boolean
 }
 
 // ---- AI (admin + generation)
