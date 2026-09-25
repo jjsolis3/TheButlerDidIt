@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* Colours come from CSS variables so each theme can recolour the whole app
+   (see applyPalette in lib/theme.ts). "inline" makes Tailwind utilities like
+   bg-surface reference the variable directly instead of copying its value. */
+@theme inline {
+  --color-bg: var(--theme-bg);
+  --color-surface: var(--theme-surface);
+  --color-raised: color-mix(in oklab, var(--theme-surface) 80%, var(--theme-ink) 8%);
+  --color-accent: var(--theme-accent);
+  --color-ink: var(--theme-ink);
+  --color-muted: color-mix(in oklab, var(--theme-ink) 62%, var(--theme-bg));
+  --color-line: color-mix(in oklab, var(--theme-ink) 16%, var(--theme-bg));
+  --color-blood: #b3261e;
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root {
+  --theme-bg: #0f0d0b;
+  --theme-surface: #1c1814;
+  --theme-accent: #c8a45a;
+  --theme-ink: #f3ead8;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--theme-bg);
+  color: var(--theme-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  /* Stop iOS from resizing text in landscape */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* A slow pan and zoom that turns a still picture into a "motion comic" shot. */
+@keyframes kenburns {
+  from { transform: scale(1.02) translate(0, 0); }
+  to { transform: scale(1.14) translate(-2%, -1.5%); }
+}
+.kenburns {
+  animation: kenburns 14s ease-in-out both;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.86; }
+  50% { opacity: 0.95; }
+  55% { opacity: 0.8; }
+}
+.candle {
+  animation: flicker 4s infinite;
+}
+
+.grain {
+  background-image: radial-gradient(ellipse at top, color-mix(in oklab, var(--theme-accent) 14%, transparent), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.6), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kenburns, .candle { animation: none; }
+}

@@ -25,13 +25,26 @@
       "title": "The Young Widow",
       "publicBio": "Reginald's glamorous second wife, thirty years his junior. Before her marriage she was 'Evie Lane', toast of the London music halls. Society never quite forgave her for it.",
       "costumeTips": "A beaded flapper dress in black or emerald, long pearls, a feathered headband and a cigarette holder.",
-      "voice": { "accent": "en-GB", "pitch": 1.15, "rate": 1.0, "style": "silky, theatrical" },
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.15,
+        "rate": 1.0,
+        "style": "silky, theatrical"
+      },
       "required": true,
       "private": {
         "backstory": "You married Reginald for security and discovered it came with a gilded cage. He controlled every penny and reminded you daily where you came from. You found comfort in the arms of Captain Jack Rafferty. Tonight Reginald was to read a new will, and you have no idea whether you are still in it.",
         "secrets": [
-          { "id": "evelyn-affair", "text": "I have been having an affair with Captain Jack Rafferty for over a year.", "unlockAct": 0 },
-          { "id": "evelyn-cheque", "text": "Last month I forged Reginald's signature on a cheque for £2,000 to pay off an old blackmailer from my music-hall days.", "unlockAct": 2 }
+          {
+            "id": "evelyn-affair",
+            "text": "I have been having an affair with Captain Jack Rafferty for over a year.",
+            "unlockAct": 0
+          },
+          {
+            "id": "evelyn-cheque",
+            "text": "Last month I forged Reginald's signature on a cheque for £2,000 to pay off an old blackmailer from my music-hall days.",
+            "unlockAct": 2
+          }
         ],
         "objectives": [
           "Keep your affair with Captain Rafferty hidden for as long as you can.",
@@ -44,9 +57,15 @@
         ],
         "alibi": "From 9:30 until the lights came back up, I was at the séance in the drawing room, holding hands with Dr. Finch and Madame Zelda.",
         "lines": {
-          "act1": ["(clutching your pearls) He was a hard man, but nobody deserved to die like that. Nobody!"],
-          "act2": ["If anyone here dares suggest I married him for money, I will remind them that I could have had any man in London."],
-          "act3": ["Doctor, your hand was so cold during the séance. Almost as if you'd just come in from outside."]
+          "act1": [
+            "(clutching your pearls) He was a hard man, but nobody deserved to die like that. Nobody!"
+          ],
+          "act2": [
+            "If anyone here dares suggest I married him for money, I will remind them that I could have had any man in London."
+          ],
+          "act3": [
+            "Doctor, your hand was so cold during the séance. Almost as if you'd just come in from outside."
+          ]
         }
       }
     },
@@ -57,13 +76,26 @@
       "title": "The Butler",
       "publicBio": "Thirty years in service at Blackwood Manor. Impeccable, unflappable, and always exactly where he is needed. He polishes the silver himself and trusts no one else with the port.",
       "costumeTips": "Black tailcoat, white gloves, a silver tray and an expression of mild disapproval.",
-      "voice": { "accent": "en-GB", "pitch": 0.8, "rate": 0.9, "style": "dry, precise" },
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.8,
+        "rate": 0.9,
+        "style": "dry, precise"
+      },
       "required": true,
       "private": {
         "backstory": "You have served the Blackwoods your entire adult life. What nobody knows is that you are Reginald's illegitimate half-brother, the son of the old lord and a housemaid. Reginald has always known and has held it over you. Everyone will suspect the butler. You did not do it, but you are hiding plenty.",
         "secrets": [
-          { "id": "hargrove-brother", "text": "I am Reginald's half-brother. The old lord was my father. Reginald promised to acknowledge me in the new will.", "unlockAct": 0 },
-          { "id": "hargrove-port", "text": "For years I have been selling his Lordship's vintage port to a London dealer and refilling the bottles with cheap ruby.", "unlockAct": 2 }
+          {
+            "id": "hargrove-brother",
+            "text": "I am Reginald's half-brother. The old lord was my father. Reginald promised to acknowledge me in the new will.",
+            "unlockAct": 0
+          },
+          {
+            "id": "hargrove-port",
+            "text": "For years I have been selling his Lordship's vintage port to a London dealer and refilling the bottles with cheap ruby.",
+            "unlockAct": 2
+          }
         ],
         "objectives": [
           "Do not let anyone discover you were selling the vintage port.",
@@ -76,9 +108,15 @@
         ],
         "alibi": "At 9:47 I was in the cellar, fetching a fresh bottle for the séance guests. Nobody saw me.",
         "lines": {
-          "act1": ["(stiffly) I discovered his Lordship at ten o'clock precisely. I did not scream. I rang for the doctor."],
-          "act2": ["The cellar is my responsibility, and I will thank you to keep your noses out of it."],
-          "act3": ["If I may, the port decanter was not where I left it. Someone else served his Lordship last night."]
+          "act1": [
+            "(stiffly) I discovered his Lordship at ten o'clock precisely. I did not scream. I rang for the doctor."
+          ],
+          "act2": [
+            "The cellar is my responsibility, and I will thank you to keep your noses out of it."
+          ],
+          "act3": [
+            "If I may, the port decanter was not where I left it. Someone else served his Lordship last night."
+          ]
         }
       }
     },
@@ -89,13 +127,26 @@
       "title": "The Family Physician",
       "publicBio": "Kindly, bespectacled and never without his black medical bag. Dr. Finch has looked after the Blackwood family for twenty years and was a great comfort when the first Lady Blackwood died.",
       "costumeTips": "Tweed three-piece suit, round spectacles, a pocket watch and a doctor's bag.",
-      "voice": { "accent": "en-GB", "pitch": 0.95, "rate": 0.95, "style": "warm, reassuring" },
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.95,
+        "rate": 0.95,
+        "style": "warm, reassuring"
+      },
       "required": true,
       "private": {
         "backstory": "YOU ARE THE MURDERER. Fifteen years ago you arrived drunk at the bedside of Margaret, the first Lady Blackwood, and gave her a fatal overdose. You covered it up as fever. Reginald has finally found your written confession to a colleague and planned to hand it to Scotland Yard tomorrow. At 9:15 tonight you poured digitalis from your bag into his port. When the lights went out at the séance you slipped away, struck the corpse with the candlestick to fake a violent attack, and set the clock back to 9:47, when you were visibly holding hands at the table. Lie calmly and point everyone at the butler.",
         "secrets": [
-          { "id": "finch-debts", "text": "I owe a great deal of money to a bookmaker in Leeds. Reginald refused to lend it to me.", "unlockAct": 0 },
-          { "id": "finch-margaret", "text": "I attended the first Lady Blackwood the night she died. I had been drinking.", "unlockAct": 3 }
+          {
+            "id": "finch-debts",
+            "text": "I owe a great deal of money to a bookmaker in Leeds. Reginald refused to lend it to me.",
+            "unlockAct": 0
+          },
+          {
+            "id": "finch-margaret",
+            "text": "I attended the first Lady Blackwood the night she died. I had been drinking.",
+            "unlockAct": 3
+          }
         ],
         "objectives": [
           "Do not get caught. Encourage suspicion of Hargrove and Captain Rafferty.",
@@ -108,9 +159,15 @@
         ],
         "alibi": "I was at the séance from 9:30 until ten, holding hands with Lady Evelyn and Madame Zelda. Ask them.",
         "lines": {
-          "act1": ["As his physician, I can tell you it was a single terrible blow. He was struck at 9:47, when the clock stopped."],
-          "act2": ["Digitalis? Yes, I carry it. I gave the last of it to old Mrs. Pritchard yesterday. Her heart, you understand."],
-          "act3": ["The séance was dark, madam. You cannot possibly be sure whose hand you were holding."]
+          "act1": [
+            "As his physician, I can tell you it was a single terrible blow. He was struck at 9:47, when the clock stopped."
+          ],
+          "act2": [
+            "Digitalis? Yes, I carry it. I gave the last of it to old Mrs. Pritchard yesterday. Her heart, you understand."
+          ],
+          "act3": [
+            "The séance was dark, madam. You cannot possibly be sure whose hand you were holding."
+          ]
         }
       }
     },
@@ -121,13 +178,26 @@
       "title": "The Aviator Daughter",
       "publicBio": "Reginald's daughter by his first marriage. Bobbed hair, oil under her fingernails, and a biplane in the old barn. She wants to be the first woman to fly solo to India, and her father refuses to pay for it.",
       "costumeTips": "Leather flying jacket, jodhpurs, goggles pushed up on the head and a silk scarf.",
-      "voice": { "accent": "en-GB", "pitch": 1.1, "rate": 1.1, "style": "brisk, defiant" },
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.1,
+        "rate": 1.1,
+        "style": "brisk, defiant"
+      },
       "required": true,
       "private": {
         "backstory": "Your mother Margaret died when you were ten. You always felt that Father never grieved, and you have never forgiven him for marrying a showgirl. Tonight you learned the new will cuts you off without a penny unless you marry Percy and give up flying.",
         "secrets": [
-          { "id": "violet-barn", "text": "At 9:47 I was not in my room as I claimed. I was in the barn, taking cash from Father's strongbox to buy a new engine.", "unlockAct": 0 },
-          { "id": "violet-engagement", "text": "I have no intention of marrying Percy. I only accepted him so Father would release my allowance.", "unlockAct": 2 }
+          {
+            "id": "violet-barn",
+            "text": "At 9:47 I was not in my room as I claimed. I was in the barn, taking cash from Father's strongbox to buy a new engine.",
+            "unlockAct": 0
+          },
+          {
+            "id": "violet-engagement",
+            "text": "I have no intention of marrying Percy. I only accepted him so Father would release my allowance.",
+            "unlockAct": 2
+          }
         ],
         "objectives": [
           "Find out who really gets the money under the new will.",
@@ -140,9 +210,15 @@
         ],
         "alibi": "I was in my room with a headache from 9:30 until I heard the commotion.",
         "lines": {
-          "act1": ["Don't look at me like that. Father and I fought, yes. We always fought. That doesn't make me a murderer."],
-          "act2": ["Disinherited? Good. I'd rather fly than be bought."],
-          "act3": ["Doctor Finch, you were there the night Mother died. What exactly happened?"]
+          "act1": [
+            "Don't look at me like that. Father and I fought, yes. We always fought. That doesn't make me a murderer."
+          ],
+          "act2": [
+            "Disinherited? Good. I'd rather fly than be bought."
+          ],
+          "act3": [
+            "Doctor Finch, you were there the night Mother died. What exactly happened?"
+          ]
         }
       }
     },
@@ -153,13 +229,26 @@
       "title": "The War Hero",
       "publicBio": "Decorated at the Somme, dashing in a dinner jacket, and Reginald's business partner in the 'import-export' trade. The ladies adore him. The gentlemen check their wallets.",
       "costumeTips": "Dinner jacket with a military medal, slicked-back hair, a thin moustache and a silver cigarette case.",
-      "voice": { "accent": "en-GB", "pitch": 0.9, "rate": 1.05, "style": "charming, roguish" },
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.9,
+        "rate": 1.05,
+        "style": "charming, roguish"
+      },
       "required": false,
       "private": {
         "backstory": "You and Reginald ran gin to Prohibition America through Hull. He was about to cut you out and hand your routes to a Glasgow gang. You are also in love with his wife.",
         "secrets": [
-          { "id": "rafferty-gin", "text": "Reginald and I smuggled gin to America. He was cutting me out of the business tonight.", "unlockAct": 0 },
-          { "id": "rafferty-evelyn", "text": "I intend to take Evelyn to Monte Carlo the moment this is over.", "unlockAct": 2 }
+          {
+            "id": "rafferty-gin",
+            "text": "Reginald and I smuggled gin to America. He was cutting me out of the business tonight.",
+            "unlockAct": 0
+          },
+          {
+            "id": "rafferty-evelyn",
+            "text": "I intend to take Evelyn to Monte Carlo the moment this is over.",
+            "unlockAct": 2
+          }
         ],
         "objectives": [
           "Get hold of the shipping ledger before anyone reads it.",
@@ -172,9 +261,15 @@
         ],
         "alibi": "I was on the terrace having a smoke from about 9:40. Violet may have seen me.",
         "lines": {
-          "act1": ["I've seen men die in the trenches, and I tell you, that wound hardly bled. Strange, don't you think?"],
-          "act2": ["Business? Reginald and I were in shipping. Perfectly legal shipping."],
-          "act3": ["I saw someone head to the study with the port decanter at quarter past nine. It wasn't the butler."]
+          "act1": [
+            "I've seen men die in the trenches, and I tell you, that wound hardly bled. Strange, don't you think?"
+          ],
+          "act2": [
+            "Business? Reginald and I were in shipping. Perfectly legal shipping."
+          ],
+          "act3": [
+            "I saw someone head to the study with the port decanter at quarter past nine. It wasn't the butler."
+          ]
         }
       }
     },
@@ -185,13 +280,26 @@
       "title": "The Spiritualist",
       "publicBio": "A celebrated medium from Paris (or possibly Peckham) invited to hold a séance so Reginald could speak to his late first wife. She claims the spirits are restless tonight.",
       "costumeTips": "Flowing shawls, a turban with a jewel, many rings and a crystal ball.",
-      "voice": { "accent": "fr-FR", "pitch": 1.0, "rate": 0.85, "style": "mysterious, dramatic" },
+      "voice": {
+        "accent": "fr-FR",
+        "pitch": 1.0,
+        "rate": 0.85,
+        "style": "mysterious, dramatic"
+      },
       "required": false,
       "private": {
         "backstory": "Your real name is Doris Pratt and you are from Peckham. Reginald hired you, then threatened to expose you as a fraud in The Times unless you used the séance to frighten a confession out of someone. He wouldn't say who.",
         "secrets": [
-          { "id": "zelda-fraud", "text": "I am a fraud. My real name is Doris Pratt, and the 'spirit trumpet' is painted with luminous paint.", "unlockAct": 0 },
-          { "id": "zelda-hand", "text": "When the lights went out at the séance, the doctor's hand slipped out of mine for several minutes.", "unlockAct": 3 }
+          {
+            "id": "zelda-fraud",
+            "text": "I am a fraud. My real name is Doris Pratt, and the 'spirit trumpet' is painted with luminous paint.",
+            "unlockAct": 0
+          },
+          {
+            "id": "zelda-hand",
+            "text": "When the lights went out at the séance, the doctor's hand slipped out of mine for several minutes.",
+            "unlockAct": 3
+          }
         ],
         "objectives": [
           "Keep your true identity secret.",
@@ -204,9 +312,15 @@
         ],
         "alibi": "I was leading the séance in the drawing room from 9:30 until ten.",
         "lines": {
-          "act1": ["The spirits speak of a woman named Margaret. She is… so angry."],
-          "act2": ["I will not be called a fraud by people with far darker secrets than mine."],
-          "act3": ["When the lights went out, someone let go of my hand. The spirits did not lie. Somebody left that table."]
+          "act1": [
+            "The spirits speak of a woman named Margaret. She is… so angry."
+          ],
+          "act2": [
+            "I will not be called a fraud by people with far darker secrets than mine."
+          ],
+          "act3": [
+            "When the lights went out, someone let go of my hand. The spirits did not lie. Somebody left that table."
+          ]
         }
       }
     },
@@ -217,13 +331,26 @@
       "title": "The Cook",
       "publicBio": "Runs the kitchen with a wooden spoon and an iron will. She hears everything through the dumbwaiter and forgets nothing.",
       "costumeTips": "Apron over a plain dress, a mob cap, rolled-up sleeves and a rolling pin.",
-      "voice": { "accent": "en-IE", "pitch": 1.0, "rate": 1.1, "style": "sharp, gossipy" },
+      "voice": {
+        "accent": "en-IE",
+        "pitch": 1.0,
+        "rate": 1.1,
+        "style": "sharp, gossipy"
+      },
       "required": false,
       "private": {
         "backstory": "You have cooked for the Blackwoods for twenty years. You know every scandal in the house. Reginald recently caught you slipping food and money to your nephew, a striking miner.",
         "secrets": [
-          { "id": "omalley-nephew", "text": "I've been giving food and money from the household to my nephew and the miners' strike fund.", "unlockAct": 0 },
-          { "id": "omalley-foxglove", "text": "Dr. Finch asked me last week whether foxgloves grow in the kitchen garden.", "unlockAct": 2 }
+          {
+            "id": "omalley-nephew",
+            "text": "I've been giving food and money from the household to my nephew and the miners' strike fund.",
+            "unlockAct": 0
+          },
+          {
+            "id": "omalley-foxglove",
+            "text": "Dr. Finch asked me last week whether foxgloves grow in the kitchen garden.",
+            "unlockAct": 2
+          }
         ],
         "objectives": [
           "Protect your nephew.",
@@ -236,9 +363,15 @@
         ],
         "alibi": "I was washing up in the kitchen all evening. Ask the dumbwaiter.",
         "lines": {
-          "act1": ["I'll say what nobody else will: this house was full of people who wanted him dead."],
-          "act2": ["Foxgloves? Funny you should mention foxgloves…"],
-          "act3": ["That decanter walked out of my hatch at ten past nine, and it didn't have legs."]
+          "act1": [
+            "I'll say what nobody else will: this house was full of people who wanted him dead."
+          ],
+          "act2": [
+            "Foxgloves? Funny you should mention foxgloves…"
+          ],
+          "act3": [
+            "That decanter walked out of my hatch at ten past nine, and it didn't have legs."
+          ]
         }
       }
     },
@@ -249,13 +382,26 @@
       "title": "The Penniless Peer",
       "publicBio": "An old title and no money to go with it. Percy is engaged to Violet, adores cricket and cocktails, and is almost certainly not as foolish as he looks.",
       "costumeTips": "Cricket jumper or a striped blazer, a boater hat, a monocle and a cocktail glass.",
-      "voice": { "accent": "en-GB", "pitch": 1.05, "rate": 1.15, "style": "jolly, flustered" },
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.05,
+        "rate": 1.15,
+        "style": "jolly, flustered"
+      },
       "required": false,
       "private": {
         "backstory": "Ashworth Hall is mortgaged to the rafters. You owe Reginald £5,000, and he agreed to forgive it on your wedding day. With him dead, you don't know whether the debt dies too.",
         "secrets": [
-          { "id": "percy-debt", "text": "I owe Reginald £5,000 in gambling debts. He was going to forgive it when I married Violet.", "unlockAct": 0 },
-          { "id": "percy-muddy", "text": "At 9:47 I followed Violet out to the barn and saw her open her father's strongbox.", "unlockAct": 2 }
+          {
+            "id": "percy-debt",
+            "text": "I owe Reginald £5,000 in gambling debts. He was going to forgive it when I married Violet.",
+            "unlockAct": 0
+          },
+          {
+            "id": "percy-muddy",
+            "text": "At 9:47 I followed Violet out to the barn and saw her open her father's strongbox.",
+            "unlockAct": 2
+          }
         ],
         "objectives": [
           "Find your IOU and make it disappear.",
@@ -268,9 +414,15 @@
         ],
         "alibi": "I was, er, in the library reading Wisden. Alone. Rather a lot of cricket.",
         "lines": {
-          "act1": ["I say, steady on. Nobody's accusing anybody. Yet. Cocktail, anyone?"],
-          "act2": ["That IOU is a forgery! Well, not a forgery exactly. More of a… misunderstanding."],
-          "act3": ["The doctor lost a packet at Doncaster. A man with debts like that might do anything."]
+          "act1": [
+            "I say, steady on. Nobody's accusing anybody. Yet. Cocktail, anyone?"
+          ],
+          "act2": [
+            "That IOU is a forgery! Well, not a forgery exactly. More of a… misunderstanding."
+          ],
+          "act3": [
+            "The doctor lost a packet at Doncaster. A man with debts like that might do anything."
+          ]
         }
       }
     }
@@ -283,7 +435,9 @@
       "visibility": "public",
       "act": 1,
       "wave": "start",
-      "pointsTo": ["hargrove"],
+      "pointsTo": [
+        "hargrove"
+      ],
       "redHerring": true
     },
     {
@@ -293,7 +447,11 @@
       "visibility": "public",
       "act": 1,
       "wave": "start",
-      "pointsTo": ["violet", "rafferty", "hargrove"],
+      "pointsTo": [
+        "violet",
+        "rafferty",
+        "hargrove"
+      ],
       "redHerring": true
     },
     {
@@ -303,17 +461,21 @@
       "visibility": "public",
       "act": 1,
       "wave": "start",
-      "pointsTo": ["finch"]
+      "pointsTo": [
+        "finch"
+      ]
     },
     {
       "id": "cook-decanter",
       "title": "The Missing Decanter",
-      "text": "You saw the doctor carry the port decanter from your serving hatch towards the study at quarter past nine. He winked and said, 'Doctor's orders: a nightcap for his Lordship's heart.'",
+      "text": "Mrs. O'Malley's kitchen ledger, in her own hand: '9:15. Doctor took the port decanter from my hatch to the study. Winked and said, \"Doctor's orders: a nightcap for his Lordship's heart.\" Since when does the doctor serve the port?'",
       "visibility": "private",
       "recipient": "omalley",
       "act": 1,
       "wave": "start",
-      "pointsTo": ["finch"]
+      "pointsTo": [
+        "finch"
+      ]
     },
     {
       "id": "cufflink",
@@ -322,18 +484,22 @@
       "visibility": "public",
       "act": 1,
       "wave": "midway",
-      "pointsTo": ["rafferty"],
+      "pointsTo": [
+        "rafferty"
+      ],
       "redHerring": true
     },
     {
       "id": "violet-boots",
       "title": "Muddy Flying Boots",
-      "text": "You noticed Violet's flying boots by the back door, soaked and caked in fresh mud at ten o'clock. She says she never left her room.",
+      "text": "Violet's flying boots stand by the back door at ten o'clock, soaked and caked in fresh mud, though she claims she never left her room.",
       "visibility": "private",
       "recipient": "percy",
       "act": 1,
       "wave": "midway",
-      "pointsTo": ["violet"],
+      "pointsTo": [
+        "violet"
+      ],
       "redHerring": true
     },
     {
@@ -343,7 +509,10 @@
       "visibility": "public",
       "act": 1,
       "wave": "midway",
-      "pointsTo": ["finch", "omalley"]
+      "pointsTo": [
+        "finch",
+        "omalley"
+      ]
     },
     {
       "id": "new-will",
@@ -352,18 +521,24 @@
       "visibility": "public",
       "act": 2,
       "wave": "start",
-      "pointsTo": ["violet", "evelyn", "hargrove"],
+      "pointsTo": [
+        "violet",
+        "evelyn",
+        "hargrove"
+      ],
       "redHerring": true
     },
     {
       "id": "forged-cheque",
       "title": "A Forged Cheque",
-      "text": "While sorting the post you found a bank letter querying a £2,000 cheque. The signature is Reginald's, badly copied, and the ink is the violet colour only Lady Evelyn uses.",
+      "text": "A bank letter in the morning post queries a £2,000 cheque. The signature is Reginald's, badly copied, and the ink is the violet colour only Lady Evelyn uses.",
       "visibility": "private",
       "recipient": "hargrove",
       "act": 2,
       "wave": "start",
-      "pointsTo": ["evelyn"],
+      "pointsTo": [
+        "evelyn"
+      ],
       "redHerring": true
     },
     {
@@ -373,7 +548,9 @@
       "visibility": "public",
       "act": 2,
       "wave": "start",
-      "pointsTo": ["finch"]
+      "pointsTo": [
+        "finch"
+      ]
     },
     {
       "id": "percy-iou",
@@ -382,7 +559,9 @@
       "visibility": "public",
       "act": 2,
       "wave": "midway",
-      "pointsTo": ["percy"],
+      "pointsTo": [
+        "percy"
+      ],
       "redHerring": true
     },
     {
@@ -392,7 +571,9 @@
       "visibility": "public",
       "act": 2,
       "wave": "midway",
-      "pointsTo": ["zelda"],
+      "pointsTo": [
+        "zelda"
+      ],
       "redHerring": true
     },
     {
@@ -402,10 +583,18 @@
       "visibility": "public",
       "act": 2,
       "wave": "midway",
-      "pointsTo": ["finch"],
+      "pointsTo": [
+        "finch"
+      ],
       "puzzle": {
         "prompt": "I have hands but cannot clap, a face but cannot see. I tell you when but never why, and tonight I told a lie. What am I?",
-        "answers": ["clock", "a clock", "the clock", "grandfather clock", "the grandfather clock"],
+        "answers": [
+          "clock",
+          "a clock",
+          "the clock",
+          "grandfather clock",
+          "the grandfather clock"
+        ],
         "hint": "Look at what everyone has been staring at since the body was found.",
         "solvedText": "The final entry reads: 'Tomorrow the truth about Margaret's death comes out. F. was drunk at her bedside and I have his own letter admitting it. After the will is read I ring Scotland Yard. Let him sweat through Zelda's séance first.'"
       }
@@ -413,12 +602,14 @@
     {
       "id": "zelda-hand-clue",
       "title": "A Cold Hand in the Dark",
-      "text": "During the séance, when the lights failed at about 9:52, the hand you were holding on your left (Dr. Finch's) let go. It came back six or seven minutes later, ice cold and damp, just before the lights returned.",
+      "text": "Madame Zelda's own recollection: when the lights failed at about 9:52, the hand on her left (Dr. Finch's) let go. It came back six or seven minutes later, ice cold and damp, just before the lights returned.",
       "visibility": "private",
       "recipient": "zelda",
       "act": 3,
       "wave": "start",
-      "pointsTo": ["finch"]
+      "pointsTo": [
+        "finch"
+      ]
     },
     {
       "id": "clock-mechanism",
@@ -427,27 +618,56 @@
       "visibility": "public",
       "act": 3,
       "wave": "start",
-      "pointsTo": ["finch", "zelda"]
+      "pointsTo": [
+        "finch",
+        "zelda"
+      ]
     },
     {
       "id": "maids-letter",
       "title": "A Letter About Mother",
-      "text": "From your mother's old lady's maid, sent years ago and only now found in your father's desk: 'Your Lordship, the doctor had been drinking that night. I saw him fumble the dose. I was too frightened to speak.'",
+      "text": "A letter to Reginald from the first Lady Blackwood's lady's maid, sent years ago and hidden in his desk: 'Your Lordship, the doctor had been drinking that night. I saw him fumble the dose. I was too frightened to speak.'",
       "visibility": "private",
       "recipient": "violet",
       "act": 3,
       "wave": "midway",
-      "pointsTo": ["finch"]
+      "pointsTo": [
+        "finch"
+      ]
     }
   ],
   "prologue": [
-    { "type": "image", "text": "Blackwood Manor, October 1926. Rain lashes the windows.", "effect": "kenburns" },
-    { "type": "narration", "text": "Blackwood Manor. A storm rolls across the moors, and the bridge to the village is already under water. Tonight Lord Reginald Blackwood has gathered his household for dinner, a séance, and an announcement: a new will." },
-    { "type": "narration", "text": "Dinner is tense. Glasses are refilled too often. At half past nine the guests follow Madame Zelda to the drawing room, where candles gutter and a luminous trumpet floats in the dark." },
-    { "type": "image", "text": "The drawing room séance. Hands joined around the table.", "effect": "kenburns" },
-    { "type": "narration", "text": "At a little before ten the lights fail. When they return, the butler's voice rings out from the study. Lord Reginald Blackwood is slumped across his desk, a bloodied candlestick beside him, and the grandfather clock has stopped at 9:47." },
-    { "type": "image", "text": "The study. The clock reads 9:47.", "effect": "kenburns" },
-    { "type": "narration", "text": "The telephone is dead. The road is flooded. Whoever did this is still in the house, and may be sitting right beside you." }
+    {
+      "type": "image",
+      "text": "Blackwood Manor, October 1926. Rain lashes the windows.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Blackwood Manor. A storm rolls across the moors, and the bridge to the village is already under water. Tonight Lord Reginald Blackwood has gathered his household for dinner, a séance, and an announcement: a new will."
+    },
+    {
+      "type": "narration",
+      "text": "Dinner is tense. Glasses are refilled too often. At half past nine the guests follow Madame Zelda to the drawing room, where candles gutter and a luminous trumpet floats in the dark."
+    },
+    {
+      "type": "image",
+      "text": "The drawing room séance. Hands joined around the table.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At a little before ten the lights fail. When they return, the butler's voice rings out from the study. Lord Reginald Blackwood is slumped across his desk, a bloodied candlestick beside him, and the grandfather clock has stopped at 9:47."
+    },
+    {
+      "type": "image",
+      "text": "The study. The clock reads 9:47.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The telephone is dead. The road is flooded. Whoever did this is still in the house, and may be sitting right beside you."
+    }
   ],
   "acts": [
     {
@@ -455,8 +675,14 @@
       "title": "Act One: The Body in the Study",
       "mingleMinutes": 25,
       "cues": [
-        { "type": "narration", "text": "Act One. The Body in the Study." },
-        { "type": "narration", "text": "The household gathers in the hall, dripping candle wax and suspicion. Somebody here struck Lord Reginald down, or so it seems. Introduce yourselves to one another, in character. Tell the others who you are and where you were at 9:47." }
+        {
+          "type": "narration",
+          "text": "Act One. The Body in the Study."
+        },
+        {
+          "type": "narration",
+          "text": "The household gathers in the hall, dripping candle wax and suspicion. Somebody here struck Lord Reginald down, or so it seems. Introduce yourselves to one another, in character. Tell the others who you are and where you were at 9:47."
+        }
       ],
       "prompts": [
         "Introduce your character: who are you, and what brought you to Blackwood Manor?",
@@ -470,9 +696,19 @@
       "title": "Act Two: Skeletons in the Cellar",
       "mingleMinutes": 25,
       "cues": [
-        { "type": "narration", "text": "Act Two. Skeletons in the Cellar." },
-        { "type": "image", "text": "Reginald's desk, papers strewn across the blotter.", "effect": "kenburns" },
-        { "type": "narration", "text": "Reginald's desk has been opened. Inside: a new will that changes everything, debts that nobody wants to talk about, and a locked diary. Money has a way of loosening tongues. Tonight, it may tighten a noose." }
+        {
+          "type": "narration",
+          "text": "Act Two. Skeletons in the Cellar."
+        },
+        {
+          "type": "image",
+          "text": "Reginald's desk, papers strewn across the blotter.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Reginald's desk has been opened. Inside: a new will that changes everything, debts that nobody wants to talk about, and a locked diary. Money has a way of loosening tongues. Tonight, it may tighten a noose."
+        }
       ],
       "prompts": [
         "Who gains and who loses under the new will?",
@@ -486,9 +722,19 @@
       "title": "Act Three: The Clock Struck Lies",
       "mingleMinutes": 20,
       "cues": [
-        { "type": "narration", "text": "Act Three. The Clock Struck Lies." },
-        { "type": "image", "text": "The grandfather clock, its pendulum still.", "effect": "kenburns" },
-        { "type": "narration", "text": "Something about the time of death doesn't sit right. The séance, the darkness, the stopped clock. Perhaps Lord Reginald did not die when everyone thinks he did. And perhaps the killer's alibi is not an alibi at all." }
+        {
+          "type": "narration",
+          "text": "Act Three. The Clock Struck Lies."
+        },
+        {
+          "type": "image",
+          "text": "The grandfather clock, its pendulum still.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Something about the time of death doesn't sit right. The séance, the darkness, the stopped clock. Perhaps Lord Reginald did not die when everyone thinks he did. And perhaps the killer's alibi is not an alibi at all."
+        }
       ],
       "prompts": [
         "Was Reginald really killed at 9:47? What if he was already dead?",
@@ -500,17 +746,44 @@
   ],
   "accusation": {
     "motives": [
-      { "id": "inheritance", "text": "To secure an inheritance" },
-      { "id": "love", "text": "For love or jealousy" },
-      { "id": "business", "text": "To save a criminal business" },
-      { "id": "exposure", "text": "To stop him exposing a past crime" },
-      { "id": "debt", "text": "To escape a debt" }
+      {
+        "id": "inheritance",
+        "text": "To secure an inheritance"
+      },
+      {
+        "id": "love",
+        "text": "For love or jealousy"
+      },
+      {
+        "id": "business",
+        "text": "To save a criminal business"
+      },
+      {
+        "id": "exposure",
+        "text": "To stop him exposing a past crime"
+      },
+      {
+        "id": "debt",
+        "text": "To escape a debt"
+      }
     ],
     "methods": [
-      { "id": "candlestick", "text": "Struck with the silver candlestick" },
-      { "id": "digitalis", "text": "Poisoned port (digitalis)" },
-      { "id": "letter-opener", "text": "Stabbed with the letter opener" },
-      { "id": "smothered", "text": "Smothered with a cushion" }
+      {
+        "id": "candlestick",
+        "text": "Struck with the silver candlestick"
+      },
+      {
+        "id": "digitalis",
+        "text": "Poisoned port (digitalis)"
+      },
+      {
+        "id": "letter-opener",
+        "text": "Stabbed with the letter opener"
+      },
+      {
+        "id": "smothered",
+        "text": "Smothered with a cushion"
+      }
     ]
   },
   "solution": {
@@ -525,19 +798,53 @@
       "The butler did not do it. Not this time."
     ],
     "timeline": [
-      { "time": "8:30", "event": "Captain Rafferty argues with Reginald in the study and loses a cufflink." },
-      { "time": "9:10", "event": "Dr. Finch takes the port decanter from the kitchen hatch." },
-      { "time": "9:15", "event": "Finch serves Reginald port laced with digitalis. Hargrove sees him leave with the decanter." },
-      { "time": "9:30", "event": "The séance begins. Reginald dies at his desk shortly after." },
-      { "time": "9:47", "event": "Violet is in the barn at the strongbox, Percy is watching her, and Rafferty is smoking on the terrace." },
-      { "time": "9:52", "event": "The lights fail. Finch slips away from the séance table." },
-      { "time": "9:55", "event": "Finch strikes the body, stops the clock and sets it to 9:47." },
-      { "time": "10:00", "event": "Hargrove discovers the body." }
+      {
+        "time": "8:30",
+        "event": "Captain Rafferty argues with Reginald in the study and loses a cufflink."
+      },
+      {
+        "time": "9:10",
+        "event": "Dr. Finch takes the port decanter from the kitchen hatch."
+      },
+      {
+        "time": "9:15",
+        "event": "Finch serves Reginald port laced with digitalis. Hargrove sees him leave with the decanter."
+      },
+      {
+        "time": "9:30",
+        "event": "The séance begins. Reginald dies at his desk shortly after."
+      },
+      {
+        "time": "9:47",
+        "event": "Violet is in the barn at the strongbox, Percy is watching her, and Rafferty is smoking on the terrace."
+      },
+      {
+        "time": "9:52",
+        "event": "The lights fail. Finch slips away from the séance table."
+      },
+      {
+        "time": "9:55",
+        "event": "Finch strikes the body, stops the clock and sets it to 9:47."
+      },
+      {
+        "time": "10:00",
+        "event": "Hargrove discovers the body."
+      }
     ]
   },
   "finale": [
-    { "type": "image", "text": "Dawn over the moors. A police car crosses the bridge.", "effect": "kenburns" },
-    { "type": "narration", "text": "By dawn the waters had fallen and the police motor came rattling across the bridge. Dr. Cornelius Finch went quietly. He had, after all, been expecting them for fifteen years." },
-    { "type": "narration", "text": "As for the rest of Blackwood Manor's household, their secrets are out now. Whether they can live with them is another mystery entirely. Good night, detectives." }
+    {
+      "type": "image",
+      "text": "Dawn over the moors. A police car crosses the bridge.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "By dawn the waters had fallen and the police motor came rattling across the bridge. Dr. Cornelius Finch went quietly. He had, after all, been expecting them for fifteen years."
+    },
+    {
+      "type": "narration",
+      "text": "As for the rest of Blackwood Manor's household, their secrets are out now. Whether they can live with them is another mystery entirely. Good night, detectives."
+    }
   ]
 }

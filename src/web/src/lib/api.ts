@@ -1,0 +1,51 @@
+import type { ContentRating, Me, PartyInfo, PartyMode, SeatResponse, ThemeCard } from './types'
+
+/** An error whose message came from the server and is safe to show to the user. */
+export class ApiError extends Error {
+  readonly status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
+async function request<T>(method: string, url: string, body?: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method,
+    // Same origin, so the host's auth cookie is sent automatically.
+    credentials: 'same-origin',
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+  if (!res.ok) {
+    // The API returns RFC 7807 "problem details": { title, detail, status }.
+    let message = res.status === 401 ? 'Please sign in.' : `Request failed (${res.status}).`
+    try {
+      const problem = await res.json()
+      message = problem.detail ?? problem.title ?? message
+    } catch {
+      /* not JSON */
+    }
+    throw new ApiError(res.status, message)
+  }
+  if (res.status === 204) return undefined as T
+  return (await res.json()) as T
+}
+
+export const api = {
+  me: () => request<Me>('GET', '/api/auth/me'),
+  login: (email: string, password: string) => request<Me>('POST', '/api/auth/login', { email, password }),
+  register: (email: string, password: string, displayName: string) =>
+    request<Me>('POST', '/api/auth/register', { email, password, displayName }),
+  logout: () => request<void>('POST', '/api/auth/logout'),
+
+  themes: () => request<ThemeCard[]>('GET', '/api/themes'),
+
+  myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
+  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null) =>
+    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor }),
+  party: (code: string) => request<PartyInfo>('GET', `/api/parties/${encodeURIComponent(code)}`),
+  join: (code: string, name: string) => request<SeatResponse>('POST', `/api/parties/${encodeURIComponent(code)}/join`, { name }),
+  addSeat: (code: string, name: string, isLocal: boolean) =>
+    request<SeatResponse>('POST', `/api/parties/${encodeURIComponent(code)}/seats`, { name, isLocal }),
+}
