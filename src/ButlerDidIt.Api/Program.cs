@@ -1,5 +1,8 @@
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using ButlerDidIt.Ai;
+using ButlerDidIt.Ai.Generation;
+using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
@@ -22,6 +25,7 @@ var config = builder.Configuration;
 // ---------------------------------------------------------------- options
 builder.Services.Configure<ContentOptions>(config.GetSection("Content"));
 builder.Services.Configure<AuthOptions>(config.GetSection("Auth"));
+builder.Services.Configure<AiOptions>(config.GetSection("Ai"));
 
 // ---------------------------------------------------------------- database
 builder.Services.AddDbContext<AppDbContext>(o =>
@@ -75,6 +79,10 @@ if (config["DataProtection:KeysPath"] is { Length: > 0 } keysPath)
 {
     builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keysPath)).SetApplicationName("ButlerDidIt");
 }
+else
+{
+    builder.Services.AddDataProtection().SetApplicationName("ButlerDidIt");
+}
 
 // ---------------------------------------------------------------- rate limiting
 builder.Services.AddRateLimiter(o =>
@@ -100,6 +108,23 @@ builder.Services.AddSingleton<PartyLocks>();
 builder.Services.AddScoped<PartyService>();
 builder.Services.AddHostedService<PartyTicker>();
 
+// ---------------------------------------------------------------- AI (see docs/ai-setup.md)
+// Every AI call goes through AiGateway, which picks the provider for the role
+// (Claude, ChatGPT, Gemini or Ollama), enforces the budget and logs usage.
+builder.Services.AddSingleton<AiKeyProtector>();
+builder.Services.AddSingleton<IChatClientFactory>(sp =>
+    new ChatClientFactory(allowFake: sp.GetRequiredService<IOptions<AiOptions>>().Value.AllowFakeProvider));
+builder.Services.AddScoped<IAiSettingsSource, DbAiSettingsSource>();
+builder.Services.AddSingleton<IAiUsageSink, DbAiUsageSink>();
+builder.Services.AddScoped<IAiBudget, DbAiBudget>();
+builder.Services.AddScoped<AiGateway>();
+builder.Services.AddScoped<MysteryGenerator>();
+builder.Services.AddScoped<AiGameService>();
+builder.Services.AddSingleton<VerdictQueue>();
+builder.Services.AddHostedService<VerdictWorker>();
+builder.Services.AddSingleton<GenerationWorker>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<GenerationWorker>());
+
 builder.Services
     .AddSignalR(o => o.AddFilter<GameRuleHubFilter>())
     .AddJsonProtocol(o =>
@@ -123,6 +148,7 @@ if (!app.Configuration.GetValue<bool>("SkipStartupTasks"))
     await db.Database.MigrateAsync();
     var contentRoot = Path.Combine(app.Environment.ContentRootPath, app.Services.GetRequiredService<IOptions<ContentOptions>>().Value.Root);
     await app.Services.GetRequiredService<ContentCatalog>().SeedAsync(contentRoot);
+    await AiConfigSeeder.SeedAsync(app.Services);
 }
 
 // ---------------------------------------------------------------- pipeline
@@ -133,6 +159,7 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async ctx =>
     var (status, message) = error switch
     {
         GameRuleException e => (StatusCodes.Status400BadRequest, e.Message),
+        AiException e => (StatusCodes.Status400BadRequest, e.Message),
         KeyNotFoundException e => (StatusCodes.Status404NotFound, e.Message),
         _ => (StatusCodes.Status500InternalServerError, "Something went wrong."),
     };
@@ -151,6 +178,8 @@ app.MapAuthEndpoints();
 app.MapThemeEndpoints();
 app.MapPartyEndpoints();
 app.MapMediaEndpoints();
+app.MapAiEndpoints();
+app.MapGenerationEndpoints();
 app.MapHub<PartyHub>("/hubs/party");
 
 // Any other URL (/join/ABC123, /stage/ABC123…) is a page in the React app.

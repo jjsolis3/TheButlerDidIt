@@ -46,7 +46,13 @@ public static class ViewProjector
             Feed: s.Feed.TakeLast(12).ToList(),
             Accusation: s.Phase == Phase.Accusation ? new AccusationProgress(s.Accusations.Count, s.Players.Count) : null,
             Reveal: s.Phase is Phase.Reveal or Phase.Awards or Phase.Finished ? BuildReveal(s, scenario) : null,
-            Awards: s.Phase is Phase.Awards or Phase.Finished ? BuildAwards(s, scenario) : null);
+            Awards: s.Phase is Phase.Awards or Phase.Finished ? BuildAwards(s, scenario) : null,
+            Ai: s.Ai,
+            Interrogations: s.Interrogations.TakeLast(30).Select(i =>
+            {
+                var npc = scenario.FindCharacter(i.CharacterId);
+                return new InterrogationView(i.Id, i.Act, i.AskerName, i.CharacterId, npc?.Name ?? i.CharacterId, i.Question, i.Answer, npc?.Voice);
+            }).ToList());
     }
 
     public static PlayerView Player(GameState s, Scenario scenario, Guid seatId, DateTimeOffset now)
@@ -83,6 +89,10 @@ public static class ViewProjector
                         .ToList(),
                     s.AwardVotes.GetValueOrDefault(seatId) ?? new Dictionary<string, Guid>())
                 : null,
+            QuestionsLeft: GameEngine.QuestionsLeft(s, seatId),
+            HintsLeft: GameEngine.HintsLeft(s, seatId),
+            // Hints are private: only this seat's own hints are copied in.
+            MyHints: s.Hints.Where(h => h.SeatId == seatId).Select(h => new HintView(h.Id, h.Act, h.Text)).ToList(),
             Stage: stage);
     }
 
@@ -213,14 +223,17 @@ public static class ViewProjector
         var guesses = s.Players.Select(p =>
         {
             var character = p.CharacterId is { } id ? scenario.FindCharacter(id)?.Name : null;
+            // The Inspector's verdict mentions the solution, so it only appears once the killer is unmasked.
+            var verdict = unmasked ? s.Verdicts.GetValueOrDefault(p.SeatId) : null;
             if (!s.Accusations.TryGetValue(p.SeatId, out var a))
-                return new GuessView(p.Name, character, null, null, null, null);
+                return new GuessView(p.Name, character, null, null, null, null, verdict);
             return new GuessView(
                 p.Name, character,
                 scenario.FindCharacter(a.SuspectId)?.Name,
                 OptionText(scenario.Accusation.Motives, a.MotiveId),
                 OptionText(scenario.Accusation.Methods, a.MethodId),
-                unmasked ? a.SuspectId == solution.MurdererId : null);
+                unmasked ? a.SuspectId == solution.MurdererId : null,
+                verdict);
         }).ToList();
 
         // Only copy solution fields in once the reveal has reached them.

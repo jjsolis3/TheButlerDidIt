@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using ButlerDidIt.Ai;
+using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
@@ -7,10 +9,11 @@ using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using ButlerDidIt.Game.Scenarios;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor);
+public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor, bool UseAi = true);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -51,8 +54,14 @@ public static class PartyEndpoints
             return result;
         }).RequireAuthorization(AuthPolicies.Host);
 
-        group.MapPost("/", async (CreatePartyRequest req, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties, CancellationToken ct) =>
+        group.MapPost("/", async (CreatePartyRequest req, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties,
+            AiGateway ai, IOptions<AiOptions> aiOptions, CancellationToken ct) =>
         {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            // AI-generated mysteries belong to the host who generated them.
+            var owner = await db.Scenarios.AsNoTracking().Where(x => x.Id == req.ScenarioId).Select(x => x.OwnerUserId).FirstOrDefaultAsync(ct);
+            if (owner is not null && owner != userId) return Results.Problem("Pick a mystery to play.", statusCode: 400);
+
             Scenario scenario;
             try { scenario = await catalog.GetScenarioAsync(db, req.ScenarioId, ct); }
             catch (KeyNotFoundException) { return Results.Problem("Pick a mystery to play.", statusCode: 400); }
@@ -64,14 +73,14 @@ public static class PartyEndpoints
             {
                 Id = Guid.NewGuid(),
                 Code = await UniqueCodeAsync(db, ct),
-                HostUserId = user.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                HostUserId = userId,
                 ScenarioId = scenario.Id,
                 Mode = req.Mode,
                 ContentLevel = req.ContentLevel,
                 Status = PartyStatus.Lobby,
                 CreatedAt = parties.Now,
                 ScheduledFor = req.ScheduledFor,
-                State = GameJson.Serialize(GameEngine.NewGame()),
+                State = GameJson.Serialize(new GameState { Ai = await AiFeaturesFor(req.UseAi, ai, aiOptions.Value, ct) }),
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);
@@ -106,6 +115,20 @@ public static class PartyEndpoints
             var isHostSeat = !req.IsLocal;
             return Results.Ok(await AddSeatAsync(party, req.Name, isHostSeat, req.IsLocal, parties, db, ct));
         }).RequireAuthorization(AuthPolicies.Host);
+    }
+
+    /// <summary>Switch on whichever AI features have a model assigned. With no AI configured, the party plays exactly as before.</summary>
+    private static async Task<AiFeatures> AiFeaturesFor(bool useAi, AiGateway ai, AiOptions options, CancellationToken ct)
+    {
+        if (!useAi) return new AiFeatures();
+        var actor = await ai.IsConfiguredAsync(AiRole.Actor, ct);
+        var inspector = await ai.IsConfiguredAsync(AiRole.Inspector, ct);
+        return new AiFeatures
+        {
+            NpcQuestions = actor, QuestionsPerAct = Math.Clamp(options.QuestionsPerAct, 1, 20),
+            Hints = inspector, HintsPerAct = Math.Clamp(options.HintsPerAct, 1, 10),
+            Verdicts = inspector,
+        };
     }
 
     private static async Task<SeatResponse> AddSeatAsync(Party party, string name, bool isHost, bool isLocal, PartyService parties, AppDbContext db, CancellationToken ct)
