@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+
+# Node / front end
+node_modules/
+dist/
+src/web/.vite/
+*.tsbuildinfo
+
+# Built SPA copied into the API for single-container hosting
+src/ButlerDidIt.Api/wwwroot/
+
+# Local runtime data
+.env
+data/
+*.log
+
+# Playwright
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+tests/e2e/screenshots/
+
+.DS_Store
+.idea/

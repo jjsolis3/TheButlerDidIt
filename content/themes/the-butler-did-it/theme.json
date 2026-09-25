@@ -1,0 +1,15 @@
+{
+  "slug": "the-butler-did-it",
+  "name": "The Butler Did It",
+  "tagline": "A country house, a storm, a corpse, and a butler who knows too much.",
+  "era": "1920s English country house",
+  "description": "Candlelight, cut-glass decanters and old money gone sour. The classic drawing-room whodunit: everyone has a secret, everyone has a motive, and everyone is looking at the butler.",
+  "palette": {
+    "background": "#0f0d0b",
+    "surface": "#1c1814",
+    "accent": "#c8a45a",
+    "ink": "#f3ead8"
+  },
+  "artStyle": "1920s oil-painted portraiture, candlelit chiaroscuro, deep greens and burgundies, gilt frames, slightly noir",
+  "sortOrder": 1
+}

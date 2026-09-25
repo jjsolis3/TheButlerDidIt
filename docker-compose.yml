@@ -1,0 +1,46 @@
+# Production stack, deployed by Coolify (see docs/deploy-coolify.md).
+#
+# Coolify's built-in Traefik proxy terminates HTTPS for your domain and forwards
+# traffic (including WebSockets) to the `app` service on port 8080. No ports are
+# published on the host.
+#
+# Local run:  POSTGRES_PASSWORD=secret docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=butlerdidit;Username=butler;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD};GSS Encryption Mode=Disable"
+      # Trust X-Forwarded-Proto/For from the reverse proxy so the app knows the
+      # original request was HTTPS (secure cookies, correct QR code links).
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      # Set to false after you create your host account to make the server invite-only.
+      Auth__AllowRegistration: "${ALLOW_REGISTRATION:-true}"
+    volumes:
+      - keys:/data/keys   # keeps hosts logged in across redeploys
+      - media:/data/media # generated images and voices (milestone 3)
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: butlerdidit
+      POSTGRES_USER: butler
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U butler -d butlerdidit"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+  keys:
+  media:

@@ -1,0 +1,10 @@
+{
+  "slug": "pirate-cove",
+  "name": "Dead Men Tell No Tales",
+  "tagline": "Buried treasure, a mutinous crew, and a captain face-down in the rum.",
+  "era": "1700s Caribbean pirate haven",
+  "description": "In a lawless port, the most feared captain on the seas is found dead the night before dividing the treasure. Quartermasters, stowaways, a governor's daughter and a parrot who saw everything.",
+  "palette": { "background": "#0b0e10", "surface": "#18201f", "accent": "#d8a84e", "ink": "#efe6d1" },
+  "artStyle": "Old nautical map illustration, weathered parchment, lantern-lit tavern",
+  "sortOrder": 7
+}

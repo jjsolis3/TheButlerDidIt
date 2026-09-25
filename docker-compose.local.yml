@@ -1,0 +1,6 @@
+# Adds a host port for running the production image on your own machine.
+# Not used by Coolify.
+services:
+  app:
+    ports:
+      - "${APP_PORT:-8080}:8080"
