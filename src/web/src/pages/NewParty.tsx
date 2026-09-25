@@ -17,6 +17,7 @@ export default function NewParty() {
   const { themes, reload: reloadThemes } = useThemes()
   const [ai, setAi] = useState<AiStatus | null>(null)
   const [useAi, setUseAi] = useState(true)
+  const [drinking, setDrinking] = useState(false)
   const navigate = useNavigate()
   const [scenarioId, setScenarioId] = useState<string>()
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
@@ -43,7 +44,7 @@ export default function NewParty() {
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createParty(scenarioId, mode, content, when ? new Date(when).toISOString() : null, useAi)
+      const party = await api.createParty(scenarioId, mode, content, when ? new Date(when).toISOString() : null, useAi, drinking && content !== 'family')
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -140,6 +141,23 @@ export default function NewParty() {
           </Field>
         </Card>
       </section>
+
+      {/* Drinking games are an adults-only extra, so the option disappears for Family parties
+          (the server also forces it off, in case an old browser tab still sends it). */}
+      {content !== 'family' && (
+        <section className="mt-8">
+          <label className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4">
+            <input type="checkbox" className="mt-1 accent-[var(--theme-accent)]" checked={drinking} onChange={(e) => setDrinking(e.target.checked)} />
+            <span>
+              <span className="font-semibold">🥂 Toast prompts</span>
+              <span className="block text-xs text-muted">
+                The narrator calls for a toast at a few dramatic moments, with a non-alcoholic alternative always shown. The lobby also
+                suggests cocktails and mocktails to match the evening.
+              </span>
+            </span>
+          </label>
+        </section>
+      )}
 
       {ai && (ai.actor || ai.inspector) && (
         <section className="mt-8">

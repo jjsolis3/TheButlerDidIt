@@ -31,6 +31,14 @@ services:
       Ai__Roles__Actor__Model: "${AI_ACTOR_MODEL:-}"
       Ai__Roles__Inspector__Provider: "${AI_PROVIDER_NAME:-}"
       Ai__Roles__Inspector__Model: "${AI_INSPECTOR_MODEL:-}"
+      # Optional second provider for voices and pictures (OpenAI only for now).
+      Ai__Providers__1__Name: "${AI_MEDIA_PROVIDER_NAME:-}"
+      Ai__Providers__1__Kind: "OpenAI"
+      Ai__Providers__1__ApiKey: "${AI_MEDIA_API_KEY:-}"
+      Ai__Roles__Voice__Provider: "${AI_MEDIA_PROVIDER_NAME:-}"
+      Ai__Roles__Voice__Model: "${AI_VOICE_MODEL:-}"
+      Ai__Roles__Illustrator__Provider: "${AI_MEDIA_PROVIDER_NAME:-}"
+      Ai__Roles__Illustrator__Model: "${AI_IMAGE_MODEL:-}"
     volumes:
       - keys:/data/keys   # keeps hosts logged in across redeploys
       - media:/data/media # generated images and voices (milestone 3)

@@ -4,7 +4,7 @@
 
 export type Phase = 'lobby' | 'castReveal' | 'prologue' | 'act' | 'accusation' | 'reveal' | 'awards' | 'finished'
 export type ActStep = 'cinematic' | 'mingle'
-export type CueType = 'narration' | 'image' | 'music' | 'sfx' | 'video' | 'line'
+export type CueType = 'narration' | 'image' | 'music' | 'sfx' | 'video' | 'line' | 'toast'
 export type PartyMode = 'sharedScreen' | 'remote' | 'passAndPlay'
 export type ContentRating = 'family' | 'mature'
 export type PartyStatus = 'lobby' | 'inProgress' | 'finished'
@@ -47,6 +47,8 @@ export interface CueView {
   speakerName: string | null
   effect: string | null
   voice: VoiceProfile | null
+  /** For toasts: the non-alcoholic version */
+  alternative: string | null
 }
 
 export interface CastMember {
@@ -71,6 +73,7 @@ export interface PlayerSummary {
   isLocal: boolean
   ready: boolean
   hasAccused: boolean
+  photoUrl: string | null
 }
 
 export interface PuzzleView {
@@ -182,6 +185,7 @@ export interface StageView {
   awards: AwardsView | null
   ai: AiFeatures
   interrogations: InterrogationView[]
+  options: { drinkingPrompts: boolean }
 }
 
 export interface AiFeatures {
@@ -190,6 +194,7 @@ export interface AiFeatures {
   hints: boolean
   hintsPerAct: number
   verdicts: boolean
+  voices: boolean
 }
 
 export interface InterrogationView {
@@ -202,6 +207,8 @@ export interface InterrogationView {
   /** null while the character is still answering */
   answer: string | null
   voice: VoiceProfile | null
+  /** The answer spoken in the NPC's voice, when a Voice provider is set up */
+  audioUrl: string | null
 }
 
 export interface HintView {
@@ -284,6 +291,7 @@ export interface ThemeDefinition {
   palette: ThemePalette
   artStyle: string
   cover: string | null
+  cocktails: { name: string; recipe: string; mocktail: string }[]
 }
 
 export interface ScenarioCard {
@@ -334,7 +342,7 @@ export interface Me {
 // ---- AI (admin + generation)
 
 export type AiProviderKind = 'anthropic' | 'openAI' | 'gemini' | 'ollama' | 'fake'
-export type AiRole = 'storyteller' | 'actor' | 'inspector'
+export type AiRole = 'storyteller' | 'actor' | 'inspector' | 'voice' | 'illustrator'
 export type MysteryLength = 'short' | 'standard' | 'long'
 export type GenerationStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 
@@ -342,6 +350,8 @@ export interface AiStatus {
   storyteller: boolean
   actor: boolean
   inspector: boolean
+  voice: boolean
+  illustrator: boolean
   budgetUsd: number
   spentThisMonthUsd: number
   isAdmin: boolean
@@ -369,6 +379,16 @@ export interface PriceView {
   model: string
   inputPerMillion: number
   outputPerMillion: number
+  perRequest: number
+}
+
+export interface MediaJob {
+  id: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+  total: number
+  done: number
+  failed: number
+  error: string | null
 }
 
 export interface UsageGroup {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { api } from '../lib/api'
 import { useParty } from '../lib/hub'
 import type { PlayerView, StageView } from '../lib/types'
 import { Portrait } from './Portrait'
@@ -40,7 +41,7 @@ export function PlayerScreen({ code, token, onLeave }: { code: string; token: st
   return (
     <>
       <StatusPill status={status} />
-      <PlayerBody view={player} invoke={invoke} />
+      <PlayerBody view={player} invoke={invoke} token={token} />
       <FeedToasts feed={player.stage.feed} offset="top-28" />
     </>
   )
@@ -48,7 +49,7 @@ export function PlayerScreen({ code, token, onLeave }: { code: string; token: st
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
-function PlayerBody({ view, invoke }: { view: PlayerView; invoke: Invoke }) {
+function PlayerBody({ view, invoke, token }: { view: PlayerView; invoke: Invoke; token: string }) {
   const stage = view.stage
   const [error, setError] = useState<string | null>(null)
   const run = (method: string, ...args: unknown[]) => {
@@ -56,13 +57,23 @@ function PlayerBody({ view, invoke }: { view: PlayerView; invoke: Invoke }) {
     return invoke(method, ...args).catch((e: Error) => setError(e.message))
   }
 
-  if (stage.phase === 'lobby') return <LobbyPlayer view={view} run={run} error={error} />
+  if (stage.phase === 'lobby') return <LobbyPlayer view={view} run={run} error={error} token={token} />
   return <InGame view={view} run={run} invoke={invoke} error={error} />
 }
 
 // ------------------------------------------------------------------ lobby
 
-function LobbyPlayer({ view, run, error }: { view: PlayerView; run: (m: string, ...a: unknown[]) => Promise<unknown>; error: string | null }) {
+function LobbyPlayer({
+  view,
+  run,
+  error,
+  token,
+}: {
+  view: PlayerView
+  run: (m: string, ...a: unknown[]) => Promise<unknown>
+  error: string | null
+  token: string
+}) {
   const stage = view.stage
   const mine = view.dossier?.character
   const [picking, setPicking] = useState(!mine)
@@ -96,6 +107,7 @@ function LobbyPlayer({ view, run, error }: { view: PlayerView; run: (m: string, 
             <p className="text-xs font-semibold tracking-wider text-accent uppercase">What to wear</p>
             <p className="mt-1 text-sm">{mine.costumeTips}</p>
           </div>
+          <CostumeSelfie token={token} photoUrl={stage.players.find((p) => p.seatId === view.seatId)?.photoUrl ?? null} />
           <p className="mt-4 text-xs text-muted">
             Your {view.dossier?.lockedSecrets} secret{view.dossier?.lockedSecrets === 1 ? '' : 's'} unlock when the evening begins.
           </p>
@@ -148,6 +160,67 @@ function LobbyPlayer({ view, run, error }: { view: PlayerView; run: (m: string, 
           {stage.players.length} guest{stage.players.length === 1 ? '' : 's'} here: {stage.players.map((p) => p.name).join(', ')}
         </p>
       </section>
+    </div>
+  )
+}
+
+/**
+ * Guests snap a photo in costume; it replaces their name on the big screen's cast list.
+ * `capture="user"` opens the front camera on phones; on a laptop it's a normal file picker.
+ * The server shrinks the photo and strips its location data before anyone else sees it.
+ * We don't keep our own copy of the URL: the upload changes the party state, and the new
+ * snapshot arrives over SignalR like every other change, so all screens stay in step.
+ */
+function CostumeSelfie({ token, photoUrl }: { token: string; photoUrl: string | null }) {
+  const input = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const upload = async (file: File | undefined) => {
+    if (!file) return
+    setBusy(true)
+    setError(null)
+    try {
+      await api.uploadPhoto(token, file)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+      if (input.current) input.current.value = '' // allow choosing the same file again
+    }
+  }
+
+  return (
+    <div className="mt-4 flex items-center gap-3 rounded-lg bg-bg/60 p-3">
+      {photoUrl ? (
+        <img src={photoUrl} alt="Your costume selfie" className="h-16 w-16 shrink-0 rounded-full border border-accent object-cover" />
+      ) : (
+        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-dashed border-line text-2xl">📸</span>
+      )}
+      <div className="min-w-0 space-y-1">
+        <p className="text-xs font-semibold tracking-wider text-accent uppercase">Costume selfie</p>
+        <p className="text-xs text-muted">Show off your outfit on the big screen. Optional.</p>
+        <div className="flex flex-wrap gap-2">
+          <label className={`cursor-pointer text-sm text-accent underline ${busy ? 'pointer-events-none opacity-50' : ''}`}>
+            {busy ? 'Uploading…' : photoUrl ? 'Retake' : 'Take a selfie'}
+            <input
+              ref={input}
+              type="file"
+              accept="image/*"
+              capture="user"
+              className="sr-only"
+              aria-label="Costume selfie"
+              onChange={(e) => void upload(e.target.files?.[0])}
+            />
+          </label>
+          {photoUrl && !busy && (
+            <button className="text-sm text-muted underline hover:text-ink" onClick={() => void api.removePhoto(token)}>
+              Remove
+            </button>
+          )}
+        </div>
+        <ErrorText>{error}</ErrorText>
+      </div>
     </div>
   )
 }

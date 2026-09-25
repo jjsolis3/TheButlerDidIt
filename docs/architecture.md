@@ -153,3 +153,35 @@ Only a mystery that passes is saved, as a `ScenarioEntity` with `Source = AiGene
 **Tests without an API key:** the `Fake` provider (`FakeChatClient`) returns canned answers, keyed on the `TASK:` line every prompt starts with. It is only allowed when `Ai:AllowFakeProvider=true`, which the test suites and Playwright set.
 
 Setup instructions: [ai-setup.md](ai-setup.md).
+
+## 11. Voices, pictures and the party kit (Phase 3)
+
+```
+ create party ──► MediaWorker.EnqueueAsync ──► MediaJobs table
+                                                   │ (background)
+ MediaPlan.For(scenario)  ── what's needed ────────┤
+                                                   ▼
+ MediaService ── cache by SHA-256(kind|model|voice|text) ──► MediaAssets + files in /data/media
+      │                                                          │
+      ▼                                                          ▼
+ MediaGateway ── budget + usage log              ScenarioMedia (scenario, key → asset)
+      │                                                          │
+ ITextToSpeech / IImageGenerator                   MediaOverlay.Apply ── fills URLs into the
+ (OpenAI or Fake)                                  scenario when ContentCatalog loads it
+```
+
+**Why prepare everything up front:** voice clips and pictures take seconds each. Making them while the guests watch would stall every scene. Instead, creating a party queues a job that makes every portrait, the victim and setting pictures, all narration and every NPC line. When it finishes, every screen of every party using that mystery is refreshed.
+
+**Why a cache keyed by a hash:** the same sentence in the same voice from the same model always sounds the same, so it's only paid for once. The hash of the request is the `MediaAssets.ContentHash` (unique), which also stops two workers from saving duplicates at the same time.
+
+**Why an overlay instead of editing the scenario:** hand-written scenario JSON stays exactly as written, and `ScenarioMedia` maps keys like `portrait/finch` or `line/finch/act1/0` to files. `MediaOverlay` (pure, in `ButlerDidIt.Game`) fills them in only where the author left `src` or `portrait` empty, so hand-made art always wins.
+
+**Why background jobs claim work atomically:** `MediaWorker` and `GenerationWorker` move a job from `Queued` to `Running` with a single `UPDATE … WHERE Status = 'Queued'`. Only one worker can win, so a job never runs twice, even with several app instances. A media job interrupted by a restart goes back to `Queued` and skips what's already done.
+
+**Voiced NPC answers** are made on demand, after the answer text is stored: the stage shows the text immediately and plays the clip when it arrives (it waits a few seconds for it, then falls back to the browser's voice).
+
+**Costume selfies** (`POST /api/seat/photo`, seat token) are decoded and re-encoded with SkiaSharp. That drops every bit of metadata, including GPS location; the photo is turned upright and shrunk to 640 px. Only the URL goes into the game state (`SetPlayerPhoto`).
+
+**The printable kit** (`/api/parties/{code}/kit/*.pdf`, host only) is drawn with QuestPDF: invitations with a QR code (QRCoder), name tags, character booklets (with secrets) and clue cards with a sealed solution.
+
+**Toast prompts** are a `toast` cue type. `ViewProjector` drops them unless the host switched on drinking prompts, which is always off for Family parties. Every toast carries a non-alcoholic alternative.

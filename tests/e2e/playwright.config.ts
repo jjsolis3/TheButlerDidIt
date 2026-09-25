@@ -10,7 +10,8 @@ import { defineConfig } from '@playwright/test'
 // automatically by EF Core migrations on startup), so the first host registered in
 // a run is the admin.
 //
-// The server runs with the "Fake" AI provider: canned answers, no API key, no cost.
+// The server runs with the "Fake" AI provider: canned answers, silent voices and
+// gradient pictures, no API key, no cost.
 const port = Number(process.env.E2E_PORT ?? 5199)
 const db = process.env.E2E_DATABASE_URL ?? `Host=localhost;Port=5432;Database=butler_e2e_${Date.now()};Username=butler;Password=butler`
 
@@ -43,6 +44,13 @@ export default defineConfig({
       Ai__Roles__Actor__Model: 'fake-model',
       Ai__Roles__Inspector__Provider: 'Fake',
       Ai__Roles__Inspector__Model: 'fake-model',
+      // Phase 3 media: silent voice clips and gradient pictures, created instantly.
+      Ai__Roles__Voice__Provider: 'Fake',
+      Ai__Roles__Voice__Model: 'fake-voice',
+      Ai__Roles__Illustrator__Provider: 'Fake',
+      Ai__Roles__Illustrator__Model: 'fake-image',
+      // Keep this run's generated files out of the developer's own media folder.
+      Media__Root: process.env.E2E_MEDIA_ROOT ?? `${process.env.TMPDIR ?? '/tmp'}/butler-e2e-media-${Date.now()}`,
     },
   },
 })

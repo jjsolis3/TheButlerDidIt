@@ -4,6 +4,7 @@ import type {
   AiStatus,
   ContentRating,
   GenerationJob,
+  MediaJob,
   Me,
   MysteryLength,
   PartyInfo,
@@ -58,8 +59,32 @@ export const api = {
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
-  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null, useAi = true) =>
-    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor, useAi }),
+  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null, useAi = true, drinkingPrompts = false) =>
+    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor, useAi, drinkingPrompts }),
+
+  // ---- Media
+  partyMedia: (code: string) => request<{ ready: number; job: MediaJob | null }>('GET', `/api/parties/${encodeURIComponent(code)}/media`),
+  prepareMedia: (code: string) => request<MediaJob>('POST', `/api/parties/${encodeURIComponent(code)}/media`),
+  kitUrl: (code: string, kind: 'invitations' | 'booklets' | 'nametags' | 'clues') => `/api/parties/${encodeURIComponent(code)}/kit/${kind}.pdf`,
+
+  /** Upload a costume selfie. Uses the seat token, because guests don't have accounts. */
+  uploadPhoto: async (token: string, file: File) => {
+    const form = new FormData()
+    form.append('photo', file)
+    const res = await fetch('/api/seat/photo', { method: 'POST', headers: { 'X-Seat-Token': token }, body: form })
+    if (!res.ok) {
+      let message = `Upload failed (${res.status}).`
+      try {
+        const problem = await res.json()
+        message = problem.detail ?? problem.title ?? message
+      } catch {
+        /* not JSON */
+      }
+      throw new ApiError(res.status, message)
+    }
+    return (await res.json()) as { photoUrl: string }
+  },
+  removePhoto: (token: string) => fetch('/api/seat/photo', { method: 'DELETE', headers: { 'X-Seat-Token': token } }),
   party: (code: string) => request<PartyInfo>('GET', `/api/parties/${encodeURIComponent(code)}`),
   join: (code: string, name: string) => request<SeatResponse>('POST', `/api/parties/${encodeURIComponent(code)}/join`, { name }),
   addSeat: (code: string, name: string, isLocal: boolean) =>
