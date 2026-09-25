@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router'
 import { Button, Card, ErrorText, Field, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
+import type { AuthOptions } from '../lib/types'
 
 export default function Login() {
   const [mode, setMode] = useState<'login' | 'register'>('login')
@@ -11,6 +12,11 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const navigate = useNavigate()
+  const [options, setOptions] = useState<AuthOptions | null>(null)
+
+  useEffect(() => {
+    api.authOptions().then(setOptions, () => setOptions(null))
+  }, [])
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -58,6 +64,17 @@ export default function Login() {
           </Button>
         </form>
       </Card>
+      {mode === 'login' && options && (
+        <p className="mt-4 text-center text-sm text-muted">
+          {options.emailEnabled ? (
+            <Link to="/forgot-password" className="text-accent underline">
+              Forgot your password?
+            </Link>
+          ) : (
+            'Forgot your password? Ask the admin for a reset link.'
+          )}
+        </p>
+      )}
       <p className="mt-4 text-center text-sm text-muted">
         {mode === 'login' ? 'New here? ' : 'Already have an account? '}
         <button className="text-accent underline" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>

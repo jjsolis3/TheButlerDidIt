@@ -28,6 +28,8 @@ var config = builder.Configuration;
 // ---------------------------------------------------------------- options
 builder.Services.Configure<ContentOptions>(config.GetSection("Content"));
 builder.Services.Configure<AuthOptions>(config.GetSection("Auth"));
+builder.Services.Configure<EmailOptions>(config.GetSection("Email"));
+builder.Services.Configure<AppOptions>(config.GetSection("App"));
 builder.Services.Configure<AiOptions>(config.GetSection("Ai"));
 builder.Services.Configure<MediaOptions>(config.GetSection("Media"));
 builder.Services.Configure<RetentionOptions>(config.GetSection("Retention"));
@@ -69,7 +71,13 @@ builder.Services
         o.Lockout.MaxFailedAccessAttempts = 8;
     })
     .AddEntityFrameworkStores<AppDbContext>()
-    .AddSignInManager();
+    .AddSignInManager()
+    // Password-reset and email-confirmation tokens. They're signed with the Data
+    // Protection keys and include the user's security stamp, so a reset link stops
+    // working once it has been used (using it changes the stamp).
+    .AddDefaultTokenProviders();
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = AccountTokens.Lifespan);
+builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(AuthPolicies.Host, p => p.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme).RequireAuthenticatedUser())
@@ -96,6 +104,9 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy(PartyEndpoints.JoinRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1) }));
+    o.AddPolicy(AuthEndpoints.EmailRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
+        http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15) }));
 });
 
 // ---------------------------------------------------------------- JSON
@@ -195,6 +206,7 @@ app.UseAuthorization();
 
 app.MapHealthChecks("/healthz");
 app.MapAuthEndpoints();
+app.MapAdminHostEndpoints();
 app.MapThemeEndpoints();
 app.MapPartyEndpoints();
 app.MapMediaEndpoints();

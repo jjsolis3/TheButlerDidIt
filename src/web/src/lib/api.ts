@@ -6,6 +6,8 @@ import type {
   GenerationJob,
   MediaJob,
   Me,
+  AuthOptions,
+  HostView,
   MysteryLength,
   PartyInfo,
   PartyMode,
@@ -55,6 +57,11 @@ export const api = {
   register: (email: string, password: string, displayName: string) =>
     request<Me>('POST', '/api/auth/register', { email, password, displayName }),
   logout: () => request<void>('POST', '/api/auth/logout'),
+  authOptions: () => request<AuthOptions>('GET', '/api/auth/options'),
+  forgotPassword: (email: string) => request<{ message: string }>('POST', '/api/auth/forgot', { email }),
+  resetPassword: (email: string, token: string, password: string) => request<Me>('POST', '/api/auth/reset', { email, token, password }),
+  confirmEmail: (userId: string, token: string) => request<void>('POST', '/api/auth/confirm', { userId, token }),
+  resendConfirmation: () => request<void>('POST', '/api/auth/resend-confirmation'),
 
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
 
@@ -97,6 +104,8 @@ export const api = {
   generationJob: (id: string) => request<GenerationJob>('GET', `/api/generation/${id}`),
 
   admin: {
+    hosts: () => request<HostView[]>('GET', '/api/admin/hosts'),
+    resetLink: (id: string) => request<{ link: string; validForHours: number }>('POST', `/api/admin/hosts/${encodeURIComponent(id)}/reset-link`),
     providers: () => request<ProviderView[]>('GET', '/api/admin/ai/providers'),
     createProvider: (p: { name: string; kind: AiProviderKind; baseUrl: string | null; apiKey: string | null }) =>
       request<ProviderView>('POST', '/api/admin/ai/providers', p),
