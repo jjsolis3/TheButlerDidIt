@@ -5,7 +5,7 @@ import { Portrait } from './Portrait'
 import { ClueCard, Countdown, FeedToasts } from './Scene'
 import { Button, ErrorText, StatusPill } from './ui'
 
-type Tab = 'dossier' | 'secrets' | 'clues' | 'notes' | 'accuse' | 'vote' | 'results'
+type Tab = 'dossier' | 'secrets' | 'clues' | 'question' | 'notes' | 'accuse' | 'vote' | 'results'
 
 const PHASE_LABEL: Record<StageView['phase'], string> = {
   lobby: 'Before the party',
@@ -176,7 +176,7 @@ function InGame({
     if (stage.phase === 'accusation') setTab('accuse')
     else if (stage.phase === 'awards') setTab('vote')
     else if (stage.phase === 'reveal' || stage.phase === 'finished') setTab('results')
-    else setTab((t) => (t === 'accuse' || t === 'vote' || t === 'results' ? 'dossier' : t))
+    else setTab((t) => (t === 'accuse' || t === 'vote' || t === 'results' || (t === 'question' && stage.phase !== 'act') ? 'dossier' : t))
   }, [stage.phase])
 
   // Buzz the phone when a private clue arrives.
@@ -195,6 +195,8 @@ function InGame({
     { id: 'clues', label: `Clues${view.myClues.length ? ` (${view.myClues.length})` : ''}` },
     { id: 'notes', label: 'Notes' },
   ]
+  // Questioning NPCs only makes sense while there are narrator-played characters and an act is running.
+  if (stage.ai.npcQuestions && stage.phase === 'act' && stage.cast.some((c) => c.isNpc)) tabs.splice(3, 0, { id: 'question', label: 'Question' })
   if (stage.phase === 'accusation') tabs.push({ id: 'accuse', label: 'Accuse' })
   if (stage.phase === 'awards') tabs.push({ id: 'vote', label: 'Vote' })
   if (stage.phase === 'reveal' || stage.phase === 'finished') tabs.push({ id: 'results', label: 'Results' })
@@ -232,7 +234,13 @@ function InGame({
         <ErrorText>{error}</ErrorText>
         {tab === 'dossier' && dossier && <DossierTab view={view} />}
         {tab === 'secrets' && dossier && <SecretsTab view={view} run={run} />}
-        {tab === 'clues' && <CluesTab view={view} invoke={invoke} run={run} />}
+        {tab === 'clues' && (
+          <>
+            {stage.ai.hints && stage.phase === 'act' && <HintBox view={view} invoke={invoke} />}
+            <CluesTab view={view} invoke={invoke} run={run} />
+          </>
+        )}
+        {tab === 'question' && <QuestionTab view={view} invoke={invoke} />}
         {tab === 'notes' && <NotesTab invoke={invoke} />}
         {tab === 'accuse' && <AccuseTab view={view} run={run} />}
         {tab === 'vote' && <VoteTab view={view} run={run} />}
@@ -515,5 +523,125 @@ function ResultsTab({ view }: { view: PlayerView }) {
         </div>
       )}
     </div>
+  )
+}
+
+// ------------------------------------------------------------------ AI game master
+
+/** Question a character the narrator is playing. Everyone sees the question and the answer. */
+function QuestionTab({ view, invoke }: { view: PlayerView; invoke: Invoke }) {
+  const stage = view.stage
+  const npcs = stage.cast.filter((c) => c.isNpc)
+  const [characterId, setCharacterId] = useState(npcs[0]?.characterId ?? '')
+  const [question, setQuestion] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const log = [...stage.interrogations].reverse()
+
+  const ask = async () => {
+    if (!question.trim() || !characterId) return
+    setBusy(true)
+    setError(null)
+    try {
+      await invoke('AskNpc', characterId, question.trim())
+      setQuestion('')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted">
+        Question the characters nobody is playing. They answer in character, and the whole room hears it. They may lie, just like
+        everyone else.
+      </p>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {npcs.map((c) => (
+          <button
+            key={c.characterId}
+            onClick={() => setCharacterId(c.characterId)}
+            className={`flex shrink-0 flex-col items-center gap-1 rounded-xl border p-2 text-xs ${characterId === c.characterId ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}
+          >
+            <Portrait id={c.characterId} name={c.name} src={c.portrait} size={44} />
+            <span className="max-w-20 truncate">{c.name}</span>
+          </button>
+        ))}
+      </div>
+      <div className="space-y-2">
+        <textarea
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          maxLength={300}
+          rows={3}
+          placeholder={`Ask ${npcs.find((c) => c.characterId === characterId)?.name ?? 'them'} something…`}
+          className="w-full rounded-xl border border-line bg-surface p-3 text-base focus:border-accent focus:outline-none"
+        />
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs text-muted">
+            {view.questionsLeft} question{view.questionsLeft === 1 ? '' : 's'} left this act
+          </span>
+          <Button onClick={ask} disabled={busy || !question.trim() || view.questionsLeft === 0}>
+            {busy ? 'Waiting for an answer…' : 'Ask'}
+          </Button>
+        </div>
+        <ErrorText>{error}</ErrorText>
+      </div>
+      {log.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-xs font-semibold tracking-widest text-accent uppercase">The interrogation so far</h3>
+          {log.map((i) => (
+            <div key={i.id} className="rounded-xl border border-line bg-surface p-3 text-sm">
+              <p className="text-muted">
+                <span className="text-ink">{i.askerName}</span> asked {i.characterName}: “{i.question}”
+              </p>
+              <p className={`mt-2 ${i.answer ? '' : 'candle text-muted italic'}`}>{i.answer ?? `${i.characterName} is thinking…`}</p>
+            </div>
+          ))}
+        </section>
+      )}
+    </div>
+  )
+}
+
+/** A private nudge from the Inspector, limited per act. */
+function HintBox({ view, invoke }: { view: PlayerView; invoke: Invoke }) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const hints = [...view.myHints].reverse()
+  return (
+    <section className="rounded-xl border border-accent/40 bg-accent/5 p-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm">
+          <span className="font-semibold">Stuck?</span> <span className="text-muted">The Inspector can nudge you. Only you will see it.</span>
+        </p>
+        <Button
+          variant="ghost"
+          className="min-h-9 shrink-0 py-1"
+          disabled={busy || view.hintsLeft === 0}
+          onClick={async () => {
+            setBusy(true)
+            setError(null)
+            try {
+              await invoke('RequestHint')
+            } catch (e) {
+              setError((e as Error).message)
+            } finally {
+              setBusy(false)
+            }
+          }}
+        >
+          {busy ? 'Thinking…' : view.hintsLeft === 0 ? 'Hint used' : 'Ask the Inspector'}
+        </Button>
+      </div>
+      {hints.map((h) => (
+        <p key={h.id} className={`font-display mt-3 text-base italic ${h.text ? '' : 'candle text-muted'}`}>
+          {h.text ?? 'The Inspector is thinking…'}
+        </p>
+      ))}
+      <ErrorText>{error}</ErrorText>
+    </section>
   )
 }

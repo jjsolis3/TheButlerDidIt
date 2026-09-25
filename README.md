@@ -7,13 +7,20 @@ An interactive murder-mystery party game for the web. Every guest plays a suspec
 
 Play it around the dinner table, over Zoom/Meet/Teams (share the stage tab with audio), or pass a single device around with press-and-hold private hand-offs. Guests who don't turn up are replaced by NPCs voiced by the narrator.
 
-The first playable mystery is **Death at Blackwood Manor** (1920s country house, 3–8 players, about 2 hours). Seven more themes are waiting for the AI storyteller in milestone 2.
+The hand-written flagship mystery is **Death at Blackwood Manor** (1920s country house, 3–8 players, about 2 hours). With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
+- generate new mysteries for any of the eight themes, family-friendly or mature
+- let guests question characters nobody is playing
+- get private hints from the Inspector
+- hear a personalised verdict at the reveal
+
+See [docs/ai-setup.md](docs/ai-setup.md).
 
 ## Tech stack
 
 | Part | Technology |
 |---|---|
 | Game rules | C# class library (`ButlerDidIt.Game`): pure functions, no web or database code |
+| AI | `ButlerDidIt.Ai` on Microsoft.Extensions.AI `IChatClient`: Anthropic, OpenAI, Gemini, Ollama |
 | Server | ASP.NET Core 10, SignalR (real-time), EF Core + PostgreSQL, ASP.NET Core Identity |
 | Front end | React 19 + TypeScript, Vite, Tailwind CSS |
 | Tests | xUnit (engine + API against real Postgres), Playwright (full parties in real browsers) |
@@ -55,6 +62,7 @@ cd tests/e2e && npm install && npx playwright test # two complete parties in rea
 
 ```
 src/ButlerDidIt.Game/   rules engine, scenario model, validator (no dependencies)
+src/ButlerDidIt.Ai/     AI providers, prompts, mystery generator (no web or database code)
 src/ButlerDidIt.Api/    ASP.NET Core host: REST endpoints, SignalR hub, database, auth
 src/web/                React front end (builds into the API's wwwroot)
 content/themes/         themes, mysteries (JSON) and media
@@ -67,10 +75,13 @@ docs/                   architecture, deployment and scenario-writing guides
 - [Architecture: how it works and why](docs/architecture.md)
 - [Deploying on Coolify](docs/deploy-coolify.md)
 - [Writing a mystery](docs/writing-scenarios.md)
+- [Setting up the AI game master](docs/ai-setup.md)
 
 ## Roadmap
 
-1. **Playable core** (this release): parties, join codes, stage + dossiers, pass-and-play, one hand-written mystery.
-2. **AI game master**: Claude generates new, validated mysteries for any theme, plays unfilled characters you can question, and gives hints.
-3. **Media pipeline**: character voices, generated portraits and scene art (cached so each is paid for once), printable invitations and character booklets.
-4. **Polish and scale**: more themes, a post-party recap page, S3 storage, and a scenario editor.
+The roadmap, feature requests and known issues are tracked in [GitHub Issues](https://github.com/jjsolis3/TheButlerDidIt/issues), with one roadmap issue per phase.
+
+1. **Playable core**: done. Parties, join codes, stage + dossiers, pass-and-play, one hand-written mystery.
+2. **AI game master** (#2): multi-provider AI, generated mysteries, NPC questioning, hints, verdicts, cost controls.
+3. **Media pipeline** (#8): character voices, generated portraits and scene art, printable party kits, costume selfies.
+4. **Polish and scale** (#14): recap page, S3 storage, multi-instance scaling, scenario editor, more themes.

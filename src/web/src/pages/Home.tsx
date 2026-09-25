@@ -49,6 +49,14 @@ export default function Home() {
             <button className="underline hover:text-ink" onClick={() => api.logout().then(() => setMe(null))}>
               Sign out
             </button>
+            {me.isAdmin && (
+              <>
+                {' · '}
+                <Link to="/admin/ai" className="underline hover:text-ink">
+                  AI settings
+                </Link>
+              </>
+            )}
           </p>
         )}
       </section>
@@ -94,11 +102,11 @@ export default function Home() {
               <div className="mt-4 text-xs">
                 {scenarios.length > 0 ? (
                   <span className="rounded-full px-2 py-1 font-semibold" style={{ background: theme.palette.accent, color: theme.palette.background }}>
-                    {scenarios.length} mystery ready to play
+                    {scenarios.length} {scenarios.length === 1 ? 'mystery' : 'mysteries'} ready to play
                   </span>
                 ) : (
-                  <span className="rounded-full border px-2 py-1 opacity-70" style={{ borderColor: theme.palette.accent }}>
-                    Coming soon
+                  <span className="rounded-full border px-2 py-1 opacity-80" style={{ borderColor: theme.palette.accent }}>
+                    {me ? 'Generate a mystery with AI' : 'AI-generated mysteries'}
                   </span>
                 )}
               </div>

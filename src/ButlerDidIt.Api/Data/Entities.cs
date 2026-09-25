@@ -49,6 +49,10 @@ public sealed class ScenarioEntity
     public ButlerDidIt.Game.Scenarios.ContentRating ContentRating { get; set; }
     public ScenarioSource Source { get; set; }
 
+    /// <summary>For AI-generated mysteries: the host who generated it. Only they (and admins) can play it.</summary>
+    [MaxLength(450)]
+    public string? OwnerUserId { get; set; }
+
     /// <summary>The complete scenario (including the solution) as jsonb. Never sent to browsers as-is.</summary>
     public required string Document { get; set; }
 

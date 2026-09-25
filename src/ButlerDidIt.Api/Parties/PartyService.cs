@@ -56,6 +56,15 @@ public sealed class PartyService(
 
     public async Task<PartySnapshot> LoadAsync(Guid partyId, CancellationToken ct = default)
     {
+        // If this DbContext already loaded the party earlier in the same request
+        // (e.g. an AI question: Begin, then Complete seconds later), EF would hand
+        // back that cached copy with the old state. Detach it so we always read the
+        // latest row; the xmin token then guards the save.
+        foreach (var tracked in db.ChangeTracker.Entries<Party>().Where(e => e.Entity.Id == partyId).ToList())
+        {
+            tracked.State = EntityState.Detached;
+        }
+
         var party = await db.Parties.FirstOrDefaultAsync(p => p.Id == partyId, ct)
             ?? throw new KeyNotFoundException("Party not found.");
         return new PartySnapshot(party, GameJson.Deserialize<GameState>(party.State), await catalog.GetScenarioAsync(db, party.ScenarioId, ct));

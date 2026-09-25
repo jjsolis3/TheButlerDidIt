@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { CuePlayer } from '../components/CuePlayer'
 import { Portrait } from '../components/Portrait'
@@ -9,7 +9,7 @@ import { useParty } from '../lib/hub'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette } from '../lib/theme'
-import type { PartyInfo, StageView } from '../lib/types'
+import type { InterrogationView, PartyInfo, StageView } from '../lib/types'
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
@@ -52,6 +52,7 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
   const [begun, setBegun] = useState(false)
   const [muted, setMuted] = useState(false)
   useThemePalette(info.themeSlug)
+  useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted)
 
   // Keep the TV or laptop from going to sleep mid-mystery.
   useEffect(() => {
@@ -368,7 +369,9 @@ function MingleView({ stage }: { stage: StageView }) {
             </div>
           )}
         </section>
-        <section>
+        <section className="space-y-8">
+          {stage.ai.npcQuestions && stage.cast.some((c) => c.isNpc) && <InterrogationRoom stage={stage} />}
+          <div>
           <h2 className="font-display mb-3 text-2xl">Secrets exposed</h2>
           {stage.revealedSecrets.length === 0 ? (
             <p className="text-sm text-muted">Nobody has confessed anything… yet.</p>
@@ -382,10 +385,56 @@ function MingleView({ stage }: { stage: StageView }) {
               ))}
             </ul>
           )}
+          </div>
         </section>
       </div>
     </div>
   )
+}
+
+/** The latest questions guests put to NPCs, with the characters' answers. */
+function InterrogationRoom({ stage }: { stage: StageView }) {
+  const latest = [...stage.interrogations].filter((i) => i.act === stage.actNumber).reverse().slice(0, 4)
+  return (
+    <div>
+      <h2 className="font-display mb-1 text-2xl">The interrogation room</h2>
+      <p className="mb-3 text-xs text-muted">
+        Question {stage.cast.filter((c) => c.isNpc).map((c) => c.name).join(', ')} from your phone ({stage.ai.questionsPerAct} per guest per act).
+      </p>
+      {latest.length === 0 ? (
+        <p className="text-sm text-muted">No one has been questioned yet this act.</p>
+      ) : (
+        <ul className="space-y-3">
+          {latest.map((i) => (
+            <li key={i.id} className="rounded-xl border border-line bg-surface p-3 text-sm">
+              <p className="text-muted">
+                {i.askerName} → <span className="text-accent">{i.characterName}</span>: “{i.question}”
+              </p>
+              <p className={`font-display mt-2 text-lg leading-snug ${i.answer ? '' : 'candle text-muted italic'}`}>{i.answer ?? 'Thinking…'}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+/** Reads each newly answered NPC question aloud in that character's voice. */
+function useSpeakNewAnswers(interrogations: InterrogationView[], enabled: boolean) {
+  const spoken = useRef<Set<string> | null>(null)
+  useEffect(() => {
+    const answered = interrogations.filter((i) => i.answer)
+    // The first time we see the list, treat existing answers as already heard.
+    if (spoken.current === null) {
+      spoken.current = new Set(answered.map((i) => i.id))
+      return
+    }
+    for (const i of answered) {
+      if (spoken.current.has(i.id)) continue
+      spoken.current.add(i.id)
+      if (enabled) void narrator.speak(`${i.characterName}: ${i.answer}`, i.voice)
+    }
+  }, [interrogations, enabled])
 }
 
 function AccusationView({ stage }: { stage: StageView }) {
@@ -485,6 +534,18 @@ function RevealView({ stage, muted, begun }: { stage: StageView; muted: boolean;
               </span>
             ))}
           </div>
+          {r.step === 1 && r.guesses.some((g) => g.verdict) && (
+            <div className="mt-2 grid max-w-4xl gap-3 text-left sm:grid-cols-2">
+              {r.guesses
+                .filter((g) => g.verdict)
+                .map((g) => (
+                  <div key={g.playerName} className="rounded-xl border border-line bg-surface p-3 text-sm">
+                    <p className="text-xs tracking-widest text-accent uppercase">The Inspector on {g.playerName}</p>
+                    <p className="font-display mt-1 text-lg italic">{g.verdict}</p>
+                  </div>
+                ))}
+            </div>
+          )}
           <div className="mt-4 max-w-3xl space-y-4 text-left">
             {r.explanation.map((p, i) => (
               <p key={i} className={`font-display text-xl leading-relaxed ${i === r.explanation.length - 1 ? 'text-ink' : 'text-ink/60'}`}>

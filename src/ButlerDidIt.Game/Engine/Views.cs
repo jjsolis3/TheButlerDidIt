@@ -27,7 +27,22 @@ public sealed record StageView(
     IReadOnlyList<FeedItem> Feed,
     AccusationProgress? Accusation,
     RevealView? Reveal,
-    AwardsView? Awards);
+    AwardsView? Awards,
+    AiFeatures Ai,
+    IReadOnlyList<InterrogationView> Interrogations);
+
+/// <summary>A question to an NPC and its answer. Public: the whole room hears the interrogation.</summary>
+public sealed record InterrogationView(
+    Guid Id,
+    int Act,
+    string AskerName,
+    string CharacterId,
+    string CharacterName,
+    string Question,
+    string? Answer,
+    VoiceProfile? Voice);
+
+public sealed record HintView(Guid Id, int Act, string? Text);
 
 public sealed record ScenarioSummary(
     string Id,
@@ -96,7 +111,7 @@ public sealed record RevealView(
     IReadOnlyList<TimelineEntry> Timeline,
     IReadOnlyList<ScoreLine> Scores);
 
-public sealed record GuessView(string PlayerName, string? CharacterName, string? SuspectName, string? Motive, string? Method, bool? Correct);
+public sealed record GuessView(string PlayerName, string? CharacterName, string? SuspectName, string? Motive, string? Method, bool? Correct, string? Verdict);
 
 public sealed record AwardsView(IReadOnlyList<AwardOption> Awards, int VotesCast, int Voters, IReadOnlyList<AwardResult>? Results, ScoreLine? BestDetective);
 
@@ -114,6 +129,9 @@ public sealed record PlayerView(
     IReadOnlyList<ClueView> MyClues,
     AccusationForm? AccusationForm,
     AwardBallot? AwardBallot,
+    int QuestionsLeft,
+    int HintsLeft,
+    IReadOnlyList<HintView> MyHints,
     StageView Stage);
 
 public sealed record Dossier(

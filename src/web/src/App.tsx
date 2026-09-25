@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router'
+import AdminAi from './pages/AdminAi'
 import Home from './pages/Home'
 import Join from './pages/Join'
 import Login from './pages/Login'
@@ -15,6 +16,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/host/new" element={<NewParty />} />
+      <Route path="/admin/ai" element={<AdminAi />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />
       <Route path="/stage/:code" element={<Stage />} />

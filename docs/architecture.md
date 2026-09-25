@@ -111,8 +111,45 @@ Only `media/` folders are served over HTTP (`MediaEndpoints.cs`), with a path ch
 
 One image (`Dockerfile`, three stages: Node builds the SPA, the .NET SDK publishes the API, and the small ASP.NET runtime image runs it) plus Postgres in `docker-compose.yml`. The API serves the SPA from `wwwroot` and falls back to `index.html` for client-side routes, so everything shares one origin: no CORS, and cookies and WebSockets just work behind Coolify's proxy. See [deploy-coolify.md](deploy-coolify.md).
 
-## Where milestone 2 (AI) plugs in
+## 10. The AI game master (Phase 2)
 
-- **Mystery generation** produces a `Scenario` JSON in the same format, validated by the same `ScenarioValidator`, stored with `Source = AiGenerated`.
-- **AI NPCs** get a new hub method (e.g. `AskNpc(characterId, question)`). The NPC's prompt is built from its `CharacterPrivate` sheet, so it only knows what that character knows.
-- **Voices and images** (milestone 3) fill the empty `src`/`portrait` slots that the UI already renders. The `MediaAssets` table caches generated files by content hash, so each one is paid for once.
+The AI lives in its own project, `src/ButlerDidIt.Ai`. It depends on the game rules, but the rules know nothing about AI.
+
+```
+ Hub / endpoint ──► AiGameService / MysteryGenerator
+                            │ builds prompts (Prompts/*)
+                            ▼
+                        AiGateway ── budget check (IAiBudget)
+                            │       usage log  (IAiUsageSink)
+                            ▼
+                  IChatClient (Microsoft.Extensions.AI)
+          ┌─────────────┬───────────┬────────────┬────────┐
+       Anthropic      OpenAI     Gemini       Ollama     Fake
+```
+
+**Why `IChatClient`:** it's .NET's standard interface for chat models, and each vendor ships an adapter. `ChatClientFactory` is the only code that knows vendors exist; supporting a new provider means one new `case`. The admin assigns a provider and model to each **role** (Storyteller, Actor, Inspector), so you can mix a strong model for writing with a cheap one for chatting.
+
+**Why the engine never calls the AI:** AI calls are slow, cost money and can fail, while `GameEngine.Apply` must stay pure and instant. So every AI action is three commands:
+
+1. `BeginNpcQuestion` checks the rules (right phase, an NPC, questions left) and reserves a slot. Everyone immediately sees "Colonel Mustardseed is thinking…".
+2. The server calls the AI **outside** the party lock, so the game never freezes.
+3. `CompleteNpcQuestion` stores the answer, or `CancelNpcQuestion` gives the slot back if the AI failed.
+
+**Why prompts are built from what a character knows:** `NpcPrompt` only includes that character's own sheet, public facts and clues already found. The model can't leak the solution because it was never given it. That's far more reliable than telling a model "don't reveal X". Hints are built from the player's own `PlayerView`, which is already filtered by `ViewProjector`. Tests in `ButlerDidIt.Ai.Tests/AiTests.cs` check both.
+
+**Generated mysteries** go through `MysteryGenerator`:
+1. An outline.
+2. The full scenario JSON.
+3. `ScenarioValidator`. The model is shown its own errors and fixes them, up to 3 times.
+4. A **blind solver**: the Inspector sees only the evidence and must name the killer.
+
+Only a mystery that passes is saved, as a `ScenarioEntity` with `Source = AiGenerated`. It belongs to the host who generated it. It runs as a background job (`GenerationWorker`) because it takes longer than a web request should stay open.
+
+**Keys and costs:**
+- API keys are encrypted with ASP.NET Data Protection (`AiKeyProtector`) before they reach the database.
+- Every call is logged in `AiUsage` with tokens and an estimated cost from the admin's price list.
+- `DbAiBudget` refuses new calls once a host's monthly budget is used.
+
+**Tests without an API key:** the `Fake` provider (`FakeChatClient`) returns canned answers, keyed on the `TASK:` line every prompt starts with. It is only allowed when `Ai:AllowFakeProvider=true`, which the test suites and Playwright set.
+
+Setup instructions: [ai-setup.md](ai-setup.md).

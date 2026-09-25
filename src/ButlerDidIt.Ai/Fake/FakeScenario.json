@@ -1,0 +1,51 @@
+{
+  "id": "draft",
+  "themeSlug": "draft",
+  "title": "The Fake Affair",
+  "synopsis": "A canned mystery used by automated tests. Someone has stolen the last breath of Professor Plumtree, and the fake clues know who.",
+  "contentRating": "family",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "estimatedMinutes": 60,
+  "murdererKnows": true,
+  "setting": { "place": "Testwood Hall", "era": "Any era", "description": "A house built entirely for automated tests." },
+  "victim": { "name": "Professor Plumtree", "description": "A retired inventor with too many enemies." },
+  "characters": [
+    { "id": "colonel", "name": "Colonel Mustardseed", "pronouns": "he/him", "title": "The Colonel", "publicBio": "A retired soldier with a loud voice.", "costumeTips": "Blazer and medals.", "required": true,
+      "private": { "backstory": "YOU ARE THE MURDERER. You swapped the professor's tea for poison to hide your gambling debts.", "secrets": [{ "id": "colonel-debt", "text": "I owe the professor a fortune.", "unlockAct": 0 }], "objectives": ["Blame the gardener."], "knows": ["The gardener was in the greenhouse."], "alibi": "I was in the library reading.", "lines": { "act1": ["What a terrible business!"] } } },
+    { "id": "gardener", "name": "Mr. Greenfinger", "pronouns": "he/him", "title": "The Gardener", "publicBio": "Knows every poisonous plant in the garden.", "costumeTips": "Apron and gloves.", "required": true,
+      "private": { "backstory": "You grow foxglove, which looks bad.", "secrets": [{ "id": "gardener-foxglove", "text": "I grow foxglove in the greenhouse.", "unlockAct": 0 }], "objectives": ["Clear your name."], "knows": ["You saw the colonel near the kitchen at nine."], "alibi": "I was in the greenhouse.", "lines": { "act1": ["Plants don't poison people. People do."] } } },
+    { "id": "niece", "name": "Miss Rosalind Plumtree", "pronouns": "she/her", "title": "The Niece", "publicBio": "The professor's heir.", "costumeTips": "Pearls.", "required": true,
+      "private": { "backstory": "You inherit everything.", "secrets": [{ "id": "niece-will", "text": "I read the will last week.", "unlockAct": 0 }], "objectives": ["Hide that you read the will."], "knows": ["The colonel argued with the professor about money."], "alibi": "I was on the terrace.", "lines": { "act1": ["Uncle was so kind to me."] } } },
+    { "id": "cook", "name": "Mrs. Butterworth", "pronouns": "she/her", "title": "The Cook", "publicBio": "Makes the professor's tea every night.", "costumeTips": "Apron.", "required": false,
+      "private": { "backstory": "You made the tea, but someone else carried it up.", "secrets": [{ "id": "cook-tea", "text": "I let someone else carry the tea tonight.", "unlockAct": 1 }], "objectives": ["Find out who carried the tea."], "knows": ["The colonel offered to carry the tea."], "alibi": "I was in the kitchen.", "lines": {} } },
+    { "id": "butler", "name": "Mr. Jeeveston", "pronouns": "he/him", "title": "The Butler", "publicBio": "Sees everything, says nothing.", "costumeTips": "Tailcoat.", "required": false,
+      "private": { "backstory": "You suspect the colonel.", "secrets": [{ "id": "butler-listen", "text": "I listen at doors.", "unlockAct": 0 }], "objectives": ["Protect the household."], "knows": [], "alibi": "I was polishing silver.", "lines": {} } },
+    { "id": "doctor", "name": "Dr. Quill", "pronouns": "they/them", "title": "The Doctor", "publicBio": "The family physician.", "costumeTips": "Stethoscope.", "required": false,
+      "private": { "backstory": "You know the poison was in the tea.", "secrets": [{ "id": "doctor-late", "text": "I arrived late tonight.", "unlockAct": 0 }], "objectives": ["Identify the poison."], "knows": [], "alibi": "I was driving here.", "lines": {} } }
+  ],
+  "clues": [
+    { "id": "teacup", "title": "The Teacup", "text": "The professor's teacup smells bitter, like crushed foxglove.", "visibility": "public", "act": 1, "wave": "start", "pointsTo": ["gardener"], "redHerring": true },
+    { "id": "debt-note", "title": "An IOU", "text": "An IOU signed by Colonel Mustardseed for a large sum, due tomorrow.", "visibility": "public", "act": 1, "wave": "start", "pointsTo": ["colonel"] },
+    { "id": "will", "title": "The Will", "text": "The will leaves everything to Miss Plumtree.", "visibility": "public", "act": 1, "wave": "midway", "pointsTo": ["niece"], "redHerring": true },
+    { "id": "tea-carrier", "title": "Kitchen Note", "text": "Mrs. Butterworth's note: 'The colonel insisted on carrying the tea up himself at nine.'", "visibility": "private", "recipient": "cook", "act": 2, "wave": "start", "pointsTo": ["colonel"] },
+    { "id": "poison-bottle", "title": "Hidden Bottle", "text": "An empty poison bottle hidden in the library, where the colonel says he was reading.", "visibility": "public", "act": 2, "wave": "midway", "pointsTo": ["colonel"] }
+  ],
+  "prologue": [ { "type": "image", "text": "Testwood Hall at night.", "effect": "kenburns" }, { "type": "narration", "text": "The professor has been poisoned." } ],
+  "acts": [
+    { "id": "act1", "title": "Act One: The Tea", "mingleMinutes": 10, "cues": [ { "type": "narration", "text": "Act One begins." } ], "prompts": ["Who made the tea?"] },
+    { "id": "act2", "title": "Act Two: The Bottle", "mingleMinutes": 10, "cues": [ { "type": "narration", "text": "Act Two begins." } ], "prompts": ["Who was in the library?"] }
+  ],
+  "accusation": {
+    "motives": [ { "id": "debt", "text": "To escape a debt" }, { "id": "inheritance", "text": "For the inheritance" } ],
+    "methods": [ { "id": "poison-tea", "text": "Poisoned tea" }, { "id": "candlestick", "text": "A blow with a candlestick" } ]
+  },
+  "solution": {
+    "murdererId": "colonel",
+    "motiveId": "debt",
+    "methodId": "poison-tea",
+    "explanation": [ "The colonel carried the poisoned tea himself.", "He owed the professor money he could never repay." ],
+    "timeline": [ { "time": "9:00", "event": "The colonel carries the tea upstairs." } ]
+  },
+  "finale": [ { "type": "narration", "text": "The colonel was led away. Case closed." } ]
+}

@@ -59,6 +59,14 @@ public static partial class GameEngine
             case SolvePuzzle c: SolvePuzzle(s, scenario, c); break;
             case SubmitAccusation c: SubmitAccusation(s, scenario, c); break;
             case CastAwardVote c: CastAwardVote(s, c); break;
+            case SetAiFeatures c: s.Ai = c.Features; break;
+            case BeginNpcQuestion c: BeginNpcQuestion(s, scenario, c); break;
+            case CompleteNpcQuestion c: RequireInterrogation(s, c.Id).Answer = Clip(c.Answer, 2000); break;
+            case CancelNpcQuestion c: s.Interrogations.RemoveAll(i => i.Id == c.Id && i.Answer is null); break;
+            case BeginHint c: BeginHint(s, c); break;
+            case CompleteHint c: RequireHint(s, c.Id).Text = Clip(c.Text, 1000); break;
+            case CancelHint c: s.Hints.RemoveAll(h => h.Id == c.Id && h.Text is null); break;
+            case SetVerdicts c: SetVerdicts(s, c); break;
             default: throw new ArgumentOutOfRangeException(nameof(command), command.GetType().Name, "Unknown command.");
         }
 
@@ -429,6 +437,75 @@ public static partial class GameEngine
     }
 
     // ------------------------------------------------------------------ Helpers
+
+    // ------------------------------------------------------------------ AI-assisted actions
+
+    public const int MaxQuestionLength = 300;
+
+    /// <summary>How many questions this seat has left to ask NPCs in the current act.</summary>
+    public static int QuestionsLeft(GameState s, Guid seatId) =>
+        !s.Ai.NpcQuestions || s.Phase != Phase.Act
+            ? 0
+            : Math.Max(0, s.Ai.QuestionsPerAct - s.Interrogations.Count(i => i.SeatId == seatId && i.Act == CurrentActNumber(s)));
+
+    public static int HintsLeft(GameState s, Guid seatId) =>
+        !s.Ai.Hints || s.Phase != Phase.Act
+            ? 0
+            : Math.Max(0, s.Ai.HintsPerAct - s.Hints.Count(h => h.SeatId == seatId && h.Act == CurrentActNumber(s)));
+
+    private static void BeginNpcQuestion(GameState s, Scenario scenario, BeginNpcQuestion c)
+    {
+        if (!s.Ai.NpcQuestions) throw new GameRuleException("Questioning characters isn't switched on for this party.");
+        if (s.Phase != Phase.Act) throw new GameRuleException("You can only question characters during an act.");
+        var player = RequirePlayer(s, c.SeatId);
+        if (!s.NpcCharacterIds.Contains(c.CharacterId))
+            throw new GameRuleException("You can only question characters played by the narrator. Ask real guests in person!");
+        var question = c.Question.Trim();
+        if (question.Length is < 3 or > MaxQuestionLength)
+            throw new GameRuleException($"Questions must be 3 to {MaxQuestionLength} characters.");
+        if (QuestionsLeft(s, c.SeatId) == 0)
+            throw new GameRuleException("You've used all your questions for this act.");
+        if (s.Interrogations.Any(i => i.CharacterId == c.CharacterId && i.Answer is null))
+            throw new GameRuleException($"{scenario.FindCharacter(c.CharacterId)?.Name} is still answering the last question.");
+
+        s.Interrogations.Add(new Interrogation
+        {
+            Id = c.Id, At = c.Now, Act = CurrentActNumber(s), SeatId = c.SeatId,
+            AskerName = player.Name, CharacterId = c.CharacterId, Question = question,
+        });
+    }
+
+    private static void BeginHint(GameState s, BeginHint c)
+    {
+        if (!s.Ai.Hints) throw new GameRuleException("Hints aren't switched on for this party.");
+        if (s.Phase != Phase.Act) throw new GameRuleException("Hints are only available during an act.");
+        RequirePlayer(s, c.SeatId);
+        if (HintsLeft(s, c.SeatId) == 0) throw new GameRuleException("You've had your hint for this act.");
+        s.Hints.Add(new HintEntry { Id = c.Id, At = c.Now, Act = CurrentActNumber(s), SeatId = c.SeatId });
+    }
+
+    private static void SetVerdicts(GameState s, SetVerdicts c)
+    {
+        if (s.Phase is not (Phase.Reveal or Phase.Awards or Phase.Finished))
+            throw new GameRuleException("Verdicts are only given at the reveal.");
+        foreach (var (seat, text) in c.Verdicts)
+        {
+            if (s.FindPlayer(seat) is not null) s.Verdicts[seat] = Clip(text, 600);
+        }
+    }
+
+    private static Interrogation RequireInterrogation(GameState s, Guid id) =>
+        s.Interrogations.FirstOrDefault(i => i.Id == id) ?? throw new GameRuleException("That question no longer exists.");
+
+    private static HintEntry RequireHint(GameState s, Guid id) =>
+        s.Hints.FirstOrDefault(h => h.Id == id) ?? throw new GameRuleException("That hint no longer exists.");
+
+    /// <summary>AI output is untrusted text: cap its length so one runaway reply can't bloat the saved game state.</summary>
+    private static string Clip(string text, int max)
+    {
+        text = text.Trim();
+        return text.Length <= max ? text : text[..max].TrimEnd() + "…";
+    }
 
     public static bool CanSeeClue(GameState s, Guid seatId, string clueId) =>
         s.DroppedClues.Any(d => d.ClueId == clueId && (d.RecipientSeatId is null || d.SharedPublicly || d.RecipientSeatId == seatId));

@@ -34,7 +34,10 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:Default", ConnectionString);
         builder.UseSetting("Auth:AllowRegistration", AllowRegistration.ToString());
+        foreach (var (key, value) in ExtraSettings) builder.UseSetting(key, value);
     }
+
+    protected virtual IEnumerable<(string Key, string Value)> ExtraSettings => [];
 
     public async Task InitializeAsync()
     {
@@ -90,4 +93,30 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 public sealed class ClosedRegistrationFactory : ApiFactory
 {
     protected override bool AllowRegistration => false;
+}
+
+/// <summary>The app with every AI role pointed at the Fake provider (canned answers, no network).</summary>
+public class FakeAiFactory : ApiFactory
+{
+    protected virtual string Budget => "0";
+
+    protected override IEnumerable<(string Key, string Value)> ExtraSettings =>
+    [
+        ("Ai:AllowFakeProvider", "true"),
+        ("Ai:MonthlyBudgetUsd", Budget),
+        ("Ai:Providers:0:Name", "Fake"),
+        ("Ai:Providers:0:Kind", "Fake"),
+        ("Ai:Roles:Storyteller:Provider", "Fake"),
+        ("Ai:Roles:Storyteller:Model", "fake-model"),
+        ("Ai:Roles:Actor:Provider", "Fake"),
+        ("Ai:Roles:Actor:Model", "fake-model"),
+        ("Ai:Roles:Inspector:Provider", "Fake"),
+        ("Ai:Roles:Inspector:Model", "fake-model"),
+    ];
+}
+
+/// <summary>A tiny budget, so one call uses it up.</summary>
+public sealed class TinyBudgetAiFactory : FakeAiFactory
+{
+    protected override string Budget => "0.0001";
 }

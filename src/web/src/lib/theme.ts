@@ -19,7 +19,14 @@ export function useThemes() {
   useEffect(() => {
     loadThemes().then(setThemes, (e: Error) => setError(e.message))
   }, [])
-  return { themes, error }
+  /** Fetch again, e.g. after a new mystery was generated. */
+  const reload = async () => {
+    themesPromise = null
+    const fresh = await loadThemes()
+    setThemes(fresh)
+    return fresh
+  }
+  return { themes, error, reload }
 }
 
 const DEFAULT: ThemePalette = { background: '#0f0d0b', surface: '#1c1814', accent: '#c8a45a', ink: '#f3ead8' }

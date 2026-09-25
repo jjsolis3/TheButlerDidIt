@@ -77,6 +77,18 @@ public sealed class GameState
 
     public DateTimeOffset? StartedAt { get; set; }
 
+    /// <summary>Which AI features this party uses. Set by the server when the party is created.</summary>
+    public AiFeatures Ai { get; set; } = new();
+
+    /// <summary>Questions guests put to NPCs, and the NPCs' answers. Public: everyone hears them.</summary>
+    public List<Interrogation> Interrogations { get; set; } = [];
+
+    /// <summary>Inspector hints. Private to the seat that asked.</summary>
+    public List<HintEntry> Hints { get; set; } = [];
+
+    /// <summary>seatId → the Inspector's comment on that guest's accusation, shown once the killer is unmasked.</summary>
+    public Dictionary<Guid, string> Verdicts { get; set; } = [];
+
     public PlayerState? FindPlayer(Guid seatId) => Players.FirstOrDefault(p => p.SeatId == seatId);
 
     public PlayerState? PlayerFor(string characterId) => Players.FirstOrDefault(p => p.CharacterId == characterId);
@@ -152,4 +164,43 @@ public sealed class FeedItem
 {
     public DateTimeOffset At { get; set; }
     public required string Text { get; set; }
+}
+
+/// <summary>
+/// AI switches for one party. They live in the game state (not in server config)
+/// so the rules engine can enforce limits and the views know what to show,
+/// without the pure engine ever calling an AI itself.
+/// </summary>
+public sealed class AiFeatures
+{
+    public bool NpcQuestions { get; set; }
+    public int QuestionsPerAct { get; set; } = 3;
+    public bool Hints { get; set; }
+    public int HintsPerAct { get; set; } = 1;
+    public bool Verdicts { get; set; }
+}
+
+public sealed class Interrogation
+{
+    public Guid Id { get; set; }
+    public DateTimeOffset At { get; set; }
+    public int Act { get; set; }
+    public Guid SeatId { get; set; }
+    public required string AskerName { get; set; }
+    public required string CharacterId { get; set; }
+    public required string Question { get; set; }
+
+    /// <summary>Null while the NPC is still "thinking".</summary>
+    public string? Answer { get; set; }
+}
+
+public sealed class HintEntry
+{
+    public Guid Id { get; set; }
+    public DateTimeOffset At { get; set; }
+    public int Act { get; set; }
+    public Guid SeatId { get; set; }
+
+    /// <summary>Null while the Inspector is still thinking.</summary>
+    public string? Text { get; set; }
 }

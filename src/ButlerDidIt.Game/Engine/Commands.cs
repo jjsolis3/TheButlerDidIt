@@ -41,3 +41,18 @@ public sealed record CastAwardVote(DateTimeOffset Now, Guid SeatId, string Award
 
 /// <summary>Thrown when a command breaks a game rule. The message is safe to show to players.</summary>
 public sealed class GameRuleException(string message) : Exception(message);
+
+// ---- AI-assisted actions ----
+// AI calls are slow and can fail, and the engine must stay pure, so each one is
+// split into steps: Begin reserves a slot (checking the rules and limits),
+// the server calls the AI outside the engine, then Complete stores the answer or
+// Cancel gives the slot back.
+
+public sealed record SetAiFeatures(DateTimeOffset Now, AiFeatures Features) : Command(Now);
+public sealed record BeginNpcQuestion(DateTimeOffset Now, Guid Id, Guid SeatId, string CharacterId, string Question) : Command(Now);
+public sealed record CompleteNpcQuestion(DateTimeOffset Now, Guid Id, string Answer) : Command(Now);
+public sealed record CancelNpcQuestion(DateTimeOffset Now, Guid Id) : Command(Now);
+public sealed record BeginHint(DateTimeOffset Now, Guid Id, Guid SeatId) : Command(Now);
+public sealed record CompleteHint(DateTimeOffset Now, Guid Id, string Text) : Command(Now);
+public sealed record CancelHint(DateTimeOffset Now, Guid Id) : Command(Now);
+public sealed record SetVerdicts(DateTimeOffset Now, IReadOnlyDictionary<Guid, string> Verdicts) : Command(Now);

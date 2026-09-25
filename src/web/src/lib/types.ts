@@ -124,6 +124,7 @@ export interface GuessView {
   motive: string | null
   method: string | null
   correct: boolean | null
+  verdict: string | null
 }
 
 export interface RevealView {
@@ -179,6 +180,34 @@ export interface StageView {
   accusation: { submitted: number; total: number } | null
   reveal: RevealView | null
   awards: AwardsView | null
+  ai: AiFeatures
+  interrogations: InterrogationView[]
+}
+
+export interface AiFeatures {
+  npcQuestions: boolean
+  questionsPerAct: number
+  hints: boolean
+  hintsPerAct: number
+  verdicts: boolean
+}
+
+export interface InterrogationView {
+  id: string
+  act: number
+  askerName: string
+  characterId: string
+  characterName: string
+  question: string
+  /** null while the character is still answering */
+  answer: string | null
+  voice: VoiceProfile | null
+}
+
+export interface HintView {
+  id: string
+  act: number
+  text: string | null
 }
 
 export interface Option {
@@ -231,6 +260,9 @@ export interface PlayerView {
     nominees: Option[]
     myVotes: Record<string, string>
   } | null
+  questionsLeft: number
+  hintsLeft: number
+  myHints: HintView[]
   stage: StageView
 }
 
@@ -263,6 +295,7 @@ export interface ScenarioCard {
   estimatedMinutes: number
   contentRating: ContentRating
   characterCount: number
+  aiGenerated: boolean
 }
 
 export interface ThemeCard {
@@ -296,4 +329,88 @@ export interface Me {
   email: string
   displayName: string
   isAdmin: boolean
+}
+
+// ---- AI (admin + generation)
+
+export type AiProviderKind = 'anthropic' | 'openAI' | 'gemini' | 'ollama' | 'fake'
+export type AiRole = 'storyteller' | 'actor' | 'inspector'
+export type MysteryLength = 'short' | 'standard' | 'long'
+export type GenerationStatus = 'queued' | 'running' | 'succeeded' | 'failed'
+
+export interface AiStatus {
+  storyteller: boolean
+  actor: boolean
+  inspector: boolean
+  budgetUsd: number
+  spentThisMonthUsd: number
+  isAdmin: boolean
+}
+
+export interface ProviderView {
+  id: string
+  name: string
+  kind: AiProviderKind
+  baseUrl: string | null
+  hasApiKey: boolean
+  fromConfig: boolean
+}
+
+export interface RoleView {
+  role: AiRole
+  providerId: string | null
+  providerName: string | null
+  model: string | null
+  maxOutputTokens: number | null
+  temperature: number | null
+}
+
+export interface PriceView {
+  model: string
+  inputPerMillion: number
+  outputPerMillion: number
+}
+
+export interface UsageGroup {
+  key: string
+  calls: number
+  failed: number
+  costUsd: number
+  inputTokens: number
+  outputTokens: number
+}
+
+export interface UsageReport {
+  budgetUsd: number
+  since: string
+  totalCostUsd: number
+  byMonth: UsageGroup[]
+  byRole: UsageGroup[]
+  byModel: UsageGroup[]
+  byHost: UsageGroup[]
+  unpricedModels: string[]
+  recent: {
+    at: string
+    role: string
+    providerName: string
+    model: string
+    purpose: string
+    inputTokens: number
+    outputTokens: number
+    costUsd: number
+    durationMs: number
+    success: boolean
+    error: string | null
+  }[]
+}
+
+export interface GenerationJob {
+  id: string
+  themeSlug: string
+  status: GenerationStatus
+  progress: string
+  scenarioId: string | null
+  error: string | null
+  warnings: string[]
+  createdAt: string
 }

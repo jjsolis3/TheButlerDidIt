@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using ButlerDidIt.Ai;
+using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Parties;
@@ -21,7 +23,7 @@ namespace ButlerDidIt.Api.Hubs;
 ///   * Host controls take the party code and check the signed-in user owns the party.
 /// </summary>
 [Authorize(Policy = AuthPolicies.PartyMember)]
-public sealed class PartyHub(PartyService parties, AppDbContext db) : Hub
+public sealed class PartyHub(PartyService parties, AppDbContext db, AiGameService aiGame) : Hub
 {
     public static string StageGroup(Guid partyId) => $"stage:{partyId}";
     public static string SeatGroup(Guid seatId) => $"seat:{seatId}";
@@ -62,6 +64,20 @@ public sealed class PartyHub(PartyService parties, AppDbContext db) : Hub
     public Task SubmitAccusation(string suspectId, string motiveId, string methodId) =>
         AsSeat((seat, now) => new SubmitAccusation(now, seat, suspectId, motiveId, methodId));
 
+    /// <summary>Question a character nobody is playing. The answer arrives for everyone through the normal stage update.</summary>
+    public Task AskNpc(string characterId, string question)
+    {
+        var (seatId, partyId) = RequireSeat();
+        return aiGame.AskNpcAsync(partyId, seatId, characterId, question, Context.ConnectionAborted);
+    }
+
+    /// <summary>Ask the Inspector for a private hint. It appears only on this seat's phone.</summary>
+    public Task RequestHint()
+    {
+        var (seatId, partyId) = RequireSeat();
+        return aiGame.RequestHintAsync(partyId, seatId, Context.ConnectionAborted);
+    }
+
     public Task CastAwardVote(string awardId, Guid nomineeSeatId) =>
         AsSeat((seat, now) => new CastAwardVote(now, seat, awardId, nomineeSeatId));
 
@@ -89,7 +105,12 @@ public sealed class PartyHub(PartyService parties, AppDbContext db) : Hub
     // ------------------------------------------------------------------ host controls
 
     public Task StartGame(string code) => AsHost(code, (_, now) => new StartGame(now));
-    public Task Advance(string code) => AsHost(code, (_, now) => new Advance(now));
+    public async Task Advance(string code)
+    {
+        var snapshot = await AsHost(code, (_, now) => new Advance(now));
+        // Entering the reveal: start writing the Inspector's verdicts in the background.
+        aiGame.QueueVerdicts(snapshot);
+    }
     public Task AutoAssign(string code) => AsHost(code, (_, now) => new AutoAssignCharacters(now));
     public Task DropNextClue(string code) => AsHost(code, (_, now) => new DropNextClue(now));
     public Task PauseTimer(string code) => AsHost(code, (_, now) => new PauseTimer(now));
@@ -126,11 +147,11 @@ public sealed class PartyHub(PartyService parties, AppDbContext db) : Hub
         await parties.ExecuteAsync(partyId, (_, now) => make(seatId, now));
     }
 
-    private async Task AsHost(string code, Func<PartySnapshot, DateTimeOffset, Command> make, Action<PartySnapshot>? beforeSave = null)
+    private async Task<PartySnapshot> AsHost(string code, Func<PartySnapshot, DateTimeOffset, Command> make, Action<PartySnapshot>? beforeSave = null)
     {
         var party = await parties.FindByCodeAsync(code) ?? throw new HubException("Party not found.");
         if (!IsHostOf(party)) throw new HubException("Only the host can do that.");
-        await parties.ExecuteAsync(party.Id, make, beforeSave);
+        return await parties.ExecuteAsync(party.Id, make, beforeSave);
     }
 
     private bool IsHostOf(Party party) =>
@@ -156,6 +177,11 @@ public sealed class GameRuleHubFilter : IHubFilter
         }
         catch (KeyNotFoundException ex)
         {
+            throw new HubException(ex.Message);
+        }
+        catch (AiException ex)
+        {
+            // Budget reached, AI not configured, provider down: all have player-friendly messages.
             throw new HubException(ex.Message);
         }
     }

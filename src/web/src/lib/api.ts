@@ -1,4 +1,20 @@
-import type { ContentRating, Me, PartyInfo, PartyMode, SeatResponse, ThemeCard } from './types'
+import type {
+  AiProviderKind,
+  AiRole,
+  AiStatus,
+  ContentRating,
+  GenerationJob,
+  Me,
+  MysteryLength,
+  PartyInfo,
+  PartyMode,
+  PriceView,
+  ProviderView,
+  RoleView,
+  SeatResponse,
+  ThemeCard,
+  UsageReport,
+} from './types'
 
 /** An error whose message came from the server and is safe to show to the user. */
 export class ApiError extends Error {
@@ -42,10 +58,35 @@ export const api = {
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
-  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null) =>
-    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor }),
+  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null, useAi = true) =>
+    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor, useAi }),
   party: (code: string) => request<PartyInfo>('GET', `/api/parties/${encodeURIComponent(code)}`),
   join: (code: string, name: string) => request<SeatResponse>('POST', `/api/parties/${encodeURIComponent(code)}/join`, { name }),
   addSeat: (code: string, name: string, isLocal: boolean) =>
     request<SeatResponse>('POST', `/api/parties/${encodeURIComponent(code)}/seats`, { name, isLocal }),
+
+  // ---- AI
+  aiStatus: () => request<AiStatus>('GET', '/api/ai/status'),
+  generate: (themeSlug: string, players: number, contentRating: ContentRating, length: MysteryLength, twist: string) =>
+    request<GenerationJob>('POST', '/api/generation', { themeSlug, players, contentRating, length, twist: twist || null }),
+  generationJob: (id: string) => request<GenerationJob>('GET', `/api/generation/${id}`),
+
+  admin: {
+    providers: () => request<ProviderView[]>('GET', '/api/admin/ai/providers'),
+    createProvider: (p: { name: string; kind: AiProviderKind; baseUrl: string | null; apiKey: string | null }) =>
+      request<ProviderView>('POST', '/api/admin/ai/providers', p),
+    updateProvider: (id: string, p: { name: string; kind: AiProviderKind; baseUrl: string | null; apiKey: string | null }) =>
+      request<ProviderView>('PUT', `/api/admin/ai/providers/${id}`, p),
+    deleteProvider: (id: string) => request<void>('DELETE', `/api/admin/ai/providers/${id}`),
+    testProvider: (id: string, model: string) =>
+      request<{ ok: boolean; message: string; milliseconds: number }>('POST', `/api/admin/ai/providers/${id}/test`, { model }),
+    roles: () => request<RoleView[]>('GET', '/api/admin/ai/roles'),
+    setRole: (role: AiRole, providerId: string, model: string, maxOutputTokens: number | null) =>
+      request<void>('PUT', `/api/admin/ai/roles/${role}`, { providerId, model, maxOutputTokens, temperature: null }),
+    clearRole: (role: AiRole) => request<void>('DELETE', `/api/admin/ai/roles/${role}`),
+    prices: () => request<PriceView[]>('GET', '/api/admin/ai/prices'),
+    setPrice: (p: PriceView) => request<void>('PUT', '/api/admin/ai/prices', p),
+    deletePrice: (model: string) => request<void>('DELETE', `/api/admin/ai/prices/${encodeURIComponent(model)}`),
+    usage: (months = 3) => request<UsageReport>('GET', `/api/admin/ai/usage?months=${months}`),
+  },
 }

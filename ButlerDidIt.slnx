@@ -1,9 +1,11 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/ButlerDidIt.Ai/ButlerDidIt.Ai.csproj" />
     <Project Path="src/ButlerDidIt.Api/ButlerDidIt.Api.csproj" />
     <Project Path="src/ButlerDidIt.Game/ButlerDidIt.Game.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ButlerDidIt.Ai.Tests/ButlerDidIt.Ai.Tests.csproj" />
     <Project Path="tests/ButlerDidIt.Api.Tests/ButlerDidIt.Api.Tests.csproj" />
     <Project Path="tests/ButlerDidIt.Game.Tests/ButlerDidIt.Game.Tests.csproj" />
   </Folder>

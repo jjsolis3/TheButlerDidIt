@@ -18,6 +18,19 @@ services:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       # Set to false after you create your host account to make the server invite-only.
       Auth__AllowRegistration: "${ALLOW_REGISTRATION:-true}"
+      # ---- AI game master (optional; see docs/ai-setup.md). You can also set all of
+      # this up on the Admin -> AI page instead. Leave blank to skip.
+      Ai__MonthlyBudgetUsd: "${AI_MONTHLY_BUDGET_USD:-25}"
+      Ai__Providers__0__Name: "${AI_PROVIDER_NAME:-}"
+      Ai__Providers__0__Kind: "${AI_PROVIDER_KIND:-}"          # Anthropic | OpenAI | Gemini | Ollama
+      Ai__Providers__0__ApiKey: "${AI_PROVIDER_API_KEY:-}"
+      Ai__Providers__0__BaseUrl: "${AI_PROVIDER_BASE_URL:-}"
+      Ai__Roles__Storyteller__Provider: "${AI_PROVIDER_NAME:-}"
+      Ai__Roles__Storyteller__Model: "${AI_STORYTELLER_MODEL:-}"
+      Ai__Roles__Actor__Provider: "${AI_PROVIDER_NAME:-}"
+      Ai__Roles__Actor__Model: "${AI_ACTOR_MODEL:-}"
+      Ai__Roles__Inspector__Provider: "${AI_PROVIDER_NAME:-}"
+      Ai__Roles__Inspector__Model: "${AI_INSPECTOR_MODEL:-}"
     volumes:
       - keys:/data/keys   # keeps hosts logged in across redeploys
       - media:/data/media # generated images and voices (milestone 3)
