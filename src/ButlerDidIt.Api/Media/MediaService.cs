@@ -45,6 +45,10 @@ public sealed class MediaStore(IOptions<MediaOptions> options, IWebHostEnvironme
     }
 
     public static string Url(Guid assetId) => $"/media/assets/{assetId}";
+
+    /// <summary>The asset id inside one of our media URLs, or null for anything else (e.g. hand-made theme art).</summary>
+    public static Guid? AssetIdFromUrl(string? url) =>
+        url is not null && url.StartsWith("/media/assets/", StringComparison.Ordinal) && Guid.TryParse(url["/media/assets/".Length..], out var id) ? id : null;
 }
 
 /// <summary>
@@ -97,17 +101,30 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, MediaStore
     }
 
     /// <summary>Stores an uploaded file (e.g. a selfie) as-is, without generation or caching.</summary>
-    public async Task<Guid> SaveUploadAsync(MediaKind kind, byte[] bytes, string contentType, string extension, CancellationToken ct)
+    public async Task<Guid> SaveUploadAsync(MediaKind kind, byte[] bytes, string contentType, string extension, Guid? partyId, CancellationToken ct)
     {
         var asset = new MediaAsset
         {
             Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(bytes, extension, ct),
             ContentHash = Convert.ToHexString(SHA256.HashData(Guid.NewGuid().ToByteArray())), Provider = "upload",
-            ContentType = contentType, SizeBytes = bytes.Length, CreatedAt = clock.GetUtcNow(),
+            ContentType = contentType, SizeBytes = bytes.Length, CreatedAt = clock.GetUtcNow(), PartyId = partyId,
         };
         db.MediaAssets.Add(asset);
         await db.SaveChangesAsync(ct);
         return asset.Id;
+    }
+
+    /// <summary>Deletes uploaded files (row and bytes). Generated media is shared between parties, so it is never deleted here.</summary>
+    public async Task DeleteUploadsAsync(IEnumerable<Guid> assetIds, CancellationToken ct)
+    {
+        var ids = assetIds.ToList();
+        if (ids.Count == 0) return;
+        var assets = await db.MediaAssets.Where(a => ids.Contains(a.Id) && a.Provider == "upload").ToListAsync(ct);
+        db.MediaAssets.RemoveRange(assets);
+        await db.SaveChangesAsync(ct);
+        // Delete the files only after the rows are gone: a crash in between leaves an
+        // unreferenced file (harmless), never a row pointing at a missing file.
+        foreach (var asset in assets) store.Delete(asset.Path);
     }
 }
 

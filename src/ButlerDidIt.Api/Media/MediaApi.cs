@@ -66,16 +66,30 @@ public static class MediaApi
                 return Results.Problem(ex.Message, statusCode: 400);
             }
 
-            var assetId = await mediaService.SaveUploadAsync(MediaKind.Photo, jpeg, "image/jpeg", "jpg", ct);
+            var assetId = await mediaService.SaveUploadAsync(MediaKind.Photo, jpeg, "image/jpeg", "jpg", partyId, ct);
             var url = MediaStore.Url(assetId);
-            await parties.ExecuteAsync(partyId, (_, now) => new SetPlayerPhoto(now, seatId, url), ct: ct);
+            string? previous = null;
+            await parties.ExecuteAsync(partyId, (s, now) =>
+            {
+                previous = s.State.Players.FirstOrDefault(p => p.SeatId == seatId)?.PhotoUrl;
+                return new SetPlayerPhoto(now, seatId, url);
+            }, ct: ct);
+            // A retake replaces the old selfie; don't keep the old one around.
+            if (MediaStore.AssetIdFromUrl(previous) is { } old) await mediaService.DeleteUploadsAsync([old], ct);
             return Results.Ok(new { PhotoUrl = url });
         }).RequireAuthorization(AuthPolicies.Seat).DisableAntiforgery();
 
-        app.MapDelete("/api/seat/photo", async (ClaimsPrincipal user, PartyService parties, CancellationToken ct) =>
+        app.MapDelete("/api/seat/photo", async (ClaimsPrincipal user, PartyService parties, MediaService mediaService, CancellationToken ct) =>
         {
             if (user.SeatId() is not { } seatId || user.PartyId() is not { } partyId) return Results.Unauthorized();
-            await parties.ExecuteAsync(partyId, (_, now) => new SetPlayerPhoto(now, seatId, null), ct: ct);
+            string? previous = null;
+            await parties.ExecuteAsync(partyId, (s, now) =>
+            {
+                previous = s.State.Players.FirstOrDefault(p => p.SeatId == seatId)?.PhotoUrl;
+                return new SetPlayerPhoto(now, seatId, null);
+            }, ct: ct);
+            // "Remove" means gone from the server too, not just hidden.
+            if (MediaStore.AssetIdFromUrl(previous) is { } old) await mediaService.DeleteUploadsAsync([old], ct);
             return Results.NoContent();
         }).RequireAuthorization(AuthPolicies.Seat);
     }

@@ -79,6 +79,7 @@ public static class PartyEndpoints
                 ContentLevel = req.ContentLevel,
                 Status = PartyStatus.Lobby,
                 CreatedAt = parties.Now,
+                UpdatedAt = parties.Now,
                 ScheduledFor = req.ScheduledFor,
                 State = GameJson.Serialize(new GameState
                 {
