@@ -106,6 +106,13 @@ public sealed class Party
     /// </summary>
     public DateTimeOffset? PrunedAt { get; set; }
 
+    /// <summary>
+    /// Set when the host shares the after-party recap: the random part of its link.
+    /// Null means not shared. Stopping sharing clears it, so the old link dies.
+    /// </summary>
+    [MaxLength(32)]
+    public string? RecapSlug { get; set; }
+
     /// <summary>The engine's GameState as jsonb, rewritten after every command.</summary>
     public required string State { get; set; }
 

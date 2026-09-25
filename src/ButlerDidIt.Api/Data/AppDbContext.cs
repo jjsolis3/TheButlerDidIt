@@ -41,6 +41,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
             p.HasIndex(x => x.HostUserId);
             p.HasIndex(x => x.NextDueAt);
             p.HasIndex(x => new { x.Status, x.UpdatedAt }); // the retention job's queries
+            p.HasIndex(x => x.RecapSlug).IsUnique();
             p.HasMany(x => x.Seats).WithOne(s => s.Party).HasForeignKey(s => s.PartyId).OnDelete(DeleteBehavior.Cascade);
         });
 

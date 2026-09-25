@@ -157,3 +157,28 @@ public sealed record AccusationForm(
     AccusationEntry? Current);
 
 public sealed record AwardBallot(IReadOnlyList<AwardOption> Awards, IReadOnlyList<Option> Nominees, IReadOnlyDictionary<string, Guid> MyVotes);
+
+/// <summary>
+/// The after-party page, for a finished game only. It deliberately shows what the
+/// game kept hidden (the solution, everyone's secrets) but still leaves out anything
+/// private to one guest: their notes and hints.
+/// </summary>
+public sealed record RecapView(
+    ScenarioSummary Scenario,
+    IReadOnlyList<RecapCharacter> Cast,
+    RevealView Reveal,
+    AwardsView Awards,
+    IReadOnlyList<InterrogationView> Interrogations,
+    IReadOnlyList<SecretView> SecretsRevealedDuringPlay);
+
+public sealed record RecapCharacter(
+    string CharacterId,
+    string Name,
+    string Title,
+    string? Portrait,
+    string? PlayedBy,
+    string? PhotoUrl,
+    bool IsNpc,
+    bool IsMurderer,
+    IReadOnlyList<string> Secrets);
+

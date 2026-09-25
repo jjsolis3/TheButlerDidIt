@@ -173,4 +173,34 @@ public class ViewProjectorTests
         s = GameEngine.Apply(s, scenario, new Advance(T0));
         Assert.Equal(["Bob"], ViewProjector.Stage(s, scenario, T0).Awards!.Results!.Single(r => r.AwardId == "costume").Winners);
     }
+
+    [Fact]
+    public void The_recap_is_refused_until_the_game_is_over()
+    {
+        var (s, scenario) = StartedGame();
+        while (s.Phase != Phase.Awards)
+        {
+            Assert.Throws<InvalidOperationException>(() => ViewProjector.Recap(s, scenario, T0));
+            s = GameEngine.Apply(s, scenario, new Advance(T0));
+        }
+        Assert.Throws<InvalidOperationException>(() => ViewProjector.Recap(s, scenario, T0));
+    }
+
+    [Fact]
+    public void The_recap_tells_the_whole_story_but_keeps_private_hints_out()
+    {
+        var (s, scenario) = StartedGame();
+        s.Hints.Add(new HintEntry { Id = Guid.NewGuid(), SeatId = Alice, Act = 1, Text = "PRIVATE_HINT" });
+        while (s.Phase != Phase.Finished) s = GameEngine.Apply(s, scenario, new Advance(T0));
+
+        var recap = ViewProjector.Recap(s, scenario, T0);
+        var json = GameJson.Serialize(recap);
+
+        Assert.All(SolutionMarkers, m => Assert.Contains(m, json)); // the full solution and timeline
+        Assert.Contains("BUTLER_SECRET_ACT2", json);                 // every secret, even ones never unlocked
+        Assert.DoesNotContain("PRIVATE_HINT", json);
+        Assert.Equal("Alice", recap.Cast.Single(c => c.CharacterId == "maid").PlayedBy);
+        Assert.Single(recap.Cast, c => c.IsMurderer);
+        Assert.DoesNotContain(recap.Cast, c => c.CharacterId == "guest"); // optional, unplayed: not part of the story
+    }
 }

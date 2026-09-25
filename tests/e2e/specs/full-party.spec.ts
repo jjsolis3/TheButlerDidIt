@@ -166,6 +166,22 @@ test('a full dinner party: join, play three acts, accuse, reveal and vote', asyn
   await expect(stage.getByRole('heading', { name: 'And the winners are…' })).toBeVisible()
   await expect(bob.getByText(/Best Detective: Bob/)).toBeVisible()
   await stage.screenshot({ path: `${SHOTS}/11-stage-awards.png`, fullPage: true })
+
+  // The recap: private until the host shares it, then readable by anyone with the link.
+  await stage.getByRole('button', { name: 'Share the recap' }).click()
+  const recapLink = await stage.getByLabel('Recap link').inputValue()
+  const reader = await (await browser.newContext()).newPage() // no account, no seat
+  await reader.goto(recapLink)
+  await expect(reader.getByRole('heading', { name: 'Death at Blackwood Manor' })).toBeVisible()
+  await expect(reader.getByText('played by Alice')).toBeVisible()
+  await expect(reader.getByText('The killer')).toBeVisible()
+  await expect(reader.getByRole('heading', { name: "Everyone's secrets" })).toBeVisible()
+  await reader.screenshot({ path: `${SHOTS}/14-recap.png`, fullPage: true })
+
+  await stage.getByRole('button', { name: 'Stop sharing' }).click()
+  await expect(stage.getByRole('button', { name: 'Share the recap' })).toBeVisible()
+  await reader.reload()
+  await expect(reader.getByText("This recap isn't available")).toBeVisible()
 })
 
 test('pass and play: one device, private hand-offs', async ({ browser }) => {
