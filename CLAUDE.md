@@ -13,6 +13,8 @@ Murder-mystery party game: ASP.NET Core 10 + SignalR + EF Core/PostgreSQL back e
 ## Conventions
 
 - Game rules live only in `src/ButlerDidIt.Game` (pure, no I/O). The API calls `GameEngine.Apply` via `PartyService.ExecuteAsync`.
+- AI code lives in `src/ButlerDidIt.Ai` and goes through `AiGateway` (budget + usage logging). The engine never calls AI; AI actions are Begin/Complete/Cancel commands. Prompts must include only what that character or player may know. Every prompt starts with a `TASK:` line, which `FakeChatClient` keys on for tests.
+- Track bugs, tech debt and follow-ups as GitHub issues (labels: `bug`, `enhancement`, `documentation`, `phase-N`, `ai`, `media`) and reference them in PRs.
 - Never send scenario data to browsers directly: add fields to `Views.cs` and copy them explicitly in `ViewProjector`. Extend `ViewProjectorTests` for anything private.
 - C# view records and `src/web/src/lib/types.ts` must stay in sync (camelCase, enums as camelCase strings).
 - Scenario JSON in `content/` is validated at startup and in tests by `ScenarioValidator`.

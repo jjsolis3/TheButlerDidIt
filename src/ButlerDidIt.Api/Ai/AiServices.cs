@@ -34,7 +34,9 @@ public sealed class AiOptions
     public sealed class ProviderOption
     {
         public string Name { get; set; } = "";
-        public AiProviderKind Kind { get; set; }
+
+        /// <summary>Anthropic, OpenAI, Gemini or Ollama. A string so a blank environment variable can't stop the app starting.</summary>
+        public string Kind { get; set; } = "";
         public string? BaseUrl { get; set; }
         public string? ApiKey { get; set; }
     }
@@ -152,14 +154,15 @@ public static class AiConfigSeeder
 
         foreach (var p in options.Providers.Where(p => !string.IsNullOrWhiteSpace(p.Name)))
         {
-            if (p.Kind == AiProviderKind.Fake && !options.AllowFakeProvider) continue;
+            if (!Enum.TryParse<AiProviderKind>(p.Kind, ignoreCase: true, out var kind)) continue;
+            if (kind == AiProviderKind.Fake && !options.AllowFakeProvider) continue;
             var row = await db.AiProviders.FirstOrDefaultAsync(x => x.Name == p.Name, ct);
             if (row is null)
             {
                 row = new AiProviderEntity { Id = Guid.NewGuid(), Name = p.Name, CreatedAt = now };
                 db.AiProviders.Add(row);
             }
-            row.Kind = p.Kind;
+            row.Kind = kind;
             row.BaseUrl = string.IsNullOrWhiteSpace(p.BaseUrl) ? null : p.BaseUrl;
             if (!string.IsNullOrWhiteSpace(p.ApiKey)) row.EncryptedApiKey = keys.Protect(p.ApiKey);
             row.FromConfig = true;
