@@ -105,6 +105,12 @@ public sealed class CharacterPrivate
 
     /// <summary>Lines to say aloud, keyed by act id. NPC lines are read by the narrator instead.</summary>
     public Dictionary<string, List<string>> Lines { get; init; } = [];
+
+    /// <summary>
+    /// Pre-recorded audio for <see cref="Lines"/>, keyed "actId/index". Filled in by
+    /// the media pipeline (see MediaOverlay), not written by hand.
+    /// </summary>
+    public Dictionary<string, string> LineAudio { get; init; } = [];
 }
 
 public sealed class Secret
@@ -200,6 +206,13 @@ public enum CueType
 
     /// <summary>A line spoken by a character. Only played on stage when that character is an NPC.</summary>
     Line,
+
+    /// <summary>
+    /// A drinking-game toast ("Raise a glass to the late Lord Blackwood!"). Only
+    /// shown when the host switched on drinking prompts; <see cref="Cue.Alternative"/>
+    /// is the non-alcoholic version shown alongside it.
+    /// </summary>
+    Toast,
 }
 
 public sealed class Cue
@@ -215,6 +228,9 @@ public sealed class Cue
 
     /// <summary>Visual effect for images, e.g. "kenburns".</summary>
     public string? Effect { get; init; }
+
+    /// <summary>For toasts: the non-alcoholic alternative, e.g. "…or a sip of something fizzy".</summary>
+    public string? Alternative { get; init; }
 }
 
 public sealed class AccusationOptions

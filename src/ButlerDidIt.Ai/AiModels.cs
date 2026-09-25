@@ -30,6 +30,12 @@ public enum AiRole
 
     /// <summary>Gives hints, checks generated mysteries are solvable, and delivers verdicts.</summary>
     Inspector,
+
+    /// <summary>Turns narration, NPC lines and answers into speech (text-to-speech).</summary>
+    Voice,
+
+    /// <summary>Paints character portraits and scene art.</summary>
+    Illustrator,
 }
 
 public sealed record AiProviderSettings(Guid Id, string Name, AiProviderKind Kind, string? BaseUrl, string? ApiKey);
@@ -79,9 +85,14 @@ public sealed class AiBudgetExceededException(string message) : AiException(mess
 
 public sealed class AiCallFailedException(string message, Exception? inner = null) : AiException(message, inner);
 
-/// <summary>Price per million tokens. Ollama and unknown models cost 0.</summary>
-public sealed record AiModelPrice(decimal InputPerMillion, decimal OutputPerMillion)
+/// <summary>
+/// What a model costs. Chat models charge per million tokens. Text-to-speech is
+/// usually priced per million characters (the usage log records characters as
+/// "input tokens" for voice calls), and image models charge per image (PerRequest).
+/// Ollama and unknown models cost 0.
+/// </summary>
+public sealed record AiModelPrice(decimal InputPerMillion, decimal OutputPerMillion, decimal PerRequest = 0m)
 {
     public decimal Cost(long inputTokens, long outputTokens) =>
-        (inputTokens * InputPerMillion + outputTokens * OutputPerMillion) / 1_000_000m;
+        (inputTokens * InputPerMillion + outputTokens * OutputPerMillion) / 1_000_000m + PerRequest;
 }

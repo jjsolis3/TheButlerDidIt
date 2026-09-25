@@ -15,6 +15,16 @@ public sealed class ThemeDefinition
 
     public string? Cover { get; init; }
     public int SortOrder { get; init; } = 100;
+
+    /// <summary>Themed drinks, shown when the host switches on drinking prompts. Each has a non-alcoholic version.</summary>
+    public List<Cocktail> Cocktails { get; init; } = [];
+}
+
+public sealed class Cocktail
+{
+    public required string Name { get; init; }
+    public string Recipe { get; init; } = "";
+    public string Mocktail { get; init; } = "";
 }
 
 public sealed class ThemePalette

@@ -154,6 +154,9 @@ public enum MediaKind
     Image,
     Audio,
     Video,
+
+    /// <summary>A guest's costume selfie.</summary>
+    Photo,
 }
 
 /// <summary>Generated or uploaded media. Filled in by the milestone 3 media pipeline; the table exists now so the schema is ready.</summary>
@@ -173,5 +176,54 @@ public sealed class MediaAsset
     public string Provider { get; set; } = "";
 
     public string Prompt { get; set; } = "";
+
+    [MaxLength(60)]
+    public string ContentType { get; set; } = "application/octet-stream";
+
+    public long SizeBytes { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+}
+
+/// <summary>Which generated file fills which slot of a scenario (see MediaOverlay for the keys).</summary>
+public sealed class ScenarioMediaEntity
+{
+    [MaxLength(120)]
+    public required string ScenarioId { get; set; }
+
+    [MaxLength(200)]
+    public required string Key { get; set; }
+
+    public Guid AssetId { get; set; }
+}
+
+public enum MediaJobStatus
+{
+    Queued,
+    Running,
+    Succeeded,
+    Failed,
+}
+
+/// <summary>A request to create the voices and pictures for one scenario, processed by MediaWorker.</summary>
+public sealed class MediaJobEntity
+{
+    public Guid Id { get; set; }
+
+    [MaxLength(120)]
+    public required string ScenarioId { get; set; }
+
+    /// <summary>Whose budget pays for it.</summary>
+    [MaxLength(450)]
+    public required string HostUserId { get; set; }
+
+    public MediaJobStatus Status { get; set; }
+    public int Total { get; set; }
+    public int Done { get; set; }
+    public int Failed { get; set; }
+
+    [MaxLength(1000)]
+    public string? Error { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

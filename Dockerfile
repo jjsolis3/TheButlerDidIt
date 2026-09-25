@@ -37,7 +37,8 @@ COPY content ./content
 ENV ASPNETCORE_HTTP_PORTS=8080 \
     ASPNETCORE_ENVIRONMENT=Production \
     Content__Root=content \
-    DataProtection__KeysPath=/data/keys
+    DataProtection__KeysPath=/data/keys \
+    Media__Root=/data/media
 
 # Run as the image's built-in non-root user; give it the data folders that
 # docker-compose mounts as volumes.

@@ -100,6 +100,12 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         var job = await db.GenerationJobs.OrderBy(j => j.CreatedAt).FirstOrDefaultAsync(j => j.Status == GenerationStatus.Queued, ct);
         if (job is null) return;
 
+        // Claim the job atomically so two workers (or a test and the background loop) never both run it.
+        var claimed = await db.GenerationJobs.Where(j => j.Id == job.Id && j.Status == GenerationStatus.Queued)
+            .ExecuteUpdateAsync(u => u.SetProperty(j => j.Status, GenerationStatus.Running), ct);
+        if (claimed == 0) return;
+        await db.Entry(job).ReloadAsync(ct);
+
         job.Status = GenerationStatus.Running;
         job.Progress = "Starting…";
         job.UpdatedAt = clock.GetUtcNow();

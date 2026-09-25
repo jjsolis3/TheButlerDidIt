@@ -4,7 +4,19 @@
   "tagline": "A luxury sleeper, a snowdrift, and a passenger who will never reach Istanbul.",
   "era": "1930s luxury express train",
   "description": "Mahogany, velvet and silver service, stalled in the snow halfway across Europe. A wealthy passenger has been found dead in a locked compartment, and every traveller aboard has a reason to lie.",
-  "palette": { "background": "#0b0d10", "surface": "#161b22", "accent": "#b8925a", "ink": "#eee6d8" },
+  "palette": {
+    "background": "#0b0d10",
+    "surface": "#161b22",
+    "accent": "#b8925a",
+    "ink": "#eee6d8"
+  },
   "artStyle": "1930s travel poster, art deco locomotive, snowy mountains, warm carriage lamplight",
-  "sortOrder": 4
+  "sortOrder": 4,
+  "cocktails": [
+    {
+      "name": "The Orient",
+      "recipe": "Brandy, sweet vermouth and a cherry.",
+      "mocktail": "Cold black tea, cherry syrup and a squeeze of orange."
+    }
+  ]
 }

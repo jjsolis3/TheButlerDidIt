@@ -647,6 +647,11 @@
       "text": "Blackwood Manor. A storm rolls across the moors, and the bridge to the village is already under water. Tonight Lord Reginald Blackwood has gathered his household for dinner, a séance, and an announcement: a new will."
     },
     {
+      "type": "toast",
+      "text": "Raise your glasses to our host, Lord Reginald Blackwood. May he live forever!",
+      "alternative": "Not drinking? Raise whatever's in your glass, or your eyebrows."
+    },
+    {
       "type": "narration",
       "text": "Dinner is tense. Glasses are refilled too often. At half past nine the guests follow Madame Zelda to the drawing room, where candles gutter and a luminous trumpet floats in the dark."
     },
@@ -708,6 +713,11 @@
         {
           "type": "narration",
           "text": "Reginald's desk has been opened. Inside: a new will that changes everything, debts that nobody wants to talk about, and a locked diary. Money has a way of loosening tongues. Tonight, it may tighten a noose."
+        },
+        {
+          "type": "toast",
+          "text": "A toast to the new will! Drink if you're in it, drink twice if you're not.",
+          "alternative": "Or take a sip of something fizzy and look suspicious."
         }
       ],
       "prompts": [
@@ -837,6 +847,11 @@
       "type": "image",
       "text": "Dawn over the moors. A police car crosses the bridge.",
       "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Mocktails up for the detectives!"
     },
     {
       "type": "narration",

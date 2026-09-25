@@ -56,3 +56,11 @@ public sealed record BeginHint(DateTimeOffset Now, Guid Id, Guid SeatId) : Comma
 public sealed record CompleteHint(DateTimeOffset Now, Guid Id, string Text) : Command(Now);
 public sealed record CancelHint(DateTimeOffset Now, Guid Id) : Command(Now);
 public sealed record SetVerdicts(DateTimeOffset Now, IReadOnlyDictionary<Guid, string> Verdicts) : Command(Now);
+
+// ---- Media ----
+public sealed record SetPartyOptions(DateTimeOffset Now, PartyOptions Options) : Command(Now);
+
+/// <summary>Set or clear (null) a guest's costume selfie.</summary>
+public sealed record SetPlayerPhoto(DateTimeOffset Now, Guid SeatId, string? PhotoUrl) : Command(Now);
+
+public sealed record SetInterrogationAudio(DateTimeOffset Now, Guid Id, string AudioUrl) : Command(Now);

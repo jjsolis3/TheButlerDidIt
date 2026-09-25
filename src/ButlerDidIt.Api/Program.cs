@@ -8,6 +8,9 @@ using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
 using ButlerDidIt.Api.Hubs;
+using ButlerDidIt.Api.Kit;
+using ButlerDidIt.Api.Media;
+using ButlerDidIt.Ai.Media;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
@@ -26,6 +29,7 @@ var config = builder.Configuration;
 builder.Services.Configure<ContentOptions>(config.GetSection("Content"));
 builder.Services.Configure<AuthOptions>(config.GetSection("Auth"));
 builder.Services.Configure<AiOptions>(config.GetSection("Ai"));
+builder.Services.Configure<MediaOptions>(config.GetSection("Media"));
 
 // ---------------------------------------------------------------- database
 builder.Services.AddDbContext<AppDbContext>(o =>
@@ -125,6 +129,15 @@ builder.Services.AddHostedService<VerdictWorker>();
 builder.Services.AddSingleton<GenerationWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<GenerationWorker>());
 
+// ---------------------------------------------------------------- media (voices, pictures, selfies, printables)
+builder.Services.AddSingleton<IMediaClientFactory>(sp =>
+    new MediaClientFactory(allowFake: sp.GetRequiredService<IOptions<AiOptions>>().Value.AllowFakeProvider));
+builder.Services.AddScoped<MediaGateway>();
+builder.Services.AddSingleton<MediaStore>();
+builder.Services.AddScoped<MediaService>();
+builder.Services.AddSingleton<MediaWorker>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<MediaWorker>());
+
 builder.Services
     .AddSignalR(o => o.AddFilter<GameRuleHubFilter>())
     .AddJsonProtocol(o =>
@@ -135,6 +148,10 @@ builder.Services
 
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 builder.Services.AddProblemDetails();
+
+// QuestPDF is free under its Community licence for individuals, open-source
+// projects and companies under $1M revenue; this line records that choice.
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var app = builder.Build();
 
@@ -180,6 +197,8 @@ app.MapPartyEndpoints();
 app.MapMediaEndpoints();
 app.MapAiEndpoints();
 app.MapGenerationEndpoints();
+app.MapMediaApi();
+app.MapKitEndpoints();
 app.MapHub<PartyHub>("/hubs/party");
 
 // Any other URL (/join/ABC123, /stage/ABC123…) is a page in the React app.
