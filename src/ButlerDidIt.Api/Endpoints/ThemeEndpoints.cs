@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record ScenarioCard(string Id, string Title, string Synopsis, int MinPlayers, int MaxPlayers, int EstimatedMinutes, ContentRating ContentRating, int CharacterCount, bool AiGenerated);
+public sealed record ScenarioCard(string Id, string Title, string Synopsis, int MinPlayers, int MaxPlayers, int EstimatedMinutes, ContentRating ContentRating, int CharacterCount, bool AiGenerated, bool Custom);
 
 public sealed record ThemeCard(ThemeDefinition Theme, IReadOnlyList<ScenarioCard> Scenarios);
 
@@ -22,7 +22,7 @@ public static class ThemeEndpoints
             var themes = await db.Themes.AsNoTracking().OrderBy(t => t.SortOrder).ToListAsync(ct);
             // Everyone sees the hand-written mysteries; a signed-in host also sees the ones they generated.
             var scenarios = await db.Scenarios.AsNoTracking()
-                .Where(s => s.OwnerUserId == null || s.OwnerUserId == userId)
+                .Where(s => s.ArchivedAt == null && (s.OwnerUserId == null || s.OwnerUserId == userId))
                 .ToListAsync(ct);
             return themes.Select(t =>
             {
@@ -30,8 +30,8 @@ public static class ThemeEndpoints
                     .Where(s => s.ThemeSlug == t.Slug)
                     .Select(e => (Entity: e, Scenario: GameJson.Deserialize<Scenario>(e.Document)))
                     .Select(x => new ScenarioCard(x.Scenario.Id, x.Scenario.Title, x.Scenario.Synopsis, x.Scenario.MinPlayers, x.Scenario.MaxPlayers,
-                        x.Scenario.EstimatedMinutes, x.Scenario.ContentRating, x.Scenario.Characters.Count, x.Entity.Source == ScenarioSource.AiGenerated))
-                    .OrderBy(s => s.AiGenerated).ThenBy(s => s.Title)
+                        x.Scenario.EstimatedMinutes, x.Scenario.ContentRating, x.Scenario.Characters.Count, x.Entity.Source == ScenarioSource.AiGenerated, x.Entity.Source == ScenarioSource.Custom))
+                    .OrderBy(s => s.AiGenerated || s.Custom).ThenBy(s => s.Title)
                     .ToList();
                 return new ThemeCard(GameJson.Deserialize<ThemeDefinition>(t.Document), cards);
             }).ToList();

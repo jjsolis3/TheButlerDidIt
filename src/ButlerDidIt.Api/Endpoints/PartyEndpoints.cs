@@ -59,8 +59,9 @@ public static class PartyEndpoints
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
             // AI-generated mysteries belong to the host who generated them.
-            var owner = await db.Scenarios.AsNoTracking().Where(x => x.Id == req.ScenarioId).Select(x => x.OwnerUserId).FirstOrDefaultAsync(ct);
-            if (owner is not null && owner != userId) return Results.Problem("Pick a mystery to play.", statusCode: 400);
+            var row = await db.Scenarios.AsNoTracking().Where(x => x.Id == req.ScenarioId).Select(x => new { x.OwnerUserId, x.ArchivedAt }).FirstOrDefaultAsync(ct);
+            if (row is not null && ((row.OwnerUserId is not null && row.OwnerUserId != userId) || row.ArchivedAt is not null))
+                return Results.Problem("Pick a mystery to play.", statusCode: 400);
 
             Scenario scenario;
             try { scenario = await catalog.GetScenarioAsync(db, req.ScenarioId, ct); }

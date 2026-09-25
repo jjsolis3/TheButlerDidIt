@@ -31,6 +31,9 @@ public enum ScenarioSource
 {
     Handwritten,
     AiGenerated,
+
+    /// <summary>A host's own copy, made with "Duplicate & edit". Editable, and never touched by the content seeder.</summary>
+    Custom,
 }
 
 public sealed class ScenarioEntity
@@ -57,6 +60,12 @@ public sealed class ScenarioEntity
     public required string Document { get; set; }
 
     public DateTimeOffset UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Set when a host deletes a mystery that finished parties have already played:
+    /// it disappears from every list, but those parties' recaps still work.
+    /// </summary>
+    public DateTimeOffset? ArchivedAt { get; set; }
 }
 
 public enum PartyMode

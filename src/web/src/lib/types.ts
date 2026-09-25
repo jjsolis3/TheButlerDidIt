@@ -304,6 +304,8 @@ export interface ScenarioCard {
   contentRating: ContentRating
   characterCount: number
   aiGenerated: boolean
+  /** A host's own edited copy. */
+  custom: boolean
 }
 
 export interface ThemeCard {
@@ -485,5 +487,23 @@ export interface RecapSharing {
   shared: boolean
   url: string | null
   page: RecapPage
+}
+
+/** A mystery on the "My mysteries" page. */
+export interface MyMystery {
+  id: string
+  title: string
+  themeSlug: string
+  source: 'handwritten' | 'aiGenerated' | 'custom'
+  contentRating: ContentRating
+  updatedAt: string
+  timesPlayed: number
+  inUse: boolean
+  canEdit: boolean
+}
+
+export interface ValidationResult {
+  valid: boolean
+  errors: string[]
 }
 

@@ -6,6 +6,8 @@ import type {
   GenerationJob,
   MediaJob,
   Me,
+  MyMystery,
+  ValidationResult,
   RecapPage,
   RecapSharing,
   AuthOptions,
@@ -20,6 +22,7 @@ import type {
   ThemeCard,
   UsageReport,
 } from './types'
+import type { ScenarioDoc } from './scenarioDoc'
 
 /** An error whose message came from the server and is safe to show to the user. */
 export class ApiError extends Error {
@@ -78,6 +81,12 @@ export const api = {
   shareRecap: (code: string) => request<{ url: string }>('POST', `/api/parties/${encodeURIComponent(code)}/recap/share`),
   unshareRecap: (code: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}/recap/share`),
   publicRecap: (slug: string) => request<RecapPage>('GET', `/api/recap/${encodeURIComponent(slug)}`),
+  myMysteries: () => request<MyMystery[]>('GET', '/api/scenarios/mine'),
+  scenario: (id: string) => request<{ id: string; source: MyMystery['source']; canEdit: boolean; document: ScenarioDoc }>('GET', `/api/scenarios/${encodeURIComponent(id)}`),
+  validateScenario: (document: ScenarioDoc) => request<ValidationResult>('POST', '/api/scenarios/validate', { document }),
+  saveScenario: (id: string, document: ScenarioDoc) => request<ValidationResult>('PUT', `/api/scenarios/${encodeURIComponent(id)}`, { document }),
+  duplicateScenario: (id: string) => request<{ id: string }>('POST', `/api/scenarios/${encodeURIComponent(id)}/duplicate`),
+  deleteScenario: (id: string) => request<void>('DELETE', `/api/scenarios/${encodeURIComponent(id)}`),
   kitUrl: (code: string, kind: 'invitations' | 'booklets' | 'nametags' | 'clues') => `/api/parties/${encodeURIComponent(code)}/kit/${kind}.pdf`,
 
   /** Upload a costume selfie. Uses the seat token, because guests don't have accounts. */

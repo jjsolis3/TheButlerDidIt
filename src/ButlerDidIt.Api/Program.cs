@@ -208,6 +208,7 @@ app.MapHealthChecks("/healthz");
 app.MapAuthEndpoints();
 app.MapAdminHostEndpoints();
 app.MapRecapEndpoints();
+app.MapScenarioEditorEndpoints();
 app.MapThemeEndpoints();
 app.MapPartyEndpoints();
 app.MapMediaEndpoints();
