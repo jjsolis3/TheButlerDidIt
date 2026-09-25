@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { formatSeconds, useCountdown } from '../lib/clock'
 import type { ClueView, FeedItem, TimerView } from '../lib/types'
@@ -57,30 +57,41 @@ export function Countdown({ timer, large = false }: { timer: TimerView | null; l
  * the top of the screen so they never cover the host's controls or a phone's
  * submit button at the bottom.
  */
-export function FeedToasts({ feed, offset = 'top-4' }: { feed: FeedItem[]; offset?: string }) {
-  const [seen, setSeen] = useState<Set<string> | null>(null)
-  const [visible, setVisible] = useState<FeedItem[]>([])
-  const key = (f: FeedItem) => f.at + f.text
+const TOAST_MS = 5000
+const feedKey = (f: FeedItem) => f.at + f.text
 
-  useEffect(() => {
-    // On first render, treat existing items as already seen, so nothing old pops up.
-    if (seen === null) {
-      setSeen(new Set(feed.map(key)))
-      return
-    }
-    const fresh = feed.filter((f) => !seen.has(key(f)))
-    if (fresh.length === 0) return
-    setSeen((prev) => new Set([...(prev ?? []), ...fresh.map(key)]))
+export function FeedToasts({ feed, offset = 'top-4' }: { feed: FeedItem[]; offset?: string }) {
+  // Items already in the feed when this mounts count as seen, so nothing old pops up.
+  const [seen, setSeen] = useState(() => new Set(feed.map(feedKey)))
+  const [visible, setVisible] = useState<FeedItem[]>([])
+  const scheduled = useRef(new Set<FeedItem>())
+
+  // New items arrived: show them. Done during render, not in an effect, so the toast
+  // appears in the same frame as the update that brought it.
+  const fresh = feed.filter((f) => !seen.has(feedKey(f)))
+  if (fresh.length > 0) {
+    setSeen(new Set([...seen, ...fresh.map(feedKey)]))
     setVisible((v) => [...v, ...fresh].slice(-2))
-    // No cleanup on purpose: a newer message must not cancel the removal of an older one.
-    setTimeout(() => setVisible((v) => v.filter((f) => !fresh.includes(f))), 5000)
-  }, [feed, seen])
+  }
+
+  // Hide each toast 5 seconds after it appeared. Every toast gets its own timer, once,
+  // so a newer toast never makes an older one stay longer.
+  useEffect(() => {
+    for (const item of visible) {
+      if (scheduled.current.has(item)) continue
+      scheduled.current.add(item)
+      setTimeout(() => {
+        scheduled.current.delete(item)
+        setVisible((v) => v.filter((x) => x !== item))
+      }, TOAST_MS)
+    }
+  }, [visible])
 
   return (
     <div className={`pointer-events-none fixed right-4 left-4 z-40 flex flex-col items-center gap-2 sm:left-auto sm:items-end ${offset}`}>
-      {visible.map((f) => (
-        <div key={key(f)} className="max-w-md rounded-lg border border-accent/50 bg-surface/95 px-4 py-2.5 text-sm text-ink shadow-xl">
-          {f.text}
+      {visible.map((item) => (
+        <div key={feedKey(item)} className="max-w-md rounded-lg border border-accent/50 bg-surface/95 px-4 py-2.5 text-sm text-ink shadow-xl">
+          {item.text}
         </div>
       ))}
     </div>

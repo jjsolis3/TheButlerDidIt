@@ -17,7 +17,7 @@ RUN npm run build
 # ---- 2. Build and publish the .NET API ---------------------------------------
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api
 WORKDIR /src
-COPY global.json ./
+COPY global.json Directory.Build.targets ./
 COPY src/ButlerDidIt.Game/ButlerDidIt.Game.csproj src/ButlerDidIt.Game/
 COPY src/ButlerDidIt.Ai/ButlerDidIt.Ai.csproj src/ButlerDidIt.Ai/
 COPY src/ButlerDidIt.Api/ButlerDidIt.Api.csproj src/ButlerDidIt.Api/

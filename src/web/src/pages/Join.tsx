@@ -10,8 +10,13 @@ export default function Join() {
   const navigate = useNavigate()
   const [code, setCode] = useState(params.code?.toUpperCase() ?? '')
   const [name, setName] = useState('')
-  const [party, setParty] = useState<PartyInfo | null>(null)
+  // The last lookup, remembering which code it was for. A stale or half-typed code
+  // simply doesn't match, so nothing old is shown and nothing needs resetting.
+  const [lookup, setLookup] = useState<{ code: string; party: PartyInfo | null } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const clean = code.replace(/[^A-Za-z0-9]/g, '')
+  const party = lookup?.code === clean ? lookup.party : null
+  const notFound = lookup?.code === clean && !lookup.party
   const [busy, setBusy] = useState(false)
 
   // Already seated at this party on this device? Go straight back in.
@@ -20,22 +25,17 @@ export default function Join() {
   }, [params.code, navigate])
 
   useEffect(() => {
-    const clean = code.replace(/[^A-Za-z0-9]/g, '')
-    if (clean.length !== 6) {
-      setParty(null)
-      return
-    }
+    if (clean.length !== 6) return
+    // If the code changes before the answer arrives, ignore the old answer.
+    let cancelled = false
     api.party(clean).then(
-      (p) => {
-        setParty(p)
-        setError(null)
-      },
-      () => {
-        setParty(null)
-        setError('No party found with that code.')
-      },
+      (p) => !cancelled && setLookup({ code: clean, party: p }),
+      () => !cancelled && setLookup({ code: clean, party: null }),
     )
-  }, [code])
+    return () => {
+      cancelled = true
+    }
+  }, [clean])
 
   const join = async (e: FormEvent) => {
     e.preventDefault()
@@ -61,7 +61,10 @@ export default function Join() {
             <input
               className={`${inputClass} font-mono text-2xl tracking-[0.4em] uppercase`}
               value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => {
+                setCode(e.target.value.toUpperCase())
+                setError(null)
+              }}
               maxLength={8}
               autoCapitalize="characters"
               autoComplete="off"
@@ -80,7 +83,7 @@ export default function Join() {
           <Field label="Your name" hint="Your real name. You'll get a character next.">
             <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} maxLength={30} required autoComplete="given-name" />
           </Field>
-          <ErrorText>{error}</ErrorText>
+          <ErrorText>{error ?? (notFound ? 'No party found with that code.' : null)}</ErrorText>
           <Button type="submit" disabled={!party || !name.trim() || busy} className="w-full text-base">
             Take my seat
           </Button>

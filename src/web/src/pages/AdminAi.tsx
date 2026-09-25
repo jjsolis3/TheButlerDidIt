@@ -54,8 +54,9 @@ export default function AdminAi() {
 
   useEffect(() => {
     if (me === null) navigate('/login')
-    else if (me && !me.isAdmin) setError('Only the admin can manage AI settings.')
-    else if (me) void reload()
+    // reload() only sets state after awaiting the network; the rule can't see into it.
+    // oxlint-disable-next-line react/set-state-in-effect
+    else if (me?.isAdmin) void reload()
   }, [me, navigate, reload])
 
   return (
@@ -66,7 +67,7 @@ export default function AdminAi() {
         Connect one or more AI providers, then choose which one plays each role. Without AI the game still works;
         these settings add generated mysteries, NPCs you can question, hints and verdicts.
       </p>
-      <ErrorText>{error}</ErrorText>
+      <ErrorText>{me && !me.isAdmin ? 'Only the admin can manage AI settings.' : error}</ErrorText>
       {me?.isAdmin && (
         <div className="space-y-10">
           <Providers providers={providers} onChange={reload} onError={setError} />
@@ -246,9 +247,21 @@ function Roles({ roles, providers, onChange, onError }: { roles: RoleView[]; pro
     <section>
       <h2 className="font-display mb-3 text-2xl">2. Who does what</h2>
       <div className="grid gap-3 md:grid-cols-3">
-        {ROLES.map((r) => (
-          <RoleCard key={r.id} info={r} current={roles.find((x) => x.role === r.id)} providers={providers} onChange={onChange} onError={onError} />
-        ))}
+        {ROLES.map((r) => {
+          const current = roles.find((x) => x.role === r.id)
+          // The key includes the saved values: when they change, React starts a fresh card
+          // with them, instead of the card copying new props into its own state.
+          return (
+            <RoleCard
+              key={`${r.id}:${current?.providerId}:${current?.model}`}
+              info={r}
+              current={current}
+              providers={providers}
+              onChange={onChange}
+              onError={onError}
+            />
+          )
+        })}
       </div>
     </section>
   )
@@ -264,10 +277,6 @@ function RoleCard({
   const [providerId, setProviderId] = useState(current?.providerId ?? '')
   const [model, setModel] = useState(current?.model ?? '')
   const [saved, setSaved] = useState(false)
-  useEffect(() => {
-    setProviderId(current?.providerId ?? '')
-    setModel(current?.model ?? '')
-  }, [current])
 
   const kind = providers.find((p) => p.id === providerId)?.kind
   const suggestions = (kind && MODEL_SUGGESTIONS[kind]) ?? []

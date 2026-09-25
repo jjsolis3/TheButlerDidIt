@@ -194,10 +194,10 @@ test('pass and play: one device, private hand-offs', async ({ browser }) => {
   const box = (await hold.boundingBox())!
   await stage.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await stage.mouse.down()
-  await stage.waitForTimeout(1200)
+  // Keep holding until the dossier opens, instead of guessing how long the hold takes.
+  await expect(stage.getByText('Private dossier: Uncle Ted')).toBeVisible()
   await stage.mouse.up()
 
-  await expect(stage.getByText('Private dossier: Uncle Ted')).toBeVisible()
   await expect(stage.getByText('Who you are')).toBeVisible()
   await stage.screenshot({ path: `${SHOTS}/13-pass-dossier.png` })
   await stage.getByRole('button', { name: 'Hide & pass on' }).click()

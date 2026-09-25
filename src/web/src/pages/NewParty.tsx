@@ -19,7 +19,7 @@ export default function NewParty() {
   const [useAi, setUseAi] = useState(true)
   const [drinking, setDrinking] = useState(false)
   const navigate = useNavigate()
-  const [scenarioId, setScenarioId] = useState<string>()
+  const [chosenId, setScenarioId] = useState<string>()
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   const [content, setContent] = useState<ContentRating>('mature')
   const [when, setWhen] = useState('')
@@ -32,9 +32,8 @@ export default function NewParty() {
   }, [me, navigate])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
-  useEffect(() => {
-    if (!scenarioId && playable.length > 0) setScenarioId(playable[0].scenario.id)
-  }, [playable, scenarioId])
+  // Until the host picks one, the first mystery is selected.
+  const scenarioId = chosenId ?? playable[0]?.scenario.id
 
   const selected = playable.find((p) => p.scenario.id === scenarioId)
   const tooMature = selected?.scenario.contentRating === 'mature' && content === 'family'

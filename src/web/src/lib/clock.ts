@@ -9,23 +9,24 @@ import type { TimerView } from './types'
  * and ours and count down in server time. Every screen then shows the same number.
  */
 export function useCountdown(timer: TimerView | null): number | null {
-  const [now, setNow] = useState(() => Date.now())
-  const [offset, setOffset] = useState(0)
-
-  useEffect(() => {
-    if (timer) setOffset(new Date(timer.serverNow).getTime() - Date.now())
-  }, [timer])
+  // The current time in *server* time, refreshed a few times a second. It starts as
+  // null, and until the first tick we use the server's own "now" from the message,
+  // which is exact at the moment it arrived.
+  const [serverNow, setServerNow] = useState<number | null>(null)
 
   useEffect(() => {
     if (!timer || timer.paused) return
-    const id = setInterval(() => setNow(Date.now()), 250)
+    // Reading the clock belongs in an effect: rendering must give the same answer every time.
+    const offset = new Date(timer.serverNow).getTime() - Date.now()
+    const id = setInterval(() => setServerNow(Date.now() + offset), 250)
     return () => clearInterval(id)
   }, [timer])
 
   if (!timer) return null
   if (timer.paused) return timer.pausedRemainingSeconds ?? 0
   if (!timer.endsAt) return null
-  return Math.max(0, Math.ceil((new Date(timer.endsAt).getTime() - (now + offset)) / 1000))
+  const now = serverNow ?? new Date(timer.serverNow).getTime()
+  return Math.max(0, Math.ceil((new Date(timer.endsAt).getTime() - now) / 1000))
 }
 
 export function formatSeconds(total: number): string {

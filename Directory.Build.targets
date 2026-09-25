@@ -1,0 +1,15 @@
+<Project>
+  <!--
+    Imported automatically by every project in the repo, after the project file.
+
+    OllamaSharp ships a source generator for its [OllamaTool] attribute, which we
+    don't use. It was built for a newer C# compiler than the .NET 10.0.1xx SDK
+    includes, so every build printed warning CS9057 (issue #28). This removes just
+    that generator before compiling; everything else in OllamaSharp still works.
+  -->
+  <Target Name="RemoveOllamaSharpSourceGenerator" BeforeTargets="CoreCompile" AfterTargets="ResolveLockFileAnalyzers">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)' == 'OllamaSharp.SourceGenerators'" />
+    </ItemGroup>
+  </Target>
+</Project>

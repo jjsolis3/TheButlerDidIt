@@ -185,3 +185,14 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 **The printable kit** (`/api/parties/{code}/kit/*.pdf`, host only) is drawn with QuestPDF: invitations with a QR code (QRCoder), name tags, character booklets (with secrets) and clue cards with a sealed solution.
 
 **Toast prompts** are a `toast` cue type. `ViewProjector` drops them unless the host switched on drinking prompts, which is always off for Family parties. Every toast carries a non-alcoholic alternative.
+
+## 12. Clean-up (retention)
+
+`RetentionWorker` runs every few hours:
+- It deletes abandoned lobbies and games.
+- It prunes finished parties: their seats (so old seat tokens stop working), private notes and selfies go, but the `Parties` row and its game state stay for the recap page.
+- It sweeps selfies whose party is gone.
+
+Selfies record their `PartyId`, deliberately without a foreign key: removing the database row must also remove the file on disk, which only application code can do. A replaced or removed selfie is deleted immediately. Generated voices and pictures are shared between parties, so they are never deleted with a party.
+
+Clearing selfie URLs from a finished game goes through the engine (`SetPlayerPhoto`) like any other state change, so the saved state never points at a deleted file.
