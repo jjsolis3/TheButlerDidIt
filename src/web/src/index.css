@@ -67,3 +67,25 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .kenburns, .candle { animation: none; }
 }
+
+/* Printing: every colour comes from these variables, so swapping them turns the
+   dark candlelit screen into black ink on white paper everywhere at once. */
+@media print {
+  :root {
+    --theme-bg: #ffffff;
+    --theme-surface: #ffffff;
+    --theme-accent: #6b4e16;
+    --theme-ink: #111111;
+    color-scheme: light;
+  }
+  .grain {
+    background: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  /* Keep a section together on one page where possible. */
+  section {
+    break-inside: avoid;
+  }
+}

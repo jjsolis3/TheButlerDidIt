@@ -30,7 +30,11 @@ public sealed record StageView(
     AwardsView? Awards,
     AiFeatures Ai,
     IReadOnlyList<InterrogationView> Interrogations,
-    PartyOptions Options);
+    PartyOptions Options,
+    SpotlightView? Spotlight);
+
+/// <summary>Whose turn it is to speak (see GameState.SpotlightSeatId).</summary>
+public sealed record SpotlightView(Guid SeatId, string PlayerName, string? CharacterName);
 
 /// <summary>A question to an NPC and its answer. Public: the whole room hears the interrogation.</summary>
 public sealed record InterrogationView(

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
+import { playerGuide } from '../lib/guide'
+import { GuideButton } from './Guide'
 import { useParty } from '../lib/hub'
 import type { PlayerView, StageView } from '../lib/types'
 import { Portrait } from './Portrait'
@@ -153,6 +155,14 @@ function LobbyPlayer({
       )}
       <ErrorText>{error}</ErrorText>
 
+      <p className="text-sm">
+        New to murder mysteries?{' '}
+        <a href="/how-to-play" target="_blank" rel="noreferrer" className="text-accent underline">
+          Read how to play
+        </a>{' '}
+        (two minutes).
+      </p>
+
       <section className="text-sm text-muted">
         <p>
           {stage.players.length} guest{stage.players.length === 1 ? '' : 's'} here: {stage.players.map((p) => p.name).join(', ')}
@@ -283,7 +293,10 @@ function InGame({
             </p>
             <p className="font-display truncate text-lg">{dossier?.character.name ?? view.name}</p>
           </div>
-          <Countdown timer={stage.timer} />
+          <div className="flex items-center gap-2">
+            <Countdown timer={stage.timer} />
+            <GuideButton guide={playerGuide(view)} phase={stage.phase} />
+          </div>
         </div>
         <nav className="-mx-1 mt-2 flex gap-1 overflow-x-auto pb-2">
           {tabs.map((t) => (
@@ -304,6 +317,7 @@ function InGame({
 
       <main className="flex-1 space-y-4 px-4 py-5">
         <ErrorText>{error}</ErrorText>
+        {stage.spotlight?.seatId === view.seatId && <YoureUp view={view} />}
         {tab === 'dossier' && dossier && <DossierTab view={view} />}
         {tab === 'secrets' && dossier && <SecretsTab view={view} run={run} />}
         {tab === 'clues' && (
@@ -328,6 +342,30 @@ function tabForPhase(phase: StageView['phase'], current: Tab): Tab {
   if (phase === 'reveal' || phase === 'finished') return 'results'
   const stale = current === 'accuse' || current === 'vote' || current === 'results' || (current === 'question' && phase !== 'act')
   return stale ? 'dossier' : current
+}
+
+/** The host put this guest in the spotlight: tell them, and hand them their lines. */
+function YoureUp({ view }: { view: PlayerView }) {
+  const lines = view.dossier?.linesThisAct ?? []
+  const intro = view.stage.phase === 'castReveal'
+  return (
+    <section className="rounded-xl border-2 border-accent bg-accent/10 p-4" role="status">
+      <p className="font-display text-2xl">🎤 You're up!</p>
+      <p className="mt-1 text-sm">
+        {intro
+          ? `Introduce ${view.dossier?.character.name ?? 'your character'} to the room: name, who you are, and anything from "What everyone knows about you".`
+          : lines.length
+            ? 'Everyone is listening. A good moment for your line:'
+            : 'Everyone is listening. Share a theory, defend your alibi, or question someone.'}
+      </p>
+      {!intro &&
+        lines.map((l) => (
+          <p key={l} className="font-display mt-2 text-lg italic">
+            “{l}”
+          </p>
+        ))}
+    </section>
+  )
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

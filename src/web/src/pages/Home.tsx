@@ -43,6 +43,11 @@ export default function Home() {
             </Button>
           )}
         </div>
+        <p className="mt-4 text-sm">
+          <Link to="/how-to-play" className="text-muted underline hover:text-ink">
+            New to murder mysteries? How to play
+          </Link>
+        </p>
         {me && (
           <p className="mt-4 text-sm text-muted">
             Signed in as {me.displayName}.{' '}

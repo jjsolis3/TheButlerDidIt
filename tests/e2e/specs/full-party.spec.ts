@@ -84,7 +84,25 @@ test('a full dinner party: join, play three acts, accuse, reveal and vote', asyn
   await expect(bob.getByText(/half-brother/)).toBeVisible()
   await expect(cara.getByText('Who you are')).toBeVisible()
   await expect(cara.getByText(/half-brother/)).toHaveCount(0)
+  // Introductions: the host spotlights each guest in turn; their phone tells them they're up.
+  await stage.getByRole('button', { name: /Spotlight a guest/ }).click()
+  await expect(stage.getByText('In the spotlight')).toBeVisible()
+  await expect(alice.getByText("You're up!")).toBeVisible()
+  await stage.getByRole('button', { name: /Next speaker/ }).click()
+  await expect(bob.getByText("You're up!")).toBeVisible()
+  await expect(alice.getByText("You're up!")).toHaveCount(0)
   await stage.screenshot({ path: `${SHOTS}/03-stage-cast.png` })
+
+  // The live guide explains the moment, on the big screen and on a phone.
+  await stage.getByRole('button', { name: 'Guide' }).click()
+  await expect(stage.getByRole('dialog', { name: 'How to play' }).getByRole('heading', { name: 'Meet the suspects' })).toBeVisible()
+  await stage.screenshot({ path: `${SHOTS}/03b-stage-guide.png` })
+  await stage.getByRole('button', { name: 'Close the guide' }).click()
+  await bob.getByRole('button', { name: 'Guide' }).click()
+  await expect(bob.getByText('How do they ever come out?', { exact: false })).toBeVisible()
+  await bob.screenshot({ path: `${SHOTS}/03c-phone-guide.png` })
+  await bob.getByRole('button', { name: 'Close the guide' }).click()
+  await stage.getByRole('button', { name: 'Clear spotlight' }).click()
   await alice.screenshot({ path: `${SHOTS}/04-phone-murderer-dossier.png` })
 
   // Prologue and act one.
@@ -96,6 +114,9 @@ test('a full dinner party: join, play three acts, accuse, reveal and vote', asyn
   await expect(stage.getByRole('heading', { name: 'The Silver Candlestick' })).toBeVisible()
   await expect(stage.getByText(/\d+:\d\d/).first()).toBeVisible()
   await stage.screenshot({ path: `${SHOTS}/06-stage-mingle.png` })
+  await alice.getByRole('button', { name: 'Guide' }).click()
+  await expect(alice.getByRole('dialog').getByText(/to say aloud this act|no scripted lines this act/)).toBeVisible()
+  await alice.getByRole('button', { name: 'Close the guide' }).click()
 
   // A phone that reloads mid-game lands back in the same seat.
   await bob.reload()
@@ -219,4 +240,13 @@ test('pass and play: one device, private hand-offs', async ({ browser }) => {
   await stage.getByRole('button', { name: 'Hide & pass on' }).click()
   await expect(stage.getByText('Who you are')).toHaveCount(0)
   await expect(stage.getByRole('button', { name: 'Grandma' })).toBeVisible()
+})
+
+test('the printable how-to-play sheet', async ({ page }) => {
+  await page.goto('/how-to-play')
+  await expect(page.getByRole('heading', { name: 'How to play' })).toBeVisible()
+  await expect(page.getByText('My dossier says to keep my secrets. How do they ever come out?')).toBeVisible()
+  await page.emulateMedia({ media: 'print' })
+  await expect(page.getByRole('button', { name: 'Print this page' })).toBeHidden() // buttons don't print
+  await page.pdf({ path: `${SHOTS}/60-how-to-play.pdf` })
 })

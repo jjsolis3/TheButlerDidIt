@@ -186,6 +186,7 @@ export interface StageView {
   ai: AiFeatures
   interrogations: InterrogationView[]
   options: { drinkingPrompts: boolean }
+  spotlight: { seatId: string; playerName: string; characterName: string | null } | null
 }
 
 export interface AiFeatures {

@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { CuePlayer } from '../components/CuePlayer'
+import { GuideButton } from '../components/Guide'
 import { Portrait } from '../components/Portrait'
 import { ClueCard, Countdown, FeedToasts, QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
 import { api } from '../lib/api'
+import { stageGuide } from '../lib/guide'
 import { useParty } from '../lib/hub'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
@@ -118,6 +120,7 @@ function TopBar({ stage, info, muted, onMute }: { stage: StageView; info: PartyI
       </div>
       <div className="flex items-center gap-3">
         {stage.phase === 'act' && stage.actStep === 'mingle' && <Countdown timer={stage.timer} />}
+        <GuideButton guide={stageGuide(stage, info.isHost)} phase={stage.phase} />
         <span className="hidden rounded-md border border-line px-2 py-1 font-mono text-sm tracking-widest text-accent sm:inline">{info.code}</span>
         <button onClick={onMute} className="rounded-md border border-line px-2 py-1 text-sm text-muted hover:text-ink" aria-label={muted ? 'Unmute' : 'Mute'}>
           {muted ? '🔇' : '🔊'}
@@ -323,8 +326,9 @@ function CastView({ stage }: { stage: StageView }) {
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="font-display text-4xl sm:text-5xl">The suspects</h1>
-        <p className="mt-2 text-muted">Everyone: read your dossier now. Your secrets have been unlocked.</p>
+        <p className="mt-2 text-muted">Everyone: read your dossier now. Then take turns introducing your character.</p>
       </div>
+      <SpotlightBanner stage={stage} />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {stage.cast.map((c) => (
           <div key={c.characterId} className="flex flex-col items-center rounded-xl border border-line bg-surface p-4 text-center">
@@ -363,6 +367,7 @@ function MingleView({ stage }: { stage: StageView }) {
         <div className="mt-2 flex justify-center">
           <Countdown timer={stage.timer} large />
         </div>
+        <SpotlightBanner stage={stage} />
         {stage.prompts.length > 0 && (
           <p key={promptIndex} className="font-display mx-auto mt-4 max-w-3xl text-2xl text-ink/90 italic sm:text-3xl">
             “{stage.prompts[promptIndex % stage.prompts.length]}”
@@ -692,6 +697,16 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
               Auto-assign characters
             </Button>
           )}
+          {(mingle || stage.phase === 'castReveal') && stage.players.length > 0 && (
+            <Button variant="ghost" disabled={busy} onClick={() => call('Spotlight', nextSpeaker(stage))}>
+              🎤 {stage.spotlight ? 'Next speaker' : 'Spotlight a guest'}
+            </Button>
+          )}
+          {stage.spotlight && (
+            <Button variant="quiet" disabled={busy} onClick={() => call('Spotlight', null)}>
+              Clear spotlight
+            </Button>
+          )}
           {mingle && (
             <>
               <Button variant="ghost" disabled={busy} onClick={() => call(stage.timer?.paused ? 'ResumeTimer' : 'PauseTimer')}>
@@ -720,6 +735,32 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/** Guests take turns in the order they joined; after the last one, the spotlight goes off. */
+function nextSpeaker(stage: StageView): string | null {
+  const order = stage.players.map((p) => p.seatId)
+  if (!stage.spotlight) return order[0] ?? null
+  const i = order.indexOf(stage.spotlight.seatId)
+  return i >= 0 && i + 1 < order.length ? order[i + 1] : null
+}
+
+/** Whose turn it is to speak, big enough to read across the room. */
+function SpotlightBanner({ stage }: { stage: StageView }) {
+  const s = stage.spotlight
+  if (!s) return null
+  return (
+    <div className="mx-auto my-4 max-w-2xl rounded-2xl border-2 border-accent bg-accent/10 px-6 py-4 text-center" role="status">
+      <p className="text-xs tracking-[0.3em] text-accent uppercase">🎤 In the spotlight</p>
+      <p className="font-display mt-1 text-3xl sm:text-4xl">
+        {s.playerName}
+        {s.characterName && <span className="text-muted"> as {s.characterName}</span>}
+      </p>
+      <p className="mt-1 text-sm text-muted">
+        {stage.phase === 'castReveal' ? 'Introduce your character to the room.' : 'Say your line, share a theory, or put a question to someone.'}
+      </p>
     </div>
   )
 }
@@ -836,6 +877,11 @@ function KitPanel({ code }: { code: string }) {
       <summary className="cursor-pointer font-semibold">🖨️ Printable party kit</summary>
       <p className="mt-2 text-xs text-muted">For in-person parties. Booklets and clue cards contain spoilers, so if you're playing too, print them without reading.</p>
       <ul className="mt-2 space-y-1">
+        <li>
+          <a href="/how-to-play" target="_blank" rel="noreferrer" className="text-accent underline">
+            How to play (a one-page guide for everyone)
+          </a>
+        </li>
         {links.map((l) => (
           <li key={l.kind}>
             <a href={api.kitUrl(code, l.kind)} className="text-accent underline" download>

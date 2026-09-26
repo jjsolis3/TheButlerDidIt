@@ -83,6 +83,13 @@ public sealed class GameState
     /// <summary>Host choices for this party that change what is shown.</summary>
     public PartyOptions Options { get; set; } = new();
 
+    /// <summary>
+    /// The guest whose turn it is to speak, chosen by the host. It gives new groups a
+    /// speaking order: introductions during the cast reveal, then lines and theories while
+    /// mingling. Cleared whenever the game moves on.
+    /// </summary>
+    public Guid? SpotlightSeatId { get; set; }
+
     /// <summary>Questions guests put to NPCs, and the NPCs' answers. Public: everyone hears them.</summary>
     public List<Interrogation> Interrogations { get; set; } = [];
 

@@ -117,6 +117,7 @@ public sealed class PartyHub(PartyService parties, AppDbContext db, AiGameServic
     public Task ResumeTimer(string code) => AsHost(code, (_, now) => new ResumeTimer(now));
     public Task ExtendTimer(string code, int minutes) => AsHost(code, (_, now) => new ExtendTimer(now, minutes));
     public Task AssignCharacter(string code, Guid seatId, string? characterId) => AsHost(code, (_, now) => new ChooseCharacter(now, seatId, characterId));
+    public Task Spotlight(string code, Guid? seatId) => AsHost(code, (_, now) => new SetSpotlight(now, seatId));
     public Task ConvertToNpc(string code, Guid seatId) => AsHost(code, (_, now) => new ConvertToNpc(now, seatId));
 
     public async Task RemoveSeat(string code, Guid seatId)

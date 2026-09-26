@@ -61,6 +61,9 @@ public sealed record SetVerdicts(DateTimeOffset Now, IReadOnlyDictionary<Guid, s
 public sealed record SetPartyOptions(DateTimeOffset Now, PartyOptions Options) : Command(Now);
 
 /// <summary>Set or clear (null) a guest's costume selfie.</summary>
+/// <summary>Host puts one guest "in the spotlight" (their turn to speak), or clears it with null.</summary>
+public sealed record SetSpotlight(DateTimeOffset Now, Guid? SeatId) : Command(Now);
+
 public sealed record SetPlayerPhoto(DateTimeOffset Now, Guid SeatId, string? PhotoUrl) : Command(Now);
 
 public sealed record SetInterrogationAudio(DateTimeOffset Now, Guid Id, string AudioUrl) : Command(Now);
