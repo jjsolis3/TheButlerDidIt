@@ -1,0 +1,886 @@
+{
+  "id": "the-ringmasters-last-bow",
+  "themeSlug": "carnival",
+  "title": "The Ringmaster's Last Bow",
+  "synopsis": "October 1953, the last week of the season for Crane's Carnival of Wonders. Tonight the ringmaster, Silas Crane, announced he's sold the whole carnival to Barlow Brothers: the big top, the acts, and the people. The magician is finished, the clown is surplus, the bearded lady is to be sold as an exhibit. After the midnight show, Silas is found dead in his red wagon. The storm has flooded the county road. Nobody leaves the lot until the killer is found.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Crane's Carnival of Wonders, on the fairground outside Millbrook, Ohio",
+    "era": "October 1953, the last week of the season",
+    "description": "Striped tents, a Ferris wheel strung with bulbs, the cookhouse tent, the sideshow banner line, and at the edge of the lot, the ringmaster's red wagon. A thunderstorm has flooded the county road; the sheriff can't get through before dawn."
+  },
+  "victim": {
+    "name": "Silas Crane",
+    "description": "Sixty-one. Owner and ringmaster of Crane's Carnival of Wonders for thirty years: top hat, silver-tipped cane, a voice that fills the big top. Generous with promises, stingy with wages, and tonight he sold the whole carnival out from under his people."
+  },
+  "characters": [
+    {
+      "id": "mysterio",
+      "name": "The Great Mysterio",
+      "pronouns": "he/him",
+      "title": "The Magician",
+      "publicBio": "Maximilian Voss, billed as the Great Mysterio, master of the Vanishing Cabinet: a cape, a waxed moustache, and a stare that makes the front row nervous. His act is the reason people buy tickets. He'd tell you so himself.",
+      "costumeTips": "A black cape lined with red, a waxed moustache (drawn on is fine), white gloves, and a deck of cards.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.9,
+        "rate": 0.9,
+        "style": "velvety, theatrical, cold"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. For twelve years your Vanishing Cabinet has sold Silas Crane's tickets. Last month Silas sold its secret, the trapdoor and the mirrors, to Barlow Brothers for two thousand dollars, and tonight he told you that you're finished after Sunday: Barlow's already has a magician doing your trick. So during the midnight show you did the one thing everybody swears is impossible: you vanished. At 11:42, while Samson spun the locked cabinet for the crowd, you dropped through the trapdoor, slipped out behind the bandstand to the red wagon, and drove the real dagger from your act (the one you show the audience to prove it's sharp) into Silas Crane. You wiped the blade on your red silk handkerchief, pushed it into the straw at the back of the lion wagon, and were back in the cabinet by 11:51. Three hundred people watched you reappear.",
+        "secrets": [
+          {
+            "id": "mysterio-stolen",
+            "text": "Silas sold the secret of my Vanishing Cabinet to Barlow Brothers. My act, my life's work, for two thousand dollars.",
+            "unlockAct": 0
+          },
+          {
+            "id": "mysterio-trapdoor",
+            "text": "My cabinet has a trapdoor. While the crowd thinks I've vanished, I'm free for ten minutes, under the stage or anywhere I like.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Your alibi is perfect: three hundred people watched you vanish and reappear.",
+          "Steer suspicion toward Bingo (his seltzer siphon was on the desk) and Bertha (she threatened Silas at dinner).",
+          "Nobody must find that dagger, or learn how the cabinet really works."
+        ],
+        "knows": [
+          "Silas always drinks a glass of seltzer with his ulcer powder after the show. Bingo fills the siphon.",
+          "At dinner, Bertha told Silas: 'Sell me like a pig at a fair and see what happens.'"
+        ],
+        "alibi": "From 11:40 to 11:52 I was locked inside the Vanishing Cabinet in the centre ring, in front of three hundred people. Samson turned it himself. Then I took my bows until the trapeze.",
+        "lines": {
+          "act1": [
+            "Three hundred witnesses saw me vanish, and three hundred saw me return. That is what I call an alibi."
+          ],
+          "act2": [
+            "A magician never reveals his secrets. But I will tell you this for free: the knife you see is never the knife you think."
+          ],
+          "act3": [
+            "Silas Crane stole my act. If you want the man with the best reason to hate him, here I am. If you want his killer, keep looking."
+          ]
+        }
+      }
+    },
+    {
+      "id": "bingo",
+      "name": "Bingo the Clown",
+      "pronouns": "he/him",
+      "title": "The Sad Clown",
+      "publicBio": "Bartholomew 'Bingo' Pike, the saddest clown in Ohio: baggy trousers, a painted tear, and a seltzer bottle he aims at the front row. He's been with Crane's for twenty-five years and hasn't had a raise in twenty.",
+      "costumeTips": "Baggy trousers and braces, a big red nose, a painted tear under one eye, and a seltzer bottle (a water spray bottle will do).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.9,
+        "rate": 0.95,
+        "style": "gentle, weary, deadpan"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Twenty years ago your wife, Lottie, fell from the trapeze. The rope had frayed. You'd asked Silas three times to replace it, and three times he said 'next town'. You stayed at Crane's anyway, because it's the only family you have left. Every night at eleven you fill Silas's seltzer siphon for his ulcer drink; you've done it for twenty-five years. Tonight Silas told you there's no room for clowns at Barlow's. You filled the siphon anyway. You did not kill him, but your siphon is sitting on his desk, and everybody knows how you felt about Lottie.",
+        "secrets": [
+          {
+            "id": "bingo-lottie",
+            "text": "My wife Lottie fell from the trapeze twenty years ago, on a rope Silas refused to replace. I have never forgiven him.",
+            "unlockAct": 0
+          },
+          {
+            "id": "bingo-dimes",
+            "text": "For years I've been slipping free tickets to kids who can't pay, a dime at a time from Silas's cash box.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who killed Silas. Hating a man isn't the same as killing him.",
+          "Keep the free tickets quiet.",
+          "Make sure the clowns still have a home after Sunday."
+        ],
+        "knows": [
+          "You fill Silas's seltzer siphon every night at eleven. Tonight was no different.",
+          "At quarter to twelve, taking off your face in clown alley, you saw someone in a long black cape run behind the bandstand toward the wagons."
+        ],
+        "alibi": "After my act I was in clown alley from 11:40 until the parade at 12:10, taking off my face. Alone. Clowns usually are.",
+        "lines": {
+          "act1": [
+            "I fill his seltzer bottle every night. Twenty-five years. He never once said thank you."
+          ],
+          "act2": [
+            "You want to know who hated Silas? Get in line. The line starts behind me, and it's a long one."
+          ],
+          "act3": [
+            "I saw a cape behind the bandstand while the magic show was on. Funny thing about capes: somebody has to be inside them."
+          ]
+        }
+      }
+    },
+    {
+      "id": "bertha",
+      "name": "Madame Bertha",
+      "pronouns": "she/her",
+      "title": "The Bearded Lady",
+      "publicBio": "Bertha Lindqvist, star of the Ten-in-One sideshow: a magnificent chestnut beard, a sharper wit, and a voice that can silence a midway. She reads Swedish poetry between shows and doesn't suffer fools. Silas Crane was a fool.",
+      "costumeTips": "A long, old-fashioned dress, a knitted red shawl, a stick-on beard (the bigger the better), and a book of poetry.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "proud, dry, thunderous"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Silas signed your contract when you were sixteen and has owned it ever since. Tonight he told you he's sold it to Barlow Brothers: you go to their sideshow on Monday 'as an exhibit'. At dinner you told him, in front of everyone, 'Sell me like a pig at a fair and see what happens.' You meant it. At a quarter past twelve you went to have it out with him, but nobody answered your knock and you lost your nerve. Your happier secret: you and Samson the strongman are in love, and you've saved nine hundred dollars to buy out your contract. Silas laughed at the money.",
+        "secrets": [
+          {
+            "id": "bertha-contract",
+            "text": "Silas has owned my contract since I was sixteen. Tonight he sold it, and me, to Barlow's sideshow.",
+            "unlockAct": 0
+          },
+          {
+            "id": "bertha-samson",
+            "text": "Samson and I are in love. We saved nine hundred dollars to buy my freedom from Silas, and he laughed at us.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "You will be nobody's exhibit, whatever happens to Crane's.",
+          "Keep Samson out of trouble.",
+          "Find your contract and tear it to pieces."
+        ],
+        "knows": [
+          "At a quarter past twelve you knocked on the red wagon's door. No answer, though the lamp was lit.",
+          "Horace the bookkeeper has been slipping into the red wagon at odd hours all week."
+        ],
+        "alibi": "From half past eleven until a quarter past twelve I was in the sideshow tent, reading Strindberg. The sideshow closes during the midnight show.",
+        "lines": {
+          "act1": [
+            "Yes, I threatened him. I threaten everyone. It's the beard: it gives me confidence."
+          ],
+          "act2": [
+            "He sold me like a steer at a stockyard. If you want to know how that feels, ask anyone in the sideshow tent."
+          ],
+          "act3": [
+            "I knocked on his door at a quarter past twelve. Nobody answered. I thought he was sulking. I was wrong about that, and about a great deal else."
+          ]
+        }
+      }
+    },
+    {
+      "id": "ruby",
+      "name": "Ruby Crane",
+      "pronouns": "she/her",
+      "title": "The Flying Ruby",
+      "publicBio": "Silas's daughter and the best trapeze artist east of the Mississippi. She's the only person who ever talked back to her father and kept her job. Tonight she ran the ring when he walked out.",
+      "costumeTips": "A sequined leotard or sparkly top, tights, a feathered headband, and chalk on your hands.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.05,
+        "style": "bright, fierce, guarded"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You grew up in the ring, and one day Crane's was supposed to be yours. Tonight your father sold it to Barlow Brothers, and sold your act with it. Worse, you're secretly engaged to Leo Marchetti, the lion tamer, and Silas swore he'd fire Leo if he ever found out. Your father's will leaves you everything, but the sale is signed on Sunday, and after that there'll be nothing to leave. You were in the ring from 11:35 to the end of the show, which is about the only thing tonight you're sure of.",
+        "secrets": [
+          {
+            "id": "ruby-leo",
+            "text": "Leo Marchetti and I are secretly engaged. Father swore he'd fire Leo if he found out.",
+            "unlockAct": 0
+          },
+          {
+            "id": "ruby-will",
+            "text": "Father's will leaves me the whole carnival, but only if he died before the sale was signed on Sunday. Now he has.",
+            "unlockAct": 3
+          }
+        ],
+        "objectives": [
+          "Keep Crane's alive. Without the sale, maybe you can.",
+          "Protect Leo.",
+          "Find out who killed your father. You didn't love him, but he was yours."
+        ],
+        "knows": [
+          "Your father left the ring at 11:35 to wire Barlow's. He handed you the top hat and said, 'Try not to ruin it.'",
+          "When the Vanishing Cabinet opened at 11:52, Mysterio's shoes were grey with sawdust and he was breathing hard, like a man who'd run a race."
+        ],
+        "alibi": "I was in the ring from 11:35 until the show ended at 12:20: ringmistress first, then on the trapeze. Three hundred people saw me.",
+        "lines": {
+          "act1": [
+            "Father left the ring at 11:35 to send a telegram to Barlow's. He handed me his top hat and said, 'Try not to ruin it.' Those were his last words to me."
+          ],
+          "act2": [
+            "Everyone here wanted Crane's to stay Crane's. Nobody wanted it more than me. That isn't the same as wanting him dead."
+          ],
+          "act3": [
+            "I watched that cabinet from the ring. When it opened, I'd swear the man inside was out of breath."
+          ]
+        }
+      }
+    },
+    {
+      "id": "samson",
+      "name": "Samson Brody",
+      "pronouns": "he/him",
+      "title": "The Strongman",
+      "publicBio": "The strongman: bends horseshoes, lifts ponies, and turns the Vanishing Cabinet for Mysterio's act. Gentle as a lamb, unless someone is unkind to Bertha.",
+      "costumeTips": "A striped vest or old-fashioned bathing suit, a painted moustache, a leopard-print sash, and a cardboard barbell.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.8,
+        "rate": 0.9,
+        "style": "deep, slow, gentle"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You love Bertha, and together you saved nine hundred dollars to buy her contract from Silas. Tonight he laughed at the money and sold her to Barlow's instead. You also threw a wrestling match in Dayton last month for a bookie; Silas found out and has been docking your pay ever since. Tonight you turned the Vanishing Cabinet as always. At one o'clock, when Silas didn't come to the cookhouse party, you went to fetch him, and found him.",
+        "secrets": [
+          {
+            "id": "samson-bertha",
+            "text": "I love Bertha. We saved nine hundred dollars to buy her freedom, and Silas laughed.",
+            "unlockAct": 0
+          },
+          {
+            "id": "samson-dayton",
+            "text": "I threw a wrestling match in Dayton for a bookie. Silas found out and has been docking my pay.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Protect Bertha, whatever she's done.",
+          "Keep the Dayton match quiet.",
+          "Find out who killed Silas before the sheriff decides it was the big fellow."
+        ],
+        "knows": [
+          "You found Silas at one o'clock, slumped over his ledger. The seltzer siphon was beside him and the stove was ticking.",
+          "Mysterio made you swear, years ago, never to tell anyone how the Vanishing Cabinet works."
+        ],
+        "alibi": "From 11:40 to 11:52 I was in the ring, turning Mysterio's cabinet. Then I helped rig Ruby's trapeze until the finale.",
+        "lines": {
+          "act1": [
+            "I turned that box a hundred times. I know how heavy a magician is."
+          ],
+          "act2": [
+            "Bertha didn't do anything. And if anyone says she did, they can say it to me."
+          ],
+          "act3": [
+            "I found him. His hand was still on the ledger, like he was adding up what everyone owed him."
+          ]
+        }
+      }
+    },
+    {
+      "id": "esmeralda",
+      "name": "Madame Esmeralda",
+      "pronouns": "she/her",
+      "title": "The Fortune Teller",
+      "publicBio": "The carnival's fortune teller: crystal ball, tarot cards, and bangles up to the elbow. She read Silas Crane's fortune this morning. She won't say what she saw.",
+      "costumeTips": "A headscarf, hoop earrings, a stack of bangles, a long skirt, and a deck of tarot cards.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 0.85,
+        "style": "husky, mysterious, amused"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You were Silas Crane's wife. You married him in Kansas in 1931 and left him in 1935; nobody at Crane's knows. You stayed because you had nowhere else to go, and because by the divorce papers you still own a quarter of the carnival, which Silas 'forgot' when he sold it to Barlow's. This morning you drew the Death card for him and left it on his desk as a warning. It was theatre. You think.",
+        "secrets": [
+          {
+            "id": "esmeralda-wife",
+            "text": "I was Silas Crane's wife. We married in Kansas in 1931. Nobody here knows.",
+            "unlockAct": 0
+          },
+          {
+            "id": "esmeralda-quarter",
+            "text": "By our divorce papers I own a quarter of Crane's. Silas sold it anyway, without a word to me.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get your quarter of the carnival.",
+          "Keep your marriage secret, unless telling helps you.",
+          "Read the room. Someone here is lying beautifully."
+        ],
+        "knows": [
+          "This morning you drew the Death card for Silas, and left it on his desk as a warning.",
+          "At quarter to twelve, from your tent by the lion wagons, you heard old Sultan growl at someone moving in the straw."
+        ],
+        "alibi": "I read palms in my tent by the lion wagons all through the midnight show. Nobody came in. Nobody wants their fortune told at midnight.",
+        "lines": {
+          "act1": [
+            "I told him this morning: the cards said Death. He told me to stick to palms."
+          ],
+          "act2": [
+            "Silas Crane was many things. A husband, once. A liar, always."
+          ],
+          "act3": [
+            "The lion growled at someone in the straw during the magic show. Lions are excellent judges of character."
+          ]
+        }
+      }
+    },
+    {
+      "id": "leo",
+      "name": "Captain Leo Marchetti",
+      "pronouns": "he/him",
+      "title": "The Lion Tamer",
+      "publicBio": "Lion tamer: whip, boots, epaulettes, and a lion called Sultan who is twenty years old and mostly asleep. The ladies of Ohio find him devastating.",
+      "costumeTips": "Riding boots, a military-style jacket with epaulettes, a whip (a skipping rope works), and a kitchen chair.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.0,
+        "rate": 1.0,
+        "style": "dashing, proud, anxious"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You're secretly engaged to Ruby Crane, which Silas forbade. Worse, Silas told you tonight that Barlow's doesn't want an old lion: Sultan is to be sold to a hunting ranch in Texas on Monday. You'd die before you let that happen, and you've been planning to steal Sultan away on Sunday night. During the midnight show you were in the lion wagon, getting Sultan ready for the finale.",
+        "secrets": [
+          {
+            "id": "leo-ruby",
+            "text": "Ruby Crane and I are secretly engaged. Silas swore he'd fire me if he knew.",
+            "unlockAct": 0
+          },
+          {
+            "id": "leo-sultan",
+            "text": "Silas sold my old lion Sultan to a hunting ranch in Texas. I planned to steal Sultan away on Sunday night.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Save Sultan.",
+          "Protect Ruby.",
+          "Keep the engagement secret, at least until the sheriff has gone."
+        ],
+        "knows": [
+          "At quarter to twelve, Sultan growled at the straw at the back of his wagon. You thought it was rats.",
+          "This afternoon, behind the cookhouse, Horace the bookkeeper paid a Barlow's man in cash."
+        ],
+        "alibi": "I was with Sultan in the lion wagon from half past eleven until the finale at 12:10.",
+        "lines": {
+          "act1": [
+            "Sultan is twenty years old and has never hurt a soul. He is the gentlest creature in this carnival, and I include myself."
+          ],
+          "act2": [
+            "Texas? Over my dead body. Or somebody's."
+          ],
+          "act3": [
+            "Sultan growled at the straw during the magic show. I thought it was rats. There are rats in this carnival, but not the kind you think."
+          ]
+        }
+      }
+    },
+    {
+      "id": "horace",
+      "name": "Horace Pennywhistle",
+      "pronouns": "he/him",
+      "title": "The Bookkeeper",
+      "publicBio": "The carnival's bookkeeper: sleeve garters, spectacles, and a ledger he guards like a dragon. He counts every ticket, every hot dog and every nail. Somehow the numbers never quite add up.",
+      "costumeTips": "Shirtsleeves with garters, a green eyeshade, spectacles, and a ledger or notebook.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.15,
+        "style": "fussy, nervous, precise"
+      },
+      "required": false,
+      "private": {
+        "backstory": "For six years you've been skimming from the ticket money: nearly four thousand dollars. When Barlow's auditors arrive on Monday, they'll find it. This afternoon you paid a Barlow's man two hundred dollars to delay the audit. Tonight at a quarter past eleven, while Silas was dressing for the show, you slipped into the red wagon and tore three pages out of his ledger with your steel ruler.",
+        "secrets": [
+          {
+            "id": "horace-skim",
+            "text": "I've been skimming from the ticket money for six years. Nearly four thousand dollars.",
+            "unlockAct": 0
+          },
+          {
+            "id": "horace-pages",
+            "text": "I tore three pages out of Silas's ledger at a quarter past eleven tonight, before the show.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the missing money hidden.",
+          "Get rid of those ledger pages.",
+          "Make sure the sheriff looks anywhere but the books."
+        ],
+        "knows": [
+          "At a quarter past eleven the stove in the red wagon was lit, and the seltzer siphon was already on the desk, full.",
+          "Silas wrote a riddle on the cover of his ledger to remind himself of the lock's combination, because he could never remember it."
+        ],
+        "alibi": "I was in the ticket booth counting the midnight takings from half past eleven until the show ended.",
+        "lines": {
+          "act1": [
+            "The numbers are all in order. Mostly. Broadly. Numbers are a matter of interpretation."
+          ],
+          "act2": [
+            "Three pages? Missing? I have no idea what you mean. Ledgers lose pages all the time. It's the damp."
+          ],
+          "act3": [
+            "Two hundred dollars to a Barlow's man is a perfectly normal business expense. In some businesses."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "siphon",
+      "title": "The Seltzer Siphon",
+      "text": "On Silas's desk, beside his hand: his seltzer siphon and a glass with a white film of ulcer powder in the bottom. Bingo the clown fills that siphon for him every night.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "bingo"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "death-card",
+      "title": "The Death Card",
+      "text": "A tarot card lies face up on Silas's ledger: Death, a skeleton on a white horse. Madame Esmeralda's deck is one card short.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "esmeralda"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "threat",
+      "title": "The Threat at Dinner",
+      "text": "At half past ten, when Silas announced the sale, the whole cookhouse heard Madame Bertha say: 'Sell me like a pig at a fair and see what happens.'",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "bertha"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "prop-case",
+      "title": "The Empty Slot",
+      "text": "Mysterio's prop case, open in the backstage wagon, has two velvet slots for daggers. One holds the rubber trick dagger. The other, for the real steel blade he shows the audience to prove it's sharp, is empty.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "mysterio"
+      ]
+    },
+    {
+      "id": "torn-ledger",
+      "title": "The Torn Ledger",
+      "text": "Three pages have been torn from Silas's ledger, neatly, along a ruler. Only one person at Crane's carries a steel ruler: Horace the bookkeeper.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "horace"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "cabinet",
+      "title": "Lighter Than Air",
+      "text": "Your own memory of the act: at 11:43, when you spun the locked cabinet for the crowd, it moved like an empty crate. You've turned it with Mysterio inside a hundred times. You said nothing. The show must go on.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "mysterio"
+      ],
+      "recipient": "samson"
+    },
+    {
+      "id": "telegram",
+      "title": "The Unsent Telegram",
+      "text": "A half-written telegram on the desk: 'BARLOW. DEAL CONFIRMED SUNDAY. RUBY'S ACT INCLUDED. BUYING TO THE LAST NAIL. CRANE.' In the drawer, Silas's will: 'Everything to my daughter Ruby.' After Sunday there would have been nothing to leave her.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "ruby"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "lion-cage",
+      "title": "The Open Cage",
+      "text": "Sultan's cage was found unlatched after the show. Leo swears he latched it. A lion loose on the lot would be a fine way to be rid of a ringmaster, and a fine way to lose a lion.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "leo"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "trapdoor",
+      "title": "Sawdust and Tar Paper",
+      "text": "Under the centre-ring stage, the trapdoor beneath the Vanishing Cabinet is scuffed with fresh boot prints. They cross the tar paper and lead out through the canvas flap behind the bandstand, toward the wagons.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "mysterio"
+      ]
+    },
+    {
+      "id": "receipt",
+      "title": "A Receipt from Barlow's",
+      "text": "In your waistcoat pocket: a receipt for two hundred dollars, 'consultancy', signed by a Barlow Brothers man and dated today.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "horace"
+      ],
+      "recipient": "horace",
+      "redHerring": true
+    },
+    {
+      "id": "ledger",
+      "title": "Silas's Ledger",
+      "text": "Silas's private ledger is locked with a combination lock. He wrote a riddle for the combination on the cover.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "mysterio"
+      ],
+      "puzzle": {
+        "prompt": "I have rings but no fingers, a master but no servants, and tonight I lost my crown. What am I?",
+        "answers": [
+          "circus",
+          "a circus",
+          "the circus",
+          "big top",
+          "the big top",
+          "carnival",
+          "a carnival",
+          "the carnival"
+        ],
+        "hint": "Look up. You're standing in it.",
+        "solvedText": "Tucked into the back: 'Sold Voss's Vanishing Cabinet, trapdoor and mirrors, to Barlow's for $2,000. Barlow's already has a magician. Must tell Voss he's through after Sunday. He'll take it badly. Keep the real dagger locked up.'"
+      }
+    },
+    {
+      "id": "handkerchief",
+      "title": "Stage Blood",
+      "text": "Tucked in the lining of Mysterio's cape: his red silk handkerchief, stained dark brown. Stage blood is corn syrup and red dye; it stays sticky and smells sweet. This is dry and stiff, and it smells of iron.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "mysterio"
+      ]
+    },
+    {
+      "id": "reading",
+      "title": "This Morning's Reading",
+      "text": "Your own memory: this morning, while you read Silas's palm in the red wagon, Mysterio burst in, white with rage. 'You sold my cabinet, Silas. You'll pay for that, one way or another.' You kept it to yourself.",
+      "visibility": "private",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "mysterio"
+      ],
+      "recipient": "esmeralda"
+    },
+    {
+      "id": "dagger",
+      "title": "The Dagger in the Straw",
+      "text": "In the straw at the back of the lion wagon: a slim steel dagger, wiped but not clean. The hilt is engraved with a star and a crescent moon, the same emblem painted on the Vanishing Cabinet.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "mysterio"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A carnival at night: the Ferris wheel lit up against storm clouds, the big top glowing red and cream.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Crane's Carnival of Wonders, the last week of the season. Tonight, in the cookhouse tent, the ringmaster rapped his cane on the table and made an announcement."
+    },
+    {
+      "type": "line",
+      "speaker": "ruby",
+      "text": "He's sold us. The big top, the wagons, the acts. Barlow Brothers takes the lot on Sunday. And the rest of us can go hang."
+    },
+    {
+      "type": "narration",
+      "text": "Barlow's wants the name, the tent and the trapeze. It does not want a magician, a sad clown, an old lion, or a bearded lady, except as an exhibit."
+    },
+    {
+      "type": "toast",
+      "text": "A toast to Silas Crane, who has sold us all!",
+      "alternative": "Raise your lemonade, and your eyebrows."
+    },
+    {
+      "type": "narration",
+      "text": "At half past eleven, the midnight show began, as it always does. Silas welcomed the crowd, handed his top hat to his daughter, and walked out to his red wagon to wire Barlow's."
+    },
+    {
+      "type": "image",
+      "text": "The ringmaster's red wagon at the edge of the lot, one lamp burning in the window.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At one o'clock, when Silas didn't come to the cookhouse party, Samson the strongman went to fetch him. Silas Crane was dead at his desk. The town doctor, who had stayed for the show, sent a boy running for the sheriff. The storm has flooded the county road. Nobody leaves the lot until dawn. And one of you killed him."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Red Wagon",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Red Wagon."
+        },
+        {
+          "type": "image",
+          "text": "Inside the red wagon: a desk, a ledger, a seltzer siphon, a coal stove, and a tarot card face up.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The doctor finds a single narrow wound beneath the ringmaster's ribs, hidden by his red waistcoat. A thin blade, driven in hard. There's no weapon in the wagon. Everyone at Crane's owns something sharp, and everyone had a reason."
+        },
+        {
+          "type": "line",
+          "speaker": "samson",
+          "text": "I found him at one. His hand was still on the ledger."
+        }
+      ],
+      "prompts": [
+        "Where was everyone during the midnight show, from half past eleven to twenty past twelve?",
+        "Who threatened Silas tonight, and who just hated him quietly?",
+        "What was on the desk, and who put it there?",
+        "Who had a blade, and who could get one?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Behind the Curtain",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Behind the Curtain."
+        },
+        {
+          "type": "image",
+          "text": "Under the centre-ring stage: tar paper, sawdust, and a trapdoor.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Every act at Crane's has a trick behind it, and every trick has a way in and a way out. The ringmaster's telegram, his will and his locked ledger say more about him than he'd like."
+        },
+        {
+          "type": "toast",
+          "text": "A toast to the Vanishing Cabinet! Drink if you've ever made something disappear.",
+          "alternative": "Or clink your soda bottle and vanish discreetly."
+        },
+        {
+          "type": "line",
+          "speaker": "ruby",
+          "text": "Everyone was in the big top, or says they were. Somebody's lying."
+        }
+      ],
+      "prompts": [
+        "Who was watched by three hundred people, and who only says so?",
+        "Who inherits, and who was being sold?",
+        "Open Silas's ledger. The cover holds a riddle.",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Last Parade",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Last Parade."
+        },
+        {
+          "type": "image",
+          "text": "The lion wagon at dawn, straw spilling from the bars.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The storm is passing and the sheriff's car is on its way. Somewhere on this lot is a blade, and somewhere is the person who knows exactly how long ten minutes can be."
+        },
+        {
+          "type": "toast",
+          "text": "To the last parade of Crane's Carnival of Wonders!",
+          "alternative": "Coffee cups up for the last parade!"
+        },
+        {
+          "type": "line",
+          "speaker": "esmeralda",
+          "text": "The cards never lie. People do."
+        }
+      ],
+      "prompts": [
+        "Where did the weapon go?",
+        "Whose alibi was a trick?",
+        "What does real blood look like, next to the fake kind?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "stolen-act",
+        "text": "Revenge for a stolen act and a ruined career"
+      },
+      {
+        "id": "sold",
+        "text": "To avoid being sold like property"
+      },
+      {
+        "id": "revenge",
+        "text": "Revenge for a death long ago"
+      },
+      {
+        "id": "inheritance",
+        "text": "To inherit the carnival before the sale"
+      },
+      {
+        "id": "money",
+        "text": "To hide stolen money"
+      },
+      {
+        "id": "love",
+        "text": "To protect a forbidden love"
+      }
+    ],
+    "methods": [
+      {
+        "id": "blade",
+        "text": "A real dagger from the magic act"
+      },
+      {
+        "id": "seltzer",
+        "text": "Poison in his seltzer siphon"
+      },
+      {
+        "id": "fumes",
+        "text": "Coal fumes in his sealed-up wagon"
+      },
+      {
+        "id": "lion",
+        "text": "A lion let loose from its cage"
+      },
+      {
+        "id": "cane",
+        "text": "A blow from his own silver-tipped cane"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "mysterio",
+    "motiveId": "stolen-act",
+    "methodId": "blade",
+    "explanation": [
+      "Silas Crane was killed by the one person at Crane's with a perfect alibi: three hundred people watched him vanish, and three hundred watched him come back. The Great Mysterio.",
+      "Last month Silas sold the secret of the Vanishing Cabinet, the trapdoor and the mirrors, to Barlow Brothers for two thousand dollars. Barlow's already had a magician doing Mysterio's trick. Tonight Silas told him he was through. Twelve years of work, sold for the price of a used truck.",
+      "At 11:42, while Samson spun the locked cabinet for the crowd, Mysterio dropped through the trapdoor, crossed the tar paper and slipped out behind the bandstand. Bingo glimpsed a cape running toward the wagons. At the red wagon Mysterio drove the real steel dagger from his act, the one he shows the audience to prove it's sharp, into Silas Crane.",
+      "He wiped the blade on his red silk handkerchief and pushed it into the straw of the lion wagon, where old Sultan growled at him. He was back in the cabinet by 11:51. When it opened, Ruby saw his sawdust-grey shoes and heard him breathing hard. Samson had felt the cabinet spin like an empty crate.",
+      "It was the best trick of his career. But real blood isn't stage blood, a prop case has two slots, and every vanishing has a trapdoor."
+    ],
+    "timeline": [
+      {
+        "time": "Morning",
+        "event": "Mysterio bursts in on Esmeralda's reading: 'You'll pay for that, one way or another.'"
+      },
+      {
+        "time": "10:30",
+        "event": "In the cookhouse, Silas announces the sale to Barlow Brothers. Bertha threatens him."
+      },
+      {
+        "time": "11:00",
+        "event": "Bingo fills Silas's seltzer siphon, as every night."
+      },
+      {
+        "time": "11:15",
+        "event": "Horace slips into the red wagon and tears three pages from the ledger."
+      },
+      {
+        "time": "11:30",
+        "event": "The midnight show begins. Silas welcomes the crowd."
+      },
+      {
+        "time": "11:35",
+        "event": "Silas hands the ring to Ruby and goes to his red wagon."
+      },
+      {
+        "time": "11:40",
+        "event": "The Vanishing Cabinet act begins. Samson turns the cabinet."
+      },
+      {
+        "time": "11:42",
+        "event": "Mysterio drops through the trapdoor and slips out behind the bandstand."
+      },
+      {
+        "time": "11:45",
+        "event": "Mysterio stabs Silas in the red wagon, then hides the dagger in the lion wagon's straw. Sultan growls."
+      },
+      {
+        "time": "11:52",
+        "event": "The cabinet opens. Mysterio 'reappears', out of breath, sawdust on his shoes."
+      },
+      {
+        "time": "12:15",
+        "event": "Bertha knocks on the red wagon's door. No answer."
+      },
+      {
+        "time": "1:00",
+        "event": "Samson finds Silas dead at his desk."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the fairground. A sheriff's car bumps across the muddy lot.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives, and to Crane's Carnival of Wonders!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The sheriff arrived at six. The Great Mysterio met him at the big top's entrance in full cape and bowed, very low. 'For my final trick,' he said, 'I shall need a lawyer.'"
+    },
+    {
+      "type": "narration",
+      "text": "As for the rest of the troupe: the sale is off, the will is read, and a lion, a clown and a bearded lady have some decisions to make. The show goes on. Goodnight, detectives."
+    }
+  ]
+}

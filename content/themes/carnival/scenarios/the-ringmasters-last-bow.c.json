@@ -1,0 +1,258 @@
+{
+  "variantOf": "the-ringmasters-last-bow",
+  "variant": "C",
+  "solution": {
+    "murdererId": "bertha",
+    "motiveId": "sold",
+    "methodId": "fumes",
+    "explanation": [
+      "Silas Crane was not stabbed and not poisoned. He fell asleep at his desk and never woke, because someone had stuffed his stovepipe and hooked his shutter closed from the outside. The wagon filled with coal fumes. The killer was the woman he'd sold like livestock that very evening: Madame Bertha.",
+      "Silas had owned Bertha's contract since she was sixteen. Tonight he sold it to Barlow's sideshow, 'one bearded lady, contract and costumes, five hundred dollars', and laughed at the nine hundred dollars she and Samson had saved to buy her freedom. At dinner she told him to see what happens. She meant it.",
+      "At ten to twelve, while the whole lot watched the Vanishing Cabinet, Bertha climbed the iron ladder on the back of the red wagon, stuffed her red knitted shawl down the stovepipe, and hooked the back shutter closed. Leo saw a tall figure in a long skirt on the roof and took it for the wagon man. Bingo saw someone climbing the ladder.",
+      "At a quarter past twelve she knocked, loudly, so there'd be a witness to her 'visit'. By half past she had climbed back up and pulled her shawl out of the chimney. But the fringe was black with soot, a long chestnut hair from her beard was caught on the ladder, and red wool was snagged on the stovepipe's rivets.",
+      "The magician had the trick, the clown had the grudge, and the bookkeeper had the missing pages. The bearded lady had a bill of sale with her name on it."
+    ],
+    "timeline": [
+      {
+        "time": "10:30",
+        "event": "In the cookhouse, Silas announces the sale, and Bertha's. She threatens him in front of everyone."
+      },
+      {
+        "time": "11:00",
+        "event": "Bingo fills Silas's seltzer siphon, as every night."
+      },
+      {
+        "time": "11:15",
+        "event": "Horace slips into the red wagon and tears three pages from the ledger."
+      },
+      {
+        "time": "11:35",
+        "event": "Silas leaves the ring and goes to his red wagon. The coal stove is lit."
+      },
+      {
+        "time": "11:50",
+        "event": "Bertha climbs the ladder on the back of the red wagon, stuffs her shawl into the stovepipe and hooks the shutter closed. Leo and Bingo glimpse someone on the wagon."
+      },
+      {
+        "time": "12:15",
+        "event": "Bertha knocks on the wagon door, loudly, for witnesses."
+      },
+      {
+        "time": "12:30",
+        "event": "Bertha climbs back up and pulls her sooty shawl from the chimney."
+      },
+      {
+        "time": "12:35",
+        "event": "Bertha returns to the sideshow tent without her shawl. Samson notices."
+      },
+      {
+        "time": "1:00",
+        "event": "Samson finds Silas dead at his desk."
+      }
+    ]
+  },
+  "characters": {
+    "bertha": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Silas has owned your contract since you were sixteen. Tonight he sold it to Barlow's sideshow, 'one bearded lady, contract and costumes, five hundred dollars', and laughed at the nine hundred dollars you and Samson saved to buy your freedom. At ten to twelve, while everyone watched the magic show, you climbed the iron ladder on the back of his red wagon, stuffed your red knitted shawl down the stovepipe, and hooked the back shutter closed from outside. The coal fumes did the rest. At a quarter past twelve you knocked loudly on his door, so someone would remember your 'visit'. At half past you climbed back up, pulled out the shawl, and hid it under a trunk in the sideshow tent.",
+        "objectives": [
+          "Don't get caught. Your threat at dinner was public; let them think it was only words.",
+          "Point suspicion at Mysterio (his impossible alibi) and Bingo (his siphon on the desk).",
+          "Keep Samson out of it. He knows nothing, and he must go on knowing nothing."
+        ],
+        "knows": [
+          "Coal fumes have no smell you'd notice in a smoky wagon, and they send a man to sleep for good.",
+          "Horace the bookkeeper has been slipping into the red wagon at odd hours all week."
+        ],
+        "lines": {
+          "act3": [
+            "I knocked on his door at a quarter past twelve. That's the act of a woman with nothing to hide, surely?"
+          ]
+        }
+      }
+    },
+    "mysterio": {
+      "private": {
+        "backstory": "For twelve years your Vanishing Cabinet has sold Silas Crane's tickets. Last month Silas sold its secret, the trapdoor and the mirrors, to Barlow Brothers for two thousand dollars, and tonight he told you you're finished after Sunday. You could have killed him. You didn't. During the trick you did what you always do: dropped through the trapdoor and crouched in the dust under the stage for ten minutes, breathing sawdust, until it was time to reappear. Your real dagger isn't in its case because you pawned it in Dayton last month to pay the rent. You'd rather die than admit either of those things.",
+        "objectives": [
+          "Protect the secret of the cabinet. The trapdoor is your whole career.",
+          "Don't let anyone learn you pawned the real dagger.",
+          "Find out who really killed Silas, before your 'impossible' alibi starts looking suspicious."
+        ],
+        "knows": [
+          "Silas always drinks a glass of seltzer with his ulcer powder after the show. Bingo fills the siphon.",
+          "At dinner, Bertha told Silas: 'Sell me like a pig at a fair and see what happens.'"
+        ],
+        "alibi": "From 11:40 to 11:52 I was in the Vanishing Cabinet. Well. Under it. The details are a professional secret.",
+        "lines": {
+          "act3": [
+            "I did not kill Silas Crane. I spent the whole trick under the stage in the dust, like every night. Ask Samson what he felt."
+          ]
+        }
+      }
+    },
+    "ruby": {
+      "private": {
+        "knows": [
+          "Your father left the ring at 11:35 to wire Barlow's. He handed you the top hat and said, 'Try not to ruin it.'",
+          "When the Vanishing Cabinet opened at 11:52, Mysterio's shoes were grey with sawdust and he was coughing. He always is, after that trick."
+        ]
+      }
+    },
+    "bingo": {
+      "private": {
+        "knows": [
+          "You fill Silas's seltzer siphon every night at eleven. Tonight was no different.",
+          "At ten to twelve, from clown alley, you saw someone tall climbing the iron ladder on the back of the red wagon. You thought it was the wagon man, fixing the chimney again."
+        ],
+        "lines": {
+          "act3": [
+            "While the magic show was on, somebody was up on the red wagon's roof. Tall. Long skirt. The wagon man doesn't wear a skirt."
+          ]
+        }
+      }
+    },
+    "samson": {
+      "private": {
+        "knows": [
+          "You found Silas at one o'clock, slumped over his ledger. The wagon was hot and stuffy, and the back shutter was hooked shut from the outside.",
+          "Bertha came back to the sideshow tent at twenty-five to one without her red shawl. She never takes it off."
+        ]
+      }
+    },
+    "esmeralda": {
+      "private": {
+        "knows": [
+          "This morning you drew the Death card for Silas, and left it on his desk as a warning.",
+          "At quarter to twelve you heard old Sultan growl, then Leo hushing him. Leo was up to something in that wagon."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "prop-case": {
+      "text": "Mysterio's prop case, open in the backstage wagon, has two velvet slots for daggers. One holds the rubber trick dagger. The other, for the real steel blade, is empty, and has been dusty for weeks.",
+      "redHerring": true
+    },
+    "cabinet": {
+      "text": "Your own memory of the act: at 11:43, when you spun the locked cabinet, it moved like an empty crate, as it always does at that moment. You've kept the secret for years: during the trick, Mysterio is under the stage.",
+      "redHerring": true
+    },
+    "trapdoor": {
+      "text": "Under the centre-ring stage, the trapdoor beneath the Vanishing Cabinet is scuffed with boot prints. They go down into the dusty crawlspace under the stage, round in a small circle, and back up. They don't go anywhere near the canvas flap.",
+      "redHerring": true
+    },
+    "handkerchief": {
+      "text": "Tucked in the lining of Mysterio's cape: his red silk handkerchief, stained red. It's sticky and smells sweet: corn syrup and dye. Stage blood, for the act.",
+      "redHerring": true
+    },
+    "reading": {
+      "text": "Your own memory: this morning, while you read Silas's palm in the red wagon, Mysterio burst in, white with rage. 'You sold my cabinet, Silas. You'll pay for that.' Then he sat down and wept. You've never seen him cry.",
+      "redHerring": true
+    },
+    "dagger": null,
+    "threat": {
+      "text": "At half past ten, when Silas announced the sale, the whole cookhouse heard Madame Bertha say: 'Sell me like a pig at a fair and see what happens.' Silas waved a paper at her: her bill of sale.",
+      "redHerring": false,
+      "pointsTo": [
+        "bertha"
+      ]
+    },
+    "ledger": {
+      "pointsTo": [
+        "bertha"
+      ],
+      "puzzle": {
+        "solvedText": "The last entry, in Silas's hand: 'Lindqvist contract sold to Barlow's Ten-in-One: $500. She goes Monday. She says she'll see me in hell first. Let her try. She can't get past a locked door.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "stovepipe",
+      "title": "The Stovepipe",
+      "text": "Soot has been knocked loose inside the red wagon's stovepipe, and a few strands of red wool are snagged on the rivets at the top. The back shutter was hooked shut from the outside.",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "bertha"
+      ]
+    },
+    {
+      "id": "beard-hair",
+      "title": "Caught on the Ladder",
+      "text": "On the iron ladder up the back of the red wagon: a long, soft, curling chestnut hair. Too long for a head, too fine for a horse.",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "bertha"
+      ]
+    },
+    {
+      "id": "roof",
+      "title": "A Figure on the Roof",
+      "text": "Your own memory: from the lion wagon at ten to twelve, you saw a tall figure in a long skirt on the red wagon's roof, bent over the stovepipe. You assumed it was the wagon man fixing the chimney.",
+      "visibility": "private",
+      "recipient": "leo",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "bertha"
+      ]
+    },
+    {
+      "id": "shawl",
+      "title": "A Shawl That Smells of Smoke",
+      "text": "In the sideshow tent, stuffed under a costume trunk: Bertha's red knitted shawl. Its fringe is black with soot and it reeks of coal smoke. The sideshow tent has no stove.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "bertha"
+      ]
+    }
+  ],
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Red Wagon."
+        },
+        {
+          "type": "image",
+          "text": "Inside the red wagon: a desk, a ledger, a seltzer siphon, a coal stove, and a tarot card face up.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The doctor finds no wound and no poison. But the ringmaster's cheeks are a strange cherry pink, the wagon is stifling, the back shutter is hooked shut from the outside, and soot has tumbled down into the stove as if something had been stuffed up the chimney and pulled out again. Fumes, the doctor says: the quiet killer of every closed-up wagon on the circuit. The only question is who closed it up."
+        },
+        {
+          "type": "line",
+          "speaker": "samson",
+          "text": "I found him at one. His hand was still on the ledger."
+        }
+      ]
+    }
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the fairground. A sheriff's car bumps across the muddy lot.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives, and to Crane's Carnival of Wonders!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The sheriff arrived at six. Madame Bertha received him in the sideshow tent, beard combed and shawl folded on her knee. 'Take me,' she said, 'but I travel as a passenger. Not as an exhibit.'"
+    },
+    {
+      "type": "narration",
+      "text": "As for the rest of the troupe: the sale is off, the will is read, and a magician, a clown and a strongman with a broken heart have some decisions to make. The show goes on. Goodnight, detectives."
+    }
+  ]
+}

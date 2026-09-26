@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { CuePlayer } from '../components/CuePlayer'
 import { GuideButton } from '../components/Guide'
+import { nextAction, nextSpeaker, spotlightTime, useHostCall, type Invoke } from '../components/HostControls'
 import { Portrait } from '../components/Portrait'
 import { ClueCard, Countdown, FeedToasts, QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
@@ -13,7 +14,6 @@ import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
 import type { InterrogationView, MediaJob, PartyInfo, StageView } from '../lib/types'
 
-type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
 /**
  * The shared screen: the TV at a dinner party, or the tab the host shares on a
@@ -101,7 +101,18 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
       <StatusPill status={status} />
       <TopBar stage={stage} info={info} muted={muted} onMute={() => setMuted((m) => !m)} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-32 sm:px-8">
-        <PhaseView stage={stage} info={info} invoke={invoke} muted={muted} begun={begun || stage.phase === 'lobby'} onBegin={() => setBegun(true)} />
+        <PhaseView
+          stage={stage}
+          info={info}
+          invoke={invoke}
+          muted={muted}
+          begun={begun || stage.phase === 'lobby'}
+          soundOn={begun}
+          onBegin={() => {
+            narrator.speak(' ', null, false)
+            setBegun(true)
+          }}
+        />
       </main>
       {info.isHost && <HostBar stage={stage} info={info} invoke={invoke} />}
       <FeedToasts feed={stage.feed} offset="top-20" />
@@ -136,17 +147,20 @@ function PhaseView({
   invoke,
   muted,
   begun,
+  soundOn,
+  onBegin,
 }: {
   stage: StageView
   info: PartyInfo
   invoke: Invoke
   muted: boolean
   begun: boolean
+  soundOn: boolean
   onBegin: () => void
 }) {
   switch (stage.phase) {
     case 'lobby':
-      return <LobbyView stage={stage} info={info} invoke={invoke} />
+      return <LobbyView stage={stage} info={info} invoke={invoke} soundOn={soundOn} onEnableSound={onBegin} />
     case 'castReveal':
       return <CastView stage={stage} />
     case 'prologue':
@@ -178,7 +192,19 @@ function PhaseView({
 
 // ------------------------------------------------------------------ lobby
 
-function LobbyView({ stage, info, invoke }: { stage: StageView; info: PartyInfo; invoke: Invoke }) {
+function LobbyView({
+  stage,
+  info,
+  invoke,
+  soundOn,
+  onEnableSound,
+}: {
+  stage: StageView
+  info: PartyInfo
+  invoke: Invoke
+  soundOn: boolean
+  onEnableSound: () => void
+}) {
   const joinUrl = `${window.location.origin}/join/${info.code}`
   const [error, setError] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
@@ -227,6 +253,13 @@ function LobbyView({ stage, info, invoke }: { stage: StageView; info: PartyInfo;
         </div>
         {info.isHost && (
           <div className="flex flex-wrap gap-2">
+            {/* Browsers only play sound after a tap on this screen. Doing it now means the host can
+                start the evening from the phone remote without walking back to the TV. */}
+            {!soundOn && (
+              <Button variant="ghost" onClick={onEnableSound}>
+                🔊 Enable sound on this screen
+              </Button>
+            )}
             {!hostSeat && (
               <Button variant="ghost" disabled={adding} onClick={() => addSeat(false)}>
                 I'm playing too
@@ -676,29 +709,58 @@ function Award({ title, winners, detail }: { title: string; winners: string[]; d
 
 // ------------------------------------------------------------------ host controls
 
+/** Remembered per party on this device, so the TV stays clean after a reload. */
+const hiddenKey = (code: string) => `butler:hideControls:${code}`
+function readHidden(code: string): boolean {
+  try {
+    return localStorage.getItem(hiddenKey(code)) === '1'
+  } catch {
+    return false
+  }
+}
+function writeHidden(code: string, hidden: boolean) {
+  try {
+    if (hidden) localStorage.setItem(hiddenKey(code), '1')
+    else localStorage.removeItem(hiddenKey(code))
+  } catch {
+    // Private browsing can block storage; the toggle then just lasts until reload.
+  }
+}
+
 function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; invoke: Invoke }) {
-  const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
-  const call = async (method: string, ...args: unknown[]) => {
-    setBusy(true)
-    setError(null)
-    try {
-      await invoke(method, info.code, ...args)
-    } catch (e) {
-      setError((e as Error).message)
-    } finally {
-      setBusy(false)
-    }
+  const { call, busy, error } = useHostCall(info.code, invoke)
+  const [hidden, setHidden] = useState(() => readHidden(info.code))
+  const [showRemote, setShowRemote] = useState(false)
+  const hide = (value: boolean) => {
+    setHidden(value)
+    writeHidden(info.code, value)
   }
 
   const next = nextAction(stage)
   const mingle = stage.phase === 'act' && stage.actStep === 'mingle'
 
+  // With the remote in use, the TV shows only the show. A small corner button brings the controls back.
+  if (hidden) {
+    return (
+      <button
+        type="button"
+        onClick={() => hide(false)}
+        className="fixed right-3 bottom-3 z-30 rounded-full border border-line bg-bg/80 px-3 py-1 text-xs text-muted opacity-60 hover:opacity-100"
+      >
+        Show host controls
+      </button>
+    )
+  }
+
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur sm:px-8">
+      {showRemote && <RemoteQr code={info.code} onClose={() => setShowRemote(false)} onHide={() => hide(true)} />}
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="mr-1 text-xs tracking-widest text-muted uppercase">Host</span>
+          <Button variant="quiet" onClick={() => setShowRemote(true)}>
+            📱 Use my phone as a remote
+          </Button>
           {stage.phase === 'lobby' && !stage.tailoring && (
             <Button variant="ghost" disabled={busy} onClick={() => call('AutoAssign')}>
               Auto-assign characters
@@ -709,7 +771,7 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
               Start without it
             </Button>
           )}
-          {(mingle || stage.phase === 'castReveal') && stage.players.length > 0 && (
+          {spotlightTime(stage) && stage.players.length > 0 && (
             <Button variant="ghost" disabled={busy} onClick={() => call('Spotlight', nextSpeaker(stage))}>
               🎤 {stage.spotlight ? 'Next speaker' : 'Spotlight a guest'}
             </Button>
@@ -751,12 +813,30 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
   )
 }
 
-/** Guests take turns in the order they joined; after the last one, the spotlight goes off. */
-function nextSpeaker(stage: StageView): string | null {
-  const order = stage.players.map((p) => p.seatId)
-  if (!stage.spotlight) return order[0] ?? null
-  const i = order.indexOf(stage.spotlight.seatId)
-  return i >= 0 && i + 1 < order.length ? order[i + 1] : null
+/**
+ * A QR code for the host's phone. Showing it on the TV is safe: the remote needs the host's own
+ * sign-in, so a guest who scans it only reaches the login page.
+ */
+function RemoteQr({ code, onClose, onHide }: { code: string; onClose: () => void; onHide: () => void }) {
+  const url = `${window.location.origin}/remote/${code}`
+  return (
+    <div className="mx-auto mb-3 flex max-w-6xl flex-col items-center gap-4 rounded-xl border border-accent/60 bg-surface p-4 sm:flex-row" role="dialog" aria-label="Phone remote">
+      <QrCode url={url} size={140} />
+      <div className="text-sm">
+        <p className="font-semibold">Run the evening from your phone</p>
+        <p className="mt-1 text-muted">
+          Scan this, or open <span className="break-all text-ink">{url}</span>, and sign in with your host account. Every button here is on your phone
+          too, plus your to-do list for each moment.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button onClick={onHide}>Hide the controls on this screen</Button>
+          <Button variant="quiet" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 /** Whose turn it is to speak, big enough to read across the room. */
@@ -775,36 +855,6 @@ function SpotlightBanner({ stage }: { stage: StageView }) {
       </p>
     </div>
   )
-}
-
-function nextAction(stage: StageView): { label: string; method: string; disabled?: boolean } | null {
-  switch (stage.phase) {
-    case 'lobby':
-      if (stage.tailoring) return { label: '✨ Tailoring the mystery…', method: 'StartGame', disabled: true }
-      return {
-        label: stage.players.length < stage.scenario.minPlayers ? `Need ${stage.scenario.minPlayers} guests to start` : 'Begin the evening',
-        method: 'StartGame',
-        disabled: stage.players.length < stage.scenario.minPlayers,
-      }
-    case 'castReveal':
-      return { label: 'Play the prologue', method: 'Advance' }
-    case 'prologue':
-      return { label: 'Begin Act One', method: 'Advance' }
-    case 'act':
-      if (stage.actStep === 'cinematic') return { label: 'Start mingling', method: 'Advance' }
-      return { label: stage.actNumber < stage.actCount ? `End Act ${stage.actNumber}` : 'Time for accusations', method: 'Advance' }
-    case 'accusation':
-      return { label: 'Reveal the truth', method: 'Advance' }
-    case 'reveal': {
-      const r = stage.reveal!
-      if (r.step === r.stepCount - 1) return { label: 'On to the awards', method: 'Advance' }
-      return { label: r.step === 0 ? 'Unmask the killer' : 'Continue', method: 'Advance' }
-    }
-    case 'awards':
-      return { label: 'Close voting & announce', method: 'Advance' }
-    default:
-      return null
-  }
 }
 
 // ------------------------------------------------------------------ media helpers

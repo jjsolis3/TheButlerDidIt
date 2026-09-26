@@ -39,6 +39,7 @@ export function stageGuide(stage: StageView, host: boolean): Guide {
               'Guests join by scanning the QR code or typing the party code on their phones.',
               'Each guest picks a character (or you press "Auto-assign" later). They can read who they are and what to wear, but their secrets stay locked until the evening begins.',
               'Optional: print the party kit (name tags, character booklets) and the how-to-play sheet.',
+              'Optional: press "Use my phone as a remote" to run the evening from your phone, then hide the controls on this screen. Press "Enable sound on this screen" first so the TV can play the story.',
               'When everyone is here, press "Begin the evening".',
             ]
           : ['Scan the QR code or go to the join page and type the party code.', 'Pick a character on your phone. Dress the part if you like!'],
@@ -195,6 +196,10 @@ export const FAQ: { q: string; a: string }[] = [
   {
     q: 'Is the killer always one of the guests?',
     a: 'With “Surprise me”, almost always. Each story has several versions with a different killer, and the version is dealt when the host begins the evening, from the characters guests chose, preferring one the host hasn’t played. If none fits and the host allowed it, the AI writes a version where a guest is the killer (about a minute). Otherwise the narrator plays the killer, and you must unmask them from the clues.',
+  },
+  {
+    q: 'Can the host run the evening from their phone?',
+    a: 'Yes. On the big screen, press “Use my phone as a remote” and scan the code (sign in with your host account). Your phone gets every host button plus your to-do list for each moment, and the big screen can hide its controls. Tap “Enable sound on this screen” on the TV first, because browsers only play sound after a tap on that screen.',
   },
   {
     q: 'How does scoring work?',

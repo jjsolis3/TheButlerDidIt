@@ -1,0 +1,27 @@
+{
+  "slug": "carnival",
+  "name": "Last Night at the Big Top",
+  "tagline": "Sawdust, sideshow secrets, and a ringmaster who took his final bow.",
+  "era": "1950s travelling carnival",
+  "description": "The last week of the season. Striped tents, a lit-up Ferris wheel, candyfloss and calliope music, a sideshow tent full of wonders, and a ringmaster everybody has a reason to hate. A storm has closed the road, and the show must go on.",
+  "palette": {
+    "background": "#120a0b",
+    "surface": "#251517",
+    "accent": "#e8b04a",
+    "ink": "#f4e7d0"
+  },
+  "artStyle": "Vintage 1950s circus poster, bold hand-lettered type, bulb lights, red and cream stripes, sawdust and lamplight",
+  "sortOrder": 9,
+  "cocktails": [
+    {
+      "name": "The Ringmaster",
+      "recipe": "Bourbon, lemon, a spoon of cherry syrup, shaken and topped with soda.",
+      "mocktail": "Cherry syrup, lemon and soda water, with a maraschino cherry on top."
+    },
+    {
+      "name": "Candy Apple Fizz",
+      "recipe": "Apple brandy, apple juice and a dash of caramel syrup, topped with ginger ale.",
+      "mocktail": "Apple juice, caramel syrup and ginger ale, with a caramel-dipped rim."
+    }
+  ]
+}

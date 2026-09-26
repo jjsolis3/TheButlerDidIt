@@ -96,7 +96,7 @@ public class VersionTests(ApiFactory app) : IClassFixture<ApiFactory>
 
         Assert.DoesNotContain(all, s => s.Id.Contains("--")); // versions aren't separate mysteries
         var blackwood = all.Single(s => s.Id == Blackwood);
-        Assert.Equal(["Version A", "Version B", "Version C"], blackwood.Versions.Select(v => v.Label));
+        Assert.Equal(["Version A", "Version B", "Version C", "Version D"], blackwood.Versions.Select(v => v.Label));
         Assert.Equal(Blackwood, blackwood.Versions[0].Id);
         Assert.All(blackwood.Versions, v => Assert.False(v.PlayedByMe));
     }
@@ -108,9 +108,9 @@ public class VersionTests(ApiFactory app) : IClassFixture<ApiFactory>
         var party = await Read<PartyInfo>(await CreateAsync(host, VersionPicker.Surprise));
         Assert.Equal(Blackwood, party.ScenarioId); // nothing is dealt yet
 
-        // Finch (version A's killer) is left to the narrator; Hargrove (B) and Evelyn (C) are guests.
+        // Finch (version A's killer) is left to the narrator; Hargrove (B), Evelyn (C) and Violet (D) are guests.
         var (dealt, guests) = await PlayAsync(cookie, party.Code, "hargrove", "evelyn", "violet");
-        Assert.Contains(dealt, new[] { ScenarioVariants.VariantId(Blackwood, "B"), ScenarioVariants.VariantId(Blackwood, "C") });
+        Assert.Contains(dealt, new[] { "B", "C", "D" }.Select(v => ScenarioVariants.VariantId(Blackwood, v)));
         Assert.Single(guests, g => g.Dossier!.IsMurderer);
     }
 
@@ -118,11 +118,11 @@ public class VersionTests(ApiFactory app) : IClassFixture<ApiFactory>
     public async Task Unplayed_versions_come_before_a_guest_killer()
     {
         var (host, cookie) = await app.RegisterHostAsync($"u{Guid.NewGuid():N}@example.com");
-        foreach (var v in new[] { "B", "C" })
+        foreach (var v in new[] { "B", "C", "D" })
             await MarkPlayedAsync((await Read<PartyInfo>(await CreateAsync(host, ScenarioVariants.VariantId(Blackwood, v)))).Code);
 
         // Only version A is unplayed. Its killer, Finch, isn't a guest, and the AI may not help
-        // (not allowed and not set up here), so the narrator plays Finch rather than replaying B or C.
+        // (not allowed and not set up here), so the narrator plays Finch rather than replaying B, C or D.
         var party = await Read<PartyInfo>(await CreateAsync(host, VersionPicker.Surprise));
         var (dealt, guests) = await PlayAsync(cookie, party.Code, "hargrove", "evelyn", "violet");
         Assert.Equal(Blackwood, dealt);
