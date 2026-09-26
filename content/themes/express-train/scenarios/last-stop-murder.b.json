@@ -1,0 +1,221 @@
+{
+  "variantOf": "last-stop-murder",
+  "variant": "B",
+  "solution": {
+    "murdererId": "doctor",
+    "motiveId": "blackmail",
+    "methodId": "morphine",
+    "explanation": [
+      "Nobody came over the roof, and nobody came through either door. Cornelius Vane was killed before he locked himself in, and he did the locking himself. His killer was the man who came every night with a syringe: Dr. Henri Lacroix.",
+      "Six years ago Lacroix was struck off in Brussels, after a patient died. Vane found out, and took five hundred pounds a month from him. Tonight Vane said that unless the doctor paid in Istanbul, he'd wire Brussels. Lacroix said, 'Sleep well tonight, Monsieur Vane.' Vane wrote it in his diary.",
+      "At half past twelve Vane asked for 'a big one tonight, Doctor; I want to sleep like the dead.' Lady Pamela heard the doctor answer, 'Oh, you shall.' He injected four ampoules of morphine at once: four times the dose. It works slowly. At a quarter to one Vane was still cheerful enough to lock and chain his door and bolt the connecting door against the countess.",
+      "By one, feeling stifled, he threw open the window, and then his breathing simply slowed and stopped. The countess knocked at one and heard only heavy snoring. The doctor left a trail: four ampoules gone from his box, the broken glass in the corridor bin, the bruised needle mark, and the letter from Brussels in Vane's briefcase.",
+      "Pierre pocketed the emerald at seven, and the countess's grudge, the colonel's glove and Miss Marlow's flask were all innocent. The perfect locked room is the one the victim locks himself."
+    ],
+    "timeline": [
+      {
+        "time": "9:00",
+        "event": "Dinner. Vane tells Dr. Lacroix to pay in Istanbul or he'll wire Brussels. 'Sleep well tonight, Monsieur Vane.'"
+      },
+      {
+        "time": "11:00",
+        "event": "Ruth Adler picks the lock of Compartment 7 and reads Vane's papers."
+      },
+      {
+        "time": "11:40",
+        "event": "The train stops in a snowdrift."
+      },
+      {
+        "time": "12:15",
+        "event": "Miss Marlow brings the flask and takes dictation. Vane unbolts the connecting door: 'A royal visitor, at one.'"
+      },
+      {
+        "time": "12:30",
+        "event": "Dr. Lacroix injects four ampoules of morphine instead of one."
+      },
+      {
+        "time": "12:40",
+        "event": "Lacroix drops the broken ampoules in the corridor bin."
+      },
+      {
+        "time": "12:45",
+        "event": "Vane locks and chains his door, and bolts the connecting door again: 'Let Her Highness knock all night.'"
+      },
+      {
+        "time": "12:50",
+        "event": "Ruth hears Vane humming, a little slurred."
+      },
+      {
+        "time": "1:00",
+        "event": "Vane throws open his window. The countess knocks on the connecting door and hears only snoring."
+      },
+      {
+        "time": "1:10",
+        "event": "Colonel Blake feels a freezing draught under Vane's door. By now, Vane has stopped breathing."
+      },
+      {
+        "time": "7:00",
+        "event": "Pierre cuts the chain, finds Vane dead, and pockets the fallen emerald."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. Compartment 7."
+        },
+        {
+          "type": "image",
+          "text": "A sleeping compartment: a berth, a washstand, a silver flask, an open window with snow on the sill, and a connecting door.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Colonel Blake, who ran a field hospital in the war, examines the body. There isn't a mark on him, except a fresh needle mark in his arm. His pupils are tiny pinpoints, and his lips are blue. 'I've seen this in the field,' says the colonel. 'Too much morphine. He just stopped breathing.' And the door was chained from inside."
+        },
+        {
+          "type": "line",
+          "speaker": "pierre",
+          "text": "I cut the chain myself. Nobody came through that door. Nobody."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "doctor": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Six years ago a patient died on your operating table and you were struck off in Brussels. Cornelius Vane found out, and he's taken five hundred pounds a month from you ever since. Tonight at dinner he said: pay in Istanbul, or he'd wire Brussels. You told him, 'Sleep well tonight, Monsieur Vane.' At half past twelve he asked for 'a big one tonight, Doctor; I want to sleep like the dead.' You gave him four ampoules of morphine instead of one. It works slowly: he was still well enough to lock himself in at a quarter to one. You threw the broken ampoules in the corridor bin on your way back.",
+        "objectives": [
+          "Don't get caught. The door was chained from inside: let them chase the roof, the countess and her connecting door.",
+          "Nobody must count the ampoules in your bag.",
+          "Keep your past buried. If it comes out, you'll hang for this."
+        ],
+        "knows": [
+          "Four ampoules of morphine will stop a man's breathing in half an hour or so. He'll feel hot and stifled first.",
+          "The countess had an appointment with Vane at one, through the connecting door. Miss Marlow knows it too."
+        ],
+        "lines": {
+          "act3": [
+            "A needle mark? Of course there's a needle mark. I gave him his injection, one ampoule, as always. Ask the countess about the connecting door."
+          ]
+        }
+      }
+    },
+    "countess": {
+      "private": {
+        "backstory": "The Volkov emerald belonged to your family for two hundred years, until the Bolsheviks took it and sold it for nothing to Cornelius Vane. Tonight he told you the price to buy it back was your pride, and that he'd unbolt the connecting door at one o'clock so you could come and beg. At one you swallowed your pride and knocked softly on that door, whispering his name. It was bolted on his side, and all you heard through it was his slow, heavy snoring. You went back to bed, humiliated. You did not kill him. But you had every reason to.",
+        "objectives": [
+          "Clear your name. Wanting a man dead is not the same as killing him.",
+          "Find the Volkov emerald: it's yours by right.",
+          "Don't let anyone learn you knocked on that door at one."
+        ],
+        "knows": [
+          "Dr. Lacroix gives Vane an injection every night on this journey, 'to help him sleep'.",
+          "At one o'clock the connecting door was bolted on Vane's side. You knocked and whispered, and he didn't answer."
+        ],
+        "lines": {
+          "act3": [
+            "I knocked on that door at one, yes. It was bolted. He made a fool of me one last time. I did not kill him."
+          ]
+        }
+      }
+    },
+    "pierre": {
+      "private": {
+        "knows": [
+          "At a quarter to one Vane rang, told you nobody was to disturb him until Istanbul, and locked and chained his door in front of you. He'd bolted the connecting door to Compartment 8 as well, laughing: 'Let Her Highness knock all night.'",
+          "At seven you cut the chain. The window was wide open, there was snow on the floor, and the connecting door to Compartment 8 was bolted on his side."
+        ]
+      }
+    },
+    "pamela": {
+      "private": {
+        "knows": [
+          "The walls are thin. At one o'clock you heard a soft knock on the connecting door, a woman whispering in Russian, and nobody answering. Just snoring.",
+          "At ten past one Colonel Blake was smoking in the corridor, right outside Vane's door."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "bolt": {
+      "text": "The connecting door to Compartment 8 is bolted on Vane's side. The brass knob is scratched, but the scratches are old and dull, and there's nothing caught under the door. The countess, next door, had every reason to hate him.",
+      "redHerring": true
+    },
+    "hatpin-gone": null,
+    "thread": null,
+    "hatpin": null,
+    "pamela-heard": {
+      "text": "Your own memory: at half past twelve, through the thin wall, you heard Vane say, 'Make it a big one tonight, Doctor. I want to sleep like the dead.' And the doctor answered, very quietly, 'Oh, you shall, Monsieur.'",
+      "pointsTo": [
+        "doctor"
+      ]
+    },
+    "syringe": {
+      "text": "In Dr. Lacroix's bag: a box of ten morphine ampoules. Four are missing. One is the usual dose; four would stop a man's breathing. The syringe has been rinsed in a hurry: there's still a cloudy drop in the barrel.",
+      "redHerring": false
+    },
+    "diary": {
+      "pointsTo": [
+        "doctor"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Lacroix late with his payment again. Told him if it isn't paid in Istanbul, I wire Brussels. He went grey and said, \"Sleep well tonight, Monsieur Vane.\" Injection at half past twelve as usual. I'll ask for a big one.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "brussels",
+      "title": "A Letter from Brussels",
+      "text": "In Vane's briefcase: an old notice from the Medical Council of Brussels. 'Dr. H. Lacquière, struck off the register, 1928, following the death of a patient.' Pinned to it, a photograph of Dr. Lacroix, and Vane's note: '£500 monthly.'",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "doctor"
+      ]
+    },
+    {
+      "id": "ampoules",
+      "title": "Broken Glass in the Bin",
+      "text": "In the corridor bin outside Dr. Lacroix's compartment, wrapped in a page of the Paris newspaper: four snapped-off morphine ampoules.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "doctor"
+      ]
+    },
+    {
+      "id": "needle",
+      "title": "The Needle Mark",
+      "text": "A closer look at Vane's arm: a single needle mark, with a wide purple bruise spreading round it. The usual small dose leaves no bruise. A large dose, pushed in fast, does.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "doctor"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "A little mountain station in the morning sun, and railway police in long coats waiting on the platform.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the passengers of the Danube Express!",
+      "alternative": "Coffee cups up for the passengers!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came aboard at the mountain station. Dr. Henri Lacroix was waiting for them with his bag closed on his knees. 'He asked me to help him sleep like the dead,' he said. 'For once, I did exactly as a patient asked.'"
+    },
+    {
+      "type": "narration",
+      "text": "Pierre handed over the Volkov emerald, very red in the face, and the countess finally held it in her hands again, for a moment. The train was forty hours late into Istanbul, and nobody on board complained. Goodnight, detectives."
+    }
+  ]
+}

@@ -15,6 +15,8 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - **Who Stopped the Circus?** (Family): the same carnival for all ages: a ringmaster who never wakes from his bedtime snack, and a missing Golden Ticket.
 - **Who Crashed the Reunion?** (Family): the Class of '86 is back in the school gym, the principal never wakes up in time to open the time capsule, and the championship trophy has vanished.
 - **Death at the Gin Joint** (Adults): a 1927 Chicago speakeasy, a torch singer, a crooked cop and a nervous bookkeeper, and a club owner who meant to settle every account before leaving town.
+- **Last Stop: Murder** (Adults): a 1930s sleeper train snowbound on the way to Istanbul, a stolen emerald, and a millionaire found dead in a compartment chained from the inside.
+- **Murder on the Red Carpet** (Adults): a 1950s Hollywood premiere, and a leading man who never makes his curtain call.
 
 All of them play with 3–8 guests in about two hours, and **each comes in three or four versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
 - generate new mysteries for any of the nine themes, family-friendly or mature

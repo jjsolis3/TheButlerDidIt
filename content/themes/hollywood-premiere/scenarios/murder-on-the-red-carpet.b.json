@@ -1,0 +1,234 @@
+{
+  "variantOf": "murder-on-the-red-carpet",
+  "variant": "B",
+  "solution": {
+    "murdererId": "victor",
+    "motiveId": "career",
+    "methodId": "electrocution",
+    "explanation": [
+      "Nobody struck Rex Hartley, and nobody poisoned him. He killed himself, in a way, by doing exactly what he did every night: switching on his makeup mirror. The trap was set an hour earlier by the man who once wired half the studio: Victor Kessler.",
+      "Rex was getting Victor thrown off 'Desert Kings II' so he could direct it himself. Victor told him, 'You'll be lit up like a Christmas tree for that, Rex.' Rex wrote it in his appointment book.",
+      "At a quarter to nine Victor went in to 'check the lights'. He spliced a length of brown flex behind the mirror, bridging the live wire to its metal frame, and switched the lights off. Rex always did his own makeup at twenty to ten, before his bow; he told Benny so.",
+      "At 9:41 Rex sat down, put his hand on the frame and flicked the switch. Buck heard the crack through the wall, the corridor lights flickered, and the fuse blew. The trail: scorched fingertips and switch, the fresh splice, the flex in Victor's tool roll, the electrician's log, and Mickey's photograph of Victor coiling wire at 8:47.",
+      "Dolores, Gloria and Sol all had their scenes with Rex tonight, but each left him alive. A good director always sets up the shot in advance."
+    ],
+    "timeline": [
+      {
+        "time": "7:30",
+        "event": "Rex walks the red carpet."
+      },
+      {
+        "time": "8:00",
+        "event": "The picture begins. Rex slips backstage."
+      },
+      {
+        "time": "8:20",
+        "event": "Rex sends Benny away: he'll do his own makeup at twenty to ten."
+      },
+      {
+        "time": "8:30",
+        "event": "Sol Mandel visits. Rex tears up his contract."
+      },
+      {
+        "time": "8:40",
+        "event": "Victor asks the stage electrician which circuit feeds Dressing Room 1."
+      },
+      {
+        "time": "8:45",
+        "event": "Victor 'checks the lights' and splices live flex to the mirror's metal frame."
+      },
+      {
+        "time": "8:47",
+        "event": "Victor leaves, coiling wire into his tool roll. Mickey photographs him."
+      },
+      {
+        "time": "9:00",
+        "event": "Gloria brings champagne. Rex drinks a glass: 'Monday, Gloria.'"
+      },
+      {
+        "time": "9:30",
+        "event": "Dolores visits. Rex, sitting in the dark, threatens her. She leaves at 9:36 in tears."
+      },
+      {
+        "time": "9:41",
+        "event": "Rex switches on his mirror lights and is electrocuted. The corridor lights flicker; the fuse blows."
+      },
+      {
+        "time": "9:45",
+        "event": "Marty Klein knocks. No answer."
+      },
+      {
+        "time": "10:05",
+        "event": "Benny finds Rex dead."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Dressing Room."
+        },
+        {
+          "type": "image",
+          "text": "The dressing table: a dark mirror, a spilled bottle of champagne, a broken glass, and a gold statuette on the carpet.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The theatre's doctor, called from the stalls, kneels by the body. There isn't a wound on him. But the fingertips of his right hand are burned white, and the switch on the mirror is scorched black. 'Electricity,' says the doctor. 'A great deal of it.' Somebody wanted the lights to go out on Rex Hartley."
+        },
+        {
+          "type": "line",
+          "speaker": "benny",
+          "text": "I straightened his tie. Force of habit. I'm sorry."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "victor": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Rex Hartley was getting you thrown off 'Desert Kings II' so he could direct it himself. You told him he'd be 'lit up like a Christmas tree' for that. Before you were a director you were a studio electrician for ten years. At twenty to nine you asked the stage electrician which circuit fed Rex's dressing room. At a quarter to nine you went in to 'check the lights', spliced a length of brown flex behind the mirror so that its metal frame was live, and switched the lights off. Rex always does his own makeup at twenty to ten. You went up to the projection booth and waited.",
+        "objectives": [
+          "Don't get caught. Point everyone at the award on the floor (Dolores was the last visitor) or Gloria's champagne.",
+          "Get rid of the brown flex in your tool roll.",
+          "Keep your picture, and your career."
+        ],
+        "knows": [
+          "Rex does his own makeup at twenty to ten every night, sitting at that mirror with his hand on the frame.",
+          "Dolores Dare was his last visitor, at half past nine. Gloria brought him champagne at nine."
+        ],
+        "lines": {
+          "act3": [
+            "I tightened a bulb at a quarter to nine. A bulb! If his lights went wrong an hour later, ask the theatre, not me."
+          ]
+        }
+      }
+    },
+    "dolores": {
+      "private": {
+        "backstory": "Four years ago, before anyone knew your name, you married Rex Hartley in Tijuana, and neither of you ever got a divorce. Now you're engaged to Sol Mandel's son, and tonight Rex said the newspapers would have your marriage certificate on Monday unless you broke it off. At half past nine you went to his dressing room to beg. He was sitting in the dark, his mirror lights off: 'saving them for my makeup at twenty to ten,' he said. You told him, 'Over my dead body, Rex. Or yours,' and walked out at twenty-five to ten, crying. You did not kill him. But you said it.",
+        "objectives": [
+          "Clear your name without anyone learning about Tijuana.",
+          "Find the marriage certificate before the police do.",
+          "Keep your engagement, and your career, alive."
+        ],
+        "lines": {
+          "act3": [
+            "Yes, I went to see him. Yes, I said something dreadful. He was alive when I left. I swear it on my mother."
+          ]
+        }
+      }
+    },
+    "benny": {
+      "private": {
+        "knows": [
+          "At five past ten you found Rex on the floor by his dressing table. The mirror lights were dark, and the room smelled of scorched wire.",
+          "At nine forty-five Marty Klein was hovering outside the door when you passed the end of the corridor."
+        ]
+      }
+    },
+    "buck": {
+      "private": {
+        "knows": [
+          "At nine forty-one, through the wall, you heard a sharp crack like a whip, and every light in the corridor flickered.",
+          "Mickey the photographer was hanging about at the end of the corridor with his camera all evening."
+        ],
+        "lines": {
+          "act3": [
+            "Nine forty-one. A crack like a whip, and the lights went funny. I thought the whole theatre was going to go dark."
+          ]
+        }
+      }
+    },
+    "mickey": {
+      "private": {
+        "knows": [
+          "You photographed everyone who went down the corridor tonight. The pictures are drying in the darkroom.",
+          "At a quarter to nine Victor Kessler went into Rex's room with his tool roll. He came out two minutes later, coiling up a length of wire."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "statuette": {
+      "text": "Rex's Golden Reel award lies on the carpet, knocked off the dressing table as he fell. There's nothing on it but fingerprints: his own, and a studio polisher's.",
+      "redHerring": true
+    },
+    "certificate": {
+      "redHerring": true
+    },
+    "stole": null,
+    "mirror": {
+      "text": "Behind Rex's makeup mirror, a fresh splice of brown flex bridges a live wire to the mirror's metal frame. The tape is still tacky. Anyone who touched the frame and switched on the lights would get the full current.",
+      "redHerring": false,
+      "pointsTo": [
+        "victor"
+      ]
+    },
+    "benny-knows": {
+      "text": "Your own memory: at twenty past eight Rex sent you away. 'Kessler's coming to fiddle with my lights,' he said, 'and I'll do my own makeup at twenty to ten. Scram.'",
+      "pointsTo": [
+        "victor"
+      ]
+    },
+    "photo": {
+      "text": "Mickey's pictures, fresh from the darkroom. One, stamped 8:47, shows Victor Kessler coming out of Rex's dressing room, coiling a length of brown wire into his tool roll.",
+      "pointsTo": [
+        "victor"
+      ]
+    },
+    "appointments": {
+      "pointsTo": [
+        "victor"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry, in Rex's big scrawl: 'Told Kessler I want him off \"Desert Kings II\", and my name on it as director. He went purple and said, \"You'll be lit up like a Christmas tree for that, Rex.\" He's coming to fix my lights at a quarter to nine. Ha.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "tool-roll",
+      "title": "The Tool Roll",
+      "text": "In Victor Kessler's coat, hung in the projection booth: a leather tool roll with wire strippers, black tape and a coil of brown flex. One end has been freshly cut. It's the same flex that's spliced behind the mirror.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "victor"
+      ]
+    },
+    {
+      "id": "fuse",
+      "title": "The Electrician's Log",
+      "text": "The stage electrician's log: '8:40. Mr. Kessler asked which circuit feeds Dressing Room 1. Showed him.' And then: '9:41. Lights flickered backstage. Fuse for Dressing Room 1 blown.'",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "victor"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "The Starlight Theatre's marquee at dawn, the searchlights off, a police car at the kerb.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Starlight Theatre!",
+      "alternative": "Cider up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came in through the stage door at eleven. Victor Kessler was waiting in the projection booth, watching the last reel run out. 'It was a good picture,' he said. 'The best I ever made. He'd have ruined the sequel.'"
+    },
+    {
+      "type": "narration",
+      "text": "'Desert Kings' was the biggest hit of the year. Buck got the sequel, Gloria got her headline, and Sol Mandel hired a new director before lunch. Goodnight, detectives."
+    }
+  ]
+}
