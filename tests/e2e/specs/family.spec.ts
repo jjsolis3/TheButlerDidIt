@@ -174,3 +174,47 @@ test('the Family circus: a second story on the Family shelf, and the stable kid 
   await host.getByRole('button', { name: 'Start mingling' }).click()
   await expect(host.getByText('The Three-Ring Supper')).toBeVisible()
 })
+
+test("the '80s reunion: Surprise me deals the version whose killer is at the party, never the principal's granddaughter", async ({ browser }) => {
+  const host = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage()
+  await host.goto('/login')
+  await host.getByRole('button', { name: 'Create an account' }).click()
+  await host.getByLabel('Your name').fill('Principal Pat')
+  await host.getByLabel('Email').fill(`reunion-${Date.now()}@example.com`)
+  await host.getByLabel('Password').fill('password123')
+  await host.getByRole('button', { name: 'Create account' }).click()
+  await host.waitForURL('**/host/new')
+
+  // The speakeasy is on the Adults shelf; the reunion is on the Family shelf.
+  await expect(host.getByRole('button', { name: /Death at the Gin Joint/ })).toContainText('3 versions, a different killer each')
+  await host.getByRole('tab', { name: /Family/ }).click()
+  await expect(host.getByText('Death at the Gin Joint')).toHaveCount(0)
+  await host.getByRole('button', { name: /Who Crashed the Reunion\?/ }).click()
+  await expect(host.getByRole('button', { name: /Who Crashed the Reunion\?/ })).toContainText('3 versions, a different killer each')
+  await expect(host.getByLabel('Version', { exact: true })).toHaveValue('surprise')
+  await host.getByLabel(/let the AI write one/).uncheck() // only the hand-written versions
+  await host.screenshot({ path: `${SHOTS}/85-family-reunion.png`, fullPage: true })
+  await host.getByRole('button', { name: 'Create party and get the invite code' }).click()
+  await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
+  const code = host.url().split('/').pop()!
+
+  // Nina (version A's culprit) isn't taken, so the dealer must pick B (Crystal) or C (Rocky).
+  const crystal = await joinAs(browser, code, 'Cass', /Crystal Starr/)
+  const rocky = await joinAs(browser, code, 'Rob', /Rocky Rhodes/)
+  const penny = await joinAs(browser, code, 'Pia', /Penny Plunkett/)
+
+  await host.getByRole('button', { name: 'Begin the evening' }).click()
+  await host.getByRole('button', { name: 'Tap to begin the evening' }).click()
+  await expect(host.getByRole('heading', { name: 'The suspects' })).toBeVisible()
+  const isKiller = (p: typeof crystal) => p.getByText('You are the murderer.', { exact: true }).count()
+  await expect.poll(async () => (await isKiller(crystal)) + (await isKiller(rocky))).toBe(1)
+  expect(await isKiller(penny)).toBe(0)
+  const dealt = await (await host.request.get(`/api/parties/${code}`)).json()
+  expect(dealt.scenarioId).toMatch(/^who-crashed-the-reunion--[bc]$/)
+  await host.screenshot({ path: `${SHOTS}/86-reunion-cast.png` })
+
+  await host.getByRole('button', { name: 'Play the prologue' }).click()
+  await host.getByRole('button', { name: 'Begin Act One' }).click()
+  await host.getByRole('button', { name: 'Start mingling' }).click()
+  await expect(host.getByText("The Principal's Plate")).toBeVisible()
+})

@@ -1,0 +1,855 @@
+{
+  "id": "who-crashed-the-reunion",
+  "themeSlug": "eighties-reunion",
+  "title": "Who Crashed the Reunion?",
+  "synopsis": "Twenty years after they graduated, the Class of '86 is back in the Maple Ridge High gym for a reunion, complete with balloons, big hair and a time capsule to open at ten o'clock. Beloved old Principal Plunkett has promised to 'set three records straight' when it's opened. But at ten he's found asleep forever in his office, and the championship trophy has vanished. A storm has flooded the road. Nobody leaves until the mystery is solved.",
+  "contentRating": "family",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "The gym at Maple Ridge High School",
+    "era": "2006: the Class of '86 twenty-year reunion",
+    "description": "A school gym full of balloons, streamers and a glitter ball, with a DJ booth, a cake table, a punch bowl and a science table with a baking-soda volcano. Down the corridor: the principal's office, the trophy case, the kitchen and the nurse's office. Outside, a thunderstorm has flooded the road."
+  },
+  "victim": {
+    "name": "Principal Percival Plunkett",
+    "description": "Seventy-five years old, with a bow tie, a whistle and a weak heart. Strict, fair and fond of his students. He ran Maple Ridge High for forty years and never missed a reunion."
+  },
+  "characters": [
+    {
+      "id": "nina",
+      "name": "Dr. Nina Newton",
+      "pronouns": "she/her",
+      "title": "The Science Whiz",
+      "publicBio": "Class of '86's science-fair champion, now the inventor of Volcano Fizz, the fizziest soda in America. She still wears safety goggles on her head 'just in case', and she brought a crate of Volcano Fizz for everyone tonight.",
+      "costumeTips": "A white lab coat, safety goggles pushed up on your head, a pocket full of pens, and a bottle of something fizzy.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.05,
+        "rate": 1.15,
+        "style": "quick, clever, a little nervous"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU DID IT. Volcano Fizz began as your 1986 science-fair project, and it made you rich. But your lab partner, Mike Mendez, worked out half the recipe, and you never told a soul. Tonight Principal Plunkett told you he'd found your old science-fair notebook in the time capsule, with Mike's handwriting all over the recipe, and at ten o'clock, when the capsule is opened, he'd 'set the record straight'. You thought: if he sleeps right through the opening, you can get the notebook first. At ten past eight you borrowed the nurse's key from Dotty's key ring in the kitchen (you asked her for ice), took a scoop of Sleepy Salts from the nurse's cabinet with the little measuring spoon from your pocket kit, and stirred it into the bottle of Volcano Fizz you gave him at twenty to nine. You only meant him to nap until morning. You didn't know how weak his heart was. Now nobody must find out.",
+        "secrets": [
+          {
+            "id": "nina-recipe",
+            "text": "Half the Volcano Fizz recipe was really Mike Mendez's idea. I never gave him any credit, or any money.",
+            "unlockAct": 0
+          },
+          {
+            "id": "nina-salts",
+            "text": "I borrowed a scoop of the nurse's Sleepy Salts tonight.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get found out. Point everyone at the cake or the Victory Cup.",
+          "Get your old science-fair notebook out of the time capsule before anyone reads it.",
+          "Keep Mike from finding out about the recipe."
+        ],
+        "knows": [
+          "The principal had three treats tonight: your Volcano Fizz, Crystal's cake and Rocky's Victory Cup of punch.",
+          "Chuck Chen was hanging about near the principal's office at half past nine."
+        ],
+        "alibi": "I gave the principal his Volcano Fizz at twenty to nine, and then I was at the science table showing everyone my baking-soda volcano all evening.",
+        "lines": {
+          "act1": [
+            "Volcano Fizz started right here, in Room 12, with a baking-soda volcano and a dream!"
+          ],
+          "act2": [
+            "Lab partners? Oh, everybody had lab partners. Mike was... a very good hand-holder. For the test tubes."
+          ],
+          "act3": [
+            "Look at the cake! Look at the punch! Look anywhere except... er, anywhere you like."
+          ]
+        }
+      }
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal Starr",
+      "pronouns": "she/her",
+      "title": "The Prom Queen",
+      "publicBio": "Prom Queen of 1986, and she's never taken the crown off. Crystal organised tonight's reunion down to the last balloon, and she baked the giant reunion cake herself: pink icing, blue stars, and '86' in silver sprinkles.",
+      "costumeTips": "A puffy prom dress (or anything with big shoulders), a tiara, big hair, and a sash that says 'Queen'.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.15,
+        "rate": 1.05,
+        "style": "bubbly, bossy, a little dramatic"
+      },
+      "required": true,
+      "private": {
+        "backstory": "In 1986 you counted the prom-queen votes yourself, and you added a few extra for you. Tonight Principal Plunkett told you he'd found the real ballots in the time capsule, and at ten o'clock he'd set the record straight. You were horrified. You still took him a slice of the reunion cake at quarter to nine, because the queen always serves the first slice. You did not hurt him. But you were very, very upset.",
+        "secrets": [
+          {
+            "id": "crystal-votes",
+            "text": "In 1986 I counted the prom-queen votes myself, and I added a few extra for me. The real ballots are in the time capsule.",
+            "unlockAct": 0
+          },
+          {
+            "id": "crystal-cake",
+            "text": "I didn't bake the reunion cake. I bought it at the supermarket and put new sprinkles on top.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your crown, and your secret.",
+          "Find out who made the principal sleep forever.",
+          "Make sure the reunion is still the best party anyone has ever been to."
+        ],
+        "knows": [
+          "You took the principal the first slice of cake at quarter to nine. A Volcano Fizz bottle was already on his desk, empty, and he was yawning.",
+          "At quarter to nine the championship trophy was still in the trophy case outside his office."
+        ],
+        "alibi": "After the cake I was in the gym running the reunion: balloons, name tags and the dance contest. Everyone saw me. Everyone always sees me.",
+        "lines": {
+          "act1": [
+            "Welcome, welcome, Class of '86! Doesn't everyone look... exactly the same? Mostly."
+          ],
+          "act2": [
+            "The prom vote was fair and square. Squarish. Fair-ish."
+          ],
+          "act3": [
+            "When I took the cake in, the fizz bottle was empty and he could hardly keep his eyes open."
+          ]
+        }
+      }
+    },
+    {
+      "id": "rocky",
+      "name": "Rocky Rhodes",
+      "pronouns": "he/him",
+      "title": "The Quarterback",
+      "publicBio": "Captain of the 1986 state-champion Maple Ridge Mustangs. Rocky still wears his letterman jacket, still tells the story of the winning touchdown, and every reunion he carries the principal's punch in the silver Victory Cup.",
+      "costumeTips": "A letterman jacket, a sports sweatband, a football under your arm, and a big grin.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 1.0,
+        "style": "loud, friendly, proud"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Before the 1986 championship game you peeked at the other team's playbook when it fell out of their coach's bag, and you never told anyone. Tonight Principal Plunkett said he'd found the other coach's letter about it in the time capsule, and at ten o'clock he'd set the record straight. At ten to nine you still brought him his punch in the Victory Cup, like every reunion, because a captain doesn't skip a tradition. You did not hurt him. But you were scared.",
+        "secrets": [
+          {
+            "id": "rocky-playbook",
+            "text": "Before the championship game I peeked at the other team's playbook. The trophy might not really be ours.",
+            "unlockAct": 0
+          },
+          {
+            "id": "rocky-knee",
+            "text": "My famous winning touchdown? I tripped over my own shoelace and fell into the end zone.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the championship trophy, and the truth about the playbook, safe.",
+          "Find out who made the principal sleep forever.",
+          "Lead the team one more time: get everyone working together."
+        ],
+        "knows": [
+          "You brought the Victory Cup of punch at ten to nine. The principal was already yawning; a fizz bottle and a plate of cake were on his desk.",
+          "Chuck Chen kept asking you where the trophy case key was kept."
+        ],
+        "alibi": "After the punch I was in the gym teaching everyone the Mustang Shuffle until ten. You can ask anyone with sore feet.",
+        "lines": {
+          "act1": [
+            "Mustangs! Mustangs! Who's got the ball? Rocky's got the ball!"
+          ],
+          "act2": [
+            "That playbook? Never saw it. It fell open. Near my eyes. For a second."
+          ],
+          "act3": [
+            "When I brought the punch he was yawning. Big yawns. Quarterback-sized yawns."
+          ]
+        }
+      }
+    },
+    {
+      "id": "penny",
+      "name": "Penny Plunkett",
+      "pronouns": "she/her",
+      "title": "The Principal's Granddaughter",
+      "publicBio": "Age twelve. Penny came to the reunion with her grandpa, the principal, and spent the evening helping the DJ pick songs. She notices everything, because grown-ups forget she's there.",
+      "costumeTips": "A scrunchie, a bright jumper or jacket, a notebook, and a pencil behind your ear.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.3,
+        "rate": 1.1,
+        "style": "bright, quick, curious"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Grandpa is your favourite person in the world. Every reunion he lets you help: you choose songs with the DJ, and at nine o'clock you pop into his office to say goodnight before your mum picks you up at half past ten. Tonight he was yawning so much he could hardly say goodnight back. You also know something nobody else does: Grandpa always takes a tiny bit of the nurse's Sleepy Salts himself before bed, so he told you where the key hangs, on Dotty's big ring in the kitchen. You'd never tell. But somebody found out.",
+        "secrets": [
+          {
+            "id": "penny-key",
+            "text": "I know the nurse's cabinet key hangs on Dotty's key ring in the kitchen, and I think somebody else found out.",
+            "unlockAct": 0
+          },
+          {
+            "id": "penny-songs",
+            "text": "I swapped the DJ's slow songs for dance songs when he wasn't looking. That's why the playlist went funny.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who hurt Grandpa.",
+          "Help the Class of '86 open the time capsule, like Grandpa wanted.",
+          "Keep the key's hiding place secret, unless telling helps catch the culprit."
+        ],
+        "knows": [
+          "At nine you said goodnight to Grandpa in his office. He was yawning like a hippo. 'Nina's Volcano Fizz tasted of peppermint tonight, Penny,' he said.",
+          "At ten past eight you saw Nina go into the kitchen, where Dotty keeps her big ring of keys."
+        ],
+        "alibi": "I was in the DJ booth with Mike all evening, except at nine when I said goodnight to Grandpa.",
+        "lines": {
+          "act1": [
+            "Grandpa says the Class of '86 was the noisiest class he ever had. He says it like it's a good thing."
+          ],
+          "act2": [
+            "Grown-ups say all sorts of things in front of kids. They think we're furniture."
+          ],
+          "act3": [
+            "Somebody knew where the key was. Somebody who went into the kitchen tonight."
+          ]
+        }
+      }
+    },
+    {
+      "id": "dotty",
+      "name": "Dotty Dumpling",
+      "pronouns": "she/her",
+      "title": "The Lunch Lady",
+      "publicBio": "Maple Ridge High's lunch lady for thirty years. Dotty made the Neon Prom Punch, knows every student's favourite pudding, and carries a key ring so big it jingles like sleigh bells.",
+      "costumeTips": "An apron, a hairnet, a ladle, and the biggest bunch of keys you can find.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 0.95,
+        "style": "warm, bossy, motherly"
+      },
+      "required": false,
+      "private": {
+        "backstory": "The principal told you last week he was closing the school kitchen and replacing it with vending machines. You were heartbroken, and you've been cross with him all week. Tonight you left your big key ring hanging on its hook in the kitchen while you washed punch cups, and when you picked it up again, the nurse's key was on the wrong side of the ring.",
+        "secrets": [
+          {
+            "id": "dotty-kitchen",
+            "text": "The principal was closing my kitchen for vending machines. I've been cross with him all week.",
+            "unlockAct": 0
+          },
+          {
+            "id": "dotty-pudding",
+            "text": "I've been sneaking the principal's granddaughter extra chocolate pudding all evening.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Save your kitchen, somehow.",
+          "Find out who touched your keys.",
+          "Keep everybody fed. Detectives can't think on an empty tummy."
+        ],
+        "knows": [
+          "The principal ate every bit of all three treats tonight: the fizz, the cake and the punch.",
+          "You were in the kitchen all evening, washing cups. Mike put his head in at nine for more punch."
+        ],
+        "alibi": "I was in the kitchen all evening, washing punch cups. My hands are still wrinkly.",
+        "lines": {
+          "act1": [
+            "Thirty years of school dinners, and not one student ever went hungry on my watch."
+          ],
+          "act2": [
+            "Vending machines! Can a vending machine remember your birthday? Can it make you a pudding?"
+          ],
+          "act3": [
+            "Somebody moved my keys tonight. I know every key on that ring, and one was on the wrong side."
+          ]
+        }
+      }
+    },
+    {
+      "id": "mike",
+      "name": "Mike Mendez",
+      "pronouns": "he/him",
+      "title": "The Band Geek",
+      "publicBio": "Marching-band drummer in 1986, now DJ Mixmaster Mike, spinning the greatest hits of the '80s tonight. He was Nina Newton's lab partner in science class, a long time ago.",
+      "costumeTips": "Big headphones, sunglasses, a band jacket, and a pair of drumsticks.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.1,
+        "style": "laid-back, funny, a bit hurt"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've always wondered whether Volcano Fizz tastes a lot like the soda you and Nina made in Room 12. You've never said anything. Tonight, at ten, you went to fetch the principal to open the time capsule, and you found him asleep forever in his chair.",
+        "secrets": [
+          {
+            "id": "mike-fizz",
+            "text": "I think Volcano Fizz is really the soda Nina and I made together in science class. She never said thank you.",
+            "unlockAct": 0
+          },
+          {
+            "id": "mike-drums",
+            "text": "I can't really DJ. I've been playing the same tape over and over and just waving my hands.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out whether Nina ever gave you any credit.",
+          "Keep the music playing; the Class of '86 needs a soundtrack.",
+          "Find out what happened to the principal."
+        ],
+        "knows": [
+          "At ten you found the principal in his chair. A Volcano Fizz bottle, a cake plate and the Victory Cup were on his desk, all empty. The trophy case outside was empty too.",
+          "Penny was with you in the DJ booth all evening, except at nine when she went to say goodnight."
+        ],
+        "alibi": "I was in the DJ booth all evening, except at nine when I popped into the kitchen for punch. Then at ten I went to fetch the principal.",
+        "lines": {
+          "act1": [
+            "I shook his shoulder to wake him for the time capsule. He looked peaceful. He'd gone to sleep for good."
+          ],
+          "act2": [
+            "Lab partners share everything. Well, one of us shares everything."
+          ],
+          "act3": [
+            "That fizz bottle on his desk was empty. Empty right down to the bottom."
+          ]
+        }
+      }
+    },
+    {
+      "id": "yolanda",
+      "name": "Yolanda 'Scoop' Yates",
+      "pronouns": "she/her",
+      "title": "The Yearbook Editor",
+      "publicBio": "Editor of the 1986 yearbook, now a newspaper reporter. Scoop never goes anywhere without her camera and her notebook, and she's writing tonight's reunion newsletter.",
+      "costumeTips": "Big glasses, a camera around your neck, a notebook and a pen, and a press card in your hat.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.2,
+        "style": "nosy, fast-talking, sharp"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've been wanting to write the big story about Principal Plunkett's retirement, and tonight he promised you an interview at quarter past nine. You also 'borrowed' his old 1986 yearbook from his shelf this afternoon to get quotes, and you haven't put it back.",
+        "secrets": [
+          {
+            "id": "yolanda-story",
+            "text": "I'm writing a big newspaper story about the principal. He promised me an interview tonight.",
+            "unlockAct": 0
+          },
+          {
+            "id": "yolanda-yearbook",
+            "text": "I took the principal's 1986 yearbook from his shelf this afternoon and haven't put it back.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the scoop of the century.",
+          "Return the yearbook before anyone notices.",
+          "Help solve the mystery. Reporters love a front page."
+        ],
+        "knows": [
+          "At quarter past nine you tried to interview the principal, but he was nodding off. 'That fizz of Nina's was too strong, Scoop,' he mumbled. 'Minty.'",
+          "At half past nine, on your way out, you saw Chuck Chen tiptoe away from the trophy case with something gold under his jacket."
+        ],
+        "alibi": "I was taking photos all over the gym all evening, except at quarter past nine when I went to interview the principal.",
+        "lines": {
+          "act1": [
+            "Say cheese, Class of '86! Say 'who dunnit'!"
+          ],
+          "act2": [
+            "A reporter never reveals her sources. Unless it's for a really good story."
+          ],
+          "act3": [
+            "At half past nine I saw Chuck Chen sneaking away from the trophy case with something gold."
+          ]
+        }
+      }
+    },
+    {
+      "id": "chuck",
+      "name": "Chuck 'Chuckles' Chen",
+      "pronouns": "he/him",
+      "title": "The Class Clown",
+      "publicBio": "Voted 'Most Likely to Get Detention' in 1986, and he did: forty-seven times. Chuck is now a children's entertainer, and he still can't walk past a whoopee cushion.",
+      "costumeTips": "A loud shirt, a bow tie that squirts (pretend), a rubber chicken, and a big grin.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.2,
+        "style": "silly, cheeky, warm-hearted"
+      },
+      "required": false,
+      "private": {
+        "backstory": "At half past nine you tiptoed to the trophy case and took the 1986 championship trophy, so you could hide it inside the time capsule as a joke before ten. You peeked into the principal's office on the way: he was fast asleep in his chair, very still. You thought he was just napping. The trophy is in your gym bag.",
+        "secrets": [
+          {
+            "id": "chuck-trophy",
+            "text": "At half past nine I took the championship trophy from the case, for a prank. It's in my gym bag.",
+            "unlockAct": 0
+          },
+          {
+            "id": "chuck-detention",
+            "text": "I kept every one of my forty-seven detention slips. I framed them.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the trophy back into the case before anyone blames you for something worse.",
+          "Decide when to admit you took it.",
+          "Find out what really happened to the principal."
+        ],
+        "knows": [
+          "At half past nine the principal was fast asleep in his chair, very still. You peeked in on your way to the trophy case.",
+          "There was an empty Volcano Fizz bottle on his desk, and the office smelled of peppermint."
+        ],
+        "alibi": "I was doing magic tricks for everyone in the gym, then at half past nine I went to the trophy case, then back to the gym.",
+        "lines": {
+          "act1": [
+            "Forty-seven detentions! That's a school record. I'd like to thank the principal, who made it possible."
+          ],
+          "act2": [
+            "The trophy? Missing? Goodness. Who would do such a thing? Ha. Ha."
+          ],
+          "act3": [
+            "All right, all right! I took the trophy, for a prank! But he was already asleep when I walked past. I thought he was just napping."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "three-treats",
+      "title": "The Principal's Plate",
+      "text": "Every reunion, the class's three stars bring Principal Plunkett a treat. Tonight: a bottle of Volcano Fizz from Nina Newton at twenty to nine, the first slice of cake from Crystal Starr at quarter to nine, and punch in the silver Victory Cup from Rocky Rhodes at ten to nine. All three were finished.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "nina",
+        "crystal",
+        "rocky"
+      ]
+    },
+    {
+      "id": "empty-case",
+      "title": "The Empty Trophy Case",
+      "text": "The trophy case outside the principal's office is empty. The 1986 state-championship trophy, the pride of Maple Ridge High, has vanished.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "chuck",
+        "rocky"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "headphones",
+      "title": "Headphones on the Floor",
+      "text": "A pair of big DJ headphones on the office floor, next to the principal's chair. They belong to Mike Mendez, who says he only came in at ten, to fetch the principal for the time capsule.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "mike"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "key-ring",
+      "title": "Dotty's Key Ring",
+      "text": "Your big key ring hung on its hook in the kitchen all evening. When you picked it up again, the key to the nurse's cabinet was on the wrong side of the ring. Only one person came into the kitchen before nine: Nina Newton, at ten past eight, asking for ice.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "nina"
+      ],
+      "recipient": "dotty"
+    },
+    {
+      "id": "fizz-bottle",
+      "title": "The Volcano Fizz Bottle",
+      "text": "On the principal's desk: an empty bottle of Volcano Fizz. Tip it up and a fine green grit slides down to the neck. It smells of peppermint, and Volcano Fizz is cherry flavour.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "nina"
+      ]
+    },
+    {
+      "id": "cake",
+      "title": "A Slice of Cake",
+      "text": "A cake plate on the desk with a few crumbs of pink icing. Crystal Starr served it, and everyone saw how upset she was with the principal at dinner.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "crystal"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "victory-cup",
+      "title": "The Victory Cup",
+      "text": "The silver Victory Cup, empty, with a ring of Neon Prom Punch at the bottom. Rocky Rhodes carried it in, and Rocky went very quiet at dinner.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "rocky"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "gym-bag",
+      "title": "In Your Gym Bag",
+      "text": "In your gym bag, under your rubber chicken: the 1986 state-championship trophy. You took it from the case at half past nine, for a prank. Engraved on the bottom, in the principal's neat writing: 'Check the time capsule. — P.P.'",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "chuck",
+        "rocky"
+      ],
+      "recipient": "chuck",
+      "redHerring": true
+    },
+    {
+      "id": "note-card",
+      "title": "The Principal's Note Card",
+      "text": "In the principal's jacket pocket: a note card for his ten o'clock speech. 'Open the time capsule. Then set three records straight: the science fair, the prom vote, and the big game.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "nina",
+        "crystal",
+        "rocky"
+      ]
+    },
+    {
+      "id": "planner",
+      "title": "The Principal's Planner",
+      "text": "The principal's planner has a little combination lock. He wrote a riddle on the cover, because he could never remember the combination.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "nina"
+      ],
+      "puzzle": {
+        "prompt": "I have a point but never argue, I live behind your ear in class, and I get shorter every time I work. What am I?",
+        "answers": [
+          "pencil",
+          "a pencil",
+          "the pencil",
+          "pencils"
+        ],
+        "hint": "Penny has one tucked behind her ear.",
+        "solvedText": "Tonight's entry: 'Told Nina I'd found her science-fair notebook in the capsule, with Mike's writing all over the recipe. She went as white as her lab coat and said, \"Maybe you should sleep on it, Principal. Sleep right through ten o'clock.\" Odd girl. She's bringing me a Volcano Fizz at twenty to nine.'"
+      }
+    },
+    {
+      "id": "hairnet",
+      "title": "A Hairnet on the Desk",
+      "text": "A lunch lady's hairnet, on the corner of the principal's desk. Dotty Dumpling has been cross with the principal all week, ever since he said he'd close her kitchen.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "dotty"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "goggles",
+      "title": "Green Dust on the Goggles",
+      "text": "Nina Newton's safety goggles, left on the science table: there's a smear of fine green grit on the strap, and it smells of peppermint. The same as the nurse's Sleepy Salts.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "nina"
+      ]
+    },
+    {
+      "id": "photo",
+      "title": "An Instant Photo",
+      "text": "An instant photo from Scoop's camera, taken at half past nine: the corridor outside the principal's office, and a blurry figure hurrying away from the trophy case in a loud shirt.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "chuck"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "spoon",
+      "title": "The Tiny Measuring Spoon",
+      "text": "On the floor of the nurse's office, under the open cabinet: a tiny silver measuring spoon, engraved 'N.N. — Science Fair Champion, 1986'. It's dusty with green grit that smells of peppermint.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "nina"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A school gym at night, full of balloons and streamers, a glitter ball turning above a dance floor, and a banner: WELCOME BACK, CLASS OF '86!",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The Maple Ridge High gym, twenty years after graduation. The Class of '86 is back: big hair, shoulder pads, and the same old rivalries."
+    },
+    {
+      "type": "narration",
+      "text": "At dinner, Principal Plunkett tapped his whistle and made an announcement. At ten o'clock, the class would open the time capsule they buried in 1986. 'And when we do,' he said, 'I shall set three records straight.'"
+    },
+    {
+      "type": "line",
+      "speaker": "penny",
+      "text": "Grandpa was smiling when he said it. But three people at the table stopped smiling."
+    },
+    {
+      "type": "narration",
+      "text": "After dinner, as every reunion, the class's three stars brought the principal a treat in his office: a Volcano Fizz from Nina Newton, the first slice of cake from Crystal Starr, and punch in the Victory Cup from Rocky Rhodes."
+    },
+    {
+      "type": "image",
+      "text": "The principal's office at night: a desk lamp, a big leather chair, a trophy case glowing in the corridor outside.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At ten o'clock, DJ Mike went to fetch him for the time capsule. The principal was in his chair, asleep. Fast asleep. Asleep forever. The doctor says someone gave him far too much of the nurse's Sleepy Salts, and his old heart simply stopped. And the championship trophy is gone from its case. The road is flooded. Nobody leaves until we know who crashed the reunion."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Principal's Office",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Principal's Office."
+        },
+        {
+          "type": "image",
+          "text": "The principal's desk: an empty fizz bottle, a cake plate with crumbs, and a silver cup.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The principal had three treats tonight, from three different people. Somebody put the nurse's Sleepy Salts in one of them. Which treat, and whose?"
+        },
+        {
+          "type": "line",
+          "speaker": "mike",
+          "text": "I went to fetch him for the time capsule. He was smiling. Like he was dreaming about the good old days."
+        }
+      ],
+      "prompts": [
+        "Who brought the principal a treat, and when?",
+        "What were the 'three records' he wanted to set straight?",
+        "Where is the championship trophy?",
+        "Who could get into the nurse's cabinet?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: The Corridor",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. The Corridor."
+        },
+        {
+          "type": "image",
+          "text": "A school corridor at night: lockers, a trophy case, and the kitchen door ajar, a big ring of keys on a hook.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Everybody from the Class of '86 has a secret or two. But having a secret isn't the same as being a culprit. The principal's planner has a riddle on the cover, and someone in this room is hiding the trophy."
+        },
+        {
+          "type": "line",
+          "speaker": "penny",
+          "text": "Grown-ups forget that kids have ears."
+        }
+      ],
+      "prompts": [
+        "Open the principal's planner. Can you solve the riddle?",
+        "Who knew where the nurse's key was kept?",
+        "Who has the trophy, and why?",
+        "Share a secret if it helps clear your name."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Time Capsule",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Time Capsule."
+        },
+        {
+          "type": "image",
+          "text": "A dented metal time capsule on the gym floor, under the glitter ball, still locked.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The rain is stopping, and the road will soon be clear. Before anyone goes home, the Class of '86 owes their principal the truth."
+        },
+        {
+          "type": "line",
+          "speaker": "yolanda",
+          "text": "Every good story has a last paragraph. Let's write this one."
+        }
+      ],
+      "prompts": [
+        "Which treat had the Sleepy Salts in it?",
+        "What was left behind at the scene, or in the nurse's office?",
+        "Who had the best reason to want the principal asleep at ten o'clock?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "credit",
+        "text": "To keep the credit for an invention that wasn't all theirs"
+      },
+      {
+        "id": "crown",
+        "text": "To keep a prom crown won unfairly"
+      },
+      {
+        "id": "trophy",
+        "text": "To keep a championship won unfairly"
+      },
+      {
+        "id": "kitchen",
+        "text": "To stop the school kitchen closing"
+      },
+      {
+        "id": "detention",
+        "text": "Payback for years of detention"
+      }
+    ],
+    "methods": [
+      {
+        "id": "fizz",
+        "text": "Sleepy Salts stirred into the Volcano Fizz"
+      },
+      {
+        "id": "cake",
+        "text": "Sleepy Salts mixed into the cake icing"
+      },
+      {
+        "id": "punch",
+        "text": "Sleepy Salts stirred into the Victory Cup of punch"
+      },
+      {
+        "id": "pudding",
+        "text": "Sleepy Salts hidden in a chocolate pudding"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "nina",
+    "motiveId": "credit",
+    "methodId": "fizz",
+    "explanation": [
+      "The principal didn't fall asleep forever by accident. Somebody wanted him asleep at ten o'clock, so he couldn't open the time capsule and set the record straight. That somebody was Dr. Nina Newton.",
+      "Volcano Fizz made Nina famous, but half the recipe was her lab partner Mike's. The principal found her old science-fair notebook in the time capsule, with Mike's writing all over it. Nina said, 'Maybe you should sleep on it, Principal. Sleep right through ten o'clock.' It's written in his planner.",
+      "At ten past eight Nina went into the kitchen asking for ice, and borrowed the nurse's key from Dotty's key ring. With the tiny measuring spoon from her pocket kit she took a scoop of Sleepy Salts, and stirred it into the bottle of Volcano Fizz she gave him at twenty to nine.",
+      "By quarter to nine he was yawning. By nine he told Penny the fizz 'tasted of peppermint'. His old heart couldn't take so much. Nina only meant him to nap until morning, but it was a very dangerous thing to do, and she left a trail: green grit in the bottle, on her goggles, and on her engraved spoon in the nurse's office.",
+      "Chuck took the trophy, but only for a prank. The cake and the punch were perfectly innocent. A good scientist always cleans up after an experiment, and Nina didn't."
+    ],
+    "timeline": [
+      {
+        "time": "7:00",
+        "event": "At dinner, the principal promises to 'set three records straight' when the time capsule is opened at ten."
+      },
+      {
+        "time": "7:30",
+        "event": "He tells Nina about her notebook. Nina: 'Maybe you should sleep on it, Principal.'"
+      },
+      {
+        "time": "8:10",
+        "event": "Nina goes into the kitchen asking for ice, and borrows the nurse's key from Dotty's ring."
+      },
+      {
+        "time": "8:20",
+        "event": "Nina takes a scoop of Sleepy Salts from the nurse's cabinet, dropping her little spoon."
+      },
+      {
+        "time": "8:40",
+        "event": "Nina gives the principal a bottle of Volcano Fizz."
+      },
+      {
+        "time": "8:45",
+        "event": "Crystal brings the first slice of cake. The fizz bottle is already empty."
+      },
+      {
+        "time": "8:50",
+        "event": "Rocky brings the Victory Cup of punch. The principal is yawning."
+      },
+      {
+        "time": "9:00",
+        "event": "Penny says goodnight. Grandpa: 'Nina's Volcano Fizz tasted of peppermint tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Scoop tries to interview him. He's nodding off."
+      },
+      {
+        "time": "9:30",
+        "event": "Chuck takes the trophy from the case for a prank. Scoop sees him."
+      },
+      {
+        "time": "10:00",
+        "event": "Mike goes to fetch the principal for the time capsule and finds him asleep forever."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "The gym at dawn: balloons drifting on the floor, and a police car splashing through the last puddles in the car park.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Officer Friendly arrived as the sun came up. Dr. Nina Newton met him at the gym doors with her goggles in her hands. 'I only wanted to keep my secret in the capsule,' she said. 'I never meant for him not to wake up.'"
+    },
+    {
+      "type": "narration",
+      "text": "Then the Class of '86 opened the time capsule together, the way the principal wanted. Mike got his name on the recipe at last, Chuck put the trophy back where it belonged, and Penny read out Grandpa's last line on the note card: 'The truth is always the best prize.' Goodnight, detectives."
+    }
+  ]
+}

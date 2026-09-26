@@ -1,0 +1,208 @@
+{
+  "variantOf": "who-crashed-the-reunion",
+  "variant": "B",
+  "solution": {
+    "murdererId": "crystal",
+    "motiveId": "crown",
+    "methodId": "cake",
+    "explanation": [
+      "The fizz was only fizz, and the punch was only punch. The Sleepy Salts were in the first slice of the reunion cake, served by the Prom Queen herself, Crystal Starr.",
+      "In 1986 Crystal counted the prom-queen votes herself, and added a few extra for her. The principal found the real ballots in the time capsule, and Crystal told him, 'Maybe you should sleep on it, Principal. Sleep right through ten o'clock.' It's written in his planner.",
+      "At ten past eight Crystal went into the kitchen for the cake knife, and borrowed the nurse's key from Dotty's key ring. With her silver cake server she scooped some Sleepy Salts into her jar of '86 sprinkles, and at quarter to nine she gave the principal a specially sprinkled first slice.",
+      "Crystal only meant him to nap through the time capsule, so the old ballots would stay a secret. But his heart couldn't take so much. The peppermint gave her away: green grit in her sprinkle jar, and on her engraved cake server in the nurse's office.",
+      "Chuck took the trophy, but only for a prank. The fizz and the punch were perfectly innocent. A queen should win fair and square."
+    ],
+    "timeline": [
+      {
+        "time": "7:00",
+        "event": "At dinner, the principal promises to 'set three records straight' when the time capsule is opened at ten."
+      },
+      {
+        "time": "7:30",
+        "event": "He tells Crystal about the old ballots. Crystal: 'Maybe you should sleep on it, Principal.'"
+      },
+      {
+        "time": "8:10",
+        "event": "Crystal goes into the kitchen for the cake knife, and borrows the nurse's key from Dotty's ring."
+      },
+      {
+        "time": "8:20",
+        "event": "Crystal takes Sleepy Salts from the nurse's cabinet and mixes them into her jar of sprinkles. She drops her cake server."
+      },
+      {
+        "time": "8:40",
+        "event": "Nina gives the principal a bottle of Volcano Fizz. He's wide awake."
+      },
+      {
+        "time": "8:45",
+        "event": "Crystal brings him the first slice of cake, with extra sprinkles."
+      },
+      {
+        "time": "8:50",
+        "event": "Rocky brings the Victory Cup of punch. The principal is yawning."
+      },
+      {
+        "time": "9:00",
+        "event": "Penny says goodnight. Grandpa: 'Crystal's cake tasted of peppermint tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Scoop tries to interview him. He's nodding off."
+      },
+      {
+        "time": "9:30",
+        "event": "Chuck takes the trophy from the case for a prank. Scoop sees him."
+      },
+      {
+        "time": "10:00",
+        "event": "Mike finds the principal asleep forever."
+      }
+    ]
+  },
+  "characters": {
+    "crystal": {
+      "private": {
+        "backstory": "YOU DID IT. In 1986 you counted the prom-queen votes yourself, and added a few extra for you. Tonight Principal Plunkett told you he'd found the real ballots in the time capsule, and at ten he'd set the record straight. You told him, 'Maybe you should sleep on it, Principal.' At ten past eight you went into the kitchen for the cake knife and borrowed the nurse's key from Dotty's key ring. You scooped some Sleepy Salts into your jar of '86 sprinkles with your silver cake server, and at quarter to nine you gave him a specially sprinkled first slice. You only meant him to nap through the time capsule. You didn't know how weak his heart was. Now nobody must find out.",
+        "objectives": [
+          "Don't get found out. Point everyone at the Volcano Fizz, or at Rocky's Victory Cup.",
+          "Get rid of your jar of sprinkles.",
+          "Keep your crown, and your secret."
+        ],
+        "knows": [
+          "The nurse's Sleepy Salts are a fine green grit that smells of peppermint. A thick layer of sprinkles hides it.",
+          "Nina Newton looked very worried at dinner. So did Rocky."
+        ],
+        "lines": {
+          "act3": [
+            "My cake? Half the gym had my cake! Is everybody in this gym asleep forever? No!"
+          ]
+        }
+      }
+    },
+    "nina": {
+      "private": {
+        "backstory": "Volcano Fizz began as your 1986 science-fair project, and it made you rich. But your lab partner, Mike Mendez, worked out half the recipe, and you never told a soul. Tonight Principal Plunkett told you he'd found your old science-fair notebook in the time capsule, and at ten he'd set the record straight. You were upset, but you still gave him his Volcano Fizz at twenty to nine, as every reunion. It was ordinary cherry fizz. You did not hurt him. But you have a secret, and people are bound to wonder.",
+        "secrets": [
+          {
+            "id": "nina-recipe",
+            "text": "Half the Volcano Fizz recipe was really Mike Mendez's idea. I never gave him any credit, or any money.",
+            "unlockAct": 0
+          },
+          {
+            "id": "nina-salts",
+            "text": "I carry a tiny measuring spoon everywhere, for experiments. I lost it tonight somewhere in the school.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Clear your name. A scientist's secret is not the same as a culprit's.",
+          "Get your old science-fair notebook out of the time capsule before anyone reads it.",
+          "Find out who really did this."
+        ],
+        "knows": [
+          "The principal had three treats tonight: your Volcano Fizz, Crystal's cake and Rocky's Victory Cup of punch.",
+          "At twenty to nine the principal was wide awake and cheerful. He drank half the fizz in one go and said, 'Still cherry! Good girl.'"
+        ],
+        "lines": {
+          "act3": [
+            "My fizz is cherry. Always cherry. Whatever made him sleepy, it wasn't in my bottle."
+          ]
+        }
+      }
+    },
+    "dotty": {
+      "private": {
+        "knows": [
+          "The principal ate every bit of all three treats tonight: the fizz, the cake and the punch.",
+          "At ten past eight Crystal Starr came into the kitchen for the cake knife, right next to your key ring. Nobody else came in before nine."
+        ]
+      }
+    },
+    "penny": {
+      "private": {
+        "knows": [
+          "At nine you said goodnight to Grandpa in his office. He was yawning like a hippo. 'Crystal's cake tasted of peppermint tonight, Penny,' he said.",
+          "At ten past eight you saw Crystal go into the kitchen, where Dotty keeps her big ring of keys."
+        ]
+      }
+    },
+    "yolanda": {
+      "private": {
+        "knows": [
+          "At quarter past nine you tried to interview the principal, but he was nodding off. 'Too many sprinkles on that cake, Scoop,' he mumbled. 'Minty.'",
+          "At half past nine, on your way out, you saw Chuck Chen tiptoe away from the trophy case with something gold under his jacket."
+        ]
+      }
+    },
+    "chuck": {
+      "private": {
+        "knows": [
+          "At half past nine the principal was fast asleep in his chair, very still. You peeked in on your way to the trophy case.",
+          "There was a cake plate on his desk with a few silver sprinkles left, and the office smelled of peppermint."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "fizz-bottle": {
+      "text": "On the principal's desk: an empty bottle of Volcano Fizz. A sticky red ring of cherry fizz at the bottom, and nothing else. Nina Newton gave it to him, and Nina looked very worried at dinner.",
+      "redHerring": true
+    },
+    "goggles": null,
+    "key-ring": {
+      "text": "Your big key ring hung on its hook in the kitchen all evening. When you picked it up again, the key to the nurse's cabinet was on the wrong side of the ring. Only one person came into the kitchen before nine: Crystal Starr, at ten past eight, for the cake knife.",
+      "pointsTo": [
+        "crystal"
+      ]
+    },
+    "cake": {
+      "text": "A cake plate on the desk with a few crumbs of pink icing and a scatter of silver '86 sprinkles. Some of the sprinkles are gritty and green, and they smell of peppermint. Crystal Starr served this slice herself.",
+      "redHerring": false,
+      "pointsTo": [
+        "crystal"
+      ]
+    },
+    "spoon": {
+      "title": "A Silver Cake Server",
+      "text": "On the floor of the nurse's office, under the open cabinet: a silver cake server, engraved 'Queen Crystal, Prom 1986'. It's dusty with green grit that smells of peppermint.",
+      "pointsTo": [
+        "crystal"
+      ]
+    },
+    "planner": {
+      "pointsTo": [
+        "crystal"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Told Crystal I'd found the real prom ballots in the capsule. She went as pink as her icing and said, \"Maybe you should sleep on it, Principal. Sleep right through ten o'clock.\" She's bringing me the first slice of cake at quarter to nine.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "sprinkle-jar",
+      "title": "The Sprinkle Jar",
+      "text": "In Crystal's reunion party box: a jar of silver '86 sprinkles. Mixed in among them is a fine green grit that smells of peppermint. The rest of the cake had plain sprinkles.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "crystal"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "The gym at dawn: balloons drifting on the floor, and a police car splashing through the last puddles in the car park.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Officer Friendly arrived as the sun came up. Crystal Starr met him at the gym doors, and for the first time in twenty years, she took off her tiara. 'I only wanted to stay queen,' she said. 'I never meant for him not to wake up.'"
+    },
+    {
+      "type": "narration",
+      "text": "Then the Class of '86 opened the time capsule together, the way the principal wanted. The real prom ballots were counted at last, Chuck put the trophy back where it belonged, and Penny read out Grandpa's last line on the note card: 'The truth is always the best prize.' Goodnight, detectives."
+    }
+  ]
+}

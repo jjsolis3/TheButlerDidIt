@@ -1,0 +1,884 @@
+{
+  "id": "death-at-the-gin-joint",
+  "themeSlug": "speakeasy",
+  "title": "Death at the Gin Joint",
+  "synopsis": "Chicago, February 1927. Behind the false wall of a South Side barber shop, the Blue Parrot swings till dawn. Tonight its owner, 'Lucky' Lou Moretti, announced he's selling up to Sal Benedetto and leaving town on Sunday, but not before he settles every account: the singer's contract, the heiress's debts, the bookkeeper's audit and the cop's payoffs. At one o'clock Lou is found dead in his back office. A blizzard has buried the streets. Nobody leaves until the killer is found.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "The Blue Parrot, a speakeasy behind Moretti's Barber Shop on the South Side of Chicago",
+    "era": "February 1927, the height of Prohibition",
+    "description": "Knock three times and whisper 'bluebird'. Behind the barber shop: a long mahogany bar, a bandstand and a piano facing the corridor, a dance floor, and at the end of the corridor, Lou's back office with its black safe. Stairs lead down to a cellar full of barrels and the singer's gown trunks. A blizzard has buried the streets; no cab or patrol car can move until dawn."
+  },
+  "victim": {
+    "name": "'Lucky' Lou Moretti",
+    "description": "Fifty-two. Owner of the Blue Parrot, with a diamond pinkie ring, a bad heart and a long memory. He kept everybody's secrets in his safe, and tonight he meant to cash them all in."
+  },
+  "characters": [
+    {
+      "id": "vera",
+      "name": "Vera Velvet",
+      "pronouns": "she/her",
+      "title": "The Torch Singer",
+      "publicBio": "The voice of the Blue Parrot: a satin gown, a gardenia in her hair and a song that makes grown men cry into their gin. After her midnight set she always carries Lou his Velvet Fizz, and she always wears Scarlet Kiss lipstick.",
+      "costumeTips": "A slinky evening gown, long gloves, a flower in your hair, and the reddest lipstick you own.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 0.9,
+        "style": "smoky, slow, dangerous"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Lou Moretti owns your contract for five more years, and he owns you with it. Tonight a telegram came from Paramount: a screen test in Hollywood, if Lou releases you. Lou tore it in half in front of you and said you're part of the furniture Sal Benedetto is buying on Sunday. So at five to midnight, carrying the Velvet Fizz Frankie had mixed for Lou, you ducked into the cellar, where you keep your gowns, and tipped a paper twist of strychnine from the rat-poison tin into it. You'd folded the twist hours ago and hidden it in your compact. You served it at midnight with a smile, went back to the piano to sit with Ike, and waited.",
+        "secrets": [
+          {
+            "id": "vera-contract",
+            "text": "Lou owns my contract for five more years. Tonight he tore up my Hollywood screen test.",
+            "unlockAct": 0
+          },
+          {
+            "id": "vera-ike",
+            "text": "Ike and I are in love. We were going to run away to California together, contract or no contract.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Point everyone at Sal (he threatened Lou) or at Pike and those heart drops.",
+          "Nobody must look inside your compact, or in the cellar.",
+          "Get to Hollywood, one way or another."
+        ],
+        "knows": [
+          "Lou takes his heart drops every night at half past twelve. Pike measures them out for him.",
+          "Sal Benedetto told Lou at the bar tonight: 'Raise the price again and I'll raise you six feet.'"
+        ],
+        "alibi": "At midnight I took Lou his Velvet Fizz, like every night, and then I sat at the piano with Ike until one. Ask the whole room.",
+        "lines": {
+          "act1": [
+            "I sing about broken hearts every night, darling. Tonight somebody finally had one."
+          ],
+          "act2": [
+            "The fizz? Frankie mixes it, I carry it. Anybody could have touched that glass between the bar and the office."
+          ],
+          "act3": [
+            "Lou had a lot of enemies. Most of them are in this room. Some of them have better reasons than me."
+          ]
+        }
+      }
+    },
+    {
+      "id": "oreilly",
+      "name": "Sergeant Mick O'Reilly",
+      "pronouns": "he/him",
+      "title": "The Crooked Cop",
+      "publicBio": "Twenty years on the force, and he's never once raided the Blue Parrot. Sergeant O'Reilly comes by every Friday 'to keep the peace', and leaves with an envelope. Tonight he's out of uniform, except for the nightstick.",
+      "costumeTips": "A police cap or flat cap, a long coat, a badge, and a nightstick (a rolled-up newspaper works).",
+      "voice": {
+        "accent": "en-IE",
+        "pitch": 0.8,
+        "rate": 0.95,
+        "style": "gruff, charming, shifty"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Lou Moretti has paid you two hundred dollars every Friday for six years, and he wrote every payment in a little black payoff ledger. Tonight, at the bar, Lou told you he's leaving Chicago on Sunday, and the ledger goes to the new District Attorney as his insurance policy. You went to his office at twenty past twelve to collect your envelope and change his mind. Lou was sweating buckets and could barely count out the cash. You left angry, and you did not touch him.",
+        "secrets": [
+          {
+            "id": "oreilly-payoffs",
+            "text": "Lou paid me two hundred dollars every Friday for six years, and wrote it all down in his payoff ledger.",
+            "unlockAct": 0
+          },
+          {
+            "id": "oreilly-brother",
+            "text": "My kid brother runs Sal Benedetto's delivery trucks. If the ledger comes out, he goes down with me.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find Lou's payoff ledger before anyone else does, and make it disappear.",
+          "Keep the investigation pointed away from the police, and from you.",
+          "Find out who killed Lou, so it's somebody else's problem."
+        ],
+        "knows": [
+          "At twenty past twelve Lou was sweating buckets, his jaw clenched tight. He could barely count out your envelope, and his Velvet Fizz was half gone.",
+          "Vera Velvet was hanging about the corridor after her set, watching the office door."
+        ],
+        "alibi": "At twenty past twelve I stopped by Lou's office, strictly social. Then I stood by the door keeping an eye on the street until one.",
+        "lines": {
+          "act1": [
+            "I'm not here as a policeman tonight. I'm here as a concerned citizen with a nightstick."
+          ],
+          "act2": [
+            "Payoffs? In Chicago? I'm shocked. Shocked, I tell you."
+          ],
+          "act3": [
+            "I've seen a hundred dead men. You want to know how Lou died? Ask who was holding the glass."
+          ]
+        }
+      }
+    },
+    {
+      "id": "pike",
+      "name": "Leonard 'Pennies' Pike",
+      "pronouns": "he/him",
+      "title": "The Bookkeeper",
+      "publicBio": "The Blue Parrot's bookkeeper: spectacles, sleeve garters and a pencil behind each ear. Pike counts every nickel that comes over the bar, and every night at half past twelve he brings Lou the takings and measures out his heart drops.",
+      "costumeTips": "Spectacles, a waistcoat with sleeve garters, a green visor if you have one, and a ledger under your arm.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.15,
+        "style": "precise, nervous, polite"
+      },
+      "required": true,
+      "private": {
+        "backstory": "For two years you've been skimming from the Blue Parrot, ten dollars here, twenty there: ten thousand dollars in all, for your sick mother's sanatorium. Tonight Lou told you Sal Benedetto's accountants will audit the books on Monday. At half past twelve you took Lou the takings and measured out his heart drops, the usual ten. Lou was shaking so hard he couldn't hold the pen. You did not kill him. But Monday's audit will make you look like a man with a reason.",
+        "secrets": [
+          {
+            "id": "pike-skim",
+            "text": "I've taken ten thousand dollars from the Blue Parrot over two years. The audit is on Monday.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pike-mother",
+            "text": "Every dollar went to my mother's sanatorium in Denver. I'd do it again.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the audit from finding the missing ten thousand.",
+          "Find out who killed Lou before somebody decides it was you.",
+          "Protect your mother, whatever happens."
+        ],
+        "knows": [
+          "At half past twelve Lou was shaking so hard you measured his heart drops for him, the usual ten. He said, 'That fizz of Vera's turned my stomach.'",
+          "Lou's drops were the same bottle as always, from Doc Halloran. You keep it in the safe drawer."
+        ],
+        "alibi": "At half past twelve I took Lou the takings and his drops, like every night, then I was at the counting table in the back until one.",
+        "lines": {
+          "act1": [
+            "Every nickel in this joint passes through my hands. Every one. Well. Most of them."
+          ],
+          "act2": [
+            "The drops were the same as always. Ten drops, in water. I've done it a thousand times."
+          ],
+          "act3": [
+            "Numbers don't lie, friends. People lie. Numbers just sit there waiting to be found out."
+          ]
+        }
+      }
+    },
+    {
+      "id": "sal",
+      "name": "Sal Benedetto",
+      "pronouns": "he/him",
+      "title": "The Rival Bootlegger",
+      "publicBio": "Sal runs gin from Canada and beer from Cicero, and he's been trying to buy the Blue Parrot for a year. Tonight he finally shook Lou's hand on it. Then Lou raised the price.",
+      "costumeTips": "A pinstripe suit, a fedora, a flower in your lapel, and an unlit cigar.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "smooth, menacing, amused"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You shook on a deal for the Blue Parrot tonight, and then Lou raised the price by five thousand dollars. You told him at the bar, 'Raise the price again and I'll raise you six feet.' Everybody heard. At ten past twelve you went into his office to settle it and you shouted. Lou was sipping his Velvet Fizz and pulling a face at it. You walked out without a deal, and without killing anybody.",
+        "secrets": [
+          {
+            "id": "sal-threat",
+            "text": "I threatened Lou in front of the whole bar tonight. It was a figure of speech. Mostly.",
+            "unlockAct": 0
+          },
+          {
+            "id": "sal-frankie",
+            "text": "Frankie the bartender has been selling me Lou's best gin out the back door for a year.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the Blue Parrot, at your price, now that Lou's gone.",
+          "Keep your deal with Frankie quiet.",
+          "Find the killer. It's bad for business when people think you did it."
+        ],
+        "knows": [
+          "At ten past twelve Lou was sipping Vera's Velvet Fizz and pulling a face: 'Tastes like a penny tonight.'",
+          "When you came out of the office, Sergeant O'Reilly was waiting outside, checking his watch."
+        ],
+        "alibi": "I had a word with Lou at ten past twelve, a loud word, then I was at my table with my bourbon until one.",
+        "lines": {
+          "act1": [
+            "I'm a businessman. I buy things. Clubs, trucks, policemen. Legitimately."
+          ],
+          "act2": [
+            "Six feet? It's an expression. Where I come from, it means 'let's negotiate'."
+          ],
+          "act3": [
+            "If I wanted Lou dead, you'd never have found him. That's all I'll say."
+          ]
+        }
+      }
+    },
+    {
+      "id": "frankie",
+      "name": "Frankie Flynn",
+      "pronouns": "he/him",
+      "title": "The Bartender",
+      "publicBio": "Frankie has poured every drink at the Blue Parrot since the day it opened: fast hands, a clean towel, and a memory for every face. He mixes Vera's famous Velvet Fizz for Lou every night at five to midnight.",
+      "costumeTips": "A white shirt with rolled sleeves, a waistcoat, a bow tie, and a bar towel over your shoulder.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.1,
+        "style": "quick, wry, watchful"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've been watering Lou's best gin and selling the good stuff out the back door to Sal Benedetto for a year. At five to midnight you mixed the Velvet Fizz, as always, and set it on the bar for Vera to carry in. At one o'clock you went to tell Lou the bar was out of ice, found the office door unlocked, and found Lou on the floor by the safe.",
+        "secrets": [
+          {
+            "id": "frankie-water",
+            "text": "I've been watering Lou's gin and selling the real stuff to Sal Benedetto out the back.",
+            "unlockAct": 0
+          },
+          {
+            "id": "frankie-ice",
+            "text": "There was plenty of ice at one o'clock. I just wanted an excuse to ask Lou for my wages.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your side business with Sal quiet.",
+          "Prove the Velvet Fizz left your bar clean.",
+          "Find out who killed Lou."
+        ],
+        "knows": [
+          "At five to midnight you mixed Vera's Velvet Fizz, gin, lemon, sugar, egg white and soda, and set it on the bar. Vera picked it up.",
+          "At one o'clock the office door was unlocked. Lou never leaves it unlocked."
+        ],
+        "alibi": "Behind the bar all night, except at one when I went to tell Lou we were out of ice.",
+        "lines": {
+          "act1": [
+            "I pour, I listen, I forget. That's the job."
+          ],
+          "act2": [
+            "The fizz was perfect when it left my bar. Gin, lemon, sugar, egg white, soda. Same as every night."
+          ],
+          "act3": [
+            "In this business you learn which door stays locked. Lou's always did. Until tonight."
+          ]
+        }
+      }
+    },
+    {
+      "id": "daisy",
+      "name": "Daisy Van Doren",
+      "pronouns": "she/her",
+      "title": "The Flapper Heiress",
+      "publicBio": "The daughter of a Lake Shore Drive railroad fortune, Daisy dances the Charleston all night and plays cards with anyone who'll let her. She loses more than she wins, and she's lost a great deal to Lou.",
+      "costumeTips": "A fringed flapper dress, a beaded headband with a feather, long pearls, and a cigarette holder.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.2,
+        "rate": 1.2,
+        "style": "breathless, reckless, bright"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You owe Lou five thousand dollars in gambling markers, and tonight he told you he'd send them to your father on Sunday before he leaves town. Daddy would cut you off without a cent. At twenty to twelve you went into the office to beg; Lou laughed, and you lost an earring on his carpet.",
+        "secrets": [
+          {
+            "id": "daisy-markers",
+            "text": "I owe Lou five thousand dollars in gambling markers. He was going to send them to my father.",
+            "unlockAct": 0
+          },
+          {
+            "id": "daisy-engaged",
+            "text": "I'm secretly engaged to Ike, the piano man. At least, I thought I was.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get your gambling markers back before anyone finds them.",
+          "Keep Daddy from ever hearing about tonight.",
+          "Have the best time anyone ever had at a murder."
+        ],
+        "knows": [
+          "At twenty to twelve Lou was in fine form, laughing at you. He hadn't had his fizz yet.",
+          "At five to midnight, powdering your nose, you saw Vera come out of the cellar door in a hurry, with the Velvet Fizz in her hand."
+        ],
+        "alibi": "Dancing the Charleston all night, except at twenty to twelve, when I had a word with Lou.",
+        "lines": {
+          "act1": [
+            "Darling, I don't gamble. I just lose money in an exciting way."
+          ],
+          "act2": [
+            "Markers? What markers? Oh, those markers. Aren't they awfully dull?"
+          ],
+          "act3": [
+            "I saw Vera come out of the cellar with Lou's drink. Now why would anyone take a drink to the cellar?"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ike",
+      "name": "'Ivory' Ike Jefferson",
+      "pronouns": "he/him",
+      "title": "The Piano Man",
+      "publicBio": "The best piano player on the South Side. Ike plays from ten till four without a break, and his piano faces the corridor to Lou's office, so he sees everyone who goes in and out.",
+      "costumeTips": "A sharp suit or waistcoat, a loose bow tie, suspenders, and a hat tipped back on your head.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.9,
+        "rate": 0.95,
+        "style": "easy, musical, careful"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You and Vera are in love, and Lou knew it. Tonight he told you that if you ever tried to take Vera out of Chicago you'd never play piano again. From the piano you watched every visitor go into Lou's office tonight, and you've been trying very hard not to think about what you saw at five to midnight.",
+        "secrets": [
+          {
+            "id": "ike-vera",
+            "text": "Vera and I are in love. Lou threatened to break my hands if I ever took her away.",
+            "unlockAct": 0
+          },
+          {
+            "id": "ike-daisy",
+            "text": "Daisy Van Doren thinks I'm engaged to her. I never said so. Exactly.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Protect Vera, if you can, for as long as you can.",
+          "Tell the truth about what you saw, if the truth is needed.",
+          "Keep playing. The Blue Parrot never stops."
+        ],
+        "knows": [
+          "From the piano you saw every office visitor: Daisy at 11:40, Vera at midnight, Sal at 12:10, O'Reilly at 12:20, Pike at 12:30, and the cigarette girl, Grace, at ten to one.",
+          "Vera sat beside you on the piano bench from quarter past twelve until one."
+        ],
+        "alibi": "At the piano all night, from ten o'clock on. Ask anyone who danced.",
+        "lines": {
+          "act1": [
+            "A piano man sees everything and says nothing. That's how he keeps his fingers."
+          ],
+          "act2": [
+            "Lou told me what he'd do if I ever took Vera away. He told me with a smile."
+          ],
+          "act3": [
+            "I saw what I saw. I just wish I hadn't seen it."
+          ]
+        }
+      }
+    },
+    {
+      "id": "grace",
+      "name": "Grace Hale",
+      "pronouns": "she/her",
+      "title": "The Cigarette Girl",
+      "publicBio": "Grace sells cigarettes, cigars and peppermints from a tray, table to table. She's only been at the Blue Parrot three weeks, and she already knows everybody's business.",
+      "costumeTips": "A short dress or skirt with a pillbox hat, and a tray (a box with a ribbon) of cigarettes and candy.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.15,
+        "rate": 1.1,
+        "style": "sweet, sharp, observant"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You're not a cigarette girl. You're Agent Grace Hale of the Prohibition Bureau, undercover, and you're here for Lou's payoff ledger: the proof of every crooked cop and judge on his payroll. At ten to one you picked the lock of Lou's office. Lou was dead on the floor by the safe. You found the ledger in the false bottom of his desk drawer, took it, and left the door unlocked behind you. You haven't told anyone.",
+        "secrets": [
+          {
+            "id": "grace-agent",
+            "text": "I'm an undercover Prohibition agent. My tray has a false bottom and a badge in it.",
+            "unlockAct": 0
+          },
+          {
+            "id": "grace-ledger",
+            "text": "At ten to one I picked Lou's lock and took his payoff ledger from the desk. He was already dead.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your cover, and the ledger, safe until dawn.",
+          "Find out who killed Lou: a murder charge would crack this whole city open.",
+          "Find out which cop in this room is on the payroll."
+        ],
+        "knows": [
+          "At ten to one Lou was dead on the floor by the safe. His face was twisted and his jaw locked tight, and the Velvet Fizz glass had rolled under the desk.",
+          "O'Reilly kept checking his watch all night, and he didn't take his eyes off the office door."
+        ],
+        "alibi": "I was selling cigarettes table to table all night. Cigarettes, cigars, peppermints!",
+        "lines": {
+          "act1": [
+            "Cigarettes, cigars, peppermints! And information, if the price is right."
+          ],
+          "act2": [
+            "Three weeks I've been here, and I already know who owes who. It's a gift."
+          ],
+          "act3": [
+            "A dead man's desk tells you everything, if you know which drawer to open."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "visitors",
+      "title": "Lou's Last Hour",
+      "text": "Half the club watched the office door tonight. At midnight Vera Velvet took Lou his Velvet Fizz. At ten past twelve Sal Benedetto stormed in and shouted. At twenty past, Sergeant O'Reilly went in for his Friday envelope. At half past, Pike took in the takings and Lou's heart drops. At one, Frankie found him dead.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "vera",
+        "sal",
+        "oreilly",
+        "pike"
+      ]
+    },
+    {
+      "id": "lump",
+      "title": "The Lump on His Temple",
+      "text": "A lump the size of a half-dollar on Lou's temple, and a smear of his hair oil on the corner of the safe beside him. It looks like he hit it on the way down. Sal Benedetto has fists like hams, and Sergeant O'Reilly never goes anywhere without his nightstick.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "sal",
+        "oreilly"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "cigar",
+      "title": "A Warm Cigar",
+      "text": "In the office ashtray: half a fat Havana cigar with a gold band. Only one man in the club smokes them: Sal Benedetto, who threatened Lou at the bar tonight.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "sal"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "fizz-glass",
+      "title": "The Velvet Fizz Glass",
+      "text": "Under the desk, on its side: the glass from Lou's Velvet Fizz. A little is left at the bottom. It smells of lemon and gin, and tastes horribly bitter, like chewing a penny. Vera Velvet carried it in herself.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "vera"
+      ]
+    },
+    {
+      "id": "drops",
+      "title": "The Heart Drops",
+      "text": "On the desk, uncorked: Lou's bottle of heart drops, digitalis, from Doc Halloran. Too much of it can stop a heart. Pike keeps the bottle in the safe drawer and measures Lou's dose himself every night.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "pike"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "ike-saw",
+      "title": "From the Piano Bench",
+      "text": "Your own memory: at five to midnight, Vera picked up the Velvet Fizz from the bar. Instead of carrying it straight down the corridor, she ducked through the cellar door for half a minute, then came out and took it to Lou.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "vera"
+      ],
+      "recipient": "ike"
+    },
+    {
+      "id": "telegram",
+      "title": "A Torn Telegram",
+      "text": "In Lou's wastebasket, torn in half: a telegram from Paramount Pictures. 'SCREEN TEST CONFIRMED FOR MISS VERA VELVET STOP REQUIRE RELEASE FROM MORETTI CONTRACT STOP'. Lou refused.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "vera"
+      ]
+    },
+    {
+      "id": "markers",
+      "title": "Gambling Markers",
+      "text": "In Lou's desk drawer, bound with a rubber band: gambling markers worth five thousand dollars, every one signed 'D. Van Doren'. On top, an envelope addressed to her father on Lake Shore Drive. And on the carpet, a beaded earring.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "daisy"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "grace-tray",
+      "title": "Under Your Tray",
+      "text": "Under the false bottom of your cigarette tray: your Prohibition Bureau badge, and Lou's black payoff ledger. You took it from his desk at ten to one. Page after page of names and sums: 'O'Reilly, $200. O'Reilly, $200. O'Reilly, $200.'",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "oreilly",
+        "grace"
+      ],
+      "recipient": "grace",
+      "redHerring": true
+    },
+    {
+      "id": "rifled",
+      "title": "The Rifled Desk",
+      "text": "The safe stands open with the night's cash still in it, but the desk drawers have been pulled out and rifled, and one has a false bottom, empty. Whatever Lou kept there, somebody wanted it more than money. Sergeant O'Reilly asked about Lou's 'papers' twice tonight.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "oreilly",
+        "grace"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "black-book",
+      "title": "Lou's Little Black Book",
+      "text": "Lou's little black book, with a brass lock. He scratched a riddle on the cover, because he could never remember the combination.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "vera"
+      ],
+      "puzzle": {
+        "prompt": "The more of me you take, the more of me you leave behind. What am I?",
+        "answers": [
+          "footsteps",
+          "footstep",
+          "steps",
+          "footprints",
+          "foot steps"
+        ],
+        "hint": "You make them walking down to the cellar.",
+        "solvedText": "Tonight's entry, in Lou's scrawl: 'Tore up Vera's Paramount wire. She said, \"You'll be sorry you ever signed me, Lou. Sorrier than you know.\" Cried into her gloves, then sang like an angel. Fizz at midnight as usual.'"
+      }
+    },
+    {
+      "id": "lock",
+      "title": "Scratches on the Lock",
+      "text": "Fresh, bright scratches around the keyhole of the office door, the kind a lock-pick leaves. Lou always kept that door locked. Frankie found it unlocked at one. The new cigarette girl, Grace, was seen near the corridor just before.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "grace"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "rat-tin",
+      "title": "The Rat-Poison Tin",
+      "text": "In the cellar, among Vera's gown trunks: a tin of strychnine rat poison, its lid pried off. There's a smear of bright red lipstick on the lid. Only one woman at the Blue Parrot wears Scarlet Kiss.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "vera"
+      ]
+    },
+    {
+      "id": "compact",
+      "title": "A Gold Compact",
+      "text": "Vera Velvet's gold compact, left on the piano. Under the powder puff: a folded paper twist, empty but for a few bitter white crystals.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "vera"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A snowy Chicago street at night, a barber's pole glowing, and behind a false wall, a smoky jazz club in full swing.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The Blue Parrot, Chicago, February 1927. At eleven o'clock, 'Lucky' Lou Moretti climbed onto the bar and tapped his glass. He's sold the club to Sal Benedetto, he said, and he's leaving town on Sunday."
+    },
+    {
+      "type": "narration",
+      "text": "But first, Lou said, he'd be settling accounts. The singer stays with the club. The heiress's gambling markers go to her father. The bookkeeper's books get audited. And a certain little black ledger goes to the District Attorney, as insurance."
+    },
+    {
+      "type": "line",
+      "speaker": "vera",
+      "text": "Then he smiled at every one of us, one at a time, like a man choosing cakes in a window."
+    },
+    {
+      "type": "toast",
+      "text": "To Lucky Lou, and his lucky, lucky friends!",
+      "alternative": "Raise your soda, and keep one eye on the door."
+    },
+    {
+      "type": "narration",
+      "text": "The band played. Vera sang her midnight set and carried Lou his Velvet Fizz, as she does every night. One by one, the people with reasons to hate him went down the corridor to his office."
+    },
+    {
+      "type": "image",
+      "text": "A narrow corridor behind the bandstand, a piano at one end and a closed office door at the other.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At one o'clock Frankie the bartender went to tell Lou they were out of ice, and found him dead on the floor beside his open safe. A lump on his temple. A glass rolled under the desk. His heart drops uncorked. Outside, the blizzard has buried the city. Nobody leaves the Blue Parrot until dawn. And one of you killed Lucky Lou."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Back Office",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Back Office."
+        },
+        {
+          "type": "image",
+          "text": "Lou's office: a green-shaded lamp, a black safe standing open, a glass on its side under the desk, and a bottle of drops uncorked.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Doc Halloran, who drinks here every Friday, takes a closer look. The lump on Lou's temple is from hitting the safe as he fell; it didn't kill him. His jaw is locked tight and his back is arched like a bow. That's poison, the doc says, and a cruel one. Somebody gave Lucky Lou something he couldn't swallow."
+        },
+        {
+          "type": "line",
+          "speaker": "frankie",
+          "text": "I went to tell him we were out of ice. The door was unlocked. Lou never leaves it unlocked."
+        }
+      ],
+      "prompts": [
+        "Who went into Lou's office tonight, and when?",
+        "What did Lou threaten each of you with tonight?",
+        "Look at the glass, the drops and the lump. What killed him?",
+        "Who was acting strangely between midnight and one?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Settling Accounts",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Settling Accounts."
+        },
+        {
+          "type": "image",
+          "text": "An open safe, a rifled desk, and a torn telegram in a wastebasket.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Lou kept everybody's secrets. Now they're spilling out of his drawers and his wastebasket. His little black book has a riddle on the cover, and somebody in this room has already helped themselves to something from his desk."
+        },
+        {
+          "type": "toast",
+          "text": "To secrets! May yours stay buried longer than Lou's.",
+          "alternative": "Or clink your coffee cup and say nothing at all."
+        },
+        {
+          "type": "line",
+          "speaker": "ike",
+          "text": "I see the whole corridor from my piano bench. I see everything. Tonight I wish I didn't."
+        }
+      ],
+      "prompts": [
+        "Open Lou's little black book. The cover holds a riddle.",
+        "Who took something from Lou's desk, and what?",
+        "Who was Lou about to ruin on Sunday?",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: Last Call",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. Last Call."
+        },
+        {
+          "type": "image",
+          "text": "The cellar: barrels, gown trunks and a single bare bulb swinging on its cord.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The snowplows are out, and the patrol cars won't be far behind. Somewhere in this club is the thing that killed Lou, and somebody who's been smiling all night to hide it."
+        },
+        {
+          "type": "toast",
+          "text": "Last call, for the drinks and for the truth!",
+          "alternative": "Last call for lemonade, and for the truth!"
+        },
+        {
+          "type": "line",
+          "speaker": "grace",
+          "text": "A dead man's desk tells you everything, if you know which drawer to open."
+        }
+      ],
+      "prompts": [
+        "What was hidden in the cellar, or on the piano?",
+        "Whose story about their visit to the office doesn't add up?",
+        "Who had the most to lose on Sunday?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "contract",
+        "text": "To escape an unbreakable contract"
+      },
+      {
+        "id": "ledger",
+        "text": "To stop the payoff ledger reaching the District Attorney"
+      },
+      {
+        "id": "embezzle",
+        "text": "To hide stolen money before the audit"
+      },
+      {
+        "id": "price",
+        "text": "To take over the club without paying the higher price"
+      },
+      {
+        "id": "debt",
+        "text": "To keep gambling debts from reaching a rich father"
+      },
+      {
+        "id": "love",
+        "text": "To protect a forbidden love"
+      }
+    ],
+    "methods": [
+      {
+        "id": "fizz",
+        "text": "Strychnine in his Velvet Fizz"
+      },
+      {
+        "id": "nightstick",
+        "text": "A blow from a nightstick, dressed up as a fall"
+      },
+      {
+        "id": "drops",
+        "text": "A double-strength dose of his heart drops"
+      },
+      {
+        "id": "push",
+        "text": "A shove against the corner of the safe"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "vera",
+    "motiveId": "contract",
+    "methodId": "fizz",
+    "explanation": [
+      "Lucky Lou wasn't struck down and his heart didn't simply give out. He was poisoned with strychnine, in the drink he had every night at midnight, carried to him by the woman who sang for him: Vera Velvet.",
+      "Lou owned Vera's contract for five more years. Tonight Paramount wired her a screen test, and Lou tore it in half and told her she'd be sold with the furniture. 'You'll be sorry you ever signed me, Lou,' she said. He wrote it in his little black book.",
+      "Hours before, Vera had folded a twist of strychnine from the rat-poison tin in the cellar, where she keeps her gowns, and hidden it in her compact. At five to midnight she picked up the Velvet Fizz from Frankie's bar, ducked into the cellar for half a minute, and tipped it in. Ike saw her from the piano; Daisy saw her come out. She left a smear of Scarlet Kiss on the tin's lid.",
+      "Strychnine takes a little while. At ten past twelve Lou told Sal the fizz tasted like a penny. At twenty past he was sweating for O'Reilly; by half past he was shaking too hard for Pike to hand him the pen. Around quarter to one he collapsed, hitting his temple on the safe. By the time Grace picked the lock at ten to one, he was dead.",
+      "Sal threatened him, O'Reilly wanted his ledger, Pike feared the audit and Grace robbed his desk. But only one of them carried the glass, and a torch singer should know: every song about poison ends the same way."
+    ],
+    "timeline": [
+      {
+        "time": "10:00",
+        "event": "Vera hides a twist of strychnine from the cellar's rat-poison tin in her compact."
+      },
+      {
+        "time": "11:00",
+        "event": "Lou announces the sale to Sal and says he'll settle every account before Sunday."
+      },
+      {
+        "time": "11:15",
+        "event": "Paramount's telegram arrives. Lou tears it up in front of Vera."
+      },
+      {
+        "time": "11:40",
+        "event": "Daisy begs Lou about her gambling markers. He laughs at her."
+      },
+      {
+        "time": "11:55",
+        "event": "Frankie mixes the Velvet Fizz. Vera ducks into the cellar with it and poisons it."
+      },
+      {
+        "time": "12:00",
+        "event": "Vera serves Lou the fizz."
+      },
+      {
+        "time": "12:10",
+        "event": "Sal argues with Lou. Lou says the fizz 'tastes like a penny'."
+      },
+      {
+        "time": "12:20",
+        "event": "O'Reilly collects his envelope. Lou is sweating and clenching his jaw."
+      },
+      {
+        "time": "12:30",
+        "event": "Pike brings the takings and measures the heart drops. Lou is shaking."
+      },
+      {
+        "time": "12:45",
+        "event": "Lou collapses beside the safe and dies."
+      },
+      {
+        "time": "12:50",
+        "event": "Grace picks the lock, finds Lou dead, and takes the payoff ledger."
+      },
+      {
+        "time": "1:00",
+        "event": "Frankie finds Lou dead."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over snowy Chicago. A patrol car noses through the drifts toward the barber's pole.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Blue Parrot!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The patrol car pulled up at six. Vera Velvet was waiting at the piano in her best gown. She sang one last song, very softly, and then she held out her wrists. 'Tell Paramount,' she said, 'I'd have been wonderful.'"
+    },
+    {
+      "type": "narration",
+      "text": "Agent Grace Hale showed her badge, and Lou's ledger, to the captain. Sergeant O'Reilly asked for a lawyer. The Blue Parrot closed its doors that morning, and the blizzard covered the barber's pole. Goodnight, detectives."
+    }
+  ]
+}
