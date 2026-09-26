@@ -3,6 +3,7 @@ import { ConfirmEmail, ForgotPassword, ResetPassword } from './pages/Account'
 import AdminAi from './pages/AdminAi'
 import AdminHosts from './pages/AdminHosts'
 import Home from './pages/Home'
+import HowToPlay from './pages/HowToPlay'
 import Join from './pages/Join'
 import Login from './pages/Login'
 import NewParty from './pages/NewParty'
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/mysteries" element={<MyMysteries />} />
+      <Route path="/how-to-play" element={<HowToPlay />} />
       <Route path="/mysteries/:id" element={<ScenarioEditor />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />

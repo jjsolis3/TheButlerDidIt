@@ -68,6 +68,7 @@ public static partial class GameEngine
             case CancelHint c: s.Hints.RemoveAll(h => h.Id == c.Id && h.Text is null); break;
             case SetVerdicts c: SetVerdicts(s, c); break;
             case SetPartyOptions c: RequirePhase(s, Phase.Lobby); s.Options = c.Options; break;
+            case SetSpotlight c: SetSpotlight(s, c); break;
             case SetPlayerPhoto c: RequirePlayer(s, c.SeatId).PhotoUrl = c.PhotoUrl; break;
             case SetInterrogationAudio c: RequireInterrogation(s, c.Id).AudioUrl = c.AudioUrl; break;
             default: throw new ArgumentOutOfRangeException(nameof(command), command.GetType().Name, "Unknown command.");
@@ -169,8 +170,18 @@ public static partial class GameEngine
 
     // ------------------------------------------------------------------ Flow
 
+    private static void SetSpotlight(GameState s, SetSpotlight c)
+    {
+        if (s.Phase is not (Phase.CastReveal or Phase.Act))
+            throw new GameRuleException("The spotlight is for introductions and the investigation.");
+        if (c.SeatId is { } seat) RequirePlayer(s, seat);
+        s.SpotlightSeatId = c.SeatId;
+    }
+
     private static void Advance(GameState s, Scenario scenario, DateTimeOffset now)
     {
+        // A new scene starts with nobody in the spotlight.
+        s.SpotlightSeatId = null;
         switch (s.Phase)
         {
             case Phase.CastReveal:
@@ -361,6 +372,7 @@ public static partial class GameEngine
         s.Players.Remove(player);
         s.Accusations.Remove(c.SeatId);
         s.AwardVotes.Remove(c.SeatId);
+        if (s.SpotlightSeatId == c.SeatId) s.SpotlightSeatId = null;
     }
 
     // ------------------------------------------------------------------ Player actions

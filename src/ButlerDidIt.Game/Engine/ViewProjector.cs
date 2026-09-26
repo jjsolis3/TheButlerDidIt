@@ -53,7 +53,10 @@ public static class ViewProjector
                 var npc = scenario.FindCharacter(i.CharacterId);
                 return new InterrogationView(i.Id, i.Act, i.AskerName, i.CharacterId, npc?.Name ?? i.CharacterId, i.Question, i.Answer, npc?.Voice, i.AudioUrl);
             }).ToList(),
-            Options: s.Options);
+            Options: s.Options,
+            Spotlight: s.SpotlightSeatId is { } spot && s.FindPlayer(spot) is { } who
+                ? new SpotlightView(who.SeatId, who.Name, who.CharacterId is { } cid ? scenario.FindCharacter(cid)?.Name : null)
+                : null);
     }
 
     /// <summary>The recap of a finished game. Throws for a game still in progress, so the solution can't leak early.</summary>
