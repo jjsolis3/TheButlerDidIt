@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace ButlerDidIt.Game.Scenarios;
 
 /// <summary>
@@ -41,6 +43,7 @@ public static class ScenarioValidator
         var murderer = s.FindCharacter(s.Solution.MurdererId);
         Check(murderer is not null, $"Solution murderer '{s.Solution.MurdererId}' is not a character.");
         Check(murderer?.Required ?? true, "The murderer must be a required character so they are always at the party.");
+        Check(murderer?.KillerEligible ?? true, $"'{s.Solution.MurdererId}' is marked as never the killer (killerEligible: false).");
         Check(s.Accusation.Motives.Any(o => o.Id == s.Solution.MotiveId), $"Solution motive '{s.Solution.MotiveId}' is not an accusation option.");
         Check(s.Accusation.Methods.Any(o => o.Id == s.Solution.MethodId), $"Solution method '{s.Solution.MethodId}' is not an accusation option.");
         Check(s.Accusation.Motives.Count >= 2, "Offer at least two motives to choose from.");
@@ -96,7 +99,24 @@ public static class ScenarioValidator
         var otherSuspects = s.Clues.SelectMany(c => c.PointsTo).Where(id => id != s.Solution.MurdererId).Distinct().Count();
         Check(otherSuspects >= 2, "Clues should cast suspicion on at least two innocent characters.");
 
+        // Family mysteries promise no alcohol. Checked here, not just in tests, so text
+        // written by the AI or in the editor is held to the same promise as ours.
+        if (s.ContentRating == ContentRating.Family)
+        {
+            foreach (var word in AlcoholWordsIn(s))
+                errors.Add($"Family mysteries can't mention alcohol, but this one says \"{word}\". Use cocoa, lemonade or juice instead.");
+        }
+
         return errors;
+    }
+
+    private static readonly string[] AlcoholWords = ["wine", "rum", "beer", "gin", "whisky", "whiskey", "vodka", "brandy", "grog", "cocktail", "drunk", "booze"];
+
+    /// <summary>Alcohol words anywhere in the mystery's text. Whole words only, so "ginger" or "Virginia" are fine.</summary>
+    public static IReadOnlyList<string> AlcoholWordsIn(Scenario s)
+    {
+        var text = GameJson.Serialize(s).ToLowerInvariant();
+        return AlcoholWords.Where(w => Regex.IsMatch(text, $@"\b{w}s?\b")).ToList();
     }
 
     private static void CheckUnique(IEnumerable<string> ids, string kind, List<string> errors)

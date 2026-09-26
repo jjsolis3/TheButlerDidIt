@@ -31,7 +31,9 @@ public sealed record StageView(
     AiFeatures Ai,
     IReadOnlyList<InterrogationView> Interrogations,
     PartyOptions Options,
-    SpotlightView? Spotlight);
+    SpotlightView? Spotlight,
+    // True while the AI writes a version of the mystery for tonight's cast; the lobby is frozen meanwhile.
+    bool Tailoring);
 
 /// <summary>Whose turn it is to speak (see GameState.SpotlightSeatId).</summary>
 public sealed record SpotlightView(Guid SeatId, string PlayerName, string? CharacterName);

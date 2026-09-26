@@ -24,6 +24,27 @@ public class GameEngineTests
     }
 
     [Fact]
+    public void While_the_ai_tailors_the_mystery_the_cast_is_frozen()
+    {
+        var scenario = Create();
+        var s = GameEngine.NewGame();
+        s = GameEngine.Apply(s, scenario, new AddPlayer(T0, Alice, "Alice", true, false));
+        s = GameEngine.Apply(s, scenario, new AddPlayer(T0, Bob, "Bob", false, false));
+        s = GameEngine.Apply(s, scenario, new BeginTailoring(T0));
+
+        Assert.True(ViewProjector.Stage(s, scenario, T0).Tailoring);
+        Assert.Throws<GameRuleException>(() => GameEngine.Apply(s, scenario, new ChooseCharacter(T0, Alice, "cook")));
+        Assert.Throws<GameRuleException>(() => GameEngine.Apply(s, scenario, new AddPlayer(T0, Cara, "Cara", false, false)));
+        Assert.Throws<GameRuleException>(() => GameEngine.Apply(s, scenario, new AutoAssignCharacters(T0)));
+
+        // Cancelling unfreezes the lobby; starting ends the tailoring too.
+        Assert.False(GameEngine.Apply(s, scenario, new CancelTailoring(T0)).Tailoring);
+        var started = GameEngine.Apply(s, scenario, new StartGame(T0));
+        Assert.False(started.Tailoring);
+        Assert.Equal(Phase.CastReveal, started.Phase);
+    }
+
+    [Fact]
     public void Apply_does_not_mutate_the_input_state()
     {
         var scenario = Create();

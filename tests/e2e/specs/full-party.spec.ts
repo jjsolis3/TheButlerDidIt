@@ -25,8 +25,8 @@ async function hostCreatesParty(page: Page, mode: 'Dinner party' | 'Pass & play'
   await expect(page.getByText('Death at Blackwood Manor')).toBeVisible()
   await page.getByRole('button', { name: new RegExp(mode) }).click()
   // This test knows the original killer, so it plays Version A rather than "Surprise me".
-  await expect(page.getByLabel('Version')).toHaveValue('surprise')
-  await page.getByLabel('Version').selectOption('death-at-blackwood-manor')
+  await expect(page.getByLabel('Version', { exact: true })).toHaveValue('surprise')
+  await page.getByLabel('Version', { exact: true }).selectOption('death-at-blackwood-manor')
   await page.getByRole('button', { name: 'Create party and get the invite code' }).click()
   await page.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   return page.url().split('/').pop()!

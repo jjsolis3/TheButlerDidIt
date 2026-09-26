@@ -119,17 +119,24 @@ public static class JsonExtraction
     /// </summary>
     public static T Parse<T>(string text)
     {
-        var start = text.IndexOf('{');
-        var end = text.LastIndexOf('}');
-        if (start < 0 || end <= start) throw new AiCallFailedException("The AI didn't return JSON.");
+        var json = JsonPart(text);
         try
         {
-            return JsonSerializer.Deserialize<T>(text[start..(end + 1)], GameJson.Options)
+            return JsonSerializer.Deserialize<T>(json, GameJson.Options)
                 ?? throw new AiCallFailedException("The AI returned empty JSON.");
         }
         catch (JsonException ex)
         {
             throw new AiCallFailedException($"The AI returned JSON that couldn't be read: {ex.Message}", ex);
         }
+    }
+
+    /// <summary>The outermost {...} block of the text, without parsing it.</summary>
+    public static string JsonPart(string text)
+    {
+        var start = text.IndexOf('{');
+        var end = text.LastIndexOf('}');
+        if (start < 0 || end <= start) throw new AiCallFailedException("The AI didn't return JSON.");
+        return text[start..(end + 1)];
     }
 }

@@ -4,6 +4,7 @@ using ButlerDidIt.Ai.Generation;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
 using Microsoft.EntityFrameworkCore;
@@ -82,15 +83,35 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         }
     }
 
-    /// <summary>A job left "Running" when the server stopped will never finish, so fail it with an honest message.</summary>
+    /// <summary>
+    /// A job left "Running" when the server stopped will never finish, so fail it with an honest
+    /// message. A party that was waiting for a remix starts with a hand-written version instead.
+    /// </summary>
     private async Task MarkInterruptedJobsAsync(CancellationToken ct)
     {
         using var scope = scopes.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var waiting = await db.GenerationJobs.Where(j => j.Status == GenerationStatus.Running && j.PartyId != null)
+            .Select(j => j.PartyId!.Value).ToListAsync(ct);
         await db.GenerationJobs.Where(j => j.Status == GenerationStatus.Running)
             .ExecuteUpdateAsync(u => u
                 .SetProperty(j => j.Status, GenerationStatus.Failed)
                 .SetProperty(j => j.Error, "The server restarted while this mystery was being written. Please try again."), ct);
+        foreach (var partyId in waiting) await StartWithoutRemixAsync(partyId, ct);
+    }
+
+    private async Task StartWithoutRemixAsync(Guid partyId, CancellationToken ct)
+    {
+        try
+        {
+            using var scope = scopes.CreateScope();
+            await scope.ServiceProvider.GetRequiredService<PartyDealer>().StartWithoutTailoringAsync(partyId, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // The party may have been deleted meanwhile; nothing else to do.
+            log.LogWarning(ex, "Could not start party {PartyId} after its remix ended", partyId);
+        }
     }
 
     public async Task RunNextAsync(CancellationToken ct)
@@ -110,6 +131,12 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         job.Progress = "Starting…";
         job.UpdatedAt = clock.GetUtcNow();
         await db.SaveChangesAsync(ct);
+
+        if (job.Kind == GenerationKind.Remix)
+        {
+            await RunRemixAsync(scope.ServiceProvider, db, job, ct);
+            return;
+        }
 
         try
         {
@@ -152,6 +179,63 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         // EF only writes the columns we changed, so progress updates made meanwhile
         // (via ExecuteUpdate) don't conflict; the final message simply replaces them.
         await db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Writes a version of a story in which a guest's character is the killer, saves it as one of
+    /// the host's versions of that story, and starts the waiting party with it. If anything fails,
+    /// the party starts with a hand-written version instead, so it is never left waiting.
+    /// </summary>
+    private async Task RunRemixAsync(IServiceProvider sp, AppDbContext db, GenerationJobEntity job, CancellationToken ct)
+    {
+        string? versionId = null;
+        try
+        {
+            var catalog = sp.GetRequiredService<ContentCatalog>();
+            var original = await catalog.GetBaseScenarioAsync(db, job.SourceScenarioId!, ct);
+            var variant = "ai" + Guid.NewGuid().ToString("N")[..6];
+            var result = await sp.GetRequiredService<VersionRemixer>().RemixAsync(original, job.TargetCharacterId!, variant,
+                new AiCallContext(job.HostUserId, job.PartyId, JobId: job.Id), new JobProgress(scopes, job.Id, clock), ct);
+
+            var s = result.Scenario;
+            db.Scenarios.Add(new ScenarioEntity
+            {
+                Id = s.Id, ThemeSlug = s.ThemeSlug, Title = s.Title, MinPlayers = s.MinPlayers, MaxPlayers = s.MaxPlayers,
+                ContentRating = s.ContentRating, Source = ScenarioSource.AiGenerated, OwnerUserId = job.HostUserId,
+                VariantOf = original.Id, Document = GameJson.Serialize(s), UpdatedAt = clock.GetUtcNow(),
+            });
+            job.Status = GenerationStatus.Succeeded;
+            job.ScenarioId = s.Id;
+            job.Progress = "Tonight's version is ready.";
+            job.Warnings = GameJson.Serialize(result.Warnings);
+            versionId = s.Id;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            log.LogWarning(ex, "Remix job {JobId} failed", job.Id);
+            job.Status = GenerationStatus.Failed;
+            job.Error = ex is AiException ? ex.Message : "Something went wrong while rewriting the mystery.";
+            foreach (var added in db.ChangeTracker.Entries<ScenarioEntity>().Where(e => e.State == EntityState.Added).ToList())
+                added.State = EntityState.Detached;
+        }
+        job.UpdatedAt = clock.GetUtcNow();
+        await db.SaveChangesAsync(ct);
+
+        if (job.PartyId is not { } partyId) return;
+        if (versionId is null)
+        {
+            await StartWithoutRemixAsync(partyId, ct);
+            return;
+        }
+        try
+        {
+            await sp.GetRequiredService<PartyDealer>().StartTailoredAsync(partyId, versionId, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            log.LogWarning(ex, "Could not start party {PartyId} with its remix", partyId);
+            await StartWithoutRemixAsync(partyId, ct);
+        }
     }
 
     private sealed class JobProgress(IServiceScopeFactory scopes, Guid jobId, TimeProvider clock) : IProgress<string>

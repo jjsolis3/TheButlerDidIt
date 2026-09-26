@@ -46,7 +46,7 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await expect(host.getByRole('radio', { name: /Mature/ })).toHaveCount(0)
   await host.screenshot({ path: `${SHOTS}/71-family-shelf.png`, fullPage: true })
 
-  await host.getByLabel('Version').selectOption('the-captains-last-cocoa') // Version A: this test knows the killer
+  await host.getByLabel('Version', { exact: true }).selectOption('the-captains-last-cocoa') // Version A: this test knows the killer
   await host.getByRole('button', { name: 'Create party and get the invite code' }).click()
   await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = host.url().split('/').pop()!
@@ -71,15 +71,17 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await host.goto('/host/new')
   await host.getByRole('tab', { name: /Family/ }).click()
   await expect(host.getByText('3 versions, a different killer each')).toBeVisible()
-  await expect(host.getByLabel('Version')).toHaveValue('surprise')
-  await expect(host.getByLabel('Version').locator('option', { hasText: 'Version A (played)' })).toHaveCount(1)
+  await expect(host.getByLabel('Version', { exact: true })).toHaveValue('surprise')
+  await expect(host.getByLabel('Version', { exact: true }).locator('option', { hasText: 'Version A (played)' })).toHaveCount(1)
   await host.screenshot({ path: `${SHOTS}/74-version-picker.png`, fullPage: true })
   const again = await host.request.post('/api/parties', {
     data: { scenarioId: 'the-captains-last-cocoa', mode: 'sharedScreen', scheduledFor: null, useAi: false, version: 'surprise' },
   })
   expect(again.ok()).toBeTruthy()
   const second = await again.json()
-  expect(second.scenarioId).toMatch(/^the-captains-last-cocoa--[bc]$/)
+  // Nothing is dealt yet: the version is picked when the evening begins, from the guests' characters.
+  expect(second.scenarioId).toBe('the-captains-last-cocoa')
+  expect(second.dealAtStart).toBe(true)
   expect(second.contentLevel).toBe('family') // the level comes from the mystery itself
 
   // Tidying up: the host deletes the party that never started, from their list on the home page.
@@ -92,4 +94,47 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await expect(host.getByRole('button', { name: new RegExp(`Remove .* \\(${second.code}\\)`) })).toHaveCount(0)
   await expect(host.getByRole('button', { name: new RegExp(`Remove .* \\(${code}\\)`) })).toBeVisible()
   expect((await host.request.get(`/api/parties/${second.code}`)).status()).toBe(404)
+})
+
+test('Surprise me: when no version fits the cast, the AI makes one of the guests the killer', async ({ browser }) => {
+  const host = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage()
+  await host.goto('/login')
+  await host.getByRole('button', { name: 'Create an account' }).click()
+  await host.getByLabel('Your name').fill('Admiral Dad')
+  await host.getByLabel('Email').fill(`remix-${Date.now()}@example.com`)
+  await host.getByLabel('Password').fill('password123')
+  await host.getByRole('button', { name: 'Create account' }).click()
+  await host.waitForURL('**/host/new')
+
+  await host.getByRole('tab', { name: /Family/ }).click()
+  await expect(host.getByLabel('Version', { exact: true })).toHaveValue('surprise')
+  // The (fake) AI Storyteller is set up in these tests, so the remix is offered, and on by default.
+  await expect(host.getByLabel(/let the AI write one/)).toBeChecked()
+  await host.getByRole('button', { name: 'Create party and get the invite code' }).click()
+  await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
+  const code = host.url().split('/').pop()!
+
+  // No spoiler PDFs: the killer isn't dealt yet.
+  await host.getByText('Printable party kit').click()
+  await expect(host.getByText(/No character booklets or clue cards/)).toBeVisible()
+
+  // None of the three killers (Flint, Grace, Cookie) is taken, and Pip can never be the killer.
+  const guests = [
+    await joinAs(browser, code, 'Ada', /Pip Marlowe/),
+    await joinAs(browser, code, 'Ben', /Navigator Nell Starling/),
+    await joinAs(browser, code, 'Cy', /Bartholomew Beak/),
+  ]
+  await host.getByRole('button', { name: 'Begin the evening' }).click()
+  // The AI's version takes a moment (seconds with the fake AI): the lobby says so meanwhile.
+  await expect(host.getByText(/Tailoring tonight's mystery/).or(host.getByRole('button', { name: 'Tap to begin the evening' }))).toBeVisible()
+  await host.getByRole('button', { name: 'Tap to begin the evening' }).click({ timeout: 30_000 })
+  await expect(host.getByRole('heading', { name: 'The suspects' })).toBeVisible()
+  await host.screenshot({ path: `${SHOTS}/76-remixed-cast.png` })
+
+  // Exactly one guest is the killer now, and it isn't Pip.
+  const isKiller = (g: (typeof guests)[number]) => g.getByText('You are the murderer.', { exact: true }).count()
+  await expect.poll(async () => (await Promise.all(guests.map(isKiller))).reduce((a, n) => a + n, 0)).toBe(1)
+  expect(await isKiller(guests[0])).toBe(0)
+  const dealt = await (await host.request.get(`/api/parties/${code}`)).json()
+  expect(dealt.scenarioId).toMatch(/^the-captains-last-cocoa--ai[0-9a-f]{6}$/)
 })

@@ -78,9 +78,21 @@ public sealed class PartyService(
 
     /// <param name="makeCommand">Builds the command from the current party and time.</param>
     /// <param name="beforeSave">Extra database changes that must commit together with the new state (e.g. adding a Seat row).</param>
-    public async Task<PartySnapshot> ExecuteAsync(
+    public Task<PartySnapshot> ExecuteAsync(
         Guid partyId,
         Func<PartySnapshot, DateTimeOffset, Command> makeCommand,
+        Action<PartySnapshot>? beforeSave = null,
+        CancellationToken ct = default) =>
+        ChangeAsync(partyId, (s, now) => Task.FromResult((GameEngine.Apply(s.State, s.Scenario, makeCommand(s, now)), s.Scenario)), beforeSave, ct);
+
+    /// <summary>
+    /// Like ExecuteAsync, for changes that need more than one command or that switch the party
+    /// to another version of its story (the dealer, when the evening begins). <paramref name="change"/>
+    /// runs under the party's lock and returns the new state and the scenario it belongs to.
+    /// </summary>
+    public async Task<PartySnapshot> ChangeAsync(
+        Guid partyId,
+        Func<PartySnapshot, DateTimeOffset, Task<(GameState State, Scenario Scenario)>> change,
         Action<PartySnapshot>? beforeSave = null,
         CancellationToken ct = default)
     {
@@ -88,10 +100,11 @@ public sealed class PartyService(
         {
             var snapshot = await LoadAsync(partyId, ct);
             var now = Now;
-            var next = GameEngine.Apply(snapshot.State, snapshot.Scenario, makeCommand(snapshot, now));
+            var (next, scenario) = await change(snapshot, now);
             if (ReferenceEquals(next, snapshot.State)) return snapshot; // nothing changed (e.g. an idle tick)
 
             var party = snapshot.Party;
+            party.ScenarioId = scenario.Id;
             party.State = GameJson.Serialize(next);
             party.Status = next.Phase switch
             {
@@ -102,7 +115,7 @@ public sealed class PartyService(
             party.NextDueAt = GameEngine.NextDueAt(next);
             party.UpdatedAt = now;
 
-            var updated = snapshot with { State = next };
+            var updated = snapshot with { State = next, Scenario = scenario };
             beforeSave?.Invoke(updated);
             await db.SaveChangesAsync(ct);
 

@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using ButlerDidIt.Ai.Generation;
 using ButlerDidIt.Ai.Prompts;
@@ -50,6 +51,7 @@ public sealed partial class FakeChatClient : IChatClient
             MysteryGenerator.OutlineTask => """{"title":"The Fake Affair","synopsis":"A test mystery.","murderer":"Colonel Fake"}""",
             MysteryGenerator.ScenarioTask => LoadScenario(),
             MysteryGenerator.SolveTask => """{"suspectId":"colonel","reasoning":"The fake clues say so."}""",
+            VersionRemixer.Task => Remix(messages),
             NpcPrompt.Task => NpcAnswer(system, messages),
             InspectorPrompts.HintTask => "Inspector Graves murmurs: \"Look again at who was seen near the library at nine.\"",
             InspectorPrompts.VerdictTask => Verdicts(system),
@@ -71,6 +73,52 @@ public sealed partial class FakeChatClient : IChatClient
         return "{\"verdicts\":[" + string.Join(",", items) + "]}";
     }
 
+    /// <summary>
+    /// A valid remix patch, built from the story in the prompt: the target becomes the killer,
+    /// and every genuine clue against the old killer now points at them.
+    /// </summary>
+    private static string Remix(List<ChatMessage> messages)
+    {
+        var prompt = messages.First(m => m.Role == ChatRole.User).Text ?? "";
+        var target = TargetLine().Match(prompt).Groups[1].Value;
+        const string startMarker = "ORIGINAL STORY (JSON):";
+        var start = prompt.IndexOf(startMarker, StringComparison.Ordinal) + startMarker.Length;
+        var end = prompt.IndexOf("END OF ORIGINAL STORY", StringComparison.Ordinal);
+        var story = JsonNode.Parse(prompt[start..end])!.AsObject();
+        var oldKiller = story["solution"]!["murdererId"]!.GetValue<string>();
+
+        var solution = story["solution"]!.DeepClone().AsObject();
+        solution["murdererId"] = target;
+        solution["explanation"] = new JsonArray($"It was {target} all along (a fake remix).");
+
+        var clues = new JsonObject();
+        foreach (var clue in story["clues"]!.AsArray())
+        {
+            var pointsTo = clue!["pointsTo"]?.AsArray().Select(x => x!.GetValue<string>()).ToList() ?? [];
+            var redHerring = clue["redHerring"]?.GetValue<bool>() ?? false;
+            if (!redHerring && pointsTo.Contains(oldKiller))
+                clues[clue["id"]!.GetValue<string>()] = new JsonObject { ["pointsTo"] = new JsonArray(target) };
+        }
+
+        return new JsonObject
+        {
+            ["solution"] = solution,
+            ["characters"] = new JsonObject
+            {
+                [target] = new JsonObject
+                {
+                    ["required"] = true,
+                    ["private"] = new JsonObject { ["backstory"] = "YOU ARE THE MURDERER. A fake remix made it you." },
+                },
+                [oldKiller] = new JsonObject
+                {
+                    ["private"] = new JsonObject { ["backstory"] = "You are innocent tonight, though you look shifty." },
+                },
+            },
+            ["clues"] = clues,
+        }.ToJsonString();
+    }
+
     private static string LoadScenario()
     {
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ButlerDidIt.Ai.Fake.FakeScenario.json")
@@ -81,6 +129,9 @@ public sealed partial class FakeChatClient : IChatClient
 
     [GeneratedRegex(@"TASK:\s*([a-z\-]+)")]
     private static partial Regex TaskLine();
+
+    [GeneratedRegex(@"^TARGET:\s*(\S+)", RegexOptions.Multiline)]
+    private static partial Regex TargetLine();
 
     [GeneratedRegex(@"You are (.+?) \(")]
     private static partial Regex YouAre();

@@ -90,6 +90,12 @@ public sealed class GameState
     /// </summary>
     public Guid? SpotlightSeatId { get; set; }
 
+    /// <summary>
+    /// The host pressed "Begin the evening" and the AI is writing a version of the mystery
+    /// in which one of tonight's guests is the killer. The cast is frozen until it's done.
+    /// </summary>
+    public bool Tailoring { get; set; }
+
     /// <summary>Questions guests put to NPCs, and the NPCs' answers. Public: everyone hears them.</summary>
     public List<Interrogation> Interrogations { get; set; } = [];
 

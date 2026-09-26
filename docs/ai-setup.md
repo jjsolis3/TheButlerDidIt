@@ -71,12 +71,14 @@ Environment settings are applied at every start-up and overwrite the same-named 
 - Costs are estimates from the price list. A model with no price shows as $0 and is flagged on the admin page.
 - Voices and pictures are cached by their exact text and model, so a mystery's media is paid for once, however many parties play it. A mystery like Blackwood Manor needs about 50 voice clips and pictures in total.
 - Rough guide with Claude: generating a mystery costs well under a couple of dollars; each NPC answer or hint costs a fraction of a cent to a few cents, depending on the model.
+- **Remixes** ("let the AI write one" on the new-party page) run only when no unplayed version of the story has a guest as the killer. One costs less than a new mystery, because the Storyteller writes a patch (the new solution, the changed character sheets and clues), not a whole story. It takes about a minute while the lobby waits. The host can press **Start without it** at any time, and if it fails, the evening starts with a hand-written version instead.
 
 ## 4. Privacy and safety
 
 - **NPC prompts** contain only what that character knows: their own sheet, public facts, and clues already found. An innocent NPC has never been told the solution, so it can't leak it.
 - **Hints** are built from the asking player's own view. If a reply names the killer anyway, it is thrown away and replaced.
 - **Verdicts** mention the solution, so they only appear after the unmasking.
+- **Remixes** send the whole story, including its solution, to the Storyteller, just like generating a mystery. The result must keep everything guests have already seen (bios, costumes, setting, prologue) and pass the validator and the blind solve before it's used.
 - **Content level and tone:** every prompt includes the mystery's rating (Family or Mature), which sets the limits, and the tone the host picked when creating the party, which flavours the AI within them: *Mature* or *Normal* (PG-13, for mixed company) for Adults mysteries, *Normal* or *Funny* (silly, for kids) for Family ones. The tone only changes what the AI says; the written script is the same.
 - **Costume selfies** never go to an AI provider. They are shrunk, stripped of metadata (including GPS location) and stored on your server.
 - **What's sent:** player names and questions go to the AI provider you configured. If that matters to your guests, choose a provider whose data policy you're comfortable with, or run Ollama locally.

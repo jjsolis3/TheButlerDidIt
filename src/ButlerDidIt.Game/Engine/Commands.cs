@@ -55,6 +55,13 @@ public sealed record CancelNpcQuestion(DateTimeOffset Now, Guid Id) : Command(No
 public sealed record BeginHint(DateTimeOffset Now, Guid Id, Guid SeatId) : Command(Now);
 public sealed record CompleteHint(DateTimeOffset Now, Guid Id, string Text) : Command(Now);
 public sealed record CancelHint(DateTimeOffset Now, Guid Id) : Command(Now);
+/// <summary>
+/// "Begin the evening" found no version whose killer is a guest, so the AI writes one. The
+/// cast is frozen meanwhile; the AI version then starts the game with StartGame, or Cancel
+/// unfreezes the lobby so a hand-written version can start instead.
+/// </summary>
+public sealed record BeginTailoring(DateTimeOffset Now) : Command(Now);
+public sealed record CancelTailoring(DateTimeOffset Now) : Command(Now);
 public sealed record SetVerdicts(DateTimeOffset Now, IReadOnlyDictionary<Guid, string> Verdicts) : Command(Now);
 
 // ---- Media ----

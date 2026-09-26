@@ -127,6 +127,16 @@ public sealed class Party
     public DateTimeOffset? HiddenAt { get; set; }
 
     /// <summary>
+    /// "Surprise me": the version is picked when the host presses "Begin the evening", once
+    /// everyone has a character, so the killer can be one of tonight's guests. Until then
+    /// ScenarioId is the original story (versions share everything guests see in the lobby).
+    /// </summary>
+    public bool DealAtStart { get; set; }
+
+    /// <summary>If no version's killer is a guest, the AI may write one (the host agreed when creating the party).</summary>
+    public bool TailorWithAi { get; set; }
+
+    /// <summary>
     /// Set when the host shares the after-party recap: the random part of its link.
     /// Null means not shared. Stopping sharing clears it, so the old link dies.
     /// </summary>

@@ -90,7 +90,13 @@ function LobbyPlayer({
         <p className="mt-2 text-sm text-muted">{stage.scenario.synopsis}</p>
       </header>
 
-      {mine && !picking ? (
+      {stage.tailoring && (
+        <p className="candle rounded-xl border border-accent/60 bg-accent/10 p-4 text-sm" role="status">
+          ✨ The host is getting the evening ready. Your dossier opens in a minute or so.
+        </p>
+      )}
+
+      {mine && (!picking || stage.tailoring) ? (
         <section className="rounded-xl border border-accent/50 bg-surface p-5">
           <div className="flex gap-4">
             <Portrait id={mine.characterId} name={mine.name} src={mine.portrait} size={84} />
@@ -108,16 +114,16 @@ function LobbyPlayer({
             <p className="mt-1 text-sm">{mine.costumeTips}</p>
           </div>
           <CostumeSelfie token={token} photoUrl={stage.players.find((p) => p.seatId === view.seatId)?.photoUrl ?? null} />
-          <p className="mt-4 text-xs text-muted">
-            Your {view.dossier?.lockedSecrets} secret{view.dossier?.lockedSecrets === 1 ? '' : 's'} unlock when the evening begins.
-          </p>
+          <p className="mt-4 text-xs text-muted">Your secrets unlock when the evening begins.</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant={view.ready ? 'ghost' : 'primary'} onClick={() => run('SetReady', !view.ready)}>
               {view.ready ? "✓ I'm ready" : "I'm ready"}
             </Button>
-            <Button variant="quiet" onClick={() => setPicking(true)}>
-              Choose someone else
-            </Button>
+            {!stage.tailoring && (
+              <Button variant="quiet" onClick={() => setPicking(true)}>
+                Choose someone else
+              </Button>
+            )}
           </div>
         </section>
       ) : (

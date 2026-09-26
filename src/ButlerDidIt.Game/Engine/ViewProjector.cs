@@ -56,7 +56,8 @@ public static class ViewProjector
             Options: s.Options,
             Spotlight: s.SpotlightSeatId is { } spot && s.FindPlayer(spot) is { } who
                 ? new SpotlightView(who.SeatId, who.Name, who.CharacterId is { } cid ? scenario.FindCharacter(cid)?.Name : null)
-                : null);
+                : null,
+            Tailoring: s.Tailoring);
     }
 
     /// <summary>The recap of a finished game. Throws for a game still in progress, so the solution can't leak early.</summary>
@@ -232,7 +233,8 @@ public static class ViewProjector
         if (!started)
         {
             // Before the party: like a printed invitation, only the public bio and costume tips.
-            return new Dossier(cast, false, false, null, null, [], [], [], c.Private.Secrets.Count, []);
+            // Not even how many secrets: with "Surprise me" the version (and its secrets) is dealt at the start.
+            return new Dossier(cast, false, false, null, null, [], [], [], 0, []);
         }
 
         var actNumber = GameEngine.CurrentActNumber(s);

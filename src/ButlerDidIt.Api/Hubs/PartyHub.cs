@@ -23,7 +23,7 @@ namespace ButlerDidIt.Api.Hubs;
 ///   * Host controls take the party code and check the signed-in user owns the party.
 /// </summary>
 [Authorize(Policy = AuthPolicies.PartyMember)]
-public sealed class PartyHub(PartyService parties, AppDbContext db, AiGameService aiGame) : Hub
+public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbContext db, AiGameService aiGame) : Hub
 {
     public static string StageGroup(Guid partyId) => $"stage:{partyId}";
     public static string SeatGroup(Guid seatId) => $"seat:{seatId}";
@@ -104,7 +104,19 @@ public sealed class PartyHub(PartyService parties, AppDbContext db, AiGameServic
 
     // ------------------------------------------------------------------ host controls
 
-    public Task StartGame(string code) => AsHost(code, (_, now) => new StartGame(now));
+    /// <summary>"Begin the evening". For a "Surprise me" party this also deals the story's version (see PartyDealer).</summary>
+    public async Task StartGame(string code)
+    {
+        var party = await RequireHostParty(code);
+        await dealer.StartAsync(party.Id);
+    }
+
+    /// <summary>The host doesn't want to wait for the AI's version: start now with a hand-written one.</summary>
+    public async Task SkipTailoring(string code)
+    {
+        var party = await RequireHostParty(code);
+        await dealer.StartWithoutTailoringAsync(party.Id);
+    }
     public async Task Advance(string code)
     {
         var snapshot = await AsHost(code, (_, now) => new Advance(now));
@@ -150,9 +162,15 @@ public sealed class PartyHub(PartyService parties, AppDbContext db, AiGameServic
 
     private async Task<PartySnapshot> AsHost(string code, Func<PartySnapshot, DateTimeOffset, Command> make, Action<PartySnapshot>? beforeSave = null)
     {
+        var party = await RequireHostParty(code);
+        return await parties.ExecuteAsync(party.Id, make, beforeSave);
+    }
+
+    private async Task<Party> RequireHostParty(string code)
+    {
         var party = await parties.FindByCodeAsync(code) ?? throw new HubException("Party not found.");
         if (!IsHostOf(party)) throw new HubException("Only the host can do that.");
-        return await parties.ExecuteAsync(party.Id, make, beforeSave);
+        return party;
     }
 
     private bool IsHostOf(Party party) =>

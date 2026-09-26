@@ -91,6 +91,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         b.Entity<GenerationJobEntity>(e =>
         {
             e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
             e.Property(x => x.Request).HasColumnType("jsonb");
             e.Property(x => x.Warnings).HasColumnType("jsonb");
             e.HasIndex(x => new { x.Status, x.CreatedAt });

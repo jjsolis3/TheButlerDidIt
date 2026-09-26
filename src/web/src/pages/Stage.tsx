@@ -203,6 +203,13 @@ function LobbyView({ stage, info, invoke }: { stage: StageView; info: PartyInfo;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+      {stage.tailoring && (
+        // Says nothing about who: once the AI is done, one of the guests is the killer either way.
+        <div className="candle rounded-2xl border-2 border-accent bg-accent/10 p-5 text-center lg:col-span-2" role="status">
+          <p className="font-display text-2xl">✨ Tailoring tonight's mystery to your cast…</p>
+          <p className="mt-1 text-sm text-muted">The Storyteller is rewriting the story around the characters you chose. This takes about a minute.</p>
+        </div>
+      )}
       <section className="space-y-5">
         <div>
           <p className="text-xs tracking-[0.3em] text-accent uppercase">{stage.scenario.era}</p>
@@ -242,7 +249,7 @@ function LobbyView({ stage, info, invoke }: { stage: StageView; info: PartyInfo;
         )}
         <ErrorText>{error}</ErrorText>
         {info.isHost && <MediaPanel code={info.code} />}
-        {info.isHost && <KitPanel code={info.code} />}
+        {info.isHost && <KitPanel code={info.code} dealLater={info.dealAtStart} />}
         {stage.options.drinkingPrompts && <Cocktails themeSlug={stage.scenario.themeSlug} />}
       </section>
 
@@ -692,9 +699,14 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="mr-1 text-xs tracking-widest text-muted uppercase">Host</span>
-          {stage.phase === 'lobby' && (
+          {stage.phase === 'lobby' && !stage.tailoring && (
             <Button variant="ghost" disabled={busy} onClick={() => call('AutoAssign')}>
               Auto-assign characters
+            </Button>
+          )}
+          {stage.tailoring && (
+            <Button variant="ghost" disabled={busy} onClick={() => call('SkipTailoring')}>
+              Start without it
             </Button>
           )}
           {(mingle || stage.phase === 'castReveal') && stage.players.length > 0 && (
@@ -768,6 +780,7 @@ function SpotlightBanner({ stage }: { stage: StageView }) {
 function nextAction(stage: StageView): { label: string; method: string; disabled?: boolean } | null {
   switch (stage.phase) {
     case 'lobby':
+      if (stage.tailoring) return { label: '✨ Tailoring the mystery…', method: 'StartGame', disabled: true }
       return {
         label: stage.players.length < stage.scenario.minPlayers ? `Need ${stage.scenario.minPlayers} guests to start` : 'Begin the evening',
         method: 'StartGame',
@@ -865,12 +878,17 @@ function MediaPanel({ code }: { code: string }) {
 }
 
 /** Host-only: printable PDFs for an in-person party. */
-function KitPanel({ code }: { code: string }) {
+function KitPanel({ code, dealLater }: { code: string; dealLater: boolean }) {
   const links: { kind: 'invitations' | 'booklets' | 'nametags' | 'clues'; label: string; note?: string }[] = [
     { kind: 'invitations', label: 'Invitations' },
     { kind: 'nametags', label: 'Name tags' },
-    { kind: 'booklets', label: 'Character booklets', note: 'every secret' },
-    { kind: 'clues', label: 'Clue cards + sealed solution', note: 'spoilers' },
+    // With "Surprise me" the killer is only dealt when the evening begins, so these can't exist yet.
+    ...(dealLater
+      ? []
+      : [
+          { kind: 'booklets' as const, label: 'Character booklets', note: 'every secret' },
+          { kind: 'clues' as const, label: 'Clue cards + sealed solution', note: 'spoilers' },
+        ]),
   ]
   return (
     <details className="rounded-xl border border-line bg-surface p-4 text-sm">
@@ -882,6 +900,12 @@ function KitPanel({ code }: { code: string }) {
             How to play (a one-page guide for everyone)
           </a>
         </li>
+        {dealLater && (
+          <li className="text-xs text-muted">
+            🎲 No character booklets or clue cards with “Surprise me”: the killer is dealt from your guests' characters when the evening begins,
+            and everyone's phone shows their dossier. To print them, create the party with a specific version.
+          </li>
+        )}
         {links.map((l) => (
           <li key={l.kind}>
             <a href={api.kitUrl(code, l.kind)} className="text-accent underline" download>

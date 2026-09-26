@@ -34,6 +34,10 @@ public static partial class GameEngine
         // copy, and the state is small (a few KB), so the cost is negligible.
         var s = Clone(current);
 
+        // While the AI tailors the mystery to tonight's cast, the cast must not change under it.
+        if (s.Tailoring && command is Engine.AddPlayer or RemovePlayer or Engine.ChooseCharacter or AutoAssignCharacters)
+            throw new GameRuleException("The host is getting the evening ready. Hold on a moment!");
+
         switch (command)
         {
             case AddPlayer c: AddPlayer(s, scenario, c); break;
@@ -67,6 +71,8 @@ public static partial class GameEngine
             case CompleteHint c: RequireHint(s, c.Id).Text = Clip(c.Text, 1000); break;
             case CancelHint c: s.Hints.RemoveAll(h => h.Id == c.Id && h.Text is null); break;
             case SetVerdicts c: SetVerdicts(s, c); break;
+            case BeginTailoring: RequirePhase(s, Phase.Lobby); s.Tailoring = true; break;
+            case CancelTailoring: s.Tailoring = false; break;
             case SetPartyOptions c: RequirePhase(s, Phase.Lobby); s.Options = c.Options; break;
             case SetSpotlight c: SetSpotlight(s, c); break;
             case SetPlayerPhoto c: RequirePlayer(s, c.SeatId).PhotoUrl = c.PhotoUrl; break;
@@ -164,6 +170,7 @@ public static partial class GameEngine
         var played = s.Players.Select(p => p.CharacterId).ToHashSet();
         s.NpcCharacterIds = scenario.Characters.Where(ch => ch.Required && !played.Contains(ch.Id)).Select(ch => ch.Id).ToList();
         s.Phase = Phase.CastReveal;
+        s.Tailoring = false;
         s.StartedAt = c.Now;
         AddFeed(s, c.Now, "The evening begins. Read your dossier, and trust no one.");
     }

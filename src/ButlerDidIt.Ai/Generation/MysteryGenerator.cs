@@ -47,7 +47,7 @@ public sealed class MysteryGenerator(AiGateway ai)
     public const int MaxRepairs = 3;
     public const string OutlineTask = "mystery-outline";
     public const string ScenarioTask = "mystery-scenario";
-    public const string SolveTask = "mystery-solve";
+    public const string SolveTask = BlindSolver.SolveTask;
 
     public async Task<GenerationResult> GenerateAsync(GenerationRequest request, AiCallContext context, IProgress<string>? progress, CancellationToken ct)
     {
@@ -91,7 +91,7 @@ public sealed class MysteryGenerator(AiGateway ai)
             if (errors.Count == 0 && scenario is not null)
             {
                 progress?.Report("The Inspector is testing whether the mystery can be solved…");
-                var solved = await BlindSolveAsync(scenario, context, ct);
+                var solved = await BlindSolver.SolvesAsync(ai, scenario, context, ct);
                 if (solved || solverRetried)
                 {
                     if (!solved) warnings.Add("The Inspector found this mystery very hard to solve from the clues alone. Expect a challenge!");
@@ -130,40 +130,6 @@ public sealed class MysteryGenerator(AiGateway ai)
         node["maxPlayers"] = Math.Min(Math.Max(s.MaxPlayers, request.Players), characters);
         node["minPlayers"] = Math.Clamp(s.MinPlayers, 2, Math.Min(request.Players, characters));
         return node.Deserialize<Scenario>(GameJson.Options)!;
-    }
-
-    private async Task<bool> BlindSolveAsync(Scenario scenario, AiCallContext context, CancellationToken ct)
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine($"TASK: {SolveTask}");
-        sb.AppendLine("You are a sharp detective. Solve this murder using ONLY the evidence below. Reason carefully, then answer.");
-        sb.AppendLine($"Victim: {scenario.Victim.Name}. {scenario.Victim.Description}");
-        sb.AppendLine("Suspects:");
-        foreach (var c in scenario.Characters) sb.AppendLine($"- id \"{c.Id}\": {c.Name}, {c.Title}. {c.PublicBio} Claims: {c.Private.Alibi}");
-        sb.AppendLine("Evidence found during the evening:");
-        foreach (var clue in scenario.Clues)
-        {
-            sb.AppendLine($"- {clue.Title}: {clue.Text}{(clue.Puzzle is null ? "" : " (Decoded: " + clue.Puzzle.SolvedText + ")")}");
-        }
-        sb.AppendLine("Reply with JSON only: {\"suspectId\": \"<id>\", \"reasoning\": \"<one sentence>\"}");
-
-        try
-        {
-            var answer = await ai.CompleteJsonAsync<SolverAnswer>(AiRole.Inspector, sb.ToString(),
-                [new ChatMessage(ChatRole.User, "Who is the murderer?")], context with { Purpose = "blind-solve" }, 1_500, ct);
-            return string.Equals(answer.SuspectId, scenario.Solution.MurdererId, StringComparison.OrdinalIgnoreCase);
-        }
-        catch (AiCallFailedException)
-        {
-            // If the check itself fails, don't throw away a valid mystery.
-            return true;
-        }
-    }
-
-    private sealed class SolverAnswer
-    {
-        public string SuspectId { get; set; } = "";
-        public string Reasoning { get; set; } = "";
     }
 
     private static string StorytellerSystem(GenerationRequest r, int characters, int acts) => $$"""

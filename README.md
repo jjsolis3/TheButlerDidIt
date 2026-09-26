@@ -12,7 +12,7 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - **Death Among the Vines** (Adults): a Tuscan wedding where the groom's father doesn't survive the rehearsal-dinner toast.
 - **The Captain's Last Cocoa** (Family): pirates, buried treasure and a very suspicious mug of cocoa.
 
-All three play with 3–8 guests in about two hours, and **each comes in three versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the game picks a version the host hasn't played, so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
+All three play with 3–8 guests in about two hours, and **each comes in three versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
 - generate new mysteries for any of the eight themes, family-friendly or mature
 - let guests question characters nobody is playing
 - get private hints from the Inspector

@@ -134,4 +134,24 @@ public sealed class GenerationJobEntity
 
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+
+    /// <summary>A brand-new mystery, or a remix: a version of a story written for one party's cast.</summary>
+    public GenerationKind Kind { get; set; }
+
+    /// <summary>For a remix: the party waiting to start with it.</summary>
+    public Guid? PartyId { get; set; }
+
+    /// <summary>For a remix: the story being remixed and the guest's character who becomes the killer.</summary>
+    [MaxLength(120)]
+    public string? SourceScenarioId { get; set; }
+
+    [MaxLength(60)]
+    public string? TargetCharacterId { get; set; }
 }
+
+public enum GenerationKind
+{
+    Mystery,
+    Remix,
+}
+
