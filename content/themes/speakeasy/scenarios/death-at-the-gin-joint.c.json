@@ -1,0 +1,251 @@
+{
+  "variantOf": "death-at-the-gin-joint",
+  "variant": "C",
+  "solution": {
+    "murdererId": "pike",
+    "motiveId": "embezzle",
+    "methodId": "drops",
+    "explanation": [
+      "Lucky Lou wasn't struck and he wasn't poisoned with anything bitter. His bad heart was stopped by the medicine meant to keep it going, measured out by the man he trusted with every nickel: Leonard 'Pennies' Pike.",
+      "For two years Pike had been skimming the Blue Parrot's takings: ten thousand dollars. Tonight Lou told him Sal's accountants would audit the books on Monday. Pike said, 'Then I'll have to balance the books first, Lou.' Lou wrote it in his little black book, and thought it was a joke.",
+      "This afternoon Pike bought a bottle of double-strength digitalis at the Halsted Street pharmacy. At half past twelve, bringing Lou the takings, he measured out the usual ten drops, from the new bottle. Twice the dose. Then he pocketed Lou's old bottle, and later dropped it in the washroom bin.",
+      "Around quarter to one Lou's heart gave out, and he hit his temple on the safe as he fell. Ike saw Pike leave at twenty-five to one, slipping a little brown bottle into his waistcoat. The pharmacy receipt in that waistcoat, the old bottle in the bin and the books that don't add up told the rest.",
+      "Sal threatened him, O'Reilly wanted his ledger and Vera wanted her freedom. But a bookkeeper should know: every sum has to balance in the end."
+    ],
+    "timeline": [
+      {
+        "time": "Afternoon",
+        "event": "Pike buys double-strength digitalis at the Halsted Street pharmacy."
+      },
+      {
+        "time": "11:00",
+        "event": "Lou announces the sale, and tells Pike the books will be audited on Monday."
+      },
+      {
+        "time": "11:10",
+        "event": "Pike: 'Then I'll have to balance the books first, Lou.'"
+      },
+      {
+        "time": "11:40",
+        "event": "Daisy begs Lou about her gambling markers."
+      },
+      {
+        "time": "12:00",
+        "event": "Vera serves Lou his Velvet Fizz."
+      },
+      {
+        "time": "12:10",
+        "event": "Sal argues with Lou. Lou is in fine form."
+      },
+      {
+        "time": "12:20",
+        "event": "O'Reilly collects his envelope. Lou curses him cheerfully."
+      },
+      {
+        "time": "12:30",
+        "event": "Pike brings the takings and measures ten drops from the double-strength bottle."
+      },
+      {
+        "time": "12:35",
+        "event": "Pike leaves, pocketing Lou's old bottle. Ike sees him."
+      },
+      {
+        "time": "12:45",
+        "event": "Lou's heart stops. He falls, hitting his temple on the safe."
+      },
+      {
+        "time": "12:50",
+        "event": "Grace picks the lock, finds Lou dead, and takes the payoff ledger."
+      },
+      {
+        "time": "1:00",
+        "event": "Frankie finds Lou dead."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Back Office."
+        },
+        {
+          "type": "image",
+          "text": "Lou's office: a green-shaded lamp, a black safe standing open, a glass on its side under the desk, and a bottle of drops uncorked.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Doc Halloran, who drinks here every Friday, takes a closer look. The lump on Lou's temple is from hitting the safe as he fell; it didn't kill him. His lips are bluish and his pupils are strange, and his heart simply stopped. 'Lou had a bad heart,' says the doc, 'but not that bad. Too much of something did this.'"
+        },
+        {
+          "type": "line",
+          "speaker": "frankie",
+          "text": "I went to tell him we were out of ice. The door was unlocked. Lou never leaves it unlocked."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "pike": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. For two years you've been skimming from the Blue Parrot: ten thousand dollars, for your mother's sanatorium. Tonight Lou told you Sal's accountants will audit the books on Monday, and you said, 'Then I'll have to balance the books first, Lou.' This afternoon, just in case, you'd bought a bottle of double-strength digitalis at the Halsted Street pharmacy. At half past twelve you took Lou the takings and measured out his usual ten drops, from the new bottle. Twice the dose. You pocketed his old bottle on the way out and dropped it in the washroom bin. You still have the receipt in your waistcoat.",
+        "objectives": [
+          "Don't get caught. Point everyone at Vera's fizz, or at O'Reilly and his nightstick.",
+          "Get rid of the pharmacy receipt in your waistcoat.",
+          "Keep the audit from ever finding the missing ten thousand."
+        ],
+        "knows": [
+          "Digitalis is a heart medicine: the right dose keeps a bad heart going, and a double dose stops it.",
+          "Sal Benedetto threatened to 'raise Lou six feet' at the bar tonight. Everybody heard."
+        ],
+        "lines": {
+          "act3": [
+            "Ten drops. Ten drops, the same as every night. I can't help it if somebody tampered with the bottle."
+          ]
+        }
+      }
+    },
+    "vera": {
+      "private": {
+        "backstory": "Lou Moretti owns your contract for five more years, and he owns you with it. Tonight a telegram came from Paramount: a screen test in Hollywood, if Lou releases you. Lou tore it in half and said you're part of the furniture Sal Benedetto is buying on Sunday. You told him he'd be sorry. At midnight you still carried him his Velvet Fizz, straight from Frankie's bar, as you do every night, and then you sat at the piano with Ike. You did not kill him. But you said what you said, in front of people.",
+        "objectives": [
+          "Clear your name. Wanting a man dead isn't the same as killing him.",
+          "Get to Hollywood, one way or another.",
+          "Keep Ike out of this."
+        ],
+        "knows": [
+          "At midnight Lou was in fine form. He took a sip of the fizz, said 'Sweet as you, Vera,' and reminded you that you belong to Sal now.",
+          "Sal Benedetto told Lou at the bar tonight: 'Raise the price again and I'll raise you six feet.'"
+        ]
+      }
+    },
+    "sal": {
+      "private": {
+        "knows": [
+          "At ten past twelve Lou was in fine form, sipping Vera's Velvet Fizz and laughing at your offer.",
+          "When you came out of the office, Sergeant O'Reilly was waiting outside, checking his watch."
+        ]
+      }
+    },
+    "oreilly": {
+      "private": {
+        "knows": [
+          "At twenty past twelve Lou was in fine form. He counted out your envelope, cursing you cheerfully the whole time.",
+          "Pike was pacing outside the office when you came out, holding his ledger to his chest."
+        ],
+        "lines": {
+          "act3": [
+            "When I left Lou at twenty past, he was right as rain. Whatever happened, it happened after."
+          ]
+        }
+      }
+    },
+    "daisy": {
+      "private": {
+        "knows": [
+          "At twenty to twelve Lou was in fine form, laughing at you.",
+          "At twenty-five to one Pike came out of the corridor with his hands shaking, and went straight into the washroom."
+        ],
+        "lines": {
+          "act3": [
+            "Pike came out of that corridor and went straight to the washroom. Now what does a bookkeeper need to wash?"
+          ]
+        }
+      }
+    },
+    "grace": {
+      "private": {
+        "knows": [
+          "At ten to one Lou was dead on the floor by the safe. His lips were bluish, and the heart drops were uncorked on the desk, smelling strong.",
+          "O'Reilly kept checking his watch all night, and he didn't take his eyes off the office door."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "fizz-glass": {
+      "text": "Under the desk, on its side: the glass from Lou's Velvet Fizz, half full. It smells of lemon and gin and tastes sweet and frothy, exactly as Frankie makes it. Vera Velvet carried it in herself.",
+      "redHerring": true
+    },
+    "telegram": {
+      "redHerring": true
+    },
+    "rat-tin": null,
+    "compact": null,
+    "drops": {
+      "text": "On the desk, uncorked: a bottle of heart drops. It smells far stronger than digitalis should, and the label is brand new: 'Tincture of Digitalis, DOUBLE STRENGTH. Halsted Street Pharmacy.' Lou's drops always came from Doc Halloran. Pike measures them out every night.",
+      "redHerring": false,
+      "pointsTo": [
+        "pike"
+      ]
+    },
+    "ike-saw": {
+      "text": "Your own memory: at twenty-five to one, Pike came out of Lou's office, looked up and down the corridor, and slipped a little brown bottle into his waistcoat pocket.",
+      "pointsTo": [
+        "pike"
+      ]
+    },
+    "black-book": {
+      "pointsTo": [
+        "pike"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry, in Lou's scrawl: 'Told Pennies about Monday's audit. He went grey and said, \"Then I'll have to balance the books first, Lou.\" Balance them how? Drops at half past as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "receipt",
+      "title": "A Pharmacy Receipt",
+      "text": "In the pocket of Pike's waistcoat, hung over his chair at the counting table: a receipt from the Halsted Street pharmacy, dated today. 'Tincture of Digitalis, double strength, one bottle.' Signed 'L. Pike'.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "pike"
+      ]
+    },
+    {
+      "id": "old-bottle",
+      "title": "The Old Bottle",
+      "text": "In the washroom bin, under the paper towels: Lou's old bottle of heart drops, labelled in Doc Halloran's handwriting, still half full. So where did the bottle on the desk come from?",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "pike"
+      ]
+    },
+    {
+      "id": "account-books",
+      "title": "The Account Books",
+      "text": "The Blue Parrot's account books, in Pike's neat hand. The columns look perfect, until you add them up: ten thousand dollars missing over two years. Pinned inside the cover, a note from Lou: 'AUDIT MONDAY. SAL'S MEN.'",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "pike"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over snowy Chicago. A patrol car noses through the drifts toward the barber's pole.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Blue Parrot!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The patrol car pulled up at six. Leonard Pike was at the counting table, adding up the night's takings one last time, to the penny. He handed the captain the books. 'They balance now,' he said quietly. 'That's all I ever wanted.'"
+    },
+    {
+      "type": "narration",
+      "text": "Agent Grace Hale showed her badge, and Lou's ledger, to the captain. Sergeant O'Reilly asked for a lawyer. Vera Velvet caught the first train west. Goodnight, detectives."
+    }
+  ]
+}

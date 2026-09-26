@@ -1,0 +1,221 @@
+{
+  "variantOf": "who-crashed-the-reunion",
+  "variant": "C",
+  "solution": {
+    "murdererId": "rocky",
+    "motiveId": "trophy",
+    "methodId": "punch",
+    "explanation": [
+      "The fizz was only fizz, and the cake was only cake. The Sleepy Salts were in the last treat of the night: the Victory Cup of punch, carried in by Rocky Rhodes.",
+      "Before the 1986 championship game, Rocky peeked at the other team's playbook. The principal found the other coach's letter about it in the time capsule, and Rocky told him, 'Maybe you should sleep on it, Principal. Sleep right through ten o'clock.' It's written in his planner.",
+      "At ten past eight Rocky went into the kitchen to polish the Victory Cup, and borrowed the nurse's key from Dotty's key ring. He took some Sleepy Salts from the nurse's cabinet, stirred them into the Victory Cup of punch, and carried it to the principal at ten to nine, like every reunion.",
+      "Rocky only meant him to nap through the time capsule, so the trophy would stay the Mustangs'. But his heart couldn't take so much. The peppermint gave him away: green grit in the Victory Cup, on his polishing cloth, and on his sweatband in the nurse's office.",
+      "Chuck took the trophy, but only for a prank. The fizz and the cake were perfectly innocent. A true champion plays fair, and Rocky didn't."
+    ],
+    "timeline": [
+      {
+        "time": "7:00",
+        "event": "At dinner, the principal promises to 'set three records straight' when the time capsule is opened at ten."
+      },
+      {
+        "time": "7:30",
+        "event": "He tells Rocky about the playbook letter. Rocky: 'Maybe you should sleep on it, Principal.'"
+      },
+      {
+        "time": "8:10",
+        "event": "Rocky goes into the kitchen to polish the Victory Cup, and borrows the nurse's key from Dotty's ring."
+      },
+      {
+        "time": "8:20",
+        "event": "Rocky takes Sleepy Salts from the nurse's cabinet. His sweatband slips off."
+      },
+      {
+        "time": "8:40",
+        "event": "Nina gives the principal a bottle of Volcano Fizz. He's wide awake."
+      },
+      {
+        "time": "8:45",
+        "event": "Crystal brings the first slice of cake. He's still wide awake, telling jokes."
+      },
+      {
+        "time": "8:50",
+        "event": "Rocky brings the Victory Cup of punch."
+      },
+      {
+        "time": "9:00",
+        "event": "Penny says goodnight, and Grandpa is yawning: 'Rocky's punch tasted of peppermint tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Scoop tries to interview him. He's nodding off."
+      },
+      {
+        "time": "9:30",
+        "event": "Chuck takes the trophy from the case for a prank. Scoop sees him."
+      },
+      {
+        "time": "10:00",
+        "event": "Mike finds the principal asleep forever."
+      }
+    ]
+  },
+  "characters": {
+    "rocky": {
+      "private": {
+        "backstory": "YOU DID IT. Before the 1986 championship game you peeked at the other team's playbook. Tonight Principal Plunkett told you he'd found the other coach's letter about it in the time capsule, and at ten he'd set the record straight. You told him, 'Maybe you should sleep on it, Principal.' At ten past eight you went into the kitchen to polish the Victory Cup and borrowed the nurse's key from Dotty's key ring. You took some Sleepy Salts from the nurse's cabinet, stirred them into the Victory Cup of punch, and carried it in at ten to nine, like every reunion. You only meant him to nap through the time capsule. You didn't know how weak his heart was. Now nobody must find out.",
+        "objectives": [
+          "Don't get found out. Point everyone at the Volcano Fizz, or at Crystal's cake.",
+          "Get rid of your polishing cloth.",
+          "Keep the championship trophy, and the truth about the playbook, safe."
+        ],
+        "knows": [
+          "The nurse's Sleepy Salts are a fine green grit that smells of peppermint. Neon Prom Punch is bright blue, and hides it.",
+          "Nina Newton looked very worried at dinner. So did Crystal."
+        ],
+        "lines": {
+          "act3": [
+            "The Victory Cup? Everybody drinks punch! The whole gym drank punch! Look at the fizz, the fizz!"
+          ]
+        }
+      }
+    },
+    "nina": {
+      "private": {
+        "backstory": "Volcano Fizz began as your 1986 science-fair project, and it made you rich. But your lab partner, Mike Mendez, worked out half the recipe, and you never told a soul. Tonight Principal Plunkett told you he'd found your old science-fair notebook in the time capsule, and at ten he'd set the record straight. You were upset, but you still gave him his Volcano Fizz at twenty to nine, as every reunion. It was ordinary cherry fizz. You did not hurt him. But you have a secret, and people are bound to wonder.",
+        "secrets": [
+          {
+            "id": "nina-recipe",
+            "text": "Half the Volcano Fizz recipe was really Mike Mendez's idea. I never gave him any credit, or any money.",
+            "unlockAct": 0
+          },
+          {
+            "id": "nina-salts",
+            "text": "I carry a tiny measuring spoon everywhere, for experiments. I lost it tonight somewhere in the school.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Clear your name. A scientist's secret is not the same as a culprit's.",
+          "Get your old science-fair notebook out of the time capsule before anyone reads it.",
+          "Find out who really did this."
+        ],
+        "knows": [
+          "The principal had three treats tonight: your Volcano Fizz, Crystal's cake and Rocky's Victory Cup of punch.",
+          "At twenty to nine the principal was wide awake and cheerful. He drank half the fizz in one go and said, 'Still cherry! Good girl.'"
+        ],
+        "lines": {
+          "act3": [
+            "My fizz is cherry. Always cherry. Whatever made him sleepy, it wasn't in my bottle."
+          ]
+        }
+      }
+    },
+    "crystal": {
+      "private": {
+        "knows": [
+          "You took the principal the first slice of cake at quarter to nine. He was wide awake and telling you a joke about a chemistry teacher.",
+          "At quarter to nine the championship trophy was still in the trophy case outside his office."
+        ],
+        "lines": {
+          "act3": [
+            "When I took the cake in, he was wide awake. Telling jokes! Terrible jokes, but awake."
+          ]
+        }
+      }
+    },
+    "dotty": {
+      "private": {
+        "knows": [
+          "The principal ate every bit of all three treats tonight: the fizz, the cake and the punch.",
+          "At ten past eight Rocky Rhodes came into the kitchen to polish the Victory Cup, right next to your key ring. Nobody else came in before nine."
+        ]
+      }
+    },
+    "penny": {
+      "private": {
+        "knows": [
+          "At nine you said goodnight to Grandpa in his office. He was yawning like a hippo. 'Rocky's punch tasted of peppermint tonight, Penny,' he said.",
+          "At ten past eight you saw Rocky go into the kitchen, where Dotty keeps her big ring of keys."
+        ]
+      }
+    },
+    "yolanda": {
+      "private": {
+        "knows": [
+          "At quarter past nine you tried to interview the principal, but he was nodding off. 'That punch of Rocky's was too strong, Scoop,' he mumbled. 'Minty.'",
+          "At half past nine, on your way out, you saw Chuck Chen tiptoe away from the trophy case with something gold under his jacket."
+        ]
+      }
+    },
+    "chuck": {
+      "private": {
+        "knows": [
+          "At half past nine the principal was fast asleep in his chair, very still. You peeked in on your way to the trophy case.",
+          "The silver Victory Cup was on his desk, empty, and the office smelled of peppermint."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "fizz-bottle": {
+      "text": "On the principal's desk: an empty bottle of Volcano Fizz. A sticky red ring of cherry fizz at the bottom, and nothing else. Nina Newton gave it to him, and Nina looked very worried at dinner.",
+      "redHerring": true
+    },
+    "goggles": null,
+    "key-ring": {
+      "text": "Your big key ring hung on its hook in the kitchen all evening. When you picked it up again, the key to the nurse's cabinet was on the wrong side of the ring. Only one person came into the kitchen before nine: Rocky Rhodes, at ten past eight, to polish the Victory Cup.",
+      "pointsTo": [
+        "rocky"
+      ]
+    },
+    "victory-cup": {
+      "text": "The silver Victory Cup, empty. At the bottom, under a ring of blue Neon Prom Punch, there's a fine green grit that smells of peppermint. Nobody else's punch had any. Rocky Rhodes carried this cup in himself.",
+      "redHerring": false,
+      "pointsTo": [
+        "rocky"
+      ]
+    },
+    "spoon": {
+      "title": "A Mustangs Sweatband",
+      "text": "On the floor of the nurse's office, under the open cabinet: a red-and-white sweatband with 'MUSTANGS #7' stitched on it. Rocky Rhodes wore number seven. It's dusted with green grit that smells of peppermint.",
+      "pointsTo": [
+        "rocky"
+      ]
+    },
+    "planner": {
+      "pointsTo": [
+        "rocky"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Told Rocky I'd found the other coach's letter about the playbook in the capsule. He went as red as his jacket and said, \"Maybe you should sleep on it, Principal. Sleep right through ten o'clock.\" He's bringing my punch in the Victory Cup at ten to nine.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "polishing-cloth",
+      "title": "A Polishing Cloth",
+      "text": "Stuffed behind the kitchen sink: the soft cloth Rocky used to polish the Victory Cup. It's streaked with blue punch and a fine green grit that smells of peppermint.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "rocky"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "The gym at dawn: balloons drifting on the floor, and a police car splashing through the last puddles in the car park.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Officer Friendly arrived as the sun came up. Rocky Rhodes met him at the gym doors with his letterman jacket folded over his arm. 'I only wanted to stay a champion,' he said. 'I never meant for him not to wake up.'"
+    },
+    {
+      "type": "narration",
+      "text": "Then the Class of '86 opened the time capsule together, the way the principal wanted. Chuck put the trophy back, with a note saying 'Almost champions', and Penny read out Grandpa's last line on the note card: 'The truth is always the best prize.' Goodnight, detectives."
+    }
+  ]
+}

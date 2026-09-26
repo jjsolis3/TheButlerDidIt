@@ -1,0 +1,259 @@
+{
+  "variantOf": "death-at-the-gin-joint",
+  "variant": "B",
+  "solution": {
+    "murdererId": "oreilly",
+    "motiveId": "ledger",
+    "methodId": "nightstick",
+    "explanation": [
+      "Lucky Lou wasn't poisoned, and his heart didn't give out. He was struck on the temple, once, hard, by the man who came every Friday for his envelope: Sergeant Mick O'Reilly.",
+      "For six years Lou paid O'Reilly two hundred dollars a week, and wrote down every dollar in his payoff ledger. Tonight Lou said the ledger goes to the new District Attorney on Sunday. O'Reilly told him, 'You won't live to see Sunday, Lou.' It's in Lou's little black book.",
+      "At twenty past twelve O'Reilly went in for his envelope. Lou laughed at him, and O'Reilly hit him with his nightstick. Then he laid Lou beside the safe to look like a fall, and wiped Lou's hair oil on the safe's corner. He tore the desk apart looking for the ledger, but it was hidden in a false bottom, and he ran out of nerve. He even left his own envelope under the desk.",
+      "The staging didn't fool anyone who looked closely: a round bruise, a clean corner, a dented nightstick with a grey hair in the grain, and hair oil on the cuff of a police greatcoat. Ike saw him come out at twenty-five past, wiping his nightstick. When Pike knocked at half past, Lou was already dead.",
+      "Grace found the ledger that O'Reilly couldn't. And a policeman should know better than anyone: a fall doesn't leave a round bruise."
+    ],
+    "timeline": [
+      {
+        "time": "11:00",
+        "event": "Lou announces the sale, and says the payoff ledger goes to the District Attorney."
+      },
+      {
+        "time": "11:10",
+        "event": "At the bar, O'Reilly tells Lou: 'You won't live to see Sunday.'"
+      },
+      {
+        "time": "11:40",
+        "event": "Daisy begs Lou about her gambling markers."
+      },
+      {
+        "time": "12:00",
+        "event": "Vera serves Lou his Velvet Fizz."
+      },
+      {
+        "time": "12:10",
+        "event": "Sal argues with Lou. Lou is in fine form."
+      },
+      {
+        "time": "12:20",
+        "event": "O'Reilly goes in for his envelope and strikes Lou with his nightstick."
+      },
+      {
+        "time": "12:25",
+        "event": "O'Reilly stages a fall, rifles the desk, and leaves wiping his nightstick. Ike sees him."
+      },
+      {
+        "time": "12:30",
+        "event": "Pike knocks with the takings. No answer."
+      },
+      {
+        "time": "12:50",
+        "event": "Grace picks the lock, finds Lou dead, and takes the payoff ledger from the false-bottomed drawer."
+      },
+      {
+        "time": "1:00",
+        "event": "Frankie finds Lou dead."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Back Office."
+        },
+        {
+          "type": "image",
+          "text": "Lou's office: a green-shaded lamp, a black safe standing open, a glass on its side under the desk, and a bottle of drops uncorked.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Doc Halloran, who drinks here every Friday, takes a closer look. Lou wasn't poisoned and his heart didn't fail. The lump on his temple is round, the size of a half-dollar, and that's what killed him. 'Funny thing,' says the doc, 'for a man who fell against a corner.'"
+        },
+        {
+          "type": "line",
+          "speaker": "frankie",
+          "text": "I went to tell him we were out of ice. The door was unlocked. Lou never leaves it unlocked."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "oreilly": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Lou Moretti has paid you two hundred dollars every Friday for six years, and he wrote every payment in a little black payoff ledger. Tonight he said the ledger goes to the new District Attorney on Sunday, and at the bar you told him, 'You won't live to see Sunday, Lou.' At twenty past twelve you went into his office for your envelope. He laughed at you. You hit him once with your nightstick, on the temple, and he went down. You laid him beside the safe, wiped his hair oil on its corner so it would look like a fall, and tore the desk apart for the ledger. You couldn't find it. At twenty-five past you walked out, wiping your nightstick, and pulled the door shut behind you. In your panic you left your own envelope under the desk.",
+        "objectives": [
+          "Don't get caught. It was a fall: Lou was drunk and his heart was bad. Or point everyone at Vera's fizz.",
+          "Find the payoff ledger before anyone else does, and make it disappear.",
+          "Get your nightstick clean, and your greatcoat out of sight."
+        ],
+        "knows": [
+          "Lou's hair oil smells of violets. You've been smelling it on your sleeve all night.",
+          "Vera Velvet told Lou tonight he'd be sorry he ever signed her. Everybody heard."
+        ],
+        "lines": {
+          "act3": [
+            "I've seen a hundred men fall and crack their heads. Lou was a drinker with a bad heart. Why make it more than it is?"
+          ]
+        }
+      }
+    },
+    "vera": {
+      "private": {
+        "backstory": "Lou Moretti owns your contract for five more years, and he owns you with it. Tonight a telegram came from Paramount: a screen test in Hollywood, if Lou releases you. Lou tore it in half and said you're part of the furniture Sal Benedetto is buying on Sunday. You told him he'd be sorry. At midnight you still carried him his Velvet Fizz, straight from Frankie's bar, as you do every night, and then you sat at the piano with Ike. You did not kill him. But you said what you said, in front of people.",
+        "objectives": [
+          "Clear your name. Wanting a man dead isn't the same as killing him.",
+          "Get to Hollywood, one way or another.",
+          "Keep Ike out of this."
+        ],
+        "knows": [
+          "At midnight Lou was in fine form. He took a sip of the fizz, said 'Sweet as you, Vera,' and reminded you that you belong to Sal now.",
+          "Sal Benedetto told Lou at the bar tonight: 'Raise the price again and I'll raise you six feet.'"
+        ]
+      }
+    },
+    "sal": {
+      "private": {
+        "knows": [
+          "At ten past twelve Lou was in fine form, sipping Vera's Velvet Fizz and laughing at your offer.",
+          "When you came out of the office, Sergeant O'Reilly was waiting outside, checking his watch."
+        ]
+      }
+    },
+    "pike": {
+      "private": {
+        "knows": [
+          "At half past twelve you knocked on Lou's door with the takings. No answer, and the door was shut. You thought he had company, and went back to the counting table.",
+          "Lou's drops were the same bottle as always, from Doc Halloran. You keep it in the safe drawer."
+        ],
+        "alibi": "At half past twelve I knocked on Lou's door with the takings, but he didn't answer, so I went back to the counting table until one.",
+        "lines": {
+          "act2": [
+            "I knocked at half past twelve, like every night. No answer. I thought, he's with somebody. He was with somebody, all right."
+          ]
+        }
+      }
+    },
+    "daisy": {
+      "private": {
+        "knows": [
+          "At twenty to twelve Lou was in fine form, laughing at you.",
+          "At twenty-five past twelve Sergeant O'Reilly came out of the corridor white as a sheet, stuffing a handkerchief in his pocket."
+        ],
+        "lines": {
+          "act3": [
+            "O'Reilly came out of that corridor looking like he'd seen a ghost. Or made one."
+          ]
+        }
+      }
+    },
+    "ike": {
+      "private": {
+        "knows": [
+          "From the piano you saw every office visitor: Daisy at 11:40, Vera at midnight, Sal at 12:10, O'Reilly at 12:20, Pike knocking at 12:30 and walking away, and the cigarette girl, Grace, at ten to one.",
+          "Vera sat beside you on the piano bench from quarter past twelve until one."
+        ]
+      }
+    },
+    "grace": {
+      "private": {
+        "knows": [
+          "At ten to one Lou was dead on the floor by the safe, with a round lump on his temple. The corner of the safe beside him had hair oil on it but no dent, and the desk had been torn apart.",
+          "O'Reilly kept checking his watch all night, and he didn't take his eyes off the office door."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "fizz-glass": {
+      "text": "Under the desk, on its side: the glass from Lou's Velvet Fizz, half full. It smells of lemon and gin and tastes sweet and frothy, exactly as Frankie makes it. Vera Velvet carried it in herself.",
+      "redHerring": true
+    },
+    "telegram": {
+      "redHerring": true
+    },
+    "rat-tin": null,
+    "compact": null,
+    "visitors": {
+      "text": "Half the club watched the office door tonight. At midnight Vera Velvet took Lou his Velvet Fizz. At ten past twelve Sal Benedetto stormed in and shouted. At twenty past, Sergeant O'Reilly went in for his Friday envelope. At half past, Pike knocked with the takings and got no answer. At one, Frankie found him dead."
+    },
+    "lump": {
+      "text": "The lump on Lou's temple is perfectly round, the size of a half-dollar. There's a smear of his hair oil on the corner of the safe beside him, but the corner is sharp and there isn't a mark on it. Whatever hit Lou was round and heavy.",
+      "redHerring": false,
+      "pointsTo": [
+        "oreilly"
+      ]
+    },
+    "drops": {
+      "text": "On the desk, on its side: Lou's bottle of heart drops, digitalis, from Doc Halloran. The cork is out and a puddle has soaked the blotter, but the bottle is nearly full. It looks knocked over, not measured out.",
+      "redHerring": true
+    },
+    "ike-saw": {
+      "text": "Your own memory: at twenty-five past twelve, Sergeant O'Reilly came out of Lou's office, pulled the door shut behind him, and wiped his nightstick with his handkerchief before sliding it back into his belt.",
+      "pointsTo": [
+        "oreilly"
+      ]
+    },
+    "black-book": {
+      "pointsTo": [
+        "oreilly"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry, in Lou's scrawl: 'Told Mick the ledger goes to the DA on Sunday. He said, \"You won't live to see Sunday, Lou.\" Coppers. All talk. Envelope at twenty past as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "nightstick",
+      "title": "The Nightstick",
+      "text": "Sergeant O'Reilly's nightstick, hung on the coat rack with his greatcoat: there's a fresh dent in the tip, and a single grey hair, stiff with violet-scented hair oil, caught in the grain. Lou's hair oil smells of violets.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "oreilly"
+      ]
+    },
+    {
+      "id": "envelope",
+      "title": "An Unopened Envelope",
+      "text": "Under Lou's desk: a fat envelope marked 'M. O'R. — Friday'. Two hundred dollars, unopened. O'Reilly went in at twenty past twelve to collect it. So why did he leave it behind?",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "oreilly"
+      ]
+    },
+    {
+      "id": "greatcoat",
+      "title": "The Greatcoat Cuff",
+      "text": "O'Reilly's police greatcoat on the coat rack: the right cuff is greasy with hair oil, and it smells of violets.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "oreilly"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over snowy Chicago. A patrol car noses through the drifts toward the barber's pole.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Blue Parrot!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The patrol car pulled up at six. Sergeant Mick O'Reilly met his captain at the door and handed over his badge and his nightstick without a word. 'He laughed at me,' he said at last. 'Six years, and he laughed.'"
+    },
+    {
+      "type": "narration",
+      "text": "Agent Grace Hale showed her own badge, and Lou's ledger, to the captain. Half the precinct would be looking for new jobs by spring. Vera Velvet caught the first train west. Goodnight, detectives."
+    }
+  ]
+}
