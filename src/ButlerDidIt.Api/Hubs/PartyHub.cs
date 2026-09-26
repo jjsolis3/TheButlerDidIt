@@ -78,6 +78,11 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
         return aiGame.RequestHintAsync(partyId, seatId, Context.ConnectionAborted);
     }
 
+    /// <summary>Challenge another character with a clue: it goes on the big screen and they get the floor.</summary>
+    public Task Confront(string clueId, string suspectId) => AsSeat((seat, now) => new Confront(now, seat, clueId, suspectId));
+    /// <summary>"Who looks guiltiest?" Only totals are ever shown.</summary>
+    public Task SetSuspicion(string? characterId) => AsSeat((seat, now) => new SetSuspicion(now, seat, characterId));
+
     public Task CastAwardVote(string awardId, Guid nomineeSeatId) =>
         AsSeat((seat, now) => new CastAwardVote(now, seat, awardId, nomineeSeatId));
 
@@ -129,7 +134,10 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
     public Task ResumeTimer(string code) => AsHost(code, (_, now) => new ResumeTimer(now));
     public Task ExtendTimer(string code, int minutes) => AsHost(code, (_, now) => new ExtendTimer(now, minutes));
     public Task AssignCharacter(string code, Guid seatId, string? characterId) => AsHost(code, (_, now) => new ChooseCharacter(now, seatId, characterId));
-    public Task Spotlight(string code, Guid? seatId) => AsHost(code, (_, now) => new SetSpotlight(now, seatId));
+    /// <summary>Give the floor to a character: a guest's, or one the narrator plays. Null clears it.</summary>
+    public Task Spotlight(string code, string? characterId) => AsHost(code, (_, now) => new SetSpotlight(now, characterId));
+    /// <summary>"🎲 Spin": the floor goes to someone who hasn't spoken in this scene.</summary>
+    public Task SpinSpotlight(string code) => AsHost(code, (_, now) => new SpinSpotlight(now));
     public Task ConvertToNpc(string code, Guid seatId) => AsHost(code, (_, now) => new ConvertToNpc(now, seatId));
 
     public async Task RemoveSeat(string code, Guid seatId)

@@ -1,0 +1,216 @@
+{
+  "variantOf": "who-stopped-the-circus",
+  "variant": "C",
+  "solution": {
+    "murdererId": "bella",
+    "motiveId": "promise",
+    "methodId": "bun",
+    "explanation": [
+      "The cocoa was only cocoa and the candyfloss was only candyfloss. The Dreamy Dust was baked into a very special cinnamon bun, with lilac icing, made by Madame Bella.",
+      "Years ago the ringmaster promised, in writing on the back of the Golden Ticket, that the circus would go to the performers when he retired. Tonight he sold it to Grimsby's instead. Bella called him a promise-breaker in front of everyone and told him, 'Sleep on it, Horatio.' She meant it more than anyone knew.",
+      "Bella brings buns to the stable every evening for Rumbles the elephant, so she knew where the Dreamy Dust key hangs; she left a floury fingerprint on the nail. This evening she stirred a spoonful into lavender icing, iced one special bun, and took it to the ringmaster at quarter to nine.",
+      "She only meant him to sleep through Sunday's signing, so the old promise would still stand. But his heart couldn't take so much Dreamy Dust. The lilac icing crumbs on his plate, the leftover icing bowl in the cookhouse, and the fingerprint on the nail told the rest.",
+      "Professor Pockets took the Golden Ticket, but only to keep it safe. The mug and the candyfloss were perfectly innocent. A promise is a promise, but that's no way to keep one."
+    ],
+    "timeline": [
+      {
+        "time": "6:00",
+        "event": "At supper, the ringmaster announces the sale. Bella calls him a promise-breaker: 'Sleep on it, Horatio.'"
+      },
+      {
+        "time": "7:00",
+        "event": "The farewell show begins."
+      },
+      {
+        "time": "8:15",
+        "event": "Bella takes a spoonful of Dreamy Dust from the stable, leaving a floury fingerprint on the key's nail."
+      },
+      {
+        "time": "8:30",
+        "event": "In the cookhouse, Bella stirs it into lavender icing and ices one special bun."
+      },
+      {
+        "time": "8:40",
+        "event": "Marvello serves the cocoa from his magic mug."
+      },
+      {
+        "time": "8:45",
+        "event": "Bella brings the special lilac-iced bun."
+      },
+      {
+        "time": "8:50",
+        "event": "Coco brings the candyfloss. The ringmaster is already yawning."
+      },
+      {
+        "time": "9:00",
+        "event": "Bella arrives at the cookhouse and scrubs a small bowl very carefully. Hank watches."
+      },
+      {
+        "time": "9:15",
+        "event": "Wanda visits. Her grandpa can hardly keep his eyes open."
+      },
+      {
+        "time": "9:30",
+        "event": "Professor Pockets tiptoes in and takes the Golden Ticket."
+      },
+      {
+        "time": "10:00",
+        "event": "Hank finds the ringmaster asleep forever."
+      }
+    ]
+  },
+  "characters": {
+    "bella": {
+      "private": {
+        "backstory": "YOU DID IT. Years ago the ringmaster promised, in writing on the back of the Golden Ticket, to leave the circus to the performers. Tonight he sold it to Grimsby's instead, and you told him, 'Sleep on it, Horatio.' You bring buns to the stable for Rumbles every evening, so you know where the Dreamy Dust key hangs. This evening you stirred a spoonful into lavender icing, iced one special bun, and took it to him at quarter to nine. You only meant him to sleep through Sunday's signing, so the old promise would still stand. You didn't know how weak his heart was. Now nobody must find out.",
+        "objectives": [
+          "Don't get found out. Point everyone at the magic mug (it has a secret compartment!) or at Coco, who shouted at him.",
+          "Get rid of the leftover lilac icing in the cookhouse.",
+          "Find the Golden Ticket and the promise on the back of it."
+        ],
+        "knows": [
+          "Dreamy Dust is silvery-lilac and smells of lavender. Lavender icing hides both.",
+          "Marvello's magic mug has a secret compartment. Everyone at the circus knows it."
+        ],
+        "lines": {
+          "act3": [
+            "My buns are famous. Everyone eats them. Tilly feeds them to the elephant! Why would anyone suspect a bun?"
+          ]
+        }
+      }
+    },
+    "marvello": {
+      "private": {
+        "backstory": "Tonight the ringmaster announced he'd sold the circus to Grimsby's, and Grimsby's doesn't want a magician. You were upset, and you said something silly: 'Perhaps you should sleep on it, Horatio.' Then at twenty to nine you served his cocoa from your magic mug, as always, with a big 'Abracadabra!' It was ordinary cocoa. You did not hurt him. But your mug has a secret compartment, and people are bound to wonder.",
+        "objectives": [
+          "Clear your name. A magician's secrets are not the same as a culprit's.",
+          "Keep the secret of the magic mug if you can.",
+          "Find the Golden Ticket before anyone else does."
+        ],
+        "knows": [
+          "The ringmaster ate his whole Three-Ring Supper tonight: cocoa, bun and candyfloss.",
+          "Professor Pockets was hanging about the star wagon at half past nine."
+        ],
+        "lines": {
+          "act3": [
+            "Yes, my mug has a secret compartment. Every magic mug does! That doesn't mean there was anything in it tonight but cocoa."
+          ]
+        }
+      }
+    },
+    "coco": {
+      "private": {
+        "knows": [
+          "You brought the candyfloss at ten to nine. The ringmaster was yawning; he'd just finished half a bun with lilac icing.",
+          "Marvello's magic mug was on the table, empty."
+        ],
+        "lines": {
+          "act3": [
+            "He was yawning when I got there. He'd just eaten half of a very fancy bun, with purple icing."
+          ]
+        }
+      }
+    },
+    "tilly": {
+      "private": {
+        "knows": [
+          "At nine the ringmaster said goodnight through his window, yawning like a hippo. 'Bella's bun had fancy lavender icing tonight, Tilly.'",
+          "Bella brings buns to the stable for Rumbles every evening, right past the key's nail."
+        ],
+        "lines": {
+          "act3": [
+            "Somebody knew where the key was. Somebody who comes to the stable every single evening."
+          ]
+        }
+      }
+    },
+    "wanda": {
+      "private": {
+        "knows": [
+          "At quarter past nine Grandpa was nodding off. He said, 'Bella made me a special bun, Wanda. Lavender icing. Very fancy.'",
+          "Your slippers were drying on the star wagon's steps all evening. You forgot them there."
+        ],
+        "lines": {
+          "act3": [
+            "Grandpa said Bella made him a special bun tonight. Lavender icing. I thought it was sweet of her."
+          ]
+        }
+      }
+    },
+    "hank": {
+      "private": {
+        "knows": [
+          "You found the ringmaster at ten, when you went to wake him for the fireworks. Half a bun with lilac icing was on his plate.",
+          "Bella came into the cookhouse at nine and scrubbed a small bowl very, very carefully before she started the dough."
+        ]
+      }
+    },
+    "pockets": {
+      "private": {
+        "knows": [
+          "At half past nine the ringmaster was fast asleep in his chair, very still. You tiptoed in and took the Golden Ticket.",
+          "On his plate: half a cinnamon bun with lilac icing that smelled of lavender."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "magic-mug": {
+      "text": "On the ringmaster's table: Marvello's famous magic mug, the one that fills with cocoa out of nowhere. Turn it upside down and a secret compartment in the bottom clicks open. Inside: a folded handkerchief and the Queen of Hearts. Nothing else.",
+      "redHerring": true
+    },
+    "sparkles": {
+      "text": "On the ringmaster's pillow and the doorstep: silver sparkles, the same glitter Marvello throws when he says 'Abracadabra!' Mind you, that glitter gets everywhere: it's all over the big top, and half the performers too.",
+      "redHerring": true
+    },
+    "lavender": null,
+    "bun": {
+      "text": "Half a cinnamon bun on the ringmaster's plate, still sticky. Its icing is lilac, not white, and it smells of lavender. Madame Bella bakes the buns, and this one was clearly special.",
+      "redHerring": false,
+      "pointsTo": [
+        "bella"
+      ]
+    },
+    "dust-cabinet": {
+      "text": "In the stable wagon, the jar of Dreamy Dust (the vet's sleeping powder for Rumbles the elephant) is lighter than it was this morning. On the nail behind the horse brushes, where the key hangs, there's a white, floury fingerprint.",
+      "pointsTo": [
+        "bella"
+      ]
+    },
+    "diary": {
+      "pointsTo": [
+        "bella"
+      ],
+      "puzzle": {
+        "solvedText": "The last entry, tonight: 'Bella called me a promise-breaker in front of everyone, and said, \"Sleep on it, Horatio.\" She says she's making me a special bun tonight. Lavender icing! I'll have it after my cocoa.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "icing-bowl",
+      "title": "The Icing Bowl",
+      "text": "In the cookhouse, pushed to the back of a shelf: a small bowl with the scrapings of lilac icing. It smells of lavender, and it sparkles, faintly. Nobody else at the circus ices buns.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "bella"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the meadow. The bridge is clear, and a policeman's bicycle comes wobbling across it.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The policeman arrived on his bicycle at seven. Madame Bella met him with a tray of buns, plain ones, and her beard combed very neatly. 'A promise is a promise,' she said. 'I just kept it the wrong way.'"
+    },
+    {
+      "type": "narration",
+      "text": "And the Golden Ticket? Professor Pockets turned it over and read out the ringmaster's old promise: 'When I retire, the circus goes to the performers.' There will be no sale on Sunday. The show goes on. Goodnight, detectives."
+    }
+  ]
+}

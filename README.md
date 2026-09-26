@@ -11,9 +11,11 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - **Death at Blackwood Manor** (Adults): a 1920s country house, a séance and a new will.
 - **Death Among the Vines** (Adults): a Tuscan wedding where the groom's father doesn't survive the rehearsal-dinner toast.
 - **The Captain's Last Cocoa** (Family): pirates, buried treasure and a very suspicious mug of cocoa.
+- **The Ringmaster's Last Bow** (Adults): a 1950s travelling carnival, a magician who can vanish, a sad clown and a bearded lady, all with a grudge against the ringmaster.
+- **Who Stopped the Circus?** (Family): the same carnival for all ages: a ringmaster who never wakes from his bedtime snack, and a missing Golden Ticket.
 
-All three play with 3–8 guests in about two hours, and **each comes in three versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
-- generate new mysteries for any of the eight themes, family-friendly or mature
+All of them play with 3–8 guests in about two hours, and **each comes in three or four versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
+- generate new mysteries for any of the nine themes, family-friendly or mature
 - let guests question characters nobody is playing
 - get private hints from the Inspector
 - hear a personalised verdict at the reveal

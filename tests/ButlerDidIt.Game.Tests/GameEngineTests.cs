@@ -281,24 +281,4 @@ public class GameEngineTests
         var costume = Scoring.TallyAwards(s).Single(a => a.AwardId == "costume");
         Assert.Equal(["Bob", "Cara"], costume.Winners);
     }
-
-    [Fact]
-    public void The_host_can_spotlight_a_guest_during_introductions_and_mingling_and_it_clears_on_the_next_scene()
-    {
-        var (s, scenario) = StartedGame(); // cast reveal: introductions
-        s = GameEngine.Apply(s, scenario, new SetSpotlight(T0, Bob));
-        Assert.Equal("Bob", ViewProjector.Stage(s, scenario, T0).Spotlight!.PlayerName);
-        Assert.Equal("Chef Cook", ViewProjector.Stage(s, scenario, T0).Spotlight!.CharacterName);
-
-        s = GameEngine.Apply(s, scenario, new Advance(T0)); // prologue: a new scene
-        Assert.Null(s.SpotlightSeatId);
-        Assert.Throws<GameRuleException>(() => GameEngine.Apply(s, scenario, new SetSpotlight(T0, Bob))); // not during a cinematic prologue
-
-        s = AdvanceTimes(s, scenario, 2); // act 1 mingle
-        s = GameEngine.Apply(s, scenario, new SetSpotlight(T0, Cara));
-        Assert.Equal(Cara, s.SpotlightSeatId);
-        Assert.Throws<GameRuleException>(() => GameEngine.Apply(s, scenario, new SetSpotlight(T0, Guid.NewGuid()))); // must be a guest
-        s = GameEngine.Apply(s, scenario, new SetSpotlight(T0, null));
-        Assert.Null(ViewProjector.Stage(s, scenario, T0).Spotlight);
-    }
 }

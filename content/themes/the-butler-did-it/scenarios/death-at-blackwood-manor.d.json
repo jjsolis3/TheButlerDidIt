@@ -1,0 +1,290 @@
+{
+  "variantOf": "death-at-blackwood-manor",
+  "variant": "D",
+  "solution": {
+    "murdererId": "violet",
+    "motiveId": "inheritance",
+    "methodId": "letter-opener",
+    "explanation": [
+      "Lord Reginald Blackwood was not poisoned, and the candlestick never touched him. He was killed at 9:47, exactly as the clock says, with a thin brass blade: the propeller-shaped letter-opener his daughter gave him for his birthday. The killer was Miss Violet Blackwood.",
+      "Violet wanted one thing in the world: to be the first woman to fly solo to India. Tonight's new will cut her off without a penny unless she married Percy Ashworth and gave up flying. His diary says the rest: her biplane was to be sold for scrap on Monday.",
+      "At twenty to ten, with the house at the séance, Violet went down to the study to beg one last time for her engine money. Her father laughed and said 'Scrap!' so loudly that Captain Rafferty heard it from the terrace. She snatched up the letter-opener and struck. In the struggle the grandfather clock was knocked hard and stopped at the true moment: 9:47. She left a smear of engine oil on its case.",
+      "She ran through the rain to the barn, dropped the blade into a bucket of engine oil, scrubbed her hands in the horse trough, and then, since she was there, took her father's cash from the strongbox. Percy saw her come running from the house, not the barn. At ten o'clock her flying boots were soaked, though she swore she'd been in her room with a headache.",
+      "The doctor had old sins, the butler had fingerprints, and the wife had a lover. But the daughter wanted her wings more than she wanted her father."
+    ],
+    "timeline": [
+      {
+        "time": "8:30",
+        "event": "Captain Rafferty argues with Reginald in the study and loses a cufflink."
+      },
+      {
+        "time": "9:15",
+        "event": "Dr. Finch serves Reginald his usual heart drops in a glass of port."
+      },
+      {
+        "time": "9:30",
+        "event": "The séance begins in the drawing room. Violet says she has a headache and goes 'to her room'."
+      },
+      {
+        "time": "9:40",
+        "event": "Violet goes to the study to demand her engine money."
+      },
+      {
+        "time": "9:45",
+        "event": "Rafferty, smoking on the terrace, hears Reginald shout 'Scrap!' at a woman."
+      },
+      {
+        "time": "9:47",
+        "event": "Violet stabs Reginald with the propeller letter-opener. The clock is knocked and stops."
+      },
+      {
+        "time": "9:50",
+        "event": "Violet runs to the barn, hides the blade in the oil bucket, washes in the horse trough and opens the strongbox. Percy watches."
+      },
+      {
+        "time": "9:52",
+        "event": "The storm cuts the lights at the séance."
+      },
+      {
+        "time": "10:00",
+        "event": "Hargrove discovers the body."
+      }
+    ]
+  },
+  "characters": {
+    "violet": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You want to be the first woman to fly solo to India, and tonight's new will cuts you off without a penny unless you marry Percy and give up flying. At twenty to ten, with everyone at the séance, you went to the study to beg for your engine money one last time. Father laughed and said your aeroplane goes for scrap on Monday. You snatched up the brass letter-opener shaped like a propeller blade (your own birthday present to him) and struck. The clock was knocked in the struggle and stopped at 9:47. You ran through the rain to the barn, dropped the blade into the bucket of engine oil, scrubbed your hands in the horse trough, and took the cash from his strongbox. Say you were in your room with a headache. Point everyone at the doctor.",
+        "objectives": [
+          "Do not get caught. You were in your room with a headache all evening.",
+          "Steer suspicion to Dr. Finch (the decanter, the digitalis, the old scandal) and to Hargrove (his fingerprints on the candlestick).",
+          "Keep Percy quiet. He saw more than he should have."
+        ],
+        "knows": [
+          "Your mother's old lady's maid once told you that Dr. Finch 'smelled of whisky' the night your mother died.",
+          "Father kept a propeller-shaped brass letter-opener on his desk, your birthday present to him."
+        ],
+        "lines": {
+          "act3": [
+            "Mud on my boots? It's October on the Yorkshire moors. Everything has mud on it. Ask the doctor about his decanter instead."
+          ]
+        }
+      }
+    },
+    "finch": {
+      "private": {
+        "backstory": "You did NOT kill Reginald, but you have every reason to look as if you did. Fifteen years ago you arrived drunk at the bedside of Margaret, the first Lady Blackwood, and fumbled a dose. Reginald found your old letter admitting it and has been tormenting you with it. Tonight, as his physician, you served him his usual heart drops (digitalis) in his port at 9:15. Now he is dead, and every clue that mentions medicine will point at you.",
+        "objectives": [
+          "Prove you never left the séance table.",
+          "Keep the truth about Margaret's death buried if you possibly can.",
+          "Find out who really killed Reginald before the police arrive and find your letter."
+        ],
+        "alibi": "I was at the séance from 9:30 until ten, holding hands with Lady Evelyn and Madame Zelda. I never let go.",
+        "lines": {
+          "act2": [
+            "Digitalis? Of course I carry it. Reginald's heart drops. I gave him his ten drops at quarter past nine, as I do every night."
+          ],
+          "act3": [
+            "I never left that table. Neither did anyone else at it. Whoever did this was not at the séance."
+          ]
+        }
+      }
+    },
+    "zelda": {
+      "private": {
+        "secrets": [
+          {
+            "id": "zelda-fraud",
+            "text": "I am a fraud. My real name is Doris Pratt, and the 'spirit trumpet' is painted with luminous paint.",
+            "unlockAct": 0
+          },
+          {
+            "id": "zelda-hand",
+            "text": "Nobody at my table let go of a hand all evening, not even when the lights failed. I'd have felt it.",
+            "unlockAct": 3
+          }
+        ],
+        "lines": {
+          "act3": [
+            "The spirits and I agree on one thing: every hand at my table stayed where it was. Look for someone who wasn't at the table at all."
+          ]
+        }
+      }
+    },
+    "percy": {
+      "private": {
+        "secrets": [
+          {
+            "id": "percy-debt",
+            "text": "I owe Reginald £5,000 in gambling debts. He was going to forgive it when I married Violet.",
+            "unlockAct": 0
+          },
+          {
+            "id": "percy-barn",
+            "text": "At ten to ten I saw Violet come running from the house to the barn in the rain. She scrubbed her hands in the horse trough, then opened her father's strongbox.",
+            "unlockAct": 2
+          }
+        ],
+        "knows": [
+          "Dr. Finch lost a fortune at the Doncaster races last month. You were there.",
+          "Violet was not in her room at 9:47, and when you saw her at ten to ten she was running from the house, not from the barn."
+        ]
+      }
+    },
+    "rafferty": {
+      "private": {
+        "knows": [
+          "You argued with Reginald in the study at 8:30. He was alive, and very rude, when you left.",
+          "At a quarter to ten, smoking on the terrace, you heard Reginald through the study window, shouting at a woman: 'Scrap, do you hear me? Scrap!'"
+        ],
+        "lines": {
+          "act3": [
+            "At a quarter to ten I heard Reginald through the study window, shouting at a woman. 'Scrap,' he said. Who in this house has something that could be scrapped?"
+          ]
+        }
+      }
+    },
+    "evelyn": {
+      "private": {
+        "lines": {
+          "act3": [
+            "Violet, darling, your flying boots were soaked through at ten o'clock. It doesn't often rain in one's bedroom."
+          ]
+        }
+      }
+    }
+  },
+  "clues": {
+    "candlestick": {
+      "text": "A heavy silver candlestick lies beside the body in a pool of blood. It's covered in the butler's fingerprints from polishing it this afternoon. But its base is clean and undented: it fell from the desk in the struggle. It didn't strike anyone.",
+      "redHerring": true
+    },
+    "little-blood": {
+      "title": "A Narrow Wound",
+      "text": "Not a blow at all: a single narrow, deep wound at the base of the skull, as if from a thin blade. There is a great deal of blood. Reginald was alive when it happened, and it happened where he sat.",
+      "redHerring": false,
+      "pointsTo": [
+        "violet"
+      ]
+    },
+    "cook-decanter": {
+      "text": "Mrs. O'Malley's kitchen ledger, in her own hand: '9:10. Doctor took the port decanter from my hatch. Said it was for his Lordship's heart drops. Since when does the doctor serve the port?'",
+      "redHerring": true
+    },
+    "port-glass": {
+      "text": "Reginald's port glass still holds a sticky residue that smells faintly bitter: digitalis, the heart medicine. Ten drops a night, the doctor says. Nobody dies of ten drops.",
+      "redHerring": true,
+      "pointsTo": [
+        "finch"
+      ]
+    },
+    "medical-bag": {
+      "text": "In Dr. Finch's medical bag: a brown bottle labelled DIGITALIS, nearly empty. The pharmacy label reads 'Ld. Blackwood. Ten drops nightly, in port.'",
+      "redHerring": true
+    },
+    "violet-boots": {
+      "text": "Violet's flying boots stand by the back door at ten o'clock, soaked and caked in fresh mud, and spattered with black engine oil, though she claims she never left her room.",
+      "redHerring": false
+    },
+    "new-will": {
+      "text": "A draft will in Reginald's hand, to be signed in the morning: Violet is disinherited unless she marries Lord Ashworth and gives up flying. In the margin, in fresh ink: 'The aeroplane to be sold for scrap on Monday.'",
+      "redHerring": false,
+      "pointsTo": [
+        "violet",
+        "evelyn",
+        "hargrove"
+      ]
+    },
+    "locked-diary": {
+      "pointsTo": [
+        "violet"
+      ],
+      "puzzle": {
+        "solvedText": "The final entry reads: 'V. came again for her engine money. I told her the aeroplane goes for scrap on Monday and she marries Ashworth in June. She said she would sooner see me dead. Such a dramatic girl. Like her mother.'"
+      }
+    },
+    "zelda-hand-clue": {
+      "title": "Nobody Let Go",
+      "text": "Madame Zelda's own recollection: the doctor held her left hand and Lady Evelyn her right, all evening. When the lights failed at 9:52 neither of them let go. Whoever killed Reginald was never at the séance table.",
+      "redHerring": true
+    },
+    "clock-mechanism": {
+      "title": "The Clock Was Knocked",
+      "text": "The grandfather clock really was knocked, hard, in a struggle: the case is scraped and the pendulum jammed at the true moment, 9:47. On the case, at shoulder height: a smear of black engine oil.",
+      "pointsTo": [
+        "violet"
+      ]
+    },
+    "maids-letter": {
+      "redHerring": true
+    }
+  },
+  "addClues": [
+    {
+      "id": "propeller",
+      "title": "The Propeller Letter-Opener",
+      "text": "Missing from Reginald's desk set: the brass letter-opener shaped like a propeller blade, a birthday present from Violet. It turns up at the bottom of a bucket of engine oil in the barn, beside her biplane.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "violet"
+      ]
+    },
+    {
+      "id": "trough",
+      "title": "The Horse Trough",
+      "text": "Outside the barn, the water in the horse trough is tinged pink. Caught on the pump handle: a silk flying scarf, the colour Violet wore at dinner.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "violet"
+      ]
+    }
+  ],
+  "acts": {
+    "act3": {
+      "title": "Act Three: Wings and Oil",
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. Wings and Oil."
+        },
+        {
+          "type": "image",
+          "text": "The old barn in the rain: a biplane under a tarpaulin, a bucket of engine oil, a horse trough.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone has been staring at the séance table and the doctor's medicine bag. But what if nobody at that table did it? The clock may have told the truth all along. So where was everyone who wasn't holding hands at 9:47?"
+        }
+      ],
+      "prompts": [
+        "Who wasn't at the séance at 9:47, and can prove it?",
+        "Who had a blade within reach, and a reason to use it?",
+        "Who loses the most under the new will?",
+        "Make your final case. Who had means, motive and opportunity?"
+      ]
+    }
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the moors. A police car crosses the bridge.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Mocktails up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "By dawn the waters had fallen and the police motor came rattling across the bridge. They found Miss Violet Blackwood in the barn, in her flying helmet, sitting in the cockpit of an aeroplane that would never leave the ground."
+    },
+    {
+      "type": "narration",
+      "text": "As for the rest of Blackwood Manor's household, their secrets are out now. Whether they can live with them is another mystery entirely. Good night, detectives."
+    }
+  ]
+}

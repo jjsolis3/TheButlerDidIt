@@ -70,7 +70,15 @@ export default function HowToPlay() {
             when the topic comes up, or when the host puts you in the spotlight.
           </li>
           <li>
-            <b>Spotlight:</b> the host can give each guest a turn. The big screen shows who’s up, and that guest’s phone says “You’re up!”.
+            <b>Spotlight:</b> the host gives someone the floor (or presses “🎲 Spin”). The big screen shows who’s up, a question for them, and a 90-second turn;
+            their phone says “You’re up!”. Characters the narrator plays get turns too.
+          </li>
+          <li>
+            <b>Confront:</b> once per act, anyone can challenge a suspect with a clue from their phone. The clue goes on the big screen, and the suspect has a
+            minute to explain.
+          </li>
+          <li>
+            <b>Who looks guiltiest?</b> Keep your pick up to date on the Clues tab. The big screen shows the totals, never who picked whom.
           </li>
           <li>Everyone may lie. The killer must. But nobody shows their phone.</li>
           <li>Stuck for something to say? The big screen shows conversation prompts during mingling, and the Guide button explains what to do next.</li>

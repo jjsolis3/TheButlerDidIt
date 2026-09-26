@@ -70,7 +70,7 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   // Same story again: "Surprise me" deals a version this host hasn't played, so a new killer.
   await host.goto('/host/new')
   await host.getByRole('tab', { name: /Family/ }).click()
-  await expect(host.getByText('3 versions, a different killer each')).toBeVisible()
+  await expect(host.getByRole('button', { name: /The Captain's Last Cocoa/ })).toContainText('3 versions, a different killer each')
   await expect(host.getByLabel('Version', { exact: true })).toHaveValue('surprise')
   await expect(host.getByLabel('Version', { exact: true }).locator('option', { hasText: 'Version A (played)' })).toHaveCount(1)
   await host.screenshot({ path: `${SHOTS}/74-version-picker.png`, fullPage: true })
@@ -137,4 +137,40 @@ test('Surprise me: when no version fits the cast, the AI makes one of the guests
   expect(await isKiller(guests[0])).toBe(0)
   const dealt = await (await host.request.get(`/api/parties/${code}`)).json()
   expect(dealt.scenarioId).toMatch(/^the-captains-last-cocoa--ai[0-9a-f]{6}$/)
+})
+
+test('the Family circus: a second story on the Family shelf, and the stable kid is never the culprit', async ({ browser }) => {
+  const host = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage()
+  await host.goto('/login')
+  await host.getByRole('button', { name: 'Create an account' }).click()
+  await host.getByLabel('Your name').fill('Ringmaster Rae')
+  await host.getByLabel('Email').fill(`circus-${Date.now()}@example.com`)
+  await host.getByLabel('Password').fill('password123')
+  await host.getByRole('button', { name: 'Create account' }).click()
+  await host.waitForURL('**/host/new')
+
+  await host.getByRole('tab', { name: /Family/ }).click()
+  await host.getByRole('button', { name: /Who Stopped the Circus\?/ }).click()
+  await expect(host.getByRole('button', { name: /Who Stopped the Circus\?/ })).toContainText('3 versions, a different killer each')
+  await host.getByLabel('Version', { exact: true }).selectOption('who-stopped-the-circus') // Version A: this test knows the culprit
+  await host.screenshot({ path: `${SHOTS}/77-family-circus.png`, fullPage: true })
+  await host.getByRole('button', { name: 'Create party and get the invite code' }).click()
+  await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
+  const code = host.url().split('/').pop()!
+
+  const marvello = await joinAs(browser, code, 'Max', /The Amazing Marvello/)
+  await joinAs(browser, code, 'Cleo', /Coco the Clown/)
+  const tilly = await joinAs(browser, code, 'Tia', /Tilly Tumble/)
+
+  await host.getByRole('button', { name: 'Begin the evening' }).click()
+  await host.getByRole('button', { name: 'Tap to begin the evening' }).click()
+  await expect(host.getByRole('heading', { name: 'The suspects' })).toBeVisible()
+  await expect(marvello.getByText('You are the murderer.', { exact: true })).toBeVisible()
+  await expect(tilly.getByText('You are the murderer.', { exact: true })).toHaveCount(0)
+  await host.screenshot({ path: `${SHOTS}/78-circus-cast.png` })
+
+  await host.getByRole('button', { name: 'Play the prologue' }).click()
+  await host.getByRole('button', { name: 'Begin Act One' }).click()
+  await host.getByRole('button', { name: 'Start mingling' }).click()
+  await expect(host.getByText('The Three-Ring Supper')).toBeVisible()
 })

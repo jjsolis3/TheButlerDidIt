@@ -87,13 +87,15 @@ test('a full dinner party: join, play three acts, accuse, reveal and vote', asyn
   await expect(bob.getByText(/half-brother/)).toBeVisible()
   await expect(cara.getByText('Who you are')).toBeVisible()
   await expect(cara.getByText(/half-brother/)).toHaveCount(0)
-  // Introductions: the host spotlights each guest in turn; their phone tells them they're up.
-  await stage.getByRole('button', { name: /Spotlight a guest/ }).click()
-  await expect(stage.getByText('In the spotlight')).toBeVisible()
-  await expect(alice.getByText("You're up!")).toBeVisible()
+  // Introductions: the host gives everyone a turn in cast order (Lady Evelyn, then Hargrove, then Finch);
+  // the big screen shows a question card, and the speaker's phone tells them they're up.
+  await stage.getByRole('button', { name: /🎤 Spotlight/ }).click()
+  await expect(stage.getByRole('status').filter({ hasText: 'In the spotlight' })).toContainText('Introduce yourself')
   await stage.getByRole('button', { name: /Next speaker/ }).click()
   await expect(bob.getByText("You're up!")).toBeVisible()
-  await expect(alice.getByText("You're up!")).toHaveCount(0)
+  await stage.getByRole('button', { name: /Next speaker/ }).click()
+  await expect(alice.getByText("You're up!")).toBeVisible()
+  await expect(bob.getByText("You're up!")).toHaveCount(0)
   await stage.screenshot({ path: `${SHOTS}/03-stage-cast.png` })
 
   // The live guide explains the moment, on the big screen and on a phone.

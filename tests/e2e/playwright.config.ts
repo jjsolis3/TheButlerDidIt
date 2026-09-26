@@ -49,6 +49,8 @@ export default defineConfig({
       Ai__Roles__Voice__Model: 'fake-voice',
       Ai__Roles__Illustrator__Provider: 'Fake',
       Ai__Roles__Illustrator__Model: 'fake-image',
+      // Every guest in every test joins from this one machine, far faster than any real party.
+      RateLimits__JoinPerMinute: process.env.E2E_JOINS_PER_MINUTE ?? '500',
       // Keep this run's generated files out of the developer's own media folder.
       Media__Root: process.env.E2E_MEDIA_ROOT ?? `${process.env.TMPDIR ?? '/tmp'}/butler-e2e-media-${Date.now()}`,
     },

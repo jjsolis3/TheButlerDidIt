@@ -54,7 +54,12 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
   })
   if (!res.ok) {
     // The API returns RFC 7807 "problem details": { title, detail, status }.
-    let message = res.status === 401 ? 'Please sign in.' : `Request failed (${res.status}).`
+    let message =
+      res.status === 401
+        ? 'Please sign in.'
+        : res.status === 429
+          ? 'Too many tries from this network in the last minute. Wait a moment and try again.'
+          : `Request failed (${res.status}).`
     try {
       const problem = await res.json()
       message = problem.detail ?? problem.title ?? message

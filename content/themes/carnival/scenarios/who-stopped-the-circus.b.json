@@ -1,0 +1,208 @@
+{
+  "variantOf": "who-stopped-the-circus",
+  "variant": "B",
+  "solution": {
+    "murdererId": "coco",
+    "motiveId": "pet",
+    "methodId": "candyfloss",
+    "explanation": [
+      "The ringmaster's cocoa was only cocoa, and his bun was only a bun. The Dreamy Dust was in the last treat of the night: the pink candyfloss. It was spun by Coco the Clown.",
+      "Tonight the ringmaster told Coco that Pepper, his clever circus dog, would be sent to a farm three states away on Sunday. Coco said, 'Then maybe you'll sleep in on Sunday, sir.' The ringmaster wrote it in his diary and thought it was a joke.",
+      "All week Coco had been helping Tilly feed Rumbles the elephant in the stable, right beside the nail where the Dreamy Dust key hangs. This evening he borrowed a spoonful and mixed it into the pink sugar of his candyfloss machine. At ten to nine he brought the ringmaster his candyfloss, as always.",
+      "Coco only meant him to sleep through Sunday morning, so Pepper's papers would never be signed. But the ringmaster's old heart couldn't take so much Dreamy Dust. The lavender smell gave it away: in the candyfloss wisps, in the sugar bowl, and in the seams of Coco's big red nose.",
+      "Professor Pockets took the Golden Ticket, but only to keep it safe. The cocoa and the bun were perfectly innocent. And Pepper? Pepper was in Coco's costume trunk all along."
+    ],
+    "timeline": [
+      {
+        "time": "6:00",
+        "event": "At supper, the ringmaster announces the sale to the Grimsby Grand Circus."
+      },
+      {
+        "time": "6:30",
+        "event": "He tells Coco that Pepper is going to a farm. Coco: 'Then maybe you'll sleep in on Sunday, sir.'"
+      },
+      {
+        "time": "7:00",
+        "event": "The farewell show begins."
+      },
+      {
+        "time": "8:20",
+        "event": "Coco takes a spoonful of Dreamy Dust from the stable cabinet and mixes it into his pink sugar."
+      },
+      {
+        "time": "8:40",
+        "event": "Marvello serves the cocoa from his magic mug."
+      },
+      {
+        "time": "8:45",
+        "event": "Bella brings a cinnamon bun. The ringmaster is wide awake, telling jokes."
+      },
+      {
+        "time": "8:50",
+        "event": "Coco brings the pink candyfloss."
+      },
+      {
+        "time": "9:00",
+        "event": "The ringmaster says goodnight to Tilly, yawning: 'Coco's candyfloss tasted of lavender tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Wanda visits. Her grandpa can hardly keep his eyes open."
+      },
+      {
+        "time": "9:30",
+        "event": "Professor Pockets tiptoes in and takes the Golden Ticket."
+      },
+      {
+        "time": "10:00",
+        "event": "Hank finds the ringmaster asleep forever."
+      }
+    ]
+  },
+  "characters": {
+    "coco": {
+      "private": {
+        "backstory": "YOU DID IT. Tonight the ringmaster told you Pepper, your clever circus dog, would be sent to a farm three states away on Sunday. All week you've been helping Tilly feed Rumbles the elephant, right beside the nail where the Dreamy Dust key hangs. This evening you borrowed a spoonful, mixed it into the pink sugar of your candyfloss machine, and at ten to nine you brought the ringmaster his candyfloss as usual. You only meant him to sleep through Sunday morning, so Pepper's papers would never be signed. You didn't know how weak his heart was. Now nobody must find out.",
+        "objectives": [
+          "Don't get found out. Point everyone at the magic mug: it has a secret compartment!",
+          "Get rid of the lavender-smelling sugar in your candyfloss machine.",
+          "Keep Pepper safe, whatever happens."
+        ],
+        "knows": [
+          "Dreamy Dust is silvery-lilac and smells of lavender. Plenty of pink sugar hides the colour.",
+          "Marvello's magic mug has a secret compartment. Everyone at the circus knows it."
+        ]
+      }
+    },
+    "marvello": {
+      "private": {
+        "backstory": "Tonight the ringmaster announced he'd sold the circus to Grimsby's, and Grimsby's doesn't want a magician. You were upset, and you said something silly: 'Perhaps you should sleep on it, Horatio.' Then at twenty to nine you served his cocoa from your magic mug, as always, with a big 'Abracadabra!' It was ordinary cocoa. You did not hurt him. But your mug has a secret compartment, and people are bound to wonder.",
+        "objectives": [
+          "Clear your name. A magician's secrets are not the same as a culprit's.",
+          "Keep the secret of the magic mug if you can.",
+          "Find the Golden Ticket before anyone else does."
+        ],
+        "knows": [
+          "The ringmaster ate his whole Three-Ring Supper tonight: cocoa, bun and candyfloss.",
+          "Professor Pockets was hanging about the star wagon at half past nine."
+        ],
+        "lines": {
+          "act3": [
+            "Yes, my mug has a secret compartment. Every magic mug does! That doesn't mean there was anything in it tonight but cocoa."
+          ]
+        }
+      }
+    },
+    "bella": {
+      "private": {
+        "knows": [
+          "You took the cinnamon bun at quarter to nine. The ringmaster was wide awake, telling you a joke about a seal.",
+          "At quarter to nine the Golden Ticket was still in its frame on the wagon wall."
+        ]
+      }
+    },
+    "tilly": {
+      "private": {
+        "knows": [
+          "At nine the ringmaster said goodnight through his window, yawning like a hippo. 'Coco's candyfloss tasted funny tonight, Tilly. Like lavender.'",
+          "All this week Coco has been helping you feed Rumbles every evening, right beside the key's nail."
+        ],
+        "lines": {
+          "act3": [
+            "Somebody knew where the key was. Somebody who's been 'helping' in the stable a lot this week."
+          ]
+        }
+      }
+    },
+    "wanda": {
+      "private": {
+        "knows": [
+          "At quarter past nine Grandpa was nodding off. He said, 'That candyfloss tasted of lavender, Wanda. Coco's getting fancy.'",
+          "Your slippers were drying on the star wagon's steps all evening. You forgot them there."
+        ],
+        "lines": {
+          "act3": [
+            "Grandpa said the candyfloss tasted of lavender. I thought he was being silly."
+          ]
+        }
+      }
+    },
+    "pockets": {
+      "private": {
+        "knows": [
+          "At half past nine the ringmaster was fast asleep in his chair, very still. You tiptoed in and took the Golden Ticket.",
+          "There was a wisp of pink candyfloss stuck to his sleeve, and it smelled of lavender."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "magic-mug": {
+      "text": "On the ringmaster's table: Marvello's famous magic mug, the one that fills with cocoa out of nowhere. Turn it upside down and a secret compartment in the bottom clicks open. Inside: a folded handkerchief and the Queen of Hearts. Nothing else.",
+      "redHerring": true
+    },
+    "sparkles": {
+      "text": "On the ringmaster's pillow and the doorstep: silver sparkles, the same glitter Marvello throws when he says 'Abracadabra!' Mind you, that glitter gets everywhere: it's all over the big top, and half the performers too.",
+      "redHerring": true
+    },
+    "lavender": null,
+    "candyfloss": {
+      "text": "A bare candyfloss stick in the waste basket, a few pink wisps still clinging to it. The wisps sparkle faintly lilac, and they smell of lavender. Coco spins the ringmaster's candyfloss himself.",
+      "redHerring": false,
+      "pointsTo": [
+        "coco"
+      ]
+    },
+    "dust-cabinet": {
+      "text": "In the stable wagon, the jar of Dreamy Dust (the vet's sleeping powder for Rumbles the elephant) is lighter than it was this morning. The key hangs on the nail behind the horse brushes. All week, Coco has been helping you feed Rumbles every evening, right beside that nail.",
+      "pointsTo": [
+        "coco"
+      ]
+    },
+    "diary": {
+      "pointsTo": [
+        "coco"
+      ],
+      "puzzle": {
+        "solvedText": "The last entry, tonight: 'Told Coco that Pepper goes to the farm on Sunday. He said, \"Then maybe you'll sleep in on Sunday, sir.\" What a funny thing to say. Candyfloss at ten to nine as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "sugar-bowl",
+      "title": "The Sugar Bowl",
+      "text": "In the candyfloss stand, the machine's sugar bowl: bright pink sugar with little lilac grains mixed in. It smells of lavender, and nobody puts lavender in candyfloss.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "coco"
+      ]
+    },
+    {
+      "id": "red-nose",
+      "title": "A Big Red Nose",
+      "text": "Coco's big red nose, left on the cookhouse table: a fine lilac powder is caught in its seams, and it smells of lavender.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "coco"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the meadow. The bridge is clear, and a policeman's bicycle comes wobbling across it.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The policeman arrived on his bicycle at seven. Coco the Clown was waiting for him with Pepper in his arms. 'I only wanted to keep my friend,' he said, and for once he wasn't smiling."
+    },
+    {
+      "type": "narration",
+      "text": "And the Golden Ticket? Professor Pockets turned it over and read out the ringmaster's old promise: 'When I retire, the circus goes to the performers.' Pepper stays, the show goes on, and nobody is selling anything on Sunday. Goodnight, detectives."
+    }
+  ]
+}

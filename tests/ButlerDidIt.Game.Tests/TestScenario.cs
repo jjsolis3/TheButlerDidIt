@@ -35,6 +35,7 @@ public static class TestScenario
                 Puzzle = new Puzzle { Prompt = "What has hands but cannot clap?", Answers = ["a clock", "clock"], SolvedText = "PUZZLE_SOLVED_TEXT" },
             },
             new Clue { Id = "c5", Title = "Guest's note", Text = "PRIVATE_CLUE_TO_GUEST", Act = 2, Visibility = ClueVisibility.Private, Recipient = "guest", PointsTo = ["maid"] },
+            new Clue { Id = "c6", Title = "Flour on the stairs", Text = "PUBLIC_CLUE_2", Act = 2, Wave = ClueWave.Midway, PointsTo = ["cook"] },
         ],
         Prologue = [new Cue { Type = CueType.Narration, Text = "A scream!" }],
         Acts =

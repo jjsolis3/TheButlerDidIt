@@ -29,7 +29,8 @@
     { "id": "debt-note", "title": "An IOU", "text": "An IOU signed by Colonel Mustardseed for a large sum, due tomorrow.", "visibility": "public", "act": 1, "wave": "start", "pointsTo": ["colonel"] },
     { "id": "will", "title": "The Will", "text": "The will leaves everything to Miss Plumtree.", "visibility": "public", "act": 1, "wave": "midway", "pointsTo": ["niece"], "redHerring": true },
     { "id": "tea-carrier", "title": "Kitchen Note", "text": "Mrs. Butterworth's note: 'The colonel insisted on carrying the tea up himself at nine.'", "visibility": "private", "recipient": "cook", "act": 2, "wave": "start", "pointsTo": ["colonel"] },
-    { "id": "poison-bottle", "title": "Hidden Bottle", "text": "An empty poison bottle hidden in the library, where the colonel says he was reading.", "visibility": "public", "act": 2, "wave": "midway", "pointsTo": ["colonel"] }
+    { "id": "poison-bottle", "title": "Hidden Bottle", "text": "An empty poison bottle hidden in the library, where the colonel says he was reading.", "visibility": "public", "act": 2, "wave": "midway", "pointsTo": ["colonel"] },
+    { "id": "muddy-cuffs", "title": "Muddy Cuffs", "text": "The colonel's trouser cuffs are caked with mud from the foxglove bed, though he swears he never left the library.", "visibility": "public", "act": 2, "wave": "midway", "pointsTo": ["colonel"] }
   ],
   "prologue": [ { "type": "image", "text": "Testwood Hall at night.", "effect": "kenburns" }, { "type": "narration", "text": "The professor has been poisoned." } ],
   "acts": [

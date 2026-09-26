@@ -1,0 +1,259 @@
+{
+  "variantOf": "death-among-the-vines",
+  "variant": "D",
+  "solution": {
+    "murdererId": "marco",
+    "motiveId": "inheritance",
+    "methodId": "withheld",
+    "explanation": [
+      "Aldo Moretti was not poisoned at all. Nothing was in the chalice, the funnel or the love potion. His heart gave out in the library after the toast, in a furious row with his son, and it could have been saved by a single tablet. His son put the pills in his pocket and watched. The killer was the groom: Marco Moretti.",
+      "Aldo had made his blessing conditional: sign over your share of the vineyard, or there's no wedding money and no villa. His cellar book shows he meant to finish it after the toast: sign, or Sofia learns about the Lombardi girl. The doctor had told Aldo: no shouting, for his heart.",
+      "At twenty-five past twelve Marco left Tommy on the terrace, saying he'd settle it with his father 'one way or another'. Tommy promised to say he never left. In the library Aldo pushed the contract at him and shouted, and then he clutched his chest and reached for the pills on the side table. Marco picked up the bottle, put it in his pocket, and waited.",
+      "Twenty minutes later he walked out, as Dario's clipboard records, leaving a petal from his boutonnière on the rug. At one o'clock Dario found Aldo, one hand pressed to his heart. The pills were in the pocket of the groom's jacket, hanging on a terrace chair.",
+      "The sommelier had a grudge, the wife had the will, and the bride had a slap. But the son wanted the vineyard, and his freedom, and he only had to do nothing at all."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The rehearsal dinner begins on the terrace."
+      },
+      {
+        "time": "9:30",
+        "event": "Aldo makes a pass at Sofia. She slaps him in front of the guests."
+      },
+      {
+        "time": "10:00",
+        "event": "Aldo tells Marco: sign over your share, or there's no wedding."
+      },
+      {
+        "time": "11:00",
+        "event": "Marco and Chiara kiss in the olive grove. Tommy sees them."
+      },
+      {
+        "time": "12:00",
+        "event": "The midnight toast from the silver chalice. Everyone drinks the same Riserva."
+      },
+      {
+        "time": "12:15",
+        "event": "Aldo goes to the library with the contract, to wait for his son."
+      },
+      {
+        "time": "12:25",
+        "event": "Marco leaves Tommy on the terrace: 'one way or another'. Tommy promises to cover for him."
+      },
+      {
+        "time": "12:30",
+        "event": "In the library, Aldo shouts, clutches his chest and reaches for his pills. Marco pockets them."
+      },
+      {
+        "time": "12:50",
+        "event": "Marco leaves the library alone. Dario logs it."
+      },
+      {
+        "time": "1:00",
+        "event": "Dario finds Aldo dead in the library, one hand on his heart."
+      }
+    ]
+  },
+  "accusation": {
+    "methods": [
+      {
+        "id": "oleander",
+        "text": "Oleander poison in his silver chalice"
+      },
+      {
+        "id": "pills",
+        "text": "An overdose of his heart pills"
+      },
+      {
+        "id": "potion",
+        "text": "A 'love potion' slipped into his dessert wine"
+      },
+      {
+        "id": "stairs",
+        "text": "A push down the cellar stairs"
+      },
+      {
+        "id": "withheld",
+        "text": "Letting his heart fail, and keeping his pills from him"
+      }
+    ]
+  },
+  "characters": {
+    "marco": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Your father made his blessing conditional: sign over your share of the vineyard, or there's no wedding money and no villa. After the toast he took the contract to the library and sent for you: sign tonight, or Sofia learns about you and Chiara. At twenty-five past twelve you left Tommy on the terrace ('I'll settle it, one way or another'; he promised to say you never left). In the library your father shouted, then clutched his chest and reached for the pills on the side table. You picked up the bottle, put it in your pocket, and waited until he was still. You left at ten to one. Hang your jacket somewhere, and never mention the library.",
+        "objectives": [
+          "Do not get caught. You were on the terrace with Tommy from eleven until one; Tommy will back you.",
+          "Steer suspicion to Luca (the chalice) and Vittoria (the will, and she hands out his pills every night).",
+          "Get rid of the pill bottle in your jacket pocket before anyone looks."
+        ],
+        "knows": [
+          "Your father's doctor told him last week: no shouting, and never be without the pills. One tablet can stop an attack.",
+          "Your father told you at ten o'clock: 'Sign, or there is no wedding.'"
+        ],
+        "alibi": "From eleven until the toast, and after it until they found him, I was on the terrace with Tommy, practising his best-man speech.",
+        "lines": {
+          "act3": [
+            "I was on the terrace all night. Ask Tommy. He'd never lie about a thing like that. Would you, Tommy?"
+          ]
+        }
+      }
+    },
+    "luca": {
+      "private": {
+        "backstory": "You are really Luca Ferrante. Twenty years ago Aldo Moretti sold fake vintages under his own label and, when he was caught, blamed your father. The Ferrante vineyard was ruined. You took this job to get close to Aldo and make him pay, but when the moment came you couldn't do it. Instead you've been quietly swapping his precious bottles for cheap wine and selling the real ones. At half past eleven you borrowed the pruning gloves to cut roses for the bridal table. You did NOT kill Aldo, but if anyone learns your real name, you're the obvious suspect.",
+        "objectives": [
+          "Keep your real name secret.",
+          "Keep the bottle-swapping quiet.",
+          "Find out who really killed Aldo. Justice for your father should be a trial, not a poisoning."
+        ],
+        "alibi": "From half past eleven I was cutting roses and then in the cellar choosing tomorrow's wines. After the toast I was clearing glasses in the kitchen.",
+        "lines": {
+          "act3": [
+            "Everybody drank my Riserva at midnight, and everybody is alive except Signor Moretti. Look at what happened after the toast, not during it."
+          ]
+        }
+      }
+    },
+    "tommy": {
+      "private": {
+        "objectives": [
+          "Nobody finds out about the rings.",
+          "Get free of Aldo's IOU now that he's dead, if you can.",
+          "You promised to cover for Marco. Decide whether a promise to a friend is worth more than the truth."
+        ],
+        "knows": [
+          "You saw Marco and Chiara in the olive grove at eleven.",
+          "At twenty-five past twelve Marco left the terrace, saying he'd settle it with his father 'one way or another'. He made you promise to say he never left. He came back at ten to one, pale, without his jacket."
+        ]
+      }
+    },
+    "dario": {
+      "private": {
+        "knows": [
+          "Your clipboard records who signed out the cellar key, and when.",
+          "You log everyone's movements, out of habit: Marco went into the library at half past twelve and came out alone at ten to one."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "chalice": {
+      "text": "Aldo never drank a toast from an ordinary glass, only from the family's antique silver chalice. The staff confirm that only the sommelier polishes it, fills it and carries it. Everyone drank the same Riserva.",
+      "redHerring": true
+    },
+    "key-log": {
+      "text": "Your clipboard: 'Cellar key signed out 11:30 by L. Bellini, with a pair of pruning gloves from the garden shed ('roses for the bridal table'). Key returned 11:55.'",
+      "redHerring": true
+    },
+    "funnel": {
+      "text": "In the cellar, the decanting funnel holds crushed green leaves and a few petals. The gardener sniffs them: rosemary and rose petals, the makings of tomorrow's wedding punch.",
+      "redHerring": true
+    },
+    "gloves": {
+      "text": "Pushed into the old wine press: a pair of pruning gloves scratched by rose thorns and dusted with petals. Stitched inside the cuff: 'L.B.' Why hide gloves you borrowed for roses?",
+      "redHerring": true
+    },
+    "clipping": {
+      "redHerring": true
+    },
+    "cellar-book": {
+      "pointsTo": [
+        "marco"
+      ],
+      "puzzle": {
+        "solvedText": "The last entry, in Aldo's hand: 'Marco still refuses to sign. After the toast I show him the contract again. If he still refuses, Sofia hears about the Lombardi girl. The doctor says no shouting, for my heart. We shall see.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "missing-pills",
+      "title": "The Missing Pills",
+      "text": "Aldo's heart pills always sit on the library side table, beside his reading glasses. Tonight the glasses are there; the pills are not. The village doctor, stranded by the storm, says one tablet might have saved him.",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "marco",
+        "vittoria"
+      ]
+    },
+    {
+      "id": "petal",
+      "title": "A Petal on the Rug",
+      "text": "On the library rug, beside Aldo's armchair: a small white rosebud petal, the kind in the groom's boutonnière. Marco says he never set foot in the library tonight.",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "marco"
+      ]
+    },
+    {
+      "id": "library-log",
+      "title": "Half Past Twelve",
+      "text": "Your clipboard, because you log everything: '12:30. M.M. to library. 12:50. M.M. out, alone. No jacket.'",
+      "visibility": "private",
+      "recipient": "dario",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "marco"
+      ]
+    },
+    {
+      "id": "jacket",
+      "title": "The Groom's Jacket",
+      "text": "Hanging on a terrace chair: the groom's jacket, boutonnière missing a petal. In its inside pocket: Aldo's heart pills, a full bottle, the label dated yesterday.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "marco"
+      ]
+    }
+  ],
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Last Toast."
+        },
+        {
+          "type": "image",
+          "text": "The terrace after the party: overturned chairs, candle stubs, a dropped napkin.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone saw Aldo drink the midnight toast, and everyone drank the same wine. The village doctor, stranded like the rest of you, says Aldo's heart simply gave out. But Aldo was never without his heart pills. So why didn't he take one?"
+        },
+        {
+          "type": "line",
+          "speaker": "marco",
+          "text": "He drank the toast, gave a speech, and went to the library. That was the last time I saw my father."
+        }
+      ]
+    }
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning over the vineyard. A carabinieri car climbs the muddy road.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Espresso cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The carabinieri arrived at eight. Marco Moretti was in the chapel, in his wedding suit, alone. 'I didn't touch him,' he said. 'I only didn't help.' The carabinieri did not see the difference."
+    },
+    {
+      "type": "narration",
+      "text": "As for the bride, the ex, the wife, the planner and the best man: they all have some explaining to do. There will be no 'I do' at noon. Buona notte, detectives."
+    }
+  ]
+}

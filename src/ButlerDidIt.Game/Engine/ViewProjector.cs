@@ -54,9 +54,14 @@ public static class ViewProjector
                 return new InterrogationView(i.Id, i.Act, i.AskerName, i.CharacterId, npc?.Name ?? i.CharacterId, i.Question, i.Answer, npc?.Voice, i.AudioUrl);
             }).ToList(),
             Options: s.Options,
-            Spotlight: s.SpotlightSeatId is { } spot && s.FindPlayer(spot) is { } who
-                ? new SpotlightView(who.SeatId, who.Name, who.CharacterId is { } cid ? scenario.FindCharacter(cid)?.Name : null)
-                : null,
+            Spotlight: BuildSpotlight(s, scenario),
+            Suspicion: s.Phase == Phase.Act
+                ? GameEngine.CharactersInPlay(s, scenario)
+                    .Select(c => new SuspicionView(c.Id, c.Name, s.Suspicions.Values.Count(v => v == c.Id)))
+                    .Where(v => v.Votes > 0)
+                    .OrderByDescending(v => v.Votes).ThenBy(v => v.Name)
+                    .ToList()
+                : [],
             Tailoring: s.Tailoring);
     }
 
@@ -128,6 +133,9 @@ public static class ViewProjector
                 : null,
             QuestionsLeft: GameEngine.QuestionsLeft(s, seatId),
             HintsLeft: GameEngine.HintsLeft(s, seatId),
+            MySuspicion: s.Suspicions.GetValueOrDefault(seatId),
+            CanConfront: s.Phase == Phase.Act && s.ActStep == ActStep.Mingle && character is not null
+                && s.ConfrontedInAct.GetValueOrDefault(seatId) != GameEngine.CurrentActNumber(s),
             // Hints are private: only this seat's own hints are copied in.
             MyHints: s.Hints.Where(h => h.SeatId == seatId).Select(h => new HintView(h.Id, h.Act, h.Text)).ToList(),
             Stage: stage);
@@ -224,6 +232,29 @@ public static class ViewProjector
                 solved is not null,
                 solved is null ? null : s.FindPlayer(solved.SolvedBySeatId)?.Name,
                 solved is null ? null : clue.Puzzle.SolvedText));
+    }
+
+    private static SpotlightView? BuildSpotlight(GameState s, Scenario scenario)
+    {
+        if (s.SpotlightCharacterId is not { } id || scenario.FindCharacter(id) is not { } character) return null;
+        var player = s.PlayerFor(id);
+        // A narrator-played character says their line for this act (the narrator voices it in the scene
+        // anyway, so it's public), or their public introduction during the cast reveal.
+        string? npcLine = null;
+        if (player is null)
+        {
+            npcLine = s.Phase == Phase.Act && character.Private.Lines.TryGetValue(scenario.Acts[s.ActIndex].Id, out var lines) && lines.Count > 0
+                ? lines[0]
+                : character.PublicBio;
+        }
+        ConfrontationView? confrontation = null;
+        if (s.Confrontation is { } c && scenario.FindClue(c.ClueId) is { } clue && s.FindPlayer(c.AccuserSeatId) is { } accuser)
+        {
+            var accuserName = accuser.CharacterId is { } aid ? scenario.FindCharacter(aid)?.Name ?? accuser.Name : accuser.Name;
+            confrontation = new ConfrontationView(accuserName, clue.Title, clue.Text);
+        }
+        return new SpotlightView(id, character.Name, player?.SeatId, player?.Name, player is null, npcLine,
+            SpotlightCards.Question(s, scenario, character), s.SpotlightEndsAt, confrontation);
     }
 
     private static Dossier BuildDossier(GameState s, Scenario scenario, Character c)

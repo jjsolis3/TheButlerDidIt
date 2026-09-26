@@ -12,6 +12,7 @@ import MyMysteries from './pages/MyMysteries'
 import Play from './pages/Play'
 import ScenarioEditor from './pages/ScenarioEditor'
 import Recap from './pages/Recap'
+import Remote from './pages/Remote'
 import Stage from './pages/Stage'
 
 // Page map. The same URLs work in production because ASP.NET Core falls back to
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />
       <Route path="/stage/:code" element={<Stage />} />
+      <Route path="/remote/:code" element={<Remote />} />
       <Route path="/play/:code" element={<Play />} />
       <Route path="/pass/:code" element={<PassAndPlay />} />
       <Route path="*" element={<Navigate to="/" replace />} />

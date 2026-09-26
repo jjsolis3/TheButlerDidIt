@@ -39,6 +39,7 @@ export function stageGuide(stage: StageView, host: boolean): Guide {
               'Guests join by scanning the QR code or typing the party code on their phones.',
               'Each guest picks a character (or you press "Auto-assign" later). They can read who they are and what to wear, but their secrets stay locked until the evening begins.',
               'Optional: print the party kit (name tags, character booklets) and the how-to-play sheet.',
+              'Optional: press "Use my phone as a remote" to run the evening from your phone, then hide the controls on this screen. Press "Enable sound on this screen" first so the TV can play the story.',
               'When everyone is here, press "Begin the evening".',
             ]
           : ['Scan the QR code or go to the join page and type the party code.', 'Pick a character on your phone. Dress the part if you like!'],
@@ -50,7 +51,12 @@ export function stageGuide(stage: StageView, host: boolean): Guide {
         steps: [
           'Everyone opens their phone and reads their dossier: who they are, their alibi, their goals, and their secrets.',
           'Go round the room: each guest introduces their character in one or two sentences, using the public bio. Stay in character!',
-          ...(host ? ['Use "Spotlight" to show whose turn it is to introduce themselves.', 'When everyone has introduced themselves, press "Play the prologue".'] : []),
+          ...(host
+            ? [
+                'Use "🎲 Spin" or "Spotlight" to show whose turn it is. Characters the narrator plays get a turn too: the narrator introduces them.',
+                'When everyone has introduced themselves, press "Play the prologue".',
+              ]
+            : []),
         ],
         tip: 'Never show your phone to anyone. Everything on it is private to your character.',
       }
@@ -78,10 +84,11 @@ export function stageGuide(stage: StageView, host: boolean): Guide {
           'Mingle in character until the timer runs out. Question each other about alibis, motives and the clues.',
           'Guests: check your phone. If it shows lines under "Say this aloud during this act", find a good moment to say them.',
           'Read new clues as they appear. More are found halfway through.',
+          'Once per act, anyone can confront a suspect with a clue from their phone (Clues tab). And keep your "who looks guiltiest?" pick up to date: the big screen shows the totals.',
           ...(stage.ai.npcQuestions ? ['Question the characters nobody is playing from the Question tab. The whole room hears the answer.'] : []),
           ...(host
             ? [
-                'Use "Spotlight" to give quieter guests a turn: the big screen shows who is up, and their phone tells them what to say.',
+                'Use "🎲 Spin" to hand the floor to someone who hasn\'t spoken yet: the big screen shows a question for them and a 90-second turn. Narrator-played characters take turns too.',
                 `Pause or add time if a conversation is going well. When the timer ends, press "${stage.actNumber < stage.actCount ? `End Act ${stage.actNumber}` : 'Time for accusations'}".`,
               ]
             : []),
@@ -152,6 +159,9 @@ export function playerGuide(view: PlayerView): Guide {
             : 'You have no scripted lines this act: improvise in character.',
           'Talk to everyone. Ask about alibis and motives; work towards your goals.',
           `Check the Clues tab${view.myClues.some((c) => c.isPrivate) ? ': some clues were given only to you. Share one with everyone if it helps you' : ''}.`,
+          view.canConfront
+            ? 'Found something damning? Press "⚖️ Confront someone with this" under a clue: it goes on the big screen and they must answer. Once per act.'
+            : 'You have used this act\'s confrontation. You get a new one next act.',
           d?.isMurderer
             ? 'You’re the killer: lie, deflect and steer suspicion onto someone else. Don’t get caught!'
             : 'Keep your secrets unless revealing one helps clear your name. See "Secrets" below.',
@@ -195,6 +205,18 @@ export const FAQ: { q: string; a: string }[] = [
   {
     q: 'Is the killer always one of the guests?',
     a: 'With “Surprise me”, almost always. Each story has several versions with a different killer, and the version is dealt when the host begins the evening, from the characters guests chose, preferring one the host hasn’t played. If none fits and the host allowed it, the AI writes a version where a guest is the killer (about a minute). Otherwise the narrator plays the killer, and you must unmask them from the clues.',
+  },
+  {
+    q: 'How does the spotlight work?',
+    a: 'The host gives someone the floor, by name or with “🎲 Spin” (a random pick among those who haven’t spoken yet in this scene). The big screen shows a question card for them and a 90-second turn. Characters the narrator plays get turns too: the narrator speaks for them. Any guest can also confront another once per act with a clue: the clue goes on the big screen and the suspect has a minute to answer.',
+  },
+  {
+    q: 'What is “Who looks guiltiest?”',
+    a: 'During the acts, everyone can pick the character they currently suspect most, on the Clues tab. Change it as often as you like. The big screen shows only the totals, never who picked whom. It’s for fun and for drama; only your final accusation scores.',
+  },
+  {
+    q: 'Can the host run the evening from their phone?',
+    a: 'Yes. On the big screen, press “Use my phone as a remote” and scan the code (sign in with your host account). Your phone gets every host button plus your to-do list for each moment, and the big screen can hide its controls. Tap “Enable sound on this screen” on the TV first, because browsers only play sound after a tap on that screen.',
   },
   {
     q: 'How does scoring work?',

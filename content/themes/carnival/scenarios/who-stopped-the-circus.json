@@ -1,0 +1,863 @@
+{
+  "id": "who-stopped-the-circus",
+  "themeSlug": "carnival",
+  "title": "Who Stopped the Circus?",
+  "synopsis": "Summer, 1956. It's the last night of the season for Hopscotch's Travelling Circus, and old Ringmaster Horatio Hopscotch has a surprise: he's selling the circus to the Grimsby Grand Circus, who don't want half the performers. After his famous Three-Ring Supper, the ringmaster falls asleep in his star wagon and never wakes up, and the Golden Ticket to the whole circus has vanished. The bridge is washed out. Nobody leaves until the mystery is solved.",
+  "contentRating": "family",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Hopscotch's Travelling Circus, in a meadow outside Maple Falls",
+    "era": "Summer 1956, the last night of the season",
+    "description": "A red-and-white big top, a candyfloss stand, painted wagons in a circle, a stable full of horses, and Rumbles the elephant. At the edge of the meadow stands the ringmaster's star wagon. A thunderstorm has washed out the bridge into town."
+  },
+  "victim": {
+    "name": "Ringmaster Horatio Hopscotch",
+    "description": "Seventy years old, with a booming voice, a magnificent moustache and a weak heart. Kind to animals, grumpy with people, and famous for his bedtime Three-Ring Supper: cocoa, a cinnamon bun and a puff of candyfloss."
+  },
+  "characters": [
+    {
+      "id": "marvello",
+      "name": "The Amazing Marvello",
+      "pronouns": "he/him",
+      "title": "The Magician",
+      "publicBio": "Top hat, twirly moustache, and a magic mug that fills with cocoa out of thin air. Every night after the show, Marvello serves the ringmaster's cocoa with a great big 'Abracadabra!'",
+      "costumeTips": "A top hat, a cape, a magic wand (a pencil with white tape on the end), and a very twirly moustache.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 1.0,
+        "style": "grand, twinkly, dramatic"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU DID IT. Tonight the ringmaster announced he'd sold the circus to the Grimsby Grand Circus, and Grimsby's doesn't want a magician. You thought: if old Horatio sleeps right through Sunday's signing at dawn, there's no sale. So this evening you borrowed a spoonful of Dreamy Dust from the stable (you've watched Tilly take the key from behind the horse brushes all week), hid it in the secret compartment of your magic mug, and served his cocoa at twenty to nine. You only meant him to sleep until Monday. You didn't know how weak his heart was. Now he'll never wake up, and nobody must find out it was you.",
+        "secrets": [
+          {
+            "id": "marvello-grimsby",
+            "text": "Grimsby's doesn't want a magician. After Sunday, the Amazing Marvello has nowhere to go.",
+            "unlockAct": 0
+          },
+          {
+            "id": "marvello-dust",
+            "text": "I borrowed a spoonful of Dreamy Dust from the stable this evening.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get found out. Point everyone at the candyfloss or the cinnamon bun.",
+          "Keep everyone away from your magic mug's secret compartment.",
+          "Find the Golden Ticket before anyone else does."
+        ],
+        "knows": [
+          "The ringmaster ate his whole Three-Ring Supper tonight: cocoa, bun and candyfloss.",
+          "Professor Pockets was hanging about the star wagon at half past nine."
+        ],
+        "alibi": "I served the cocoa at twenty to nine, said goodnight, and went straight back to my wagon to polish my wand.",
+        "lines": {
+          "act1": [
+            "I pour the ringmaster's cocoa every night. Abracadabra: one mug, piping hot! It's a tradition."
+          ],
+          "act2": [
+            "Grimsby's doesn't want a magician? Their loss. Their very, very big loss."
+          ],
+          "act3": [
+            "Look at the candyfloss! Look at the bun! Look anywhere except... er, anywhere you like."
+          ]
+        }
+      }
+    },
+    {
+      "id": "coco",
+      "name": "Coco the Clown",
+      "pronouns": "he/him",
+      "title": "The Clown",
+      "publicBio": "Big shoes, bigger heart, and the pinkest candyfloss in the county. His best friend is Pepper, the circus dog, who can count to five and jump through a hoop.",
+      "costumeTips": "Baggy clothes, big shoes, a red nose, a rainbow wig or silly hat, and a puff of pink candyfloss (a pink pompom works).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.1,
+        "style": "silly, warm, a little sad"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Tonight the ringmaster told you Grimsby's wants the clowns, but not Pepper, your performing dog: Pepper is to go and live on a farm three states away. You were heartbroken and cross, and you told him so. At ten to nine you still brought him his candyfloss, like every night, because that's what clowns do. You did not hurt him. But everyone heard you shout.",
+        "secrets": [
+          {
+            "id": "coco-pepper",
+            "text": "The ringmaster was sending my dog Pepper away to a farm three states away. I shouted at him in front of everyone.",
+            "unlockAct": 0
+          },
+          {
+            "id": "coco-trunk",
+            "text": "I've hidden Pepper in my costume trunk so nobody can take him away on Sunday.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep Pepper safe.",
+          "Find out who made the ringmaster sleep forever.",
+          "Make everyone laugh at least once, even tonight."
+        ],
+        "knows": [
+          "You brought the candyfloss at ten to nine. The ringmaster was already yawning his head off.",
+          "Marvello's magic mug was on the table, and the ringmaster had finished every drop."
+        ],
+        "alibi": "After the candyfloss I took Pepper for his walk round the meadow, all the way until the fireworks.",
+        "lines": {
+          "act1": [
+            "I bring the candyfloss every night. Pink, always pink. The ringmaster says blue candyfloss is for show-offs."
+          ],
+          "act2": [
+            "Nobody is sending Pepper anywhere. Pepper can count to five, and I'm counting on Pepper."
+          ],
+          "act3": [
+            "He was yawning before I even got there with the candyfloss. Big yawns. Hippo yawns."
+          ]
+        }
+      }
+    },
+    {
+      "id": "bella",
+      "name": "Madame Bella",
+      "pronouns": "she/her",
+      "title": "The Bearded Lady",
+      "publicBio": "The Magnificent Bearded Lady: a glorious ginger beard, a booming laugh, and the best cinnamon buns this side of the Mississippi. She bakes for the whole circus every night.",
+      "costumeTips": "A long dress, an apron dusted with flour, a big stick-on beard, and a rolling pin.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.9,
+        "rate": 0.95,
+        "style": "hearty, proud, warm"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Years ago the ringmaster wrote a promise on the back of the Golden Ticket, the deed to the whole circus: 'When I retire, the circus goes to the performers.' Tonight he sold it to Grimsby's instead, and Grimsby's doesn't want a bearded lady. You told him he was a promise-breaker in front of everyone. Then, at quarter to nine, you still took him his cinnamon bun, because you are not a sulker.",
+        "secrets": [
+          {
+            "id": "bella-promise",
+            "text": "The ringmaster promised, in writing on the back of the Golden Ticket, to leave the circus to the performers. He broke his promise.",
+            "unlockAct": 0
+          },
+          {
+            "id": "bella-recipe",
+            "text": "My famous cinnamon buns are really the ringmaster's late wife's recipe. He gave it to me, and I've never told a soul.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find the Golden Ticket, and the promise on the back of it.",
+          "Keep the circus family together.",
+          "Find out who did this. Nobody eats one of your buns and comes to harm. Nobody."
+        ],
+        "knows": [
+          "You took the cinnamon bun at quarter to nine. The magic mug was already on the table, empty.",
+          "At quarter to nine the Golden Ticket was still in its frame on the wagon wall."
+        ],
+        "alibi": "After the bun I went back to the cookhouse to start tomorrow's dough. Hank was there from nine, eating the leftovers.",
+        "lines": {
+          "act1": [
+            "I told him he was a promise-breaker, and I'd tell him again. Then I took him a bun. That's called manners."
+          ],
+          "act2": [
+            "Grimsby's doesn't want a bearded lady? Grimsby's doesn't know what it's missing."
+          ],
+          "act3": [
+            "When I took the bun in, the magic mug was empty and he was yawning like a sleepy bear."
+          ]
+        }
+      }
+    },
+    {
+      "id": "tilly",
+      "name": "Tilly Tumble",
+      "pronouns": "she/her",
+      "title": "The Stable Kid",
+      "publicBio": "Age eleven. Tilly brushes the horses, feeds Rumbles the elephant, and knows every secret in the circus, because grown-ups forget she's listening.",
+      "costumeTips": "Dungarees or overalls, a checked shirt, a straw hat, a horse brush, and a carrot in your pocket.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.3,
+        "rate": 1.1,
+        "style": "bright, quick, curious"
+      },
+      "required": true,
+      "private": {
+        "backstory": "The ringmaster was like a grandpa to you. Every night at nine he says goodnight through the star-wagon window while you brush Duchess, his old white horse. Tonight he was yawning so much he could hardly finish the words. You also know where the key to the Dreamy Dust cabinet hangs: on the nail behind the horse brushes. The vet uses Dreamy Dust to calm Rumbles when thunder scares her. You'd never tell anyone about the key. But somebody found out.",
+        "secrets": [
+          {
+            "id": "tilly-key",
+            "text": "I know where the key to the Dreamy Dust cabinet hangs, and I think somebody else found out.",
+            "unlockAct": 0
+          },
+          {
+            "id": "tilly-buns",
+            "text": "I've been feeding Rumbles the elephant extra buns from Bella's kitchen. That's why Bella keeps running out.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who hurt the ringmaster.",
+          "Protect the animals, whatever happens on Sunday.",
+          "Keep the key's hiding place secret, unless telling helps catch the culprit."
+        ],
+        "knows": [
+          "At nine the ringmaster said goodnight through his window, yawning like a hippo. 'Marvello's cocoa is extra dreamy tonight,' he said.",
+          "All this week Marvello has been practising card tricks in the stable every evening, right next to the key's nail."
+        ],
+        "alibi": "I was in the stable with Duchess and Rumbles all evening. Duchess can vouch for me, if you speak horse.",
+        "lines": {
+          "act1": [
+            "He said goodnight through the window at nine. He was yawning like a hippo."
+          ],
+          "act2": [
+            "Grown-ups say all sorts of things in front of stable kids. They think we're furniture."
+          ],
+          "act3": [
+            "Somebody knew where the key was. Somebody who's been hanging around the stable a lot this week."
+          ]
+        }
+      },
+      "killerEligible": false
+    },
+    {
+      "id": "hank",
+      "name": "Hercules Hank",
+      "pronouns": "he/him",
+      "title": "The Strongman",
+      "publicBio": "The strongman: lifts ponies, bends spoons, and cries at sad songs. Grimsby's doesn't want a strongman either, or so everyone thinks.",
+      "costumeTips": "A stripy vest, a painted moustache, a leopard-print sash, and a cardboard barbell.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.8,
+        "rate": 0.9,
+        "style": "deep, gentle, easily moved"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Grimsby's secretly offered you a job, but only you: not your friends. You haven't said yes, but you haven't said no. You were the one who went to wake the ringmaster for the fireworks at ten, and found him asleep forever.",
+        "secrets": [
+          {
+            "id": "hank-offer",
+            "text": "Grimsby's offered me a job, but only if I leave everyone else behind. I haven't said no.",
+            "unlockAct": 0
+          },
+          {
+            "id": "hank-firework",
+            "text": "I set off one firework early at half past nine, by accident, and blamed the thunder.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Decide whether to take Grimsby's offer.",
+          "Look after your circus family tonight.",
+          "Find out what happened to the ringmaster."
+        ],
+        "knows": [
+          "You found the ringmaster at ten, when you went to wake him for the fireworks. His cocoa mug was empty, and so was the Golden Ticket's frame.",
+          "Bella was with you in the cookhouse from nine, making dough."
+        ],
+        "alibi": "From nine I was in the cookhouse eating leftover buns with Bella, until I went to fetch the ringmaster for the fireworks.",
+        "lines": {
+          "act1": [
+            "I lifted him up to wake him. He was light as a feather. He'd gone to sleep for good."
+          ],
+          "act2": [
+            "Grimsby's wants me? Well. Maybe. Nobody's said yes to anything."
+          ],
+          "act3": [
+            "That bang at half past nine? Thunder. Probably. Mostly thunder."
+          ]
+        }
+      }
+    },
+    {
+      "id": "jojo",
+      "name": "Juggling Jo",
+      "pronouns": "she/her",
+      "title": "The Juggler",
+      "publicBio": "Josephine 'Jo' Juggins juggles clubs, plates and flaming torches (not tonight, it's raining) while riding a unicycle. She wants to be the star of the show one day. Maybe one day soon.",
+      "costumeTips": "Bright stripy tights or trousers, a bow tie, and three things to juggle (rolled-up socks are perfect).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.15,
+        "rate": 1.2,
+        "style": "zippy, ambitious, cheeky"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've been writing secret letters to the Grimsby Grand Circus, asking to be their star juggler. Tonight you found out they said yes, and you haven't told anyone. You also borrowed the ringmaster's top hat this afternoon to practise your act, and you still haven't put it back.",
+        "secrets": [
+          {
+            "id": "jojo-letters",
+            "text": "I've been writing to Grimsby's asking to be their star. They said yes.",
+            "unlockAct": 0
+          },
+          {
+            "id": "jojo-hat",
+            "text": "I borrowed the ringmaster's top hat this afternoon to practise, and it's still in my wagon.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Become the star of the show, one way or another.",
+          "Return the top hat before anyone notices.",
+          "Help solve the mystery. Detectives get applause too."
+        ],
+        "knows": [
+          "At half past nine you saw Professor Pockets tiptoe out of the star wagon with something gold in his hand.",
+          "Coco walked Pepper round the meadow all evening; you juggled for them at nine."
+        ],
+        "alibi": "I was practising on my unicycle by the Ferris wheel all evening. You can see the ruts in the mud.",
+        "lines": {
+          "act1": [
+            "The show must go on! Preferably with a juggler in the middle of it."
+          ],
+          "act2": [
+            "Letters? What letters? I write lots of letters. To my aunt. In Grimsby."
+          ],
+          "act3": [
+            "I saw Professor Pockets sneaking out of the star wagon at half past nine with something shiny and gold."
+          ]
+        }
+      }
+    },
+    {
+      "id": "pockets",
+      "name": "Professor Pockets",
+      "pronouns": "he/him",
+      "title": "The Ticket Seller",
+      "publicBio": "The ringmaster's assistant and ticket seller: a waistcoat with twenty-two pockets, a pencil behind each ear, and a head for numbers. He knows exactly how much the circus is worth.",
+      "costumeTips": "A waistcoat (the more pockets the better), spectacles, pencils behind your ears, and a roll of raffle tickets.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.15,
+        "style": "fussy, kind, flustered"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've worked for the ringmaster for thirty years and you love this circus more than anything. At half past nine you tiptoed into the star wagon and took the Golden Ticket from its frame to keep it safe from Grimsby's. The ringmaster was so still you thought he was sleeping peacefully. You also have a secret savings tin: you've been saving for years to buy the circus yourself one day.",
+        "secrets": [
+          {
+            "id": "pockets-ticket",
+            "text": "At half past nine I took the Golden Ticket from its frame to keep it safe from Grimsby's. It's in my waistcoat.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pockets-savings",
+            "text": "I've been saving pennies for thirty years to buy the circus myself one day.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the Golden Ticket safe from Grimsby's.",
+          "Decide when to admit you took it.",
+          "Find out what really happened to the ringmaster."
+        ],
+        "knows": [
+          "At half past nine the ringmaster was fast asleep in his chair, very still. You tiptoed in and took the Golden Ticket.",
+          "The magic mug was on the table, and it smelled of cocoa and something like lavender."
+        ],
+        "alibi": "I was in the ticket booth counting the takings until half past nine, then I went to the star wagon, and then back to the booth.",
+        "lines": {
+          "act1": [
+            "Thirty years I've counted this circus's tickets. I know it's worth more than Grimsby's is paying."
+          ],
+          "act2": [
+            "The Golden Ticket? Missing? Goodness. Dear me. How... unexpected."
+          ],
+          "act3": [
+            "All right, all right! I took the Golden Ticket, to keep it safe! But he was already asleep when I got there. I thought he was only sleeping."
+          ]
+        }
+      }
+    },
+    {
+      "id": "wanda",
+      "name": "Wanda Wire",
+      "pronouns": "she/her",
+      "title": "The Tightrope Walker",
+      "publicBio": "The ringmaster's granddaughter, and the bravest tightrope walker in the land: she crosses the high wire with a parasol and never looks down. One day, everyone says, the circus will be hers.",
+      "costumeTips": "A sparkly costume, ballet slippers, a paper parasol, and your nose held high.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.2,
+        "rate": 1.05,
+        "style": "graceful, proud, determined"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You knew about the sale a week before anyone else: your sweetheart, Gilbert, is the son of the owner of the Grimsby Grand Circus. You didn't tell anyone, because you were afraid they'd think you'd helped. You visited your grandpa at quarter past nine to ask him to change his mind, but he was yawning too much to talk.",
+        "secrets": [
+          {
+            "id": "wanda-gilbert",
+            "text": "My sweetheart is the son of the man who owns the Grimsby Grand Circus. I knew about the sale a week early.",
+            "unlockAct": 0
+          },
+          {
+            "id": "wanda-visit",
+            "text": "I visited Grandpa at quarter past nine to beg him to change his mind. He could hardly keep his eyes open.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Save your grandpa's circus.",
+          "Keep Gilbert a secret, for now.",
+          "Find out who did this to Grandpa."
+        ],
+        "knows": [
+          "At quarter past nine Grandpa was nodding off in his chair. He said, 'Too much cocoa, Wanda. That magician makes it far too dreamy.'",
+          "Your slippers were drying on the star wagon's steps all evening. You forgot them there."
+        ],
+        "alibi": "I practised on the high wire until nine, then visited Grandpa for five minutes, then went to my wagon.",
+        "lines": {
+          "act1": [
+            "Grandpa never broke a promise in his life. Until tonight."
+          ],
+          "act2": [
+            "Of course I knew about Grimsby's. I didn't say I liked it."
+          ],
+          "act3": [
+            "Grandpa told me the cocoa was far too dreamy tonight. I thought he was being silly."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "three-ring",
+      "title": "The Three-Ring Supper",
+      "text": "Every night after the show the ringmaster eats his Three-Ring Supper: cocoa from Marvello's magic mug, a cinnamon bun from Madame Bella's oven, and a puff of pink candyfloss from Coco's machine. Tonight all three were delivered, and all three were eaten.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "marvello",
+        "bella",
+        "coco"
+      ]
+    },
+    {
+      "id": "empty-frame",
+      "title": "The Empty Frame",
+      "text": "The frame on the star wagon's wall that always holds the Golden Ticket, the deed to the whole circus, is empty. Whoever has the Golden Ticket could stop Sunday's sale.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "pockets"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "slippers",
+      "title": "Slippers on the Steps",
+      "text": "A pair of pink ballet slippers on the star wagon's steps, damp from the rain. Only one performer wears slippers like these: Wanda Wire.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "wanda"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "dust-cabinet",
+      "title": "The Dreamy Dust Cabinet",
+      "text": "In the stable wagon, the jar of Dreamy Dust (the vet's sleeping powder for Rumbles the elephant) is lighter than it was this morning. The key hangs on the nail behind the horse brushes. All week, Marvello has been practising card tricks in the stable every evening, right beside that nail.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "marvello"
+      ],
+      "recipient": "tilly"
+    },
+    {
+      "id": "magic-mug",
+      "title": "The Magic Mug",
+      "text": "On the ringmaster's table: Marvello's famous magic mug, the one that fills with cocoa out of nowhere. Turn it upside down and a secret compartment in the bottom clicks open. Inside: a dusting of silvery-lilac powder that smells of lavender.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "marvello"
+      ]
+    },
+    {
+      "id": "bun",
+      "title": "Half a Cinnamon Bun",
+      "text": "Half a cinnamon bun on the ringmaster's plate, still sticky. Madame Bella bakes them fresh every night, and she was very cross with the ringmaster tonight.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "bella"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "candyfloss",
+      "title": "A Bare Candyfloss Stick",
+      "text": "A bare candyfloss stick in the waste basket, a few pink wisps still clinging to it. Coco spins the ringmaster's candyfloss himself, and Coco shouted at the ringmaster tonight.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "coco"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "golden-ticket",
+      "title": "In Your Waistcoat",
+      "text": "In your seventh waistcoat pocket: the Golden Ticket. You took it from the frame at half past nine to keep it safe. On the back, in the ringmaster's writing: 'When I retire, the circus goes to the performers. H.H.'",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "pockets",
+        "bella"
+      ],
+      "recipient": "pockets",
+      "redHerring": true
+    },
+    {
+      "id": "letter",
+      "title": "A Letter from Grimsby's",
+      "text": "On the ringmaster's desk: 'Dear Horatio, the Grimsby Grand Circus is delighted to buy your big top, horses and clowns. We shall not need a magician, a strongman or a bearded lady. Signing on Sunday at dawn, at the bridge. Bring the Golden Ticket.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "marvello",
+        "bella",
+        "hank"
+      ]
+    },
+    {
+      "id": "diary",
+      "title": "The Ringmaster's Diary",
+      "text": "The ringmaster's diary is locked with a little padlock. On the cover he's written a riddle, because he could never remember the code.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "marvello"
+      ],
+      "puzzle": {
+        "prompt": "I have a big top but no bottom, and lots of rings but no fingers. What am I?",
+        "answers": [
+          "circus",
+          "a circus",
+          "the circus",
+          "big top",
+          "the big top",
+          "tent",
+          "a tent",
+          "circus tent"
+        ],
+        "hint": "You're standing in one right now.",
+        "solvedText": "The last entry, tonight: 'Told Marvello that Grimsby's has no need of a magician. He went as white as his gloves and said, \"Then perhaps you should sleep on it, Horatio. A good long sleep.\" Silly fellow. Cocoa at twenty to nine as usual.'"
+      }
+    },
+    {
+      "id": "muddy-boots",
+      "title": "Big Muddy Boots",
+      "text": "Enormous muddy boot prints on the star wagon's floor, far bigger than anyone else's. Hercules Hank says he only came in at ten, to fetch the ringmaster for the fireworks.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "hank"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "sparkles",
+      "title": "Silver Sparkles",
+      "text": "On the ringmaster's pillow, on the table, and on the doorstep: silver sparkles, the same glitter Marvello throws in the air when he says 'Abracadabra!' Marvello says he only stayed a moment at twenty to nine.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "marvello"
+      ]
+    },
+    {
+      "id": "top-hat",
+      "title": "The Missing Top Hat",
+      "text": "The ringmaster's top hat is missing from its peg. It turns up in Juggling Jo's wagon, full of juggling balls.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "jojo"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "lavender",
+      "title": "Lavender on the Wand",
+      "text": "Marvello's magic wand, left in the stable: its tip is dusted with silvery-lilac powder that smells of lavender. It's the same powder as the vet's Dreamy Dust.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "marvello"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A circus in a summer meadow at dusk: a red-and-white big top, painted wagons, lanterns and an elephant.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Hopscotch's Travelling Circus, the last night of the season. At supper, Ringmaster Horatio Hopscotch banged his cane on the table and made an announcement."
+    },
+    {
+      "type": "line",
+      "speaker": "tilly",
+      "text": "He's selling the circus! To the Grimsby Grand Circus! They'll take the big top and the horses and the clowns, and everybody else has to go!"
+    },
+    {
+      "type": "narration",
+      "text": "Grimsby's doesn't want a magician, a strongman, or a bearded lady. And poor Pepper the dog is to be sent to a farm. The signing is on Sunday at dawn, at the bridge. The ringmaster must bring the Golden Ticket, the deed to the whole circus."
+    },
+    {
+      "type": "narration",
+      "text": "After the farewell show, the ringmaster went to his star wagon for his famous Three-Ring Supper: a mug of Marvello's magic cocoa, one of Madame Bella's cinnamon buns, and a puff of Coco's pink candyfloss."
+    },
+    {
+      "type": "image",
+      "text": "The star wagon at night, a lantern glowing in the window, rain on the roof.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At ten o'clock, Hercules Hank went to fetch him for the fireworks. The ringmaster was in his armchair, asleep. Fast asleep. Asleep forever. The doctor says someone gave him far too much sleeping powder, and his old heart simply stopped. And the Golden Ticket is gone from its frame. The bridge is washed out. Nobody leaves until we know who stopped the circus."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Star Wagon",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Star Wagon."
+        },
+        {
+          "type": "image",
+          "text": "Inside the star wagon: an armchair, a little table, an empty mug, a plate with half a bun, and an empty frame on the wall.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The ringmaster ate three treats tonight, from three different people. Somebody put Dreamy Dust in one of them, the sleeping powder the vet keeps for Rumbles the elephant. Which treat, and whose?"
+        },
+        {
+          "type": "line",
+          "speaker": "hank",
+          "text": "I went to wake him for the fireworks. He was smiling. Like he was having a lovely dream."
+        }
+      ],
+      "prompts": [
+        "Who brought the ringmaster his supper, and when?",
+        "Who was upset about the sale?",
+        "Where is the Golden Ticket?",
+        "Who could get to the Dreamy Dust?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Behind the Big Top",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Behind the Big Top."
+        },
+        {
+          "type": "image",
+          "text": "The stable wagon: horse brushes on the wall, a nail, and a little locked cabinet.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Everybody at the circus had a reason to be cross tonight. But being cross isn't the same as being a culprit. The ringmaster's diary has a riddle on the cover, and someone in this room is hiding the Golden Ticket."
+        },
+        {
+          "type": "line",
+          "speaker": "tilly",
+          "text": "Grown-ups forget that stable kids have ears."
+        }
+      ],
+      "prompts": [
+        "Open the ringmaster's diary. Can you solve the riddle?",
+        "Who knew where the Dreamy Dust key was kept?",
+        "Who has the Golden Ticket, and why?",
+        "Share a secret if it helps clear your name."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Grand Finale",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Grand Finale."
+        },
+        {
+          "type": "image",
+          "text": "The big top at dawn, the ring empty, sawdust sparkling in the first light.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The sun is coming up, and the bridge is nearly clear. Soon everyone will want to go home. Before they do, the circus needs to know the truth."
+        },
+        {
+          "type": "line",
+          "speaker": "pockets",
+          "text": "Thirty years I've counted this circus's tickets. Tonight the numbers just don't add up."
+        }
+      ],
+      "prompts": [
+        "Which treat was the one with the Dreamy Dust?",
+        "What was left behind at the scene?",
+        "Who had the best reason to want the ringmaster to sleep through Sunday?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "save-circus",
+        "text": "To stop the circus being sold"
+      },
+      {
+        "id": "pet",
+        "text": "To stop a beloved animal being sent away"
+      },
+      {
+        "id": "promise",
+        "text": "To make him keep a broken promise"
+      },
+      {
+        "id": "fame",
+        "text": "To become the star of a new circus"
+      },
+      {
+        "id": "ticket",
+        "text": "To get the Golden Ticket for themselves"
+      }
+    ],
+    "methods": [
+      {
+        "id": "cocoa",
+        "text": "Dreamy Dust hidden in the magic cocoa mug"
+      },
+      {
+        "id": "candyfloss",
+        "text": "Dreamy Dust spun into the pink candyfloss"
+      },
+      {
+        "id": "bun",
+        "text": "Dreamy Dust baked into a cinnamon bun"
+      },
+      {
+        "id": "lemonade",
+        "text": "Dreamy Dust stirred into pink lemonade"
+      },
+      {
+        "id": "pillow",
+        "text": "Dreamy Dust sprinkled on his pillow"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "marvello",
+    "motiveId": "save-circus",
+    "methodId": "cocoa",
+    "explanation": [
+      "The ringmaster didn't fall asleep forever by accident. Somebody wanted him to sleep right through Sunday's signing, so the circus couldn't be sold. That somebody was the Amazing Marvello.",
+      "Grimsby's didn't want a magician. When the ringmaster told him so, Marvello went white as his gloves and said, 'Perhaps you should sleep on it, Horatio. A good long sleep.' It's written in the ringmaster's diary.",
+      "All week Marvello had been practising card tricks in the stable, right beside the nail where Tilly keeps the key to the Dreamy Dust cabinet. This evening he borrowed a spoonful and hid it in the secret compartment of his magic mug. At twenty to nine: 'Abracadabra!' One mug of extra-dreamy cocoa.",
+      "By quarter to nine the ringmaster was yawning. By nine he told Tilly the cocoa was 'extra dreamy tonight'. His old heart couldn't take so much Dreamy Dust. Marvello only meant him to sleep until Monday, but it was a very dangerous trick, and he left a trail: silver sparkles on the pillow, lavender powder in the mug, and more on the tip of his wand.",
+      "Professor Pockets took the Golden Ticket, but only to keep it safe. The bun and the candyfloss were perfectly innocent. Every magic trick has a secret, and this one had a secret compartment."
+    ],
+    "timeline": [
+      {
+        "time": "6:00",
+        "event": "At supper, the ringmaster announces the sale to the Grimsby Grand Circus."
+      },
+      {
+        "time": "6:30",
+        "event": "He tells Marvello there's no place for a magician. Marvello: 'Perhaps you should sleep on it.'"
+      },
+      {
+        "time": "7:00",
+        "event": "The farewell show begins."
+      },
+      {
+        "time": "8:15",
+        "event": "Marvello takes a spoonful of Dreamy Dust from the stable cabinet."
+      },
+      {
+        "time": "8:40",
+        "event": "Marvello serves the cocoa from his magic mug. 'Abracadabra!'"
+      },
+      {
+        "time": "8:45",
+        "event": "Bella brings a cinnamon bun. The mug is already empty."
+      },
+      {
+        "time": "8:50",
+        "event": "Coco brings the candyfloss. The ringmaster is yawning his head off."
+      },
+      {
+        "time": "9:00",
+        "event": "The ringmaster says goodnight to Tilly: 'Marvello's cocoa is extra dreamy tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Wanda visits. Her grandpa can hardly keep his eyes open."
+      },
+      {
+        "time": "9:30",
+        "event": "Professor Pockets tiptoes in and takes the Golden Ticket. Jo sees him."
+      },
+      {
+        "time": "10:00",
+        "event": "Hank goes to fetch the ringmaster for the fireworks and finds him asleep forever."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the meadow. The bridge is clear, and a policeman's bicycle comes wobbling across it.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The policeman arrived on his bicycle at seven. The Amazing Marvello met him at the big top with his top hat in his hands. 'I only wanted to save the show,' he said. 'I never meant for the curtain to come down.'"
+    },
+    {
+      "type": "narration",
+      "text": "And the Golden Ticket? Professor Pockets turned it over, and read out the ringmaster's old promise: 'When I retire, the circus goes to the performers.' There will be no sale on Sunday. The show goes on. Goodnight, detectives."
+    }
+  ]
+}

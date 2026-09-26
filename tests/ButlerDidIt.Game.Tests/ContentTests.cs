@@ -17,7 +17,7 @@ public class ContentTests
     public void All_content_loads_and_validates()
     {
         var themes = ContentLibrary.Load(ContentRoot());
-        Assert.True(themes.Count >= 8);
+        Assert.True(themes.Count >= 9);
         Assert.Contains(themes, t => t.Theme.Slug == "the-butler-did-it" && t.Scenarios.Count >= 1);
         Assert.Equal(themes.Count, themes.Select(t => t.Theme.Slug).Distinct().Count());
     }

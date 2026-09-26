@@ -188,7 +188,9 @@ export interface StageView {
   ai: AiFeatures
   interrogations: InterrogationView[]
   options: { drinkingPrompts: boolean; tone: Tone }
-  spotlight: { seatId: string; playerName: string; characterName: string | null } | null
+  spotlight: SpotlightView | null
+  /** "Who looks guiltiest?" totals per character, during the acts only. Never who voted for whom. */
+  suspicion: SuspicionView[]
   /** The AI is writing a version of the mystery for tonight's cast; the lobby is frozen. */
   tailoring: boolean
 }
@@ -252,6 +254,28 @@ export interface AccusationEntry {
   methodId: string
 }
 
+/** Whose turn it is to speak: a guest's character, or one the narrator plays (isNpc). Mirrors SpotlightView in Views.cs. */
+export interface SpotlightView {
+  characterId: string
+  characterName: string
+  seatId: string | null
+  playerName: string | null
+  isNpc: boolean
+  /** For a narrator-played character: what the narrator says for them. */
+  npcLine: string | null
+  /** The question card on the big screen. */
+  question: string
+  /** When the turn is up (a guide, not enforced). */
+  endsAt: string | null
+  confrontation: { accuserName: string; clueTitle: string; clueText: string } | null
+}
+
+export interface SuspicionView {
+  characterId: string
+  name: string
+  votes: number
+}
+
 export interface PlayerView {
   version: number
   seatId: string
@@ -272,6 +296,10 @@ export interface PlayerView {
     nominees: Option[]
     myVotes: Record<string, string>
   } | null
+  /** This guest's "who looks guiltiest?" pick. */
+  mySuspicion: string | null
+  /** Whether this guest can still confront someone this act (once per act, while mingling). */
+  canConfront: boolean
   questionsLeft: number
   hintsLeft: number
   myHints: HintView[]

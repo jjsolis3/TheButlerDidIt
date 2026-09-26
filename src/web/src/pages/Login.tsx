@@ -1,8 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Button, Card, ErrorText, Field, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import type { AuthOptions } from '../lib/types'
+
+/**
+ * Where to go after signing in: the ?next= page (e.g. the host remote), but only a path on this
+ * site. "//evil.example" or "https://…" would turn the login page into a redirect to anywhere.
+ */
+function safeNext(next: string | null): string {
+  return next && next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/\\') ? next : '/host/new'
+}
 
 export default function Login() {
   const [mode, setMode] = useState<'login' | 'register'>('login')
@@ -12,6 +20,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const navigate = useNavigate()
+  const [params] = useSearchParams()
   const [options, setOptions] = useState<AuthOptions | null>(null)
 
   useEffect(() => {
@@ -25,7 +34,7 @@ export default function Login() {
     try {
       if (mode === 'login') await api.login(email, password)
       else await api.register(email, password, displayName)
-      navigate('/host/new')
+      navigate(safeNext(params.get('next')))
     } catch (err) {
       setError((err as Error).message)
     } finally {
