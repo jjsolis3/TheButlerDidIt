@@ -1,0 +1,233 @@
+{
+  "variantOf": "last-stop-murder",
+  "variant": "C",
+  "solution": {
+    "murdererId": "edith",
+    "motiveId": "father",
+    "methodId": "cyanide",
+    "explanation": [
+      "Nobody came over the roof, and nobody came through either door. The poison was already in Compartment 7 when Vane locked himself in: in the brandy flask he took to bed every night, filled by his secretary, Miss Edith Marlow.",
+      "Ten years ago Vane ruined Marlow and Sons, and its owner, Harold Marlow, shot himself. His daughter changed her name and became Vane's secretary, waiting. Tonight Vane found her father's photograph in her handbag, and wrote that he'd tell her at breakfast that he knew. She never gave him the chance.",
+      "Edith develops her own photographs, and her kit includes potassium cyanide. At ten past twelve, in the dining-car pantry, she filled the flask with brandy and cyanide through a little silver funnel. At a quarter past she carried it in. Lady Pamela heard him: 'Fill it to the brim, Miss Marlow, I'll have it at one.' And her: 'Every drop, sir.'",
+      "At a quarter to one Vane locked, chained and bolted himself in, alive. At one he took his nightcap, choked, threw open the window gasping for air, and fell. The countess's knock a minute later went unanswered. The bitter almonds in the flask, the half-empty tin in Edith's valise and the funnel in the pantry told the rest.",
+      "Pierre pocketed the emerald at seven, and the countess, the doctor and the colonel were all innocent. A good secretary never forgets a thing, and Edith never forgot her father."
+    ],
+    "timeline": [
+      {
+        "time": "9:00",
+        "event": "Dinner. Vane finds a photograph of Harold Marlow in Edith's handbag."
+      },
+      {
+        "time": "11:00",
+        "event": "Ruth Adler picks the lock of Compartment 7 and reads Vane's papers."
+      },
+      {
+        "time": "11:40",
+        "event": "The train stops in a snowdrift."
+      },
+      {
+        "time": "12:10",
+        "event": "In the dining-car pantry, Edith fills the flask with brandy and cyanide."
+      },
+      {
+        "time": "12:15",
+        "event": "Edith brings the flask and takes dictation. 'Fill it to the brim.' 'Every drop, sir.'"
+      },
+      {
+        "time": "12:30",
+        "event": "Dr. Lacroix gives Vane his usual injection. Vane is cheerful."
+      },
+      {
+        "time": "12:45",
+        "event": "Vane locks and chains his door, and bolts the connecting door again: 'Let Her Highness knock all night.'"
+      },
+      {
+        "time": "12:50",
+        "event": "Ruth hears Vane humming."
+      },
+      {
+        "time": "1:00",
+        "event": "Vane drinks from the flask, chokes, throws open the window and collapses."
+      },
+      {
+        "time": "1:01",
+        "event": "The countess knocks on the connecting door. No answer."
+      },
+      {
+        "time": "1:10",
+        "event": "Colonel Blake feels a freezing draught under Vane's door."
+      },
+      {
+        "time": "7:00",
+        "event": "Pierre cuts the chain, finds Vane dead, and pockets the fallen emerald."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. Compartment 7."
+        },
+        {
+          "type": "image",
+          "text": "A sleeping compartment: a berth, a washstand, a silver flask, an open window with snow on the sill, and a connecting door.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Colonel Blake, who ran a field hospital in the war, examines the body. There isn't a mark on him. His cheeks are flushed pink, and on his lips there's a faint smell of bitter almonds. 'Cyanide,' says the colonel. 'I'd know that smell anywhere. It takes a minute, no more.' And the door was chained from inside."
+        },
+        {
+          "type": "line",
+          "speaker": "pierre",
+          "text": "I cut the chain myself. Nobody came through that door. Nobody."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "edith": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Ten years ago Cornelius Vane ruined your father's firm, Marlow and Sons, and your father shot himself. You changed your name and became Vane's secretary. Tonight at dinner you saw him take your father's photograph out of your handbag and smile. You knew he'd use it. You develop your own photographs, and your kit includes a tin of potassium cyanide. At ten past twelve, in the dining-car pantry, you filled his brandy flask and stirred in the cyanide through a little silver funnel. At a quarter past you carried it in. He always has his nightcap at one.",
+        "objectives": [
+          "Don't get caught. The door was chained from inside: let them chase the countess and her connecting door, or the doctor's needle.",
+          "Get rid of the funnel and the tin in your valise.",
+          "Keep your real name secret."
+        ],
+        "knows": [
+          "Cyanide smells faintly of bitter almonds. Good brandy hides most of it.",
+          "Vane unbolted the connecting door at a quarter past twelve and said, 'A royal visitor, at one.' The countess had an appointment."
+        ],
+        "lines": {
+          "act3": [
+            "I fill that flask every night. Every night! If I wanted to poison him, why wait three years?"
+          ]
+        }
+      }
+    },
+    "countess": {
+      "private": {
+        "backstory": "The Volkov emerald belonged to your family for two hundred years, until the Bolsheviks took it and sold it for nothing to Cornelius Vane. Tonight he told you the price to buy it back was your pride, and that he'd unbolt the connecting door at one o'clock so you could come and beg. At one you swallowed your pride and knocked softly on that door, whispering his name. It was bolted on his side, and there was no answer at all: only silence, and an icy draught under the door. You went back to bed, humiliated. You did not kill him. But you had every reason to.",
+        "objectives": [
+          "Clear your name. Wanting a man dead is not the same as killing him.",
+          "Find the Volkov emerald: it's yours by right.",
+          "Don't let anyone learn you knocked on that door at one."
+        ],
+        "knows": [
+          "Dr. Lacroix gives Vane an injection every night on this journey, 'to help him sleep'.",
+          "At one o'clock the connecting door was bolted on Vane's side. You knocked and whispered, and he didn't answer."
+        ],
+        "lines": {
+          "act3": [
+            "I knocked on that door at one, yes. It was bolted. He made a fool of me one last time. I did not kill him."
+          ]
+        }
+      }
+    },
+    "pierre": {
+      "private": {
+        "knows": [
+          "At a quarter to one Vane rang, told you nobody was to disturb him until Istanbul, and locked and chained his door in front of you. He'd bolted the connecting door to Compartment 8 as well, laughing: 'Let Her Highness knock all night.'",
+          "At seven you cut the chain. The window was wide open, there was snow on the floor, and the connecting door to Compartment 8 was bolted on his side."
+        ]
+      }
+    },
+    "pamela": {
+      "private": {
+        "knows": [
+          "The walls are thin. At one o'clock you heard a cough, a crash and the window being flung open. A minute later, a soft knock on the connecting door, and a woman whispering in Russian.",
+          "At ten past one Colonel Blake was smoking in the corridor, right outside Vane's door."
+        ]
+      }
+    },
+    "doctor": {
+      "private": {
+        "knows": [
+          "At half past twelve you gave Vane his usual injection, one small ampoule. He was cheerful, and said he was expecting 'a royal visitor at one'.",
+          "Miss Marlow was leaving his compartment as you arrived, white-faced. There was a smell of almonds in the dining-car pantry when you passed it at ten past twelve."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "bolt": {
+      "text": "The connecting door to Compartment 8 is bolted on Vane's side. The brass knob is scratched, but the scratches are old and dull, and there's nothing caught under the door. The countess, next door, had every reason to hate him.",
+      "redHerring": true
+    },
+    "hatpin-gone": null,
+    "thread": null,
+    "hatpin": null,
+    "pamela-heard": {
+      "text": "Your own memory: at a quarter past twelve, through the thin wall, you heard Vane say, 'Fill it to the brim, Miss Marlow; I'll have it at one.' And Miss Marlow answered, 'Every drop, sir. Every drop.'",
+      "pointsTo": [
+        "edith"
+      ]
+    },
+    "flask": {
+      "text": "Vane's silver flask on the floor, half drunk. It smells of good brandy, and under it, faintly, of bitter almonds. Miss Marlow filled it and carried it in.",
+      "redHerring": false
+    },
+    "diary": {
+      "pointsTo": [
+        "edith"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Found a photograph in Marlow's handbag: old Harold Marlow, of Marlow and Sons. So she's his girl. I'll tell her at breakfast that I know, and watch her face. Flask at a quarter past twelve as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "photo",
+      "title": "A Photograph",
+      "text": "In Miss Marlow's handbag: a photograph of a grey-haired man, inscribed 'To my Edie, from Papa. Marlow and Sons, 1924.' Marlow and Sons went bankrupt in 1924 after Cornelius Vane took it over. Its owner shot himself.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "edith"
+      ]
+    },
+    {
+      "id": "tin",
+      "title": "A Photographer's Tin",
+      "text": "In Miss Marlow's valise, with her camera and developing trays: a tin labelled 'Potassium Cyanide, for photographic use'. It's half empty.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "edith"
+      ]
+    },
+    {
+      "id": "funnel",
+      "title": "A Silver Funnel",
+      "text": "Pushed behind the tins in the dining-car pantry, wrapped in a handkerchief embroidered 'E.M.': a tiny silver funnel. It smells of brandy and bitter almonds.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "edith"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "A little mountain station in the morning sun, and railway police in long coats waiting on the platform.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the passengers of the Danube Express!",
+      "alternative": "Coffee cups up for the passengers!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came aboard at the mountain station. Miss Edith Marlow was waiting in the corridor with her notebook, her father's photograph tucked inside it. 'I took his dictation for three years,' she said. 'Last night, for once, he took mine.'"
+    },
+    {
+      "type": "narration",
+      "text": "Pierre handed over the Volkov emerald, very red in the face, and the countess finally held it in her hands again, for a moment. The train was forty hours late into Istanbul, and nobody on board complained. Goodnight, detectives."
+    }
+  ]
+}

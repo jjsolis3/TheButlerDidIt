@@ -1,0 +1,887 @@
+{
+  "id": "last-stop-murder",
+  "themeSlug": "express-train",
+  "title": "Last Stop: Murder",
+  "synopsis": "January 1934. The Danube Express, Paris to Istanbul, is stuck in a snowdrift somewhere in the mountains of Yugoslavia. Overnight, the American millionaire Cornelius Vane is murdered in Compartment 7, a compartment locked and chained from the inside. Everyone in the sleeping car has a reason to hate him, and the police can't reach the train until the line is cleared. Until then, the passengers must find the killer among themselves.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "The sleeping car of the Danube Express, snowbound in the mountains of Yugoslavia",
+    "era": "January 1934",
+    "description": "A narrow mahogany corridor with brass lamps, eight sleeping compartments (7 and 8 joined by a connecting door), the conductor's seat at one end, and beyond it, the dining car with white linen and silver service. Outside, nothing but snow and mountains. The line is blocked; the police can't arrive before evening."
+  },
+  "victim": {
+    "name": "Cornelius Vane",
+    "description": "Sixty. An American millionaire who made his fortune in railways and kept it by blackmail. Loud, charming, cruel and very rich, he boarded in Paris wearing the stolen Volkov emerald on his tie pin, and told everyone he'd sell it in Istanbul."
+  },
+  "characters": [
+    {
+      "id": "countess",
+      "name": "Countess Irina Volkova",
+      "pronouns": "she/her",
+      "title": "The Exiled Countess",
+      "publicBio": "A Russian countess who fled the Revolution with nothing but her title and her pride. She travels in Compartment 8, next door to Mr. Vane, with a hatbox, a sewing kit and a jewelled hatpin that once belonged to an empress.",
+      "costumeTips": "An elegant gown or fur stole, long gloves, a dramatic hat with a hatpin, and a cigarette holder.",
+      "voice": {
+        "accent": "ru-RU",
+        "pitch": 0.9,
+        "rate": 0.9,
+        "style": "cool, regal, cutting"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. The Volkov emerald belonged to your family for two hundred years, until the Bolsheviks took it and sold it for nothing to Cornelius Vane. Tonight at dinner he wore it on his tie pin and told you the price to buy it back was your pride. He said he'd unbolt the connecting door between his compartment and yours at one o'clock, so you could come and beg. You went through at one. He laughed at you. You drove your jewelled hatpin into his heart. Then you opened his window to make it look as if someone came over the roof, stepped back into your own compartment, and slid his bolt shut through the gap with a loop of red silk thread from your sewing kit. At half past one you dropped the hatpin out of your own window into the snow.",
+        "secrets": [
+          {
+            "id": "countess-emerald",
+            "text": "The Volkov emerald is mine by right. Vane bought it from the thieves who murdered my family.",
+            "unlockAct": 0
+          },
+          {
+            "id": "countess-poor",
+            "text": "I have no money at all. My pearls are glass. I have been selling my furs one by one to pay for this journey.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. The door was chained from inside: let them believe the killer came over the roof.",
+          "Nobody must look at the connecting door's bolt, or in your sewing kit.",
+          "Point everyone at the doctor, the secretary or the colonel. Each of them had a reason."
+        ],
+        "knows": [
+          "Dr. Lacroix gives Vane an injection every night on this journey, 'to help him sleep'.",
+          "Vane's secretary, Miss Marlow, looks at him as if she'd like to push him off the train."
+        ],
+        "alibi": "I dined until half past eleven, then I retired to Compartment 8 and read until I fell asleep. I heard nothing. A countess sleeps soundly.",
+        "lines": {
+          "act1": [
+            "In my country, Mr. Vane would have been a footman. Here he was a king. The world is upside down."
+          ],
+          "act2": [
+            "Yes, I hated him. So did everyone in this carriage. Hatred is not a crime, or we would all be hanged."
+          ],
+          "act3": [
+            "The window was open and the door was chained. Look to the roof, gentlemen. Look to the snow."
+          ]
+        }
+      }
+    },
+    {
+      "id": "doctor",
+      "name": "Dr. Henri Lacroix",
+      "pronouns": "he/him",
+      "title": "The Physician",
+      "publicBio": "A Belgian doctor travelling to a clinic in Istanbul. Neat moustache, black bag, and a habit of taking everyone's pulse. Mr. Vane has asked him for an injection every night of the journey.",
+      "costumeTips": "A dark suit, a neat moustache, round spectacles, and a doctor's bag (any small bag will do).",
+      "voice": {
+        "accent": "fr-BE",
+        "pitch": 1.0,
+        "rate": 1.05,
+        "style": "precise, polite, anxious"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Six years ago a patient died on your operating table, and you were struck off in Brussels. You've been practising under a clean name since. Cornelius Vane found out, and he has taken five hundred pounds a month from you ever since. At half past twelve tonight you gave him his usual injection, a small dose of morphine to help him sleep, and he gloated about 'a royal visitor at one'. You wanted to kill him. You didn't.",
+        "secrets": [
+          {
+            "id": "doctor-struck",
+            "text": "I was struck off in Brussels six years ago, after a patient died. I practise under a false name.",
+            "unlockAct": 0
+          },
+          {
+            "id": "doctor-blackmail",
+            "text": "Vane has blackmailed me for five hundred pounds a month for four years.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your past buried. If it comes out, you'll never practise again.",
+          "Find out who killed Vane before someone looks too closely at your bag.",
+          "Help the living, if you can: you are still a doctor."
+        ],
+        "knows": [
+          "At half past twelve you gave Vane his usual injection, one small ampoule. He was cheerful, and said he was expecting 'a royal visitor at one'.",
+          "Miss Marlow was leaving his compartment as you arrived, white-faced, carrying her notebook."
+        ],
+        "alibi": "At half past twelve I gave Mr. Vane his injection, then I went to my compartment and wrote letters until two.",
+        "lines": {
+          "act1": [
+            "I have seen many dead men. This one, I think, was expecting company."
+          ],
+          "act2": [
+            "One ampoule, the usual dose. A man doesn't die of one ampoule. I would stake my career on it."
+          ],
+          "act3": [
+            "Ask the countess what she was doing at one o'clock. Her lamp was burning. I saw it under her door."
+          ]
+        }
+      }
+    },
+    {
+      "id": "edith",
+      "name": "Miss Edith Marlow",
+      "pronouns": "she/her",
+      "title": "The Secretary",
+      "publicBio": "Mr. Vane's private secretary for three years: shorthand, spectacles and a face that gives nothing away. She brings him his brandy flask and takes his dictation every night at a quarter past twelve.",
+      "costumeTips": "A neat blouse and skirt, spectacles, hair pinned up, a notebook and a pencil.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.1,
+        "rate": 1.1,
+        "style": "crisp, efficient, guarded"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Ten years ago Cornelius Vane ruined your father's firm, Marlow and Sons, and your father shot himself. You changed your name and took a job as Vane's secretary, and you've been waiting ever since for... something. You don't know what. At a quarter past twelve tonight you took him his brandy flask and his dictation, as always: a letter to a buyer in Istanbul about the Volkov emerald. While you were there, he slid back the bolt on the connecting door to Compartment 8 and smirked.",
+        "secrets": [
+          {
+            "id": "edith-father",
+            "text": "Vane ruined my father's firm, and my father shot himself. Vane doesn't know who I am.",
+            "unlockAct": 0
+          },
+          {
+            "id": "edith-letters",
+            "text": "I've been copying Vane's private letters for years, waiting for a way to ruin him.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your real name secret.",
+          "Find Vane's private papers before anyone else does.",
+          "Find out who killed him. You'd like to thank them."
+        ],
+        "knows": [
+          "At a quarter past twelve Vane dictated a letter about selling the Volkov emerald in Istanbul. Then he unbolted the connecting door to Compartment 8 and said, 'A royal visitor, at one.'",
+          "The flask was full of his usual brandy when you took it in. You filled it yourself in the dining car."
+        ],
+        "alibi": "At a quarter past twelve I took Mr. Vane his flask and his dictation. At twenty-five past I went to my compartment and typed the letter until half past one.",
+        "lines": {
+          "act1": [
+            "Mr. Vane dictated a letter tonight. He always dictated. He liked to hear himself."
+          ],
+          "act2": [
+            "Three years I worked for him. I know every enemy he had. It's a very long list."
+          ],
+          "act3": [
+            "He unbolted that connecting door himself, you know. He wanted the countess to come through it."
+          ]
+        }
+      }
+    },
+    {
+      "id": "pierre",
+      "name": "Pierre Moreau",
+      "pronouns": "he/him",
+      "title": "The Conductor",
+      "publicBio": "The sleeping-car conductor: brass buttons, a passkey on a chain, and twenty years of discretion. Pierre knows who's in every compartment, and who shouldn't be.",
+      "costumeTips": "A dark uniform jacket with brass buttons, a peaked cap, and a big key on a chain.",
+      "voice": {
+        "accent": "fr-FR",
+        "pitch": 0.95,
+        "rate": 1.0,
+        "style": "discreet, weary, proud"
+      },
+      "required": true,
+      "private": {
+        "backstory": "At a quarter to one Vane rang for you, told you he was not to be disturbed until Istanbul, and locked and chained his door in front of you. At seven this morning you cut the chain and found him dead. And there, on the floor by the bed, was the Volkov emerald, fallen from his tie pin. You slipped it into your pocket. Twenty years of carrying other people's luggage. Just once, you thought.",
+        "secrets": [
+          {
+            "id": "pierre-emerald",
+            "text": "At seven this morning I took the Volkov emerald from the floor of Vane's compartment. It's in my pocket.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pierre-debts",
+            "text": "I owe money to men in Marseille who don't wait patiently.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the emerald, if you can.",
+          "Protect the good name of the Company: this train has never had a murder.",
+          "Find out who did it before the police board at the next station."
+        ],
+        "knows": [
+          "At a quarter to one Vane rang, told you nobody was to disturb him until Istanbul, and locked and chained his door in front of you. He was alive and in a very good mood.",
+          "At seven you cut the chain. The window was wide open, there was snow on the floor, and the connecting door to Compartment 8 was bolted on his side."
+        ],
+        "alibi": "I was in my little seat at the end of the corridor all night, as always. I see every door.",
+        "lines": {
+          "act1": [
+            "Twenty years on the Danube Express, and never a murder. Never! Until tonight."
+          ],
+          "act2": [
+            "The door was locked and chained from inside. I cut the chain myself. Nobody came through that door."
+          ],
+          "act3": [
+            "The window, the connecting door, or a ghost. Take your pick, messieurs, mesdames."
+          ]
+        }
+      }
+    },
+    {
+      "id": "pamela",
+      "name": "Lady Pamela Hurst",
+      "pronouns": "she/her",
+      "title": "The Travel Writer",
+      "publicBio": "An English aristocrat writing a book about the grand railways of Europe. Tweed, pearls and a notebook. She has Compartment 6, on the other side of Mr. Vane's, and she complains about the walls being thin.",
+      "costumeTips": "Tweeds or a travelling suit, pearls, a felt hat, and a notebook.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.0,
+        "rate": 1.0,
+        "style": "brisk, amused, sharp"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Twenty years ago, in Boston, you were briefly married to Cornelius Vane. You never divorced him properly, and his will, as far as you know, still leaves everything to you. You haven't spoken in years; you booked this train by pure bad luck. The walls are thin, and you hear everything in Compartment 7.",
+        "secrets": [
+          {
+            "id": "pamela-married",
+            "text": "I was married to Cornelius Vane once. I believe his will still leaves me everything.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pamela-book",
+            "text": "There is no book. I'm travelling to Istanbul to hide from my creditors.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your marriage to Vane a secret, at least until the will is read.",
+          "Find out who killed him before anyone decides it was the widow.",
+          "Get a good chapter out of this. Murder sells."
+        ],
+        "knows": [
+          "The walls are thin. At about one o'clock you heard someone in Vane's compartment, then nothing.",
+          "At ten past one Colonel Blake was smoking in the corridor, right outside Vane's door."
+        ],
+        "alibi": "I was in Compartment 6 all night, writing my book. I never left it.",
+        "lines": {
+          "act1": [
+            "These walls are paper, darling. One hears everything. Everything."
+          ],
+          "act2": [
+            "Married? To that man? What a hideous idea. Who told you?"
+          ],
+          "act3": [
+            "I heard what I heard through that wall. Whether I tell you depends on how nicely you ask."
+          ]
+        }
+      }
+    },
+    {
+      "id": "blake",
+      "name": "Colonel Arthur Blake",
+      "pronouns": "he/him",
+      "title": "The Old Soldier",
+      "publicBio": "A retired colonel of the Indian Army, with a magnificent moustache, a service revolver in his luggage and a great many stories. He ran a field hospital in the war, and he knows death when he sees it.",
+      "costumeTips": "A blazer or military jacket, a bristling moustache, a walking stick, and a monocle if you dare.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.8,
+        "rate": 0.95,
+        "style": "booming, blunt, gallant"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You lost your savings at cards in Monte Carlo, most of it to Cornelius Vane, and signed him IOUs for three thousand pounds you'll never be able to pay. He said he'd send them to your regiment. At ten past one you couldn't sleep, and stood smoking outside his door, working out what you'd say to him. You felt a freezing draught under his door, and heard nothing at all.",
+        "secrets": [
+          {
+            "id": "blake-ious",
+            "text": "I owe Vane three thousand pounds in gambling IOUs. He threatened to send them to my old regiment.",
+            "unlockAct": 0
+          },
+          {
+            "id": "blake-revolver",
+            "text": "My service revolver is in my luggage, and it hasn't been fired since 1918. I checked it this morning. Twice.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get your IOUs back before anyone reads them.",
+          "Find the killer. You've faced worse than this at Kut.",
+          "Protect the ladies, whatever they may say about needing protection."
+        ],
+        "knows": [
+          "At ten past one you smoked in the corridor outside Vane's door. There was a freezing draught under it, and not a sound.",
+          "The countess's lamp was still burning under her door at ten past one."
+        ],
+        "alibi": "I went to bed at midnight, couldn't sleep, and smoked a pipe in the corridor from ten past one to half past. Then bed.",
+        "lines": {
+          "act1": [
+            "I ran a field hospital at Kut. I know a dead man, and I know how he got that way."
+          ],
+          "act2": [
+            "IOUs? A gentleman's debts are his own affair, sir."
+          ],
+          "act3": [
+            "A draught under the door at ten past one. That window was already open. Mark my words."
+          ]
+        }
+      }
+    },
+    {
+      "id": "rinaldi",
+      "name": "Signor Enzo Rinaldi",
+      "pronouns": "he/him",
+      "title": "The Jeweller",
+      "publicBio": "A jeweller from Milan with a loupe on a ribbon, a case of samples and very soft hands. Mr. Vane showed him the Volkov emerald in the dining car tonight, and named a price that made him laugh out loud.",
+      "costumeTips": "A sharp suit, a silk handkerchief, rings on several fingers, and a jeweller's loupe (or a magnifying glass).",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.0,
+        "rate": 1.1,
+        "style": "charming, quick, calculating"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You're a jeweller, and also, when times are hard, a fence for stolen stones. You planned to steal the Volkov emerald from Vane's compartment before Istanbul, and you've been watching his door. You never got the chance. Now the emerald has vanished, and you're the obvious suspect.",
+        "secrets": [
+          {
+            "id": "rinaldi-fence",
+            "text": "When business is slow, I buy and sell stolen jewels. The police in three countries know my name.",
+            "unlockAct": 0
+          },
+          {
+            "id": "rinaldi-plan",
+            "text": "I planned to steal the Volkov emerald before Istanbul. Someone got there first.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find the Volkov emerald.",
+          "Keep your other line of business quiet.",
+          "Find the killer, so nobody looks too closely at the jeweller."
+        ],
+        "knows": [
+          "At midnight in the dining car Vane showed you the Volkov emerald on his tie pin and asked twice what it was worth.",
+          "The countess watched that emerald all through dinner like a hawk watching a mouse."
+        ],
+        "alibi": "After the dining car closed I went to my compartment and polished my samples until I fell asleep.",
+        "lines": {
+          "act1": [
+            "The Volkov emerald. Thirty carats, flawless, Colombian. I would know it anywhere."
+          ],
+          "act2": [
+            "A jeweller notices things. Hands. Rings. Who looks at what. The countess looked at nothing but that stone."
+          ],
+          "act3": [
+            "The emerald is gone. Find the emerald and you find something, I promise you. Maybe not a murderer."
+          ]
+        }
+      }
+    },
+    {
+      "id": "ruth",
+      "name": "Ruth Adler",
+      "pronouns": "she/her",
+      "title": "The Reporter",
+      "publicBio": "An American newspaperwoman from Chicago with a pencil behind her ear and a camera in her bag. She says she's writing about the Balkans. She's been asking a great many questions about Mr. Vane.",
+      "costumeTips": "A trench coat or blazer, a cloche hat, a notebook, and a pencil behind your ear.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.2,
+        "style": "fast, wry, tenacious"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've followed Cornelius Vane across Europe for a front-page exposé: bribes, blackmail, and a stolen emerald. At eleven last night you picked the lock of his compartment while he was at dinner and read his papers. At ten to one you tried his door again. It was locked, and you heard him humming inside, alive.",
+        "secrets": [
+          {
+            "id": "ruth-expose",
+            "text": "I've followed Vane across Europe for a story on his blackmail. I have a list of his victims.",
+            "unlockAct": 0
+          },
+          {
+            "id": "ruth-lock",
+            "text": "At eleven o'clock I picked the lock on Vane's compartment and read his papers.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the story.",
+          "Keep your notes safe: half this train is in them.",
+          "Find the killer first. That's the headline."
+        ],
+        "knows": [
+          "At ten to one you tried Vane's door. It was locked, and you heard him humming inside. He was alive.",
+          "Your notes say Vane was taking money from somebody on this train every month. 'Dr. L.'"
+        ],
+        "alibi": "I was in the dining car writing until twenty to one, then I walked the corridor once, then bed.",
+        "lines": {
+          "act1": [
+            "Every man has a story. Vane had about forty, and I was writing them all down."
+          ],
+          "act2": [
+            "The Balkans? Sure, I'm writing about the Balkans. They're right outside the window."
+          ],
+          "act3": [
+            "He was alive at ten to one. I heard him humming 'Yankee Doodle'. So it happened after that."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "visitors",
+      "title": "The Last Visitors",
+      "text": "Mr. Vane's last visitors, by the conductor's account: Miss Marlow at a quarter past twelve with his brandy flask and her notebook, Dr. Lacroix at half past with his nightly injection. At a quarter to one Vane locked and chained himself in. Next door, through a connecting door, is Compartment 8: the countess's.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "edith",
+        "doctor",
+        "countess"
+      ]
+    },
+    {
+      "id": "window",
+      "title": "The Open Window",
+      "text": "Vane's window is wide open, and snow has drifted across the floor. On the sill lies a man's leather glove. Colonel Blake says he lost a glove yesterday.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "blake"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "emerald-case",
+      "title": "The Empty Tie Pin",
+      "text": "Vane's gold tie pin lies on the washstand, its claws bent open and empty. The Volkov emerald is gone. Signor Rinaldi, the jeweller, asked about it twice at dinner.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "rinaldi",
+        "pierre"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "bolt",
+      "title": "The Connecting Door",
+      "text": "The connecting door to Compartment 8 is bolted on Vane's side. But the brass knob of the bolt has fresh scratches on it, and caught in the gap beneath the door is a loop of fine red silk thread.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "countess"
+      ]
+    },
+    {
+      "id": "pamela-heard",
+      "title": "Through the Wall",
+      "text": "Your own memory: at about one o'clock, through the thin wall, you heard Vane say, 'Come in, Your Highness,' and laugh. Then a woman's voice, low and furious, in Russian. Then nothing.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "countess"
+      ],
+      "recipient": "pamela"
+    },
+    {
+      "id": "hatpin-gone",
+      "title": "An Empty Hatband",
+      "text": "On the rack in Compartment 8: the countess's hat. The jewelled hatpin she wore at dinner, with an imperial eagle on its head, is missing.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "countess"
+      ]
+    },
+    {
+      "id": "flask",
+      "title": "The Brandy Flask",
+      "text": "Vane's silver flask on the table, half drunk. It smells of good brandy and nothing else. Miss Marlow filled it and carried it in.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "edith"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "syringe",
+      "title": "The Doctor's Bag",
+      "text": "In Dr. Lacroix's bag: a syringe, cleaned, and a box of morphine ampoules with one missing. One is the usual dose. The doctor gave Vane his injection at half past twelve.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "doctor"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "pierre-pocket",
+      "title": "In Your Pocket",
+      "text": "In your waistcoat pocket, wrapped in your handkerchief: the Volkov emerald. You picked it up from the floor by Vane's bed at seven this morning, after you cut the chain.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "pierre",
+        "rinaldi"
+      ],
+      "recipient": "pierre",
+      "redHerring": true
+    },
+    {
+      "id": "diary",
+      "title": "Vane's Pocket Diary",
+      "text": "Vane's leather pocket diary has a little lock. He wrote a riddle on the flyleaf, because he couldn't remember the combination.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "countess"
+      ],
+      "puzzle": {
+        "prompt": "I have a head and a tail but no body, and I'm always changing hands. What am I?",
+        "answers": [
+          "coin",
+          "a coin",
+          "coins",
+          "penny",
+          "a penny",
+          "money"
+        ],
+        "hint": "Vane collected lots of them. Toss one.",
+        "solvedText": "Tonight's entry: 'The countess wants her emerald back. Told her the price is her pride. I'll unbolt the door at one and let Her Highness come through and beg. I shall enjoy it very much.'"
+      }
+    },
+    {
+      "id": "ious",
+      "title": "A Bundle of IOUs",
+      "text": "In Vane's briefcase: gambling IOUs worth three thousand pounds, every one signed 'A. Blake, Col.', and an envelope addressed to the colonel's old regiment.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "blake"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "notebook",
+      "title": "The Reporter's Notebook",
+      "text": "Ruth Adler's notebook, left in the dining car: 'VANE: bribes, blackmail, the emerald. Picked his lock 11 pm. Must get the diary.' She was very interested in his compartment.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "ruth"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "thread",
+      "title": "The Sewing Kit",
+      "text": "In the countess's sewing kit: a spool of fine red silk thread. A long length has been cut from it very recently: the end is fresh and bright.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "countess"
+      ]
+    },
+    {
+      "id": "hatpin",
+      "title": "Something in the Snow",
+      "text": "Beneath the window of Compartment 8, sticking out of a snowdrift beside the track: a long jewelled hatpin with an imperial eagle on its head. It has been wiped, but there's a dark stain caught between the jewels.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "countess"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A luxury train at night, lamps glowing gold, stopped in a snowstorm among black mountains.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The Danube Express, January 1934. At twenty to twelve, somewhere in the mountains of Yugoslavia, the train ran into a snowdrift and stopped dead."
+    },
+    {
+      "type": "narration",
+      "text": "In the dining car, the American millionaire Cornelius Vane raised his glass. He'd had a wonderful trip, he said. He'd seen so many old friends. And in Istanbul he'd sell the Volkov emerald on his tie pin for a fortune."
+    },
+    {
+      "type": "line",
+      "speaker": "rinaldi",
+      "text": "Every one of us at that table wanted something from him. And he knew it. He looked at us like a cat looking into a birdcage."
+    },
+    {
+      "type": "toast",
+      "text": "To Cornelius Vane, and to old friends!",
+      "alternative": "Raise your tea, and don't turn your back."
+    },
+    {
+      "type": "narration",
+      "text": "At a quarter to one, Vane rang for the conductor, told him he was not to be disturbed until Istanbul, and locked and chained his door."
+    },
+    {
+      "type": "image",
+      "text": "A mahogany corridor at night, lamps turned low, and the door of Compartment 7 with its brass number.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At seven in the morning, when Vane didn't answer his breakfast call, the conductor cut the chain. Cornelius Vane lay dead in his berth. The window was wide open, and snow had drifted across the floor. The door had been locked and chained from inside. And one of you killed him."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: Compartment 7",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. Compartment 7."
+        },
+        {
+          "type": "image",
+          "text": "A sleeping compartment: a berth, a washstand, a silver flask, an open window with snow on the sill, and a connecting door.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Colonel Blake, who ran a field hospital in the war, examines the body. There's a tiny wound over the heart, barely bleeding: something long and very thin went in. It isn't a knife and it isn't a bullet. And the door was chained from inside."
+        },
+        {
+          "type": "line",
+          "speaker": "pierre",
+          "text": "I cut the chain myself. Nobody came through that door. Nobody."
+        }
+      ],
+      "prompts": [
+        "Who visited Vane last night, and when?",
+        "The door was chained. So how did the killer get in, and out?",
+        "Where is the Volkov emerald?",
+        "Who had a reason to hate him? (Everyone. Start there.)"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: The Sleeping Car",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. The Sleeping Car."
+        },
+        {
+          "type": "image",
+          "text": "A row of compartment doors down the corridor, each a little ajar, and a brass bolt on a connecting door.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Cornelius Vane collected secrets the way other men collect stamps. His briefcase and his locked pocket diary are full of them, and so is this carriage."
+        },
+        {
+          "type": "toast",
+          "text": "To secrets, and the people who keep them!",
+          "alternative": "Raise a coffee cup to discretion."
+        },
+        {
+          "type": "line",
+          "speaker": "pamela",
+          "text": "These walls are paper, darling. One hears everything."
+        }
+      ],
+      "prompts": [
+        "Open Vane's pocket diary. The flyleaf holds a riddle.",
+        "Who did Vane have a hold over, and how?",
+        "Who has the emerald?",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Line Is Cleared",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Line Is Cleared."
+        },
+        {
+          "type": "image",
+          "text": "Snowploughs on the line ahead, and a railway police car waiting at a little mountain station.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The snowploughs are through. In an hour the train will reach the station, and the police will come aboard. Before they do, the passengers owe it to themselves to name the killer."
+        },
+        {
+          "type": "toast",
+          "text": "To the last stop!",
+          "alternative": "Hot chocolate up for the last stop!"
+        },
+        {
+          "type": "line",
+          "speaker": "blake",
+          "text": "I've seen a lot of men die. I've never seen one murdered in a locked room. Something doesn't add up."
+        }
+      ],
+      "prompts": [
+        "How was the locked room really done?",
+        "What was found in the snow, or in someone's luggage?",
+        "Whose story about one o'clock doesn't hold together?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "emerald",
+        "text": "To take back a stolen family heirloom, and her pride"
+      },
+      {
+        "id": "blackmail",
+        "text": "To end years of blackmail"
+      },
+      {
+        "id": "father",
+        "text": "To avenge a father he ruined"
+      },
+      {
+        "id": "debts",
+        "text": "To destroy gambling debts"
+      },
+      {
+        "id": "inheritance",
+        "text": "To inherit his fortune"
+      },
+      {
+        "id": "theft",
+        "text": "To steal the Volkov emerald"
+      }
+    ],
+    "methods": [
+      {
+        "id": "hatpin",
+        "text": "A jewelled hatpin through the heart"
+      },
+      {
+        "id": "morphine",
+        "text": "An overdose in his nightly injection"
+      },
+      {
+        "id": "cyanide",
+        "text": "Cyanide in his brandy flask"
+      },
+      {
+        "id": "pillow",
+        "text": "Smothered with a pillow"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "countess",
+    "motiveId": "emerald",
+    "methodId": "hatpin",
+    "explanation": [
+      "Nobody came over the roof, and nobody came through the chained door. Cornelius Vane let his killer in himself, through the connecting door to Compartment 8. His killer was Countess Irina Volkova.",
+      "The Volkov emerald belonged to her family for two hundred years, until the Bolsheviks stole it and sold it to Vane. He told her the price to buy it back was her pride, and that he'd unbolt the connecting door at one o'clock so she could come and beg. He wrote it in his diary, and he told Miss Marlow too.",
+      "At one o'clock she went through. Lady Pamela heard him say, 'Come in, Your Highness.' He laughed at her, and she drove her jewelled hatpin into his heart. Then she opened his window, so it would look as if someone had come over the roof.",
+      "Back in her own compartment, she slid Vane's bolt shut through the gap under the door with a loop of red silk thread, which left the scratches on the knob and a strand behind. At half past one she dropped the hatpin from her own window into the snow.",
+      "Pierre pocketed the fallen emerald at seven, and the colonel's glove, the doctor's syringe and Miss Marlow's flask were innocent. But a locked room only works if you lock it from the right side."
+    ],
+    "timeline": [
+      {
+        "time": "9:00",
+        "event": "Dinner. Vane wears the Volkov emerald and tells the countess the price to buy it back is her pride."
+      },
+      {
+        "time": "11:00",
+        "event": "Ruth Adler picks the lock of Compartment 7 and reads Vane's papers."
+      },
+      {
+        "time": "11:40",
+        "event": "The train stops in a snowdrift."
+      },
+      {
+        "time": "12:00",
+        "event": "Vane shows the emerald to Rinaldi in the dining car."
+      },
+      {
+        "time": "12:15",
+        "event": "Miss Marlow brings Vane his flask and takes dictation. He unbolts the connecting door: 'A royal visitor, at one.'"
+      },
+      {
+        "time": "12:30",
+        "event": "Dr. Lacroix gives Vane his usual injection."
+      },
+      {
+        "time": "12:45",
+        "event": "Vane tells Pierre not to disturb him, and locks and chains his door."
+      },
+      {
+        "time": "12:50",
+        "event": "Ruth tries Vane's door and hears him humming."
+      },
+      {
+        "time": "1:00",
+        "event": "The countess comes through the connecting door and stabs Vane with her hatpin. She opens his window."
+      },
+      {
+        "time": "1:05",
+        "event": "Back in Compartment 8, she slides his bolt shut with a loop of red silk thread."
+      },
+      {
+        "time": "1:10",
+        "event": "Colonel Blake smokes outside Vane's door and feels a freezing draught."
+      },
+      {
+        "time": "1:30",
+        "event": "The countess drops the hatpin out of her window into the snow."
+      },
+      {
+        "time": "7:00",
+        "event": "Pierre cuts the chain, finds Vane dead, and pockets the fallen emerald."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "A little mountain station in the morning sun, and railway police in long coats waiting on the platform.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the passengers of the Danube Express!",
+      "alternative": "Coffee cups up for the passengers!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came aboard at the mountain station. Countess Irina Volkova was waiting in the corridor in her furs, her hat on straight, without its pin. 'He asked for my pride,' she said. 'I gave him what was left of it.'"
+    },
+    {
+      "type": "narration",
+      "text": "Pierre handed over the Volkov emerald, very red in the face. The train was forty hours late into Istanbul, and nobody on board complained. Goodnight, detectives."
+    }
+  ]
+}

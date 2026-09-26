@@ -1,0 +1,230 @@
+{
+  "variantOf": "murder-on-the-red-carpet",
+  "variant": "C",
+  "solution": {
+    "murdererId": "gloria",
+    "motiveId": "exposure",
+    "methodId": "pills",
+    "explanation": [
+      "Nobody struck Rex Hartley, and his lights worked perfectly. He fell asleep and never woke up, from the champagne poured for him by the most feared woman in Hollywood: Gloria Gale.",
+      "Rex had a folder of sworn statements from six stars: Gloria's column invented stories, and she took money to keep others out. On Monday it was going to the Times. When he told her so, she said, 'Then I'll just have to make sure you get a good night's sleep, darling.' He wrote it in his appointment book.",
+      "Gloria can't sleep without her Seconal. Before her 'interview' at nine, she crushed a whole bottle of pills into a twist of paper. She poured Rex a glass of champagne with the powder in it, and he drank it laughing: 'Monday, Gloria.' Mickey caught her at 9:04, slipping the empty pill bottle into her bag.",
+      "By half past nine, when Dolores came, Rex was yawning and slurring; she thought he was drunk. Buck heard him through the wall. By ten to ten he'd slid from his chair and stopped breathing. The chalky film in the glass, the empty bottle in Gloria's bag and the folder in Rex's briefcase told the rest.",
+      "Dolores, Victor and Sol all had their scenes with Rex tonight, and each had a reason. But the columnist always gets the last word."
+    ],
+    "timeline": [
+      {
+        "time": "7:30",
+        "event": "Rex walks the red carpet."
+      },
+      {
+        "time": "8:00",
+        "event": "The picture begins. Rex slips backstage."
+      },
+      {
+        "time": "8:20",
+        "event": "Rex sends Benny away: 'Gloria's coming at nine. If she tries anything, she's finished.'"
+      },
+      {
+        "time": "8:30",
+        "event": "Sol Mandel visits. Rex tears up his contract."
+      },
+      {
+        "time": "8:45",
+        "event": "Victor Kessler checks the mirror lights and tightens a bulb."
+      },
+      {
+        "time": "9:00",
+        "event": "Gloria brings champagne, and pours Rex a glass laced with a whole bottle of crushed sleeping pills."
+      },
+      {
+        "time": "9:04",
+        "event": "Gloria leaves, slipping the empty pill bottle into her bag. Mickey photographs her."
+      },
+      {
+        "time": "9:30",
+        "event": "Dolores visits. Rex is yawning and slurring; she thinks he's drunk. She leaves at 9:36."
+      },
+      {
+        "time": "9:45",
+        "event": "Marty Klein knocks. No answer."
+      },
+      {
+        "time": "9:50",
+        "event": "Rex slides from his chair and stops breathing. Buck hears a soft thump."
+      },
+      {
+        "time": "10:05",
+        "event": "Benny finds Rex dead."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Dressing Room."
+        },
+        {
+          "type": "image",
+          "text": "The dressing table: a dark mirror, a spilled bottle of champagne, a broken glass, and a gold statuette on the carpet.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The theatre's doctor, called from the stalls, kneels by the body. There isn't a mark on him: no wound, no burn. His pupils are tiny, and he looks as if he simply fell into a very deep sleep and forgot to breathe. There's a chalky white film at the bottom of the broken champagne glass. Somebody wanted Rex Hartley to sleep through his curtain call, and everything after it."
+        },
+        {
+          "type": "line",
+          "speaker": "benny",
+          "text": "I straightened his tie. Force of habit. I'm sorry."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "gloria": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Rex Hartley had a folder of sworn statements from six stars: your column invented stories, and you took money to keep others out. On Monday it was going to the Times, and you'd be finished. You told him you'd make sure he 'got a good night's sleep'. You can't sleep without your Seconal. Before your 'interview' at nine you crushed a whole bottle into a twist of paper. You poured Rex a glass of champagne with the powder in it, and he drank it laughing. At four minutes past nine you left, slipping the empty pill bottle into your bag.",
+        "objectives": [
+          "Don't get caught. Point everyone at the award on the floor (Dolores was the last visitor) or Victor's lights.",
+          "Get rid of the pill bottle in your bag.",
+          "Find Rex's folder and destroy it."
+        ],
+        "knows": [
+          "A whole bottle of Seconal in a glass of champagne takes about half an hour to put a man to sleep, and less than an hour to stop his breathing.",
+          "Rex said 'a little visit from my wife' at half past nine. Dolores Dare left the Mandel box at twenty-five past nine."
+        ],
+        "lines": {
+          "act3": [
+            "I poured him one glass of champagne. One! Half of Hollywood has poured him champagne. Ask Dolores what she did at half past nine."
+          ]
+        }
+      }
+    },
+    "dolores": {
+      "private": {
+        "backstory": "Four years ago, before anyone knew your name, you married Rex Hartley in Tijuana, and neither of you ever got a divorce. Now you're engaged to Sol Mandel's son, and tonight Rex said the newspapers would have your marriage certificate on Monday unless you broke it off. At half past nine you went to his dressing room to beg. He was yawning and slurring, sprawled in his chair. I thought he was drunk. You told him, 'Over my dead body, Rex. Or yours,' and walked out at twenty-five to ten, crying. You did not kill him. But you said it.",
+        "objectives": [
+          "Clear your name without anyone learning about Tijuana.",
+          "Find the marriage certificate before the police do.",
+          "Keep your engagement, and your career, alive."
+        ],
+        "lines": {
+          "act3": [
+            "Yes, I went to see him. Yes, I said something dreadful. He was alive when I left. I swear it on my mother."
+          ]
+        }
+      }
+    },
+    "benny": {
+      "private": {
+        "knows": [
+          "At five past ten you found Rex on the floor beside his chair, as if he'd slid off it in his sleep. The champagne glass was broken beside him.",
+          "At nine forty-five Marty Klein was hovering outside the door when you passed the end of the corridor."
+        ]
+      }
+    },
+    "buck": {
+      "private": {
+        "knows": [
+          "At half past nine, through the wall, you heard Rex slurring and yawning at a woman. After she left, nothing, until a soft thump at about ten to ten.",
+          "Mickey the photographer was hanging about at the end of the corridor with his camera all evening."
+        ],
+        "lines": {
+          "act3": [
+            "He sounded drunk at half past nine. Slurring, yawning. Rex never got drunk before a bow. Never."
+          ]
+        }
+      }
+    },
+    "mickey": {
+      "private": {
+        "knows": [
+          "You photographed everyone who went down the corridor tonight. The pictures are drying in the darkroom.",
+          "At four minutes past nine Gloria Gale came out of Rex's room smiling, and slipped something small and brown into her handbag."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "statuette": {
+      "text": "Rex's Golden Reel award lies on the carpet, knocked off the dressing table as he fell. There's nothing on it but fingerprints: his own, and a studio polisher's.",
+      "redHerring": true
+    },
+    "certificate": {
+      "redHerring": true
+    },
+    "stole": null,
+    "champagne": {
+      "text": "A bottle of champagne on its side on the dressing table, and a glass broken on the floor. In the bottom of the glass's stem there's a chalky white film, and it tastes faintly bitter. Gloria Gale poured it herself.",
+      "redHerring": false,
+      "pointsTo": [
+        "gloria"
+      ]
+    },
+    "benny-knows": {
+      "text": "Your own memory: at twenty past eight Rex sent you away. 'Gloria's bringing champagne at nine for her interview,' he said. 'I've got a folder on her. If she tries anything, she's finished.'",
+      "pointsTo": [
+        "gloria"
+      ]
+    },
+    "photo": {
+      "text": "Mickey's pictures, fresh from the darkroom. One, stamped 9:04, shows Gloria Gale coming out of Rex's dressing room, smiling, and slipping a small brown bottle into her handbag.",
+      "pointsTo": [
+        "gloria"
+      ]
+    },
+    "appointments": {
+      "pointsTo": [
+        "gloria"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry, in Rex's big scrawl: 'Told Gloria the folder goes to the Times on Monday. She smiled that alligator smile and said, \"Then I'll just have to make sure you get a good night's sleep, darling.\" She's bringing champagne at nine. I'll let her pour.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "pill-bottle",
+      "title": "An Empty Pill Bottle",
+      "text": "In Gloria Gale's evening bag, left on a chair in the powder room: an empty bottle of Seconal sleeping pills, prescribed to 'Miss G. Gale'. The label says it held thirty. And a twist of paper with a trace of white powder.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "gloria"
+      ]
+    },
+    {
+      "id": "folder",
+      "title": "The Folder",
+      "text": "In Rex's briefcase: a folder marked 'GLORIA'. Inside, six signed statements from stars, all saying the same thing: her column invented stories about them, and she took money to keep others out. On top, in Rex's hand: 'To the Times. Monday.'",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "gloria"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "The Starlight Theatre's marquee at dawn, the searchlights off, a police car at the kerb.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Starlight Theatre!",
+      "alternative": "Cider up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came in through the stage door at eleven. Gloria Gale was waiting for them in her enormous hat, a pen in her hand. 'Take it down, boys,' she said. 'Gloria Gale confesses. It's the scoop of the century, and it's mine.'"
+    },
+    {
+      "type": "narration",
+      "text": "'Desert Kings' was the biggest hit of the year. Buck got the sequel, and for once, the morning papers told the truth. Goodnight, detectives."
+    }
+  ]
+}
