@@ -71,8 +71,9 @@ export const api = {
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
-  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null, useAi = true, drinkingPrompts = false) =>
-    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor, useAi, drinkingPrompts }),
+  // version: 'surprise' lets the server pick one this host hasn't played; a version id picks it; null plays the original.
+  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null, useAi = true, drinkingPrompts = false, version: string | null = null) =>
+    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor, useAi, drinkingPrompts, version }),
 
   // ---- Media
   partyMedia: (code: string) => request<{ ready: number; job: MediaJob | null }>('GET', `/api/parties/${encodeURIComponent(code)}/media`),

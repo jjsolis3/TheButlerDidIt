@@ -307,6 +307,8 @@ export interface ScenarioCard {
   aiGenerated: boolean
   /** A host's own edited copy. */
   custom: boolean
+  /** Versions of this story (same place, different killer). Empty when there's only one. */
+  versions: VersionOption[]
 }
 
 export interface ThemeCard {
@@ -506,5 +508,12 @@ export interface MyMystery {
 export interface ValidationResult {
   valid: boolean
   errors: string[]
+}
+
+/** One version of a story. The label ("Version B") is deliberately bland, so it gives nothing away. */
+export interface VersionOption {
+  id: string
+  label: string
+  playedByMe: boolean
 }
 

@@ -50,6 +50,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<MediaAsset>().HasIndex(m => m.PartyId);
         b.Entity<ScenarioEntity>().HasIndex(s => s.OwnerUserId);
+        b.Entity<ScenarioEntity>().HasIndex(s => s.VariantOf);
 
         b.Entity<AiProviderEntity>(e =>
         {

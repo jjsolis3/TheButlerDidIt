@@ -71,6 +71,25 @@ public class ContentTests
         Assert.Contains(all, s => s.ContentRating == ContentRating.Mature);
     }
 
+    [Fact]
+    public void Every_version_of_a_story_has_a_different_killer_in_the_same_setting_with_the_same_cast()
+    {
+        var all = ContentLibrary.Load(ContentRoot()).SelectMany(t => t.Scenarios).ToList();
+        foreach (var story in all.Where(s => s.VariantOf is null))
+        {
+            var versions = all.Where(s => s.Id == story.Id || s.VariantOf == story.Id).ToList();
+            Assert.Equal(versions.Count, versions.Select(v => v.Solution.MurdererId).Distinct().Count());
+            Assert.All(versions, v =>
+            {
+                Assert.Equal(story.Title, v.Title);
+                Assert.Equal(story.Setting.Place, v.Setting.Place);
+                Assert.Equal(story.Victim.Name, v.Victim.Name);
+                Assert.Equal(story.Characters.Select(c => c.Name), v.Characters.Select(c => c.Name));
+                Assert.Equal(story.ContentRating, v.ContentRating);
+            });
+        }
+    }
+
     private static readonly string[] AlcoholWords = ["wine", "rum", "beer", "gin", "whisky", "whiskey", "vodka", "brandy", "grog", "cocktail", "drunk", "booze"];
 
     [Theory]

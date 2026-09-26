@@ -42,6 +42,7 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await expect(host.getByLabel(/Toast prompts/)).toHaveCount(0)
   await host.screenshot({ path: `${SHOTS}/71-family-shelf.png`, fullPage: true })
 
+  await host.getByLabel('Version').selectOption('the-captains-last-cocoa') // Version A: this test knows the killer
   await host.getByRole('button', { name: 'Create party and get the invite code' }).click()
   await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = host.url().split('/').pop()!
@@ -61,4 +62,17 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await host.getByRole('button', { name: 'Start mingling' }).click()
   await expect(host.getByText('The Empty Map Case')).toBeVisible()
   await host.screenshot({ path: `${SHOTS}/73-family-mingle.png` })
+
+  // Same story again: "Surprise me" deals a version this host hasn't played, so a new killer.
+  await host.goto('/host/new')
+  await host.getByRole('tab', { name: /Family/ }).click()
+  await expect(host.getByText('3 versions, a different killer each')).toBeVisible()
+  await expect(host.getByLabel('Version')).toHaveValue('surprise')
+  await expect(host.getByLabel('Version').locator('option', { hasText: 'Version A (played)' })).toHaveCount(1)
+  await host.screenshot({ path: `${SHOTS}/74-version-picker.png`, fullPage: true })
+  const again = await host.request.post('/api/parties', {
+    data: { scenarioId: 'the-captains-last-cocoa', mode: 'sharedScreen', contentLevel: 'family', scheduledFor: null, useAi: false, version: 'surprise' },
+  })
+  expect(again.ok()).toBeTruthy()
+  expect((await again.json()).scenarioId).toMatch(/^the-captains-last-cocoa--[bc]$/)
 })

@@ -66,6 +66,10 @@ public sealed class ScenarioEntity
     /// it disappears from every list, but those parties' recaps still work.
     /// </summary>
     public DateTimeOffset? ArchivedAt { get; set; }
+
+    /// <summary>For a version of a hand-written story (same place, different killer): the original's id.</summary>
+    [MaxLength(120)]
+    public string? VariantOf { get; set; }
 }
 
 public enum PartyMode

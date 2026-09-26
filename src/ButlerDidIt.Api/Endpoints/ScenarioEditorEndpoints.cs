@@ -45,7 +45,7 @@ public static class ScenarioEditorEndpoints
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
             var rows = await db.Scenarios.AsNoTracking()
-                .Where(s => s.ArchivedAt == null && (s.OwnerUserId == user.Id || (user.IsAdmin && s.Source == ScenarioSource.Handwritten)))
+                .Where(s => s.ArchivedAt == null && s.VariantOf == null && (s.OwnerUserId == user.Id || (user.IsAdmin && s.Source == ScenarioSource.Handwritten)))
                 .OrderBy(s => s.Source).ThenBy(s => s.Title)
                 .Select(s => new { s.Id, s.Title, s.ThemeSlug, s.Source, s.ContentRating, s.UpdatedAt, s.OwnerUserId })
                 .ToListAsync(ct);

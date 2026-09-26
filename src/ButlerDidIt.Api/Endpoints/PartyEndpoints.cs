@@ -13,7 +13,10 @@ using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor, bool UseAi = true, bool DrinkingPrompts = false);
+/// <param name="Version">For stories with several versions: "surprise" to let the server pick one this host hasn't
+/// played, a version's id to choose it, or null for the original.</param>
+public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor,
+    bool UseAi = true, bool DrinkingPrompts = false, string? Version = null);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -63,8 +66,25 @@ public static class PartyEndpoints
             if (row is not null && ((row.OwnerUserId is not null && row.OwnerUserId != userId) || row.ArchivedAt is not null))
                 return Results.Problem("Pick a mystery to play.", statusCode: 400);
 
+            // Which version of the story to play (same place and cast, different killer).
+            var versions = await db.Scenarios.AsNoTracking()
+                .Where(x => x.VariantOf == req.ScenarioId && x.ArchivedAt == null).OrderBy(x => x.Id).Select(x => x.Id).ToListAsync(ct);
+            versions.Insert(0, req.ScenarioId);
+            string scenarioId;
+            if (req.Version is null) scenarioId = req.ScenarioId;
+            else if (req.Version == VersionPicker.Surprise)
+            {
+                var played = await db.Parties.AsNoTracking()
+                    .Where(p => p.HostUserId == userId && p.Status != PartyStatus.Lobby && versions.Contains(p.ScenarioId))
+                    .GroupBy(p => p.ScenarioId).Select(g => new { g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.Key, x => x.Count, ct);
+                scenarioId = VersionPicker.Pick(versions, played, Random.Shared);
+            }
+            else if (versions.Contains(req.Version)) scenarioId = req.Version;
+            else return Results.Problem("That version doesn't belong to this mystery.", statusCode: 400);
+
             Scenario scenario;
-            try { scenario = await catalog.GetScenarioAsync(db, req.ScenarioId, ct); }
+            try { scenario = await catalog.GetScenarioAsync(db, scenarioId, ct); }
             catch (KeyNotFoundException) { return Results.Problem("Pick a mystery to play.", statusCode: 400); }
 
             if (scenario.ContentRating > req.ContentLevel)
@@ -183,7 +203,8 @@ public static class PartyEndpoints
     {
         var scenario = await catalog.GetScenarioAsync(db, p.ScenarioId, ct);
         var state = GameJson.Deserialize<GameState>(p.State);
-        return new PartyInfo(p.Code, scenario.Id, scenario.Title, scenario.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
+        // Guests see the shared story's id: a version's id would hint at which killer they're facing.
+        return new PartyInfo(p.Code, isHost ? scenario.Id : scenario.VariantOf ?? scenario.Id, scenario.Title, scenario.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
             p.CreatedAt, p.ScheduledFor, state.Players.Count, scenario.MaxPlayers, isHost);
     }
 }

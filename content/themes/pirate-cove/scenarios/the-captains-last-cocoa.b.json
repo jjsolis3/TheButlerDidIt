@@ -1,0 +1,218 @@
+{
+  "variantOf": "the-captains-last-cocoa",
+  "variant": "B",
+  "solution": {
+    "murdererId": "grace",
+    "motiveId": "ship",
+    "methodId": "biscuit",
+    "explanation": [
+      "Captain Bones wasn't harmed by Cookie's cocoa, and not by the Quartermaster either, though Flint certainly stole his map. The captain ate a ship's biscuit sprinkled with Skull Rock sleepy-moss, brought to his cabin at half past ten by First Mate Grace O'Hara.",
+      "For ten years the captain had promised Grace a ship of her own. Tonight, over pudding, he told her he'd changed his mind: the Salty Maiden would never be hers. Grace shouted, 'You'll regret this!', and everyone heard.",
+      "Grace didn't want to hurt the old sea dog. She wanted him to sleep through tomorrow's sailing, so that she could take the Maiden out herself and prove she was the better captain. Pirates use a pinch of sleepy-moss to calm seasick passengers. Grace used a whole pouch, sprinkled on his bedtime biscuit. From up in the rigging, Pip saw a long red coat carry the biscuit plate into the cabin.",
+      "It was far too much for a weak old heart. By the time Flint crept in at half past eleven to steal the map, the captain was already gone, so still in his chair that the thief thought he was sleeping. Squawk the parrot heard it all, and he's been practising his new favourite words ever since: 'Captain Grace! Captain Grace!'",
+      "The quartermaster was a thief, and he'll answer for that. But the captain's last biscuit came from his own first mate."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The treasure feast begins. Over pudding, the captain tells Grace she'll never have a ship. She shouts at him."
+      },
+      {
+        "time": "9:45",
+        "event": "Captain Scarlett Vane rows in uninvited and offers pearls for the map. The captain laughs."
+      },
+      {
+        "time": "10:00",
+        "event": "Cookie puts the captain's cocoa on the stove, then chases Nutmeg the monkey, who has stolen the sugar."
+      },
+      {
+        "time": "10:20",
+        "event": "Cookie carries the cocoa to the captain's cabin."
+      },
+      {
+        "time": "10:30",
+        "event": "Grace brings the captain his bedtime biscuit, sprinkled with sleepy-moss. Pip sees a red coat from the rigging."
+      },
+      {
+        "time": "11:00",
+        "event": "Grace joins the bonfire. The captain's weak heart gives out."
+      },
+      {
+        "time": "11:30",
+        "event": "Flint creeps in, takes the map from beside the 'sleeping' captain, and buries it under the palm."
+      },
+      {
+        "time": "12:00",
+        "event": "Pip brings the captain his slippers and finds him."
+      }
+    ]
+  },
+  "characters": {
+    "grace": {
+      "private": {
+        "backstory": "YOU DID IT. The captain promised you a ship of your own for ten years, and tonight he told you you'd never have one. You didn't want to hurt him. You only wanted him to sleep through tomorrow's sailing so you could take the Salty Maiden out and prove you're the better captain. At half past ten you took him his bedtime biscuit, sprinkled with a whole pouch of Skull Rock sleepy-moss. His weak heart couldn't take it. Now keep your head. Point everyone at the Quartermaster: he's a thief, after all.",
+        "objectives": [
+          "Don't get caught. Point suspicion at Flint (the map, the boot prints) and at Cookie (the cocoa).",
+          "Keep the sleepy-moss pouch out of sight.",
+          "Get the crew to accept you as the next captain."
+        ],
+        "knows": [
+          "Quartermaster Flint wears buckled boots. You'd know those buckles anywhere.",
+          "The captain always has a ship's biscuit at half past ten. You've brought it to him for years."
+        ],
+        "alibi": "After our argument I walked the beach alone to cool off. I joined the bonfire at about eleven."
+      }
+    },
+    "flint": {
+      "private": {
+        "backstory": "For years you have shaved a coin or two off every crew member's share and buried your stash under the tall palm. This week the captain checked your sums and said you'd be marooned on Skull Rock after the feast. So at half past eleven you crept into his cabin to steal the second half of the treasure map. He was so still in his chair you thought he was fast asleep. You took the map and buried it with your stash. You did NOT hurt the captain, but if anyone finds that map, they'll think you did.",
+        "objectives": [
+          "Keep your stash and the stolen map hidden.",
+          "Prove you never harmed the captain: you only stole from him.",
+          "Find out who really did it, before the crew blames you."
+        ],
+        "alibi": "At ten I was in the storeroom counting shares with Mr. Ledger. From half past ten I led the sea shanties at the bonfire, apart from a quick walk at half past eleven.",
+        "lines": {
+          "act3": [
+            "All right, all right! I took the map. But the captain was sound asleep when I did. I never hurt a hair on his head!"
+          ]
+        }
+      }
+    },
+    "pip": {
+      "private": {
+        "secrets": [
+          {
+            "id": "pip-reading",
+            "text": "The captain was secretly teaching me to read. I sneak into his cabin to borrow his books.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pip-rigging",
+            "text": "I wasn't asleep at all. I was up the rigging, and at half past ten I saw someone in a long RED coat carry the captain's biscuit plate into his cabin.",
+            "unlockAct": 2
+          }
+        ]
+      }
+    },
+    "beak": {
+      "private": {
+        "knows": [
+          "Squawk sleeps in the captain's cabin, and tonight he came out chattering new words: 'Captain Grace! Captain Grace!'",
+          "First Mate Grace told everyone she was walking the beach at half past ten, but you didn't see her on the sand."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "medicine-chest": {
+      "text": "The ship's surgeon went ashore last week, but his medicine chest is in the storeroom, locked. Only the Quartermaster has the key. The bottle of 'Dreamy Drops' sleeping draught is full; nobody has touched it.",
+      "redHerring": true
+    },
+    "boot-prints": {
+      "text": "In the damp sand between the galley and the captain's cabin: boot prints with a square buckle pressed into each heel, made late at night. Only one member of the crew wears buckled boots.",
+      "redHerring": true
+    },
+    "palm-stash": {
+      "text": "Somebody's been digging under the tall palm. Buried there: a small chest of coins, AND the missing half of the treasure map, wrapped in a handkerchief embroidered 'M.F.' A thief, certainly. But a thief who stole from a sleeping captain, or a villain?",
+      "redHerring": true
+    },
+    "angry-words": {
+      "redHerring": false
+    },
+    "rigging-view": {
+      "text": "From up in the rigging at half past ten, you saw someone in a long RED coat carry the captain's biscuit plate into his cabin. Only one of the crew wears a red coat.",
+      "pointsTo": [
+        "grace"
+      ]
+    },
+    "parrot-words": {
+      "text": "Squawk the parrot, who sleeps in the captain's cabin, won't stop squawking two new phrases: 'Sleep tight, old sea dog!' and 'Captain Grace! Captain Grace!'",
+      "pointsTo": [
+        "grace",
+        "beak"
+      ]
+    },
+    "logbook": {
+      "puzzle": {
+        "prompt": "I have a head and a tail but no body. Pirates want me, and some count me twice. What am I?",
+        "answers": [
+          "coin",
+          "a coin",
+          "coins",
+          "doubloon",
+          "a doubloon",
+          "gold coin",
+          "a gold coin"
+        ],
+        "hint": "Somebody on this beach never stops counting them.",
+        "solvedText": "The last entry reads: 'Told Grace tonight: no ship for her. She shouts at the crew, and a captain must never shout. She took it hard. And Flint's sums don't add up either. Tomorrow I deal with them both.'"
+      },
+      "pointsTo": [
+        "grace",
+        "flint"
+      ]
+    }
+  },
+  "addClues": [
+    {
+      "id": "biscuit-plate",
+      "title": "The Biscuit Plate",
+      "text": "On the captain's desk: an empty plate with a few biscuit crumbs, speckled with tiny green flakes that smell of pine and honey. Skull Rock sleepy-moss, says the cook. Pirates use a pinch for seasick passengers.",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "grace"
+      ]
+    },
+    {
+      "id": "moss-pouch",
+      "title": "An Empty Pouch",
+      "text": "In the pocket of a long red coat, hung on a post by the bonfire: an empty leather pouch, still dusted with green sleepy-moss.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "grace"
+      ]
+    }
+  ],
+  "acts": {
+    "act3": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. X Marks the Spot."
+        },
+        {
+          "type": "image",
+          "text": "The tall palm tree, and fresh digging in the sand beneath it.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Dawn is coming. Somebody has been digging under the tall palm tree, and somebody else has been telling fibs about where they walked last night. A thief isn't always a villain, and a villain isn't always a thief. Follow the crumbs."
+        },
+        {
+          "type": "line",
+          "speaker": "grace",
+          "text": "Buckled boots. I'd know those buckles anywhere."
+        }
+      ]
+    }
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Sunrise over Skull Rock. A Navy ship on the horizon.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At sunrise, the Governor's ship sailed into the cove. First Mate Grace O'Hara handed over her wooden sword and said she was sorry. She had only wanted a ship of her own. Quartermaster Flint handed over the stolen map and a great many coins."
+    },
+    {
+      "type": "narration",
+      "text": "The two halves of the map were joined at last, and the crew of the Salty Maiden shared Redbeard's treasure fairly, the way their old captain always wanted. And Pip kept the captain's books. Every single one. Fair winds, detectives!"
+    }
+  ]
+}

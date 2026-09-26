@@ -22,6 +22,8 @@ export default function NewParty() {
   const [drinking, setDrinking] = useState(false)
   const navigate = useNavigate()
   const [chosenId, setScenarioId] = useState<string>()
+  // Which version of the chosen story to play. "surprise" by default, so even the host doesn't know the killer.
+  const [version, setVersion] = useState('surprise')
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   const [content, setContent] = useState<ContentRating>('mature')
   // Two catalogs: Adults (Mature) and Family. Adults first, so Blackwood Manor stays the default.
@@ -57,7 +59,9 @@ export default function NewParty() {
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createParty(scenarioId, mode, content, when ? new Date(when).toISOString() : null, useAi, drinking && content !== 'family')
+      const versions = selected?.scenario.versions ?? []
+      const chosenVersion = versions.length === 0 ? null : version === 'surprise' || versions.some((v) => v.id === version) ? version : 'surprise'
+      const party = await api.createParty(scenarioId, mode, content, when ? new Date(when).toISOString() : null, useAi, drinking && content !== 'family', chosenVersion)
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -114,9 +118,32 @@ export default function NewParty() {
               {scenario.contentRating === 'mature' ? 'Mature themes' : 'Family friendly'}
               {scenario.aiGenerated && ' · ✨ written by AI for you'}
               {scenario.custom && ' · ✏️ your edited copy'}
+              {scenario.versions.length > 1 && ` · 🎲 ${scenario.versions.length} versions, a different killer each`}
             </p>
           </button>
         ))}
+        {selected && selected.scenario.versions.length > 1 && (
+          <label className="block rounded-xl border border-line bg-surface p-4">
+            <span className="text-xs font-semibold tracking-widest text-accent uppercase">Version</span>
+            <select
+              className={`${inputClass} mt-2`}
+              aria-label="Version"
+              value={selected.scenario.versions.some((v) => v.id === version) ? version : 'surprise'}
+              onChange={(e) => setVersion(e.target.value)}
+            >
+              <option value="surprise">🎲 Surprise me: a version I haven't played</option>
+              {selected.scenario.versions.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                  {v.playedByMe ? ' (played)' : ''}
+                </option>
+              ))}
+            </select>
+            <span className="mt-2 block text-xs text-muted">
+              Same place and suspects, a different killer and new clues. With “Surprise me” even you won't know whodunit, so you can play along.
+            </span>
+          </label>
+        )}
         {themes && playable.length === 0 && <p className="text-muted">No mysteries are installed yet.</p>}
         {ai?.storyteller && themes && (
           <GenerateMystery

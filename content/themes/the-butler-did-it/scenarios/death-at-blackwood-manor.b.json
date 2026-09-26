@@ -1,0 +1,257 @@
+{
+  "variantOf": "death-at-blackwood-manor",
+  "variant": "B",
+  "solution": {
+    "murdererId": "hargrove",
+    "motiveId": "inheritance",
+    "methodId": "candlestick",
+    "explanation": [
+      "For once, the obvious answer was the right one. Lord Reginald Blackwood was struck down with the silver candlestick at 9:47, exactly as the stopped clock says, by the man whose fingerprints were all over it: Mr. Alistair Hargrove, the butler.",
+      "Hargrove was Reginald's half-brother, and the will Reginald signed years ago acknowledged him and left him the house. But this week Reginald found a London dealer's receipt made out to 'A. Hargrove': thirty years of the finest vintage port, sold off bottle by bottle and replaced with cheap ruby. Tonight he struck Alistair's name from the new will in fresh ink: 'Not a penny to a thief.' The new will was to be signed in the morning.",
+      "Hargrove had until dawn. At twenty to ten he carried a tray of sherry to the séance, promised to fetch a fresh bottle from the cellar, and locked the cellar door behind him so that anyone who came looking would assume he was below. Instead he went up the back stairs to the study.",
+      "At 9:47 he struck his brother with the candlestick he had polished that afternoon. The blow knocked the grandfather clock and stopped it. He wiped the candlestick with his polishing cloth, which only smeared silver polish across the clock case, and was back at the cellar door before the lights failed at 9:52. At ten o'clock he 'discovered' the body and rang for the doctor.",
+      "Dr. Finch's decanter, digitalis and old sins were real, and they made him the perfect suspect. But the doctor never left the séance table. The butler did it."
+    ],
+    "timeline": [
+      {
+        "time": "8:30",
+        "event": "Captain Rafferty argues with Reginald in the study and loses a cufflink."
+      },
+      {
+        "time": "9:00",
+        "event": "Reginald confronts Hargrove with the port dealer's receipt and strikes him from the new will."
+      },
+      {
+        "time": "9:15",
+        "event": "Dr. Finch serves Reginald his usual heart drops in a glass of port."
+      },
+      {
+        "time": "9:30",
+        "event": "The séance begins in the drawing room."
+      },
+      {
+        "time": "9:40",
+        "event": "Hargrove brings sherry to the séance, promises a fresh bottle, and locks the cellar door behind him."
+      },
+      {
+        "time": "9:45",
+        "event": "Mrs. O'Malley finds the cellar door locked. Nobody answers."
+      },
+      {
+        "time": "9:47",
+        "event": "Hargrove strikes Reginald with the candlestick. The clock is knocked and stops."
+      },
+      {
+        "time": "9:52",
+        "event": "The storm cuts the lights at the séance."
+      },
+      {
+        "time": "10:00",
+        "event": "Hargrove 'discovers' the body and rings for the doctor."
+      }
+    ]
+  },
+  "characters": {
+    "hargrove": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You are Reginald's half-brother, the son of the old lord and a housemaid, and the will he signed years ago acknowledged you and left you the house. But for years you have been selling his vintage port to a London dealer, and this evening he found the receipt. He struck your name from the new will in fresh ink and told you you'd be dismissed in the morning. At 9:40 you took sherry to the séance, locked the cellar door behind you, and went up the back stairs. At 9:47 you struck him with the candlestick, and the clock stopped. You wiped the candlestick and returned to the cellar before the lights failed. Your fingerprints are on it anyway: you polished it this afternoon. Say so, calmly. Point everyone at the doctor and his decanter.",
+        "objectives": [
+          "Do not get caught. Your fingerprints on the candlestick are explained: you polished it this afternoon.",
+          "Steer suspicion to Dr. Finch (the decanter, the digitalis) and Captain Rafferty (the cufflink).",
+          "Nobody must learn that the new will cut you out."
+        ],
+        "knows": [
+          "At 9:15 you saw Dr. Finch leave the study carrying the port decanter. He said it was his Lordship's heart drops.",
+          "Captain Rafferty argued with Reginald at 8:30. You heard it through the door."
+        ],
+        "alibi": "At 9:47 I was in the cellar, fetching a fresh bottle for the séance guests. Nobody saw me."
+      }
+    },
+    "finch": {
+      "private": {
+        "backstory": "You did NOT kill Reginald, but you have every reason to look as if you did. Fifteen years ago you arrived drunk at the bedside of Margaret, the first Lady Blackwood, and fumbled a dose. Reginald found your old letter admitting it and has been tormenting you with it. Tonight, as his physician, you served him his usual heart drops (digitalis) in his port at 9:15. Now he is dead, and every clue that mentions medicine will point at you.",
+        "objectives": [
+          "Prove you never left the séance table.",
+          "Keep the truth about Margaret's death buried if you possibly can.",
+          "Find out who really killed Reginald before the police arrive and find your letter."
+        ],
+        "alibi": "I was at the séance from 9:30 until ten, holding hands with Lady Evelyn and Madame Zelda. I never let go.",
+        "lines": {
+          "act2": [
+            "Digitalis? Of course I carry it. Reginald's heart drops. I gave him his ten drops at quarter past nine, as I do every night."
+          ],
+          "act3": [
+            "I never left that table. Madame Zelda gripped my hand so hard I lost the feeling in my fingers."
+          ]
+        }
+      }
+    },
+    "zelda": {
+      "private": {
+        "secrets": [
+          {
+            "id": "zelda-fraud",
+            "text": "I am a fraud. My real name is Doris Pratt, and the 'spirit trumpet' is painted with luminous paint.",
+            "unlockAct": 0
+          },
+          {
+            "id": "zelda-hand",
+            "text": "The doctor never let go of my hand all evening. But the butler brought us sherry at twenty to ten, promised a fresh bottle, and never came back.",
+            "unlockAct": 3
+          }
+        ],
+        "lines": {
+          "act3": [
+            "The spirits and I agree on one thing: the doctor never left that table. Somebody else did."
+          ]
+        }
+      }
+    },
+    "evelyn": {
+      "private": {
+        "lines": {
+          "act3": [
+            "Hargrove, you brought us sherry at twenty to ten and never came back with that bottle. Where exactly did you go?"
+          ]
+        }
+      }
+    },
+    "omalley": {
+      "private": {
+        "knows": [
+          "The port decanter vanished from the serving hatch at about 9:10; the doctor took it for his Lordship's heart drops.",
+          "At quarter to ten you went down for more sherry. The cellar door was locked, and nobody answered."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "candlestick": {
+      "text": "A heavy silver candlestick lies beside the body, its base dented and smeared with blood. It is covered in the butler's fingerprints. He polished it this afternoon, he says.",
+      "redHerring": false,
+      "pointsTo": [
+        "hargrove"
+      ]
+    },
+    "little-blood": {
+      "title": "A Single Savage Blow",
+      "text": "One heavy blow from behind, struck by someone standing, tall and right-handed. The blood has soaked the blotter: Reginald was very much alive when he was hit, and it happened where he sat.",
+      "pointsTo": [
+        "hargrove"
+      ]
+    },
+    "cook-decanter": {
+      "text": "Mrs. O'Malley's kitchen ledger, in her own hand: '9:10. Doctor took the port decanter from my hatch. Said it was for his Lordship's heart drops. Since when does the doctor serve the port?'",
+      "redHerring": true
+    },
+    "port-glass": {
+      "text": "Reginald's port glass still holds a sticky residue that smells faintly bitter: digitalis, the heart medicine. Reginald had a weak heart; was it his medicine, or something more?",
+      "redHerring": true,
+      "pointsTo": [
+        "finch"
+      ]
+    },
+    "medical-bag": {
+      "text": "In Dr. Finch's medical bag: a brown bottle labelled DIGITALIS, nearly empty. The pharmacy label reads 'Ld. Blackwood. Ten drops nightly, in port.'",
+      "redHerring": true
+    },
+    "new-will": {
+      "text": "A draft will in Reginald's hand, to be signed in the morning: Violet is disinherited unless she marries Lord Ashworth. A line leaving the house to 'my brother Alistair' has been struck through tonight in fresh ink: 'Not a penny to a thief. A.H. to be dismissed.'"
+    },
+    "locked-diary": {
+      "puzzle": {
+        "solvedText": "The final entry reads: 'Found the London dealer's receipt. Thirty years of my father's port, sold by my own brother and replaced with ruby. Alistair leaves this house tomorrow with nothing. Let him serve the séance first.'"
+      },
+      "pointsTo": [
+        "hargrove"
+      ]
+    },
+    "zelda-hand-clue": {
+      "title": "The Sherry That Never Came",
+      "text": "Madame Zelda's own recollection: the doctor held her left hand all evening; she never let go. But at twenty to ten the butler brought sherry, promised a fresh bottle from the cellar, and never came back.",
+      "pointsTo": [
+        "hargrove"
+      ]
+    },
+    "clock-mechanism": {
+      "title": "The Clock Was Knocked",
+      "text": "The grandfather clock was knocked hard enough to crack the glass, stopping it at the true moment of the blow. Smeared across the case: silver polish, as if someone had wiped something clean against it.",
+      "pointsTo": [
+        "hargrove"
+      ]
+    },
+    "maids-letter": {
+      "redHerring": true
+    }
+  },
+  "addClues": [
+    {
+      "id": "cellar-door",
+      "title": "The Locked Cellar",
+      "text": "At quarter to ten you went down for more sherry: the cellar door was locked from the inside, and nobody answered. Mr. Hargrove says he spent that time in the cellar.",
+      "visibility": "private",
+      "recipient": "omalley",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "hargrove"
+      ]
+    },
+    {
+      "id": "port-receipt",
+      "title": "A Wine Merchant's Receipt",
+      "text": "Crumpled in Reginald's waste-paper basket: a receipt from Berry's of St James's, London, made out to 'A. Hargrove', for twelve bottles of 1896 vintage port. 'Payment on delivery, as usual.'",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "hargrove"
+      ]
+    }
+  ],
+  "acts": {
+    "act3": {
+      "title": "Act Three: Below Stairs",
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. Below Stairs."
+        },
+        {
+          "type": "image",
+          "text": "The butler's pantry: a polishing cloth, a ring of keys, a locked cellar door.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone has been staring at the doctor and his medicine bag. But the house has another world beneath it, of keys and cellars and back stairs. Who could move through Blackwood Manor without anyone noticing? And whose promises tonight were never kept?"
+        }
+      ],
+      "prompts": [
+        "Where exactly was everyone at 9:47?",
+        "Who had keys to every door in this house?",
+        "Who lost the most under the new will?",
+        "Make your final case. Who had means, motive and opportunity?"
+      ]
+    }
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the moors. A police car crosses the bridge.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Mocktails up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "By dawn the waters had fallen and the police motor came rattling across the bridge. Mr. Alistair Hargrove met them at the door, as he had met every visitor for thirty years, and handed them the silver keys. 'Very good, sir,' he said."
+    },
+    {
+      "type": "narration",
+      "text": "The butler did it. For once, the obvious answer was the right one. Good night, detectives."
+    }
+  ]
+}
