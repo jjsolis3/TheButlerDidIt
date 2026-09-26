@@ -1,0 +1,213 @@
+{
+  "variantOf": "death-at-blackwood-manor",
+  "variant": "C",
+  "solution": {
+    "murdererId": "evelyn",
+    "motiveId": "love",
+    "methodId": "smothered",
+    "explanation": [
+      "Lord Reginald Blackwood was not struck down at 9:47, and the candlestick never killed him. He was smothered with a velvet cushion from his own study sofa, by the woman who had sat beside him at dinner: Lady Evelyn Blackwood.",
+      "Evelyn wanted two things: Jack Rafferty, and her freedom. Reginald had found out about both. His diary says so: the forged cheque, the affair, and tomorrow's new will, which left her an annuity only if she left Blackwood Manor forever and never saw Rafferty again.",
+      "At dinner Dr. Finch gave Reginald his usual heart drops in his port, and by half past nine he was dozing at his desk. When the storm cut the lights at the séance at 9:52, Evelyn slipped her hand from Madame Zelda's, crossed the dark hall she knew so well, and pressed the cushion over her sleeping husband's face.",
+      "Then she did what a music-hall girl does best: she staged a scene. She struck the body with the candlestick to fake a savage attack, which is why there was so little blood, wound the clock back to 9:47, when a dozen people could swear she was at the table, and was back in her chair before the lights returned. She left lavender face powder on the cushion, and a pearl from her necklace under the desk.",
+      "The doctor had old sins, and the butler had fingerprints, but Evelyn gave the performance of her life. Almost."
+    ],
+    "timeline": [
+      {
+        "time": "8:30",
+        "event": "Captain Rafferty argues with Reginald in the study and loses a cufflink."
+      },
+      {
+        "time": "9:15",
+        "event": "Dr. Finch serves Reginald his usual heart drops in a glass of port."
+      },
+      {
+        "time": "9:30",
+        "event": "The séance begins. Reginald dozes at his desk."
+      },
+      {
+        "time": "9:47",
+        "event": "Violet is in the barn at the strongbox, Percy is watching her, and Rafferty is smoking on the terrace."
+      },
+      {
+        "time": "9:52",
+        "event": "The storm cuts the lights. Evelyn slips her hand from Madame Zelda's."
+      },
+      {
+        "time": "9:54",
+        "event": "Evelyn smothers Reginald with a cushion, strikes the body with the candlestick, and sets the clock to 9:47."
+      },
+      {
+        "time": "9:58",
+        "event": "The lights return. Evelyn is back at the table."
+      },
+      {
+        "time": "10:00",
+        "event": "Hargrove discovers the body."
+      }
+    ]
+  },
+  "characters": {
+    "evelyn": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You married Reginald for security and found a gilded cage. You love Captain Jack Rafferty, and this week Reginald found out: about Jack, and about the cheque you forged. Tomorrow's new will leaves you an annuity only if you leave Blackwood Manor forever and never see Jack again. At the séance, when the storm cut the lights at 9:52, you slipped your hand from Madame Zelda's, crept to the study where Reginald was dozing after his heart drops, and smothered him with a cushion. Then you staged the scene like a music-hall set: a blow with the candlestick, the clock wound back to 9:47. Stay gracious. Point everyone at the doctor.",
+        "objectives": [
+          "Do not get caught. Insist you held hands at the séance all evening.",
+          "Steer suspicion to Dr. Finch (the decanter, the digitalis, the cold hand) and to Hargrove (the fingerprints).",
+          "Keep Jack Rafferty out of it. He knows nothing."
+        ],
+        "knows": [
+          "Reginald quarrelled with Dr. Finch in the study before dinner. You heard Reginald shout, 'Margaret deserved better than you!'",
+          "At the séance you sat between Dr. Finch and Madame Zelda, holding Zelda's right hand."
+        ]
+      }
+    },
+    "finch": {
+      "private": {
+        "backstory": "You did NOT kill Reginald, but you have every reason to look as if you did. Fifteen years ago you arrived drunk at the bedside of Margaret, the first Lady Blackwood, and fumbled a dose. Reginald found your old letter admitting it and has been tormenting you with it. Tonight, as his physician, you served him his usual heart drops (digitalis) in his port at 9:15. Now he is dead, and every clue that mentions medicine will point at you.",
+        "objectives": [
+          "Prove you never left the séance table.",
+          "Keep the truth about Margaret's death buried if you possibly can.",
+          "Find out who really killed Reginald before the police arrive and find your letter."
+        ],
+        "knows": [
+          "Captain Rafferty and Reginald argued about money in the study at 8:30.",
+          "When the lights failed, Lady Evelyn's chair creaked beside you, then went quiet for several minutes."
+        ],
+        "lines": {
+          "act2": [
+            "Digitalis? Of course I carry it. Reginald's heart drops. I gave him his ten drops at quarter past nine, as I do every night."
+          ],
+          "act3": [
+            "The séance was dark, madam, but I know one thing: the chair beside me was empty for a good few minutes."
+          ]
+        }
+      }
+    },
+    "zelda": {
+      "private": {
+        "secrets": [
+          {
+            "id": "zelda-fraud",
+            "text": "I am a fraud. My real name is Doris Pratt, and the 'spirit trumpet' is painted with luminous paint.",
+            "unlockAct": 0
+          },
+          {
+            "id": "zelda-hand",
+            "text": "When the lights went out, the hand on my right, Lady Evelyn's, slipped out of mine for several minutes. It came back cold, and smelling of lavender powder.",
+            "unlockAct": 3
+          }
+        ]
+      }
+    },
+    "rafferty": {
+      "private": {
+        "knows": [
+          "You argued with Reginald in the study at 8:30. He was alive, and very rude, when you left.",
+          "This afternoon Evelyn asked you: 'If he were gone, Jack, would you still take me to Monte Carlo?' You laughed. She didn't."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "little-blood": {
+      "pointsTo": [
+        "evelyn",
+        "finch"
+      ]
+    },
+    "cook-decanter": {
+      "text": "Mrs. O'Malley's kitchen ledger, in her own hand: '9:10. Doctor took the port decanter from my hatch. Said it was for his Lordship's heart drops. Since when does the doctor serve the port?'",
+      "redHerring": true
+    },
+    "port-glass": {
+      "text": "Reginald's port glass holds a sticky residue that smells faintly bitter: digitalis, the heart medicine his doctor prescribed. It would make a man drowsy. Did it make him easier to kill?",
+      "redHerring": true,
+      "pointsTo": [
+        "finch"
+      ]
+    },
+    "medical-bag": {
+      "text": "In Dr. Finch's medical bag: a brown bottle labelled DIGITALIS, nearly empty. The pharmacy label reads 'Ld. Blackwood. Ten drops nightly, in port.'",
+      "redHerring": true
+    },
+    "new-will": {
+      "text": "A draft will in Reginald's hand, to be signed in the morning: Violet is disinherited unless she marries Lord Ashworth. Lady Evelyn receives an annuity 'on condition that she leaves Blackwood Manor forever and has no further contact with Captain J. Rafferty'.",
+      "pointsTo": [
+        "evelyn",
+        "violet",
+        "rafferty"
+      ]
+    },
+    "forged-cheque": {
+      "redHerring": false
+    },
+    "locked-diary": {
+      "puzzle": {
+        "solvedText": "The final entry reads: 'E. forged my name for £2,000, and she and Rafferty think me a fool. Tomorrow she learns what the new will says. Let her smile through Zelda's séance first. She was always a fine performer.'"
+      },
+      "pointsTo": [
+        "evelyn"
+      ]
+    },
+    "zelda-hand-clue": {
+      "text": "Madame Zelda's own recollection: when the lights failed at about 9:52, the hand on her right (Lady Evelyn's) let go. It came back six or seven minutes later, cold, and smelling of lavender face powder.",
+      "pointsTo": [
+        "evelyn"
+      ]
+    },
+    "clock-mechanism": {
+      "text": "On close inspection the grandfather clock was not knocked. Its pendulum was stopped by hand and the hands wound back to 9:47. On the glass: a smudge of lavender face powder.",
+      "pointsTo": [
+        "evelyn"
+      ]
+    },
+    "maids-letter": {
+      "redHerring": true
+    }
+  },
+  "addClues": [
+    {
+      "id": "powdered-cushion",
+      "title": "The Study Cushion",
+      "text": "A velvet cushion from the study sofa has been stuffed behind the curtains. One side is crushed flat and dusted with lavender face powder, with a faint print of red lipstick.",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "evelyn"
+      ]
+    },
+    {
+      "id": "lost-pearl",
+      "title": "A Single Pearl",
+      "text": "Under Reginald's desk, where you stood to look at the body: a single pearl, still on its knotted silk thread. Only one guest tonight wears pearls that long.",
+      "visibility": "private",
+      "recipient": "hargrove",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "evelyn"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Dawn over the moors. A police car crosses the bridge.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Mocktails up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "By dawn the waters had fallen and the police motor came rattling across the bridge. Lady Evelyn Blackwood met them on the stairs in her finest pearls, one short, and took her final bow."
+    },
+    {
+      "type": "narration",
+      "text": "As for the rest of Blackwood Manor's household, their secrets are out now. Whether they can live with them is another mystery entirely. Good night, detectives."
+    }
+  ]
+}

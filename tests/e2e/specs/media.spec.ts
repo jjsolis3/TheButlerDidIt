@@ -27,10 +27,10 @@ test('media: prepared portraits, printable kit, costume selfies and toast prompt
   await host.getByRole('button', { name: 'Create account' }).click()
   await host.waitForURL('**/host/new')
 
-  // ---- Toast prompts are an adults-only option: hidden for Family, offered for Mature.
-  await host.getByRole('button', { name: /^Family/ }).click()
+  // ---- Toast prompts are an adults-only option: hidden on the Family shelf, offered on Adults.
+  await host.getByRole('tab', { name: /Family/ }).click()
   await expect(host.getByLabel(/Toast prompts/)).toHaveCount(0)
-  await host.getByRole('button', { name: /^Mature/ }).click()
+  await host.getByRole('tab', { name: /Adults/ }).click()
   await host.getByRole('button', { name: /Death at Blackwood Manor/ }).click()
   await host.getByLabel(/Toast prompts/).check()
   await host.getByRole('button', { name: 'Create party and get the invite code' }).click()

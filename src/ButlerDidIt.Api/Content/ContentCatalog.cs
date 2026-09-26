@@ -69,6 +69,7 @@ public sealed class ContentCatalog(IServiceScopeFactory scopes, ILogger<ContentC
                 entity.MinPlayers = scenario.MinPlayers;
                 entity.MaxPlayers = scenario.MaxPlayers;
                 entity.ContentRating = scenario.ContentRating;
+                entity.VariantOf = scenario.VariantOf;
                 entity.Document = json;
                 entity.UpdatedAt = now;
                 Invalidate(scenario.Id);

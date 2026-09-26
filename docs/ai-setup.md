@@ -77,7 +77,7 @@ Environment settings are applied at every start-up and overwrite the same-named 
 - **NPC prompts** contain only what that character knows: their own sheet, public facts, and clues already found. An innocent NPC has never been told the solution, so it can't leak it.
 - **Hints** are built from the asking player's own view. If a reply names the killer anyway, it is thrown away and replaced.
 - **Verdicts** mention the solution, so they only appear after the unmasking.
-- **Content level:** the party's content level (Family or Mature) is included in every prompt.
+- **Content level and tone:** every prompt includes the mystery's rating (Family or Mature), which sets the limits, and the tone the host picked when creating the party, which flavours the AI within them: *Mature* or *Normal* (PG-13, for mixed company) for Adults mysteries, *Normal* or *Funny* (silly, for kids) for Family ones. The tone only changes what the AI says; the written script is the same.
 - **Costume selfies** never go to an AI provider. They are shrunk, stripped of metadata (including GPS location) and stored on your server.
 - **What's sent:** player names and questions go to the AI provider you configured. If that matters to your guests, choose a provider whose data policy you're comfortable with, or run Ollama locally.
 

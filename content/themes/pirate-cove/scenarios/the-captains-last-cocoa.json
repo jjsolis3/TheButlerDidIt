@@ -1,0 +1,852 @@
+{
+  "id": "the-captains-last-cocoa",
+  "themeSlug": "pirate-cove",
+  "title": "The Captain's Last Cocoa",
+  "synopsis": "Skull Rock Cove, 1720. The crew of the Salty Maiden have finally dug up the treasure of Redbeard the Terrible, and tonight there's a feast on the beach. But by midnight Captain \"Black\" Barnaby Bones is found still in his cabin, his cocoa gone cold, and the second half of the treasure map is missing. The tide is out and nobody leaves the cove until the scoundrel is found. A family-friendly mystery for young detectives and grown-ups alike.",
+  "contentRating": "family",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 100,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Skull Rock Cove",
+    "era": "1720, the age of pirates",
+    "description": "A moonlit cove with a bonfire on the beach, the Salty Maiden at anchor, and a tall palm tree leaning over the sand. The tide is out, the rowing boats are drawn up, and nobody is going anywhere tonight."
+  },
+  "victim": {
+    "name": "Captain \"Black\" Barnaby Bones",
+    "description": "Seventy years old, grumpy, generous and very fond of cocoa. The most famous captain in the Caribbean, with a weak heart and a strong opinion about everything. He was retiring after this last, greatest treasure."
+  },
+  "characters": [
+    {
+      "id": "flint",
+      "name": "Quartermaster Morgan Flint",
+      "pronouns": "he/him",
+      "title": "The Quartermaster",
+      "publicBio": "Keeper of the ship's keys, the ship's books and every last doubloon. Fair shares for all, he says, and he never stops counting: \"Count the coins, lads, count the coins!\"",
+      "costumeTips": "A long blue coat, a ring of big keys on your belt, buckled boots and a pencil behind your ear.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.9,
+        "rate": 0.95,
+        "style": "smooth, careful, a little too friendly"
+      },
+      "required": true,
+      "private": {
+        "backstory": "For years you have shaved a coin or two off every crew member's share and buried your stash under the tall palm on the beach. This week the captain checked your sums and found you out. He told you that after the treasure feast you would be marooned on Skull Rock with nothing but a spoon. Worse, he kept the second half of the treasure map, the half that shows where the REAL hoard is buried, locked away where only he could reach it. Tonight you made sure he would sleep very soundly while you took it. You only meant him to sleep. His weak heart didn't wake up.",
+        "secrets": [
+          {
+            "id": "flint-stash",
+            "text": "I've been skimming a coin or two from every share for years. My secret stash is buried under the tall palm tree.",
+            "unlockAct": 0
+          },
+          {
+            "id": "flint-marooned",
+            "text": "The captain found my crooked sums this week and said he would maroon me on Skull Rock after the feast.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Point suspicion at anyone else, especially the First Mate and the rival captain.",
+          "Keep everyone away from the tall palm tree on the beach.",
+          "Get the crew to agree the captain simply died of his weak heart."
+        ],
+        "knows": [
+          "The captain kept the second half of the map in a brass case by his bed.",
+          "Cookie always leaves the captain's cocoa on the galley stove at ten o'clock.",
+          "You hold the only key to the surgeon's medicine chest. The surgeon went ashore last week."
+        ],
+        "alibi": "At ten I was in the storeroom counting shares with Mr. Ledger. From half past ten I led the sea shanties at the bonfire. Everyone saw me.",
+        "lines": {
+          "act1": [
+            "Terrible business. Terrible. Let's all stay calm and... count what we've got, eh?"
+          ],
+          "act2": [
+            "That parrot says all sorts of nonsense. I'd not trust a bird over a sailor."
+          ],
+          "act3": [
+            "Why is everyone looking at the palm tree? It's just a tree! A perfectly ordinary tree!"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grace",
+      "name": "First Mate Grace O'Hara",
+      "pronouns": "she/her",
+      "title": "The First Mate",
+      "publicBio": "Tough as an anchor and twice as heavy-handed. 'Gunpowder' Grace has sailed with Captain Bones for ten years and expected to be a captain herself by now.",
+      "costumeTips": "A long red coat, a sash, big boots and a tricorn hat. A wooden sword helps.",
+      "voice": {
+        "accent": "en-IE",
+        "pitch": 0.95,
+        "rate": 1.05,
+        "style": "loud, fiery, honest"
+      },
+      "required": true,
+      "private": {
+        "backstory": "The captain promised you a ship of your own when the treasure was found. At the feast he told you he had changed his mind, and you shouted at him in front of the whole crew. You have also been quietly writing to the Royal Navy about a pardon: you are tired of piracy and dream of a little boat of your own.",
+        "secrets": [
+          {
+            "id": "grace-pardon",
+            "text": "I've been secretly writing to the Royal Navy asking for a pardon. I want to give up piracy.",
+            "unlockAct": 0
+          },
+          {
+            "id": "grace-promise",
+            "text": "The captain promised me my own ship, then gave it away tonight. I told him he'd regret it.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your letters to the Navy secret.",
+          "Find out who really harmed the captain. You loved the old sea dog, even if you shouted at him.",
+          "Make the crew see you as the next captain."
+        ],
+        "knows": [
+          "You walked the beach alone after the argument and saw a lantern moving near the tall palm at half past eleven.",
+          "Mr. Ledger isn't a real pirate. He can't even tie a knot."
+        ],
+        "alibi": "After our argument I walked the beach alone to cool off. I joined the bonfire at about eleven.",
+        "lines": {
+          "act1": [
+            "I shouted at him, aye. Everyone shouts at captains. That's what captains are for!"
+          ],
+          "act2": [
+            "If I wanted to be captain, I'd challenge for it fair and square, with a sword, not sneakiness."
+          ],
+          "act3": [
+            "Those boot prints in the sand. I know those buckles. I'd know them anywhere."
+          ]
+        }
+      }
+    },
+    {
+      "id": "cookie",
+      "name": "Cookie Pottage",
+      "pronouns": "they/them",
+      "title": "The Ship's Cook",
+      "publicBio": "Makes the best stew on the seven seas and the worst puns. Cookie brews the captain's cocoa every night at ten, exactly the way he likes it.",
+      "costumeTips": "An apron, a chef's hat or headscarf, a wooden spoon and a tea towel over the shoulder.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.05,
+        "rate": 1.1,
+        "style": "cheerful, chatty, fussy"
+      },
+      "required": true,
+      "private": {
+        "backstory": "The galley is your kingdom. Tonight Nutmeg, the ship's monkey, stole the sugar bowl just as the cocoa went on the stove, and you chased him round the deck for a good quarter of an hour. You never told anyone you left the cocoa alone. You also once served the captain boiled seagull and told him it was chicken.",
+        "secrets": [
+          {
+            "id": "cookie-seagull",
+            "text": "I once served the captain boiled seagull and told him it was chicken. He had seconds.",
+            "unlockAct": 0
+          },
+          {
+            "id": "cookie-unguarded",
+            "text": "At ten o'clock I left the captain's cocoa alone on the stove to chase Nutmeg the monkey. Anyone could have got at it.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Prove nobody poisoned the captain with YOUR cooking.",
+          "Keep quiet that you left the galley unguarded, unless it helps clear your name.",
+          "Find the thief who was in your galley."
+        ],
+        "knows": [
+          "Nutmeg the monkey stole the sugar at ten and you chased him for about fifteen minutes.",
+          "Quartermaster Flint asked you twice at dinner what time the captain has his cocoa."
+        ],
+        "alibi": "I made the captain's cocoa at ten, same as always, and carried it to his cabin at twenty past. Then I served pudding at the bonfire.",
+        "lines": {
+          "act1": [
+            "My cocoa is famous! Nobody has ever complained. Well, nobody has ever complained twice."
+          ],
+          "act2": [
+            "Somebody was in my galley. The spoons were moved. Nobody moves my spoons!"
+          ],
+          "act3": [
+            "I stir with love, not with sleeping drops. Whoever did this owes me an apology AND a new mug."
+          ]
+        }
+      }
+    },
+    {
+      "id": "pip",
+      "name": "Pip Marlowe",
+      "pronouns": "she/her",
+      "title": "The Cabin Girl",
+      "publicBio": "The youngest of the crew and the fastest up the rigging. Pip brings the captain his slippers every midnight, and was the one who found him.",
+      "costumeTips": "A striped shirt, rolled-up trousers, bare feet or sandals and a bandana. A toy telescope if you have one.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.3,
+        "rate": 1.1,
+        "style": "bright, quick, a bit nervous"
+      },
+      "required": true,
+      "private": {
+        "backstory": "The captain was like a grandfather to you. He had been secretly teaching you to read from the books in his cabin. You were supposed to be asleep in your hammock tonight, but you climbed the rigging to watch the bonfire, and from up there you saw something you haven't told anyone.",
+        "secrets": [
+          {
+            "id": "pip-reading",
+            "text": "The captain was secretly teaching me to read. I sneak into his cabin to borrow his books.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pip-rigging",
+            "text": "I wasn't asleep at all. I was up the rigging, and at ten past ten I saw someone in a long coat with jangling keys bending over the cocoa pot.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who hurt the captain.",
+          "Don't get in trouble for being out of your hammock.",
+          "Look after the captain's books."
+        ],
+        "knows": [
+          "The captain said he'd tell everyone 'something shocking about someone's sums' tomorrow.",
+          "Squawk the parrot only learns words he hears again and again, and he sleeps in the captain's cabin."
+        ],
+        "alibi": "I was asleep in my hammock until midnight, when I took the captain his slippers. Honest.",
+        "lines": {
+          "act1": [
+            "He was just sleeping. I thought he was just sleeping."
+          ],
+          "act2": [
+            "Grown-ups always think children don't notice things. I notice EVERYTHING."
+          ],
+          "act3": [
+            "The captain always said: follow the sums, and you'll find the scoundrel."
+          ]
+        }
+      }
+    },
+    {
+      "id": "nell",
+      "name": "Navigator Nell Starling",
+      "pronouns": "she/her",
+      "title": "The Navigator",
+      "publicBio": "Reads the stars like a book and the sea like a friend. Nell drew the first half of the treasure map, and has been itching to see the second.",
+      "costumeTips": "A long coat or cloak, a compass on a string, star charts rolled under your arm and ink-stained fingers.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.1,
+        "rate": 0.95,
+        "style": "dreamy, clever, secretive"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You copied the captain's half of the map last week, but you copied it wrong and can't make sense of it. You've hidden a rowing boat behind the rocks so that, once you've worked the map out, you can row off and find the hoard yourself.",
+        "secrets": [
+          {
+            "id": "nell-copy",
+            "text": "I made a secret copy of the captain's half of the map, but I copied it wrong and can't read it.",
+            "unlockAct": 0
+          },
+          {
+            "id": "nell-boat",
+            "text": "I hid a rowing boat behind the rocks, meaning to sail off and find the hoard on my own.",
+            "unlockAct": 3
+          }
+        ],
+        "objectives": [
+          "Get a look at the real second half of the map.",
+          "Keep your rowing boat secret.",
+          "Help catch the villain, as long as it doesn't cost you the treasure."
+        ],
+        "knows": [
+          "The first half of the map shows Skull Rock; the second half shows where the real hoard lies.",
+          "Captain Vane's rowing boat was still on our beach at eleven."
+        ],
+        "alibi": "I was on the cliff with my telescope all evening, reading the stars.",
+        "lines": {
+          "act1": [
+            "The stars tonight were terribly unlucky. I should have known."
+          ],
+          "act2": [
+            "Maps don't lie. People do."
+          ],
+          "act3": [
+            "Whoever took the map half can't read it without me. They'll have to come to me eventually."
+          ]
+        }
+      }
+    },
+    {
+      "id": "beak",
+      "name": "Bartholomew Beak",
+      "pronouns": "he/him",
+      "title": "The Parrot Keeper",
+      "publicBio": "Keeper of Squawk, the captain's clever old parrot. Beak insists Squawk understands every word. Squawk insists on crackers.",
+      "costumeTips": "A waistcoat, a scarf, feathers in your hat and a toy parrot on your shoulder (essential!).",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "gravelly, kind, rambling"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You love that parrot more than gold. You taught Squawk to say 'Captain Bones smells like old socks!' as a joke, and you sold one of the captain's gold coins to buy Squawk fancy crackers. Squawk sleeps in the captain's cabin, and tonight he came out chattering words you never taught him.",
+        "secrets": [
+          {
+            "id": "beak-socks",
+            "text": "I taught Squawk to say 'Captain Bones smells like old socks!' The captain never found out who.",
+            "unlockAct": 0
+          },
+          {
+            "id": "beak-coin",
+            "text": "I sold one of the captain's gold coins to buy Squawk fancy crackers.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep Squawk safe and well fed.",
+          "Work out where Squawk learned his new words.",
+          "Keep the gold coin business quiet."
+        ],
+        "knows": [
+          "Squawk sleeps in the captain's cabin, and tonight he came out chattering new words.",
+          "First Mate Grace was walking alone on the beach at half past ten."
+        ],
+        "alibi": "I played my squeezebox by the bonfire from ten until midnight. Squawk was asleep in the captain's cabin.",
+        "lines": {
+          "act1": [
+            "Squawk saw something, I just know it. He's gone all quiet, apart from the chattering."
+          ],
+          "act2": [
+            "A parrot only repeats what he hears again and again. Somebody in that cabin talks too much."
+          ],
+          "act3": [
+            "Pieces of eight, pieces of eight. Or should I say: count the coins?"
+          ]
+        }
+      }
+    },
+    {
+      "id": "scarlett",
+      "name": "Captain Scarlett Vane",
+      "pronouns": "she/her",
+      "title": "The Rival Captain",
+      "publicBio": "Captain of the Crimson Dagger, the fastest ship in the Caribbean. She rowed into the feast uninvited, all smiles, wanting to buy the map.",
+      "costumeTips": "A red coat, a big feathered hat, lots of jewellery and a very fancy sword.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.0,
+        "style": "grand, charming, sly"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You and Barnaby Bones were rivals for twenty years. Tonight you offered him a chest of pearls for his half of the map and he laughed in your face. What nobody knows is that your crew is anchored just round the point, ready to steal the treasure chest before dawn.",
+        "secrets": [
+          {
+            "id": "scarlett-pearls",
+            "text": "I offered Bones a chest of pearls for his half of the map, and he laughed at me.",
+            "unlockAct": 0
+          },
+          {
+            "id": "scarlett-crew",
+            "text": "My crew is anchored round the point, ready to steal the treasure chest before dawn.",
+            "unlockAct": 3
+          }
+        ],
+        "objectives": [
+          "Get the second half of the map by any means (short of murder).",
+          "Keep your hidden crew secret.",
+          "Make sure you're not blamed for Bones's death."
+        ],
+        "knows": [
+          "Bones told you the map half was 'safe where only my key can reach it'.",
+          "Quartermaster Flint offered to sell you the map last month, 'for the right price'."
+        ],
+        "alibi": "After Bones laughed at me I rowed back to my ship at ten, and stayed there until I heard the shouting.",
+        "lines": {
+          "act1": [
+            "Barnaby and I were rivals, not enemies. There's a difference, darling."
+          ],
+          "act2": [
+            "Pearls, gold, maps. Everyone on this beach wanted something from Bones."
+          ],
+          "act3": [
+            "I know a crooked quartermaster when I see one. I've employed three."
+          ]
+        }
+      }
+    },
+    {
+      "id": "ledger",
+      "name": "Mr. Percival Ledger",
+      "pronouns": "he/him",
+      "title": "The Governor's Clerk",
+      "publicBio": "A nervous man in a pirate costume that fits him badly. He says he's the crew's new bookkeeper. He jumps at loud noises.",
+      "costumeTips": "A neat shirt with a very new-looking pirate hat, spectacles, a quill and a notebook.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.05,
+        "rate": 1.15,
+        "style": "prim, anxious, fussy"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You aren't a pirate at all. The harbour Governor sent you to count the treasure so the King gets his share, and promised the crew a pardon if they pay up. The Governor also told you to bring back the captain's map, or spend the rest of your days scrubbing the fort's floors.",
+        "secrets": [
+          {
+            "id": "ledger-clerk",
+            "text": "I'm not really a pirate. The Governor sent me to count the treasure for the King's tax.",
+            "unlockAct": 0
+          },
+          {
+            "id": "ledger-orders",
+            "text": "The Governor ordered me to bring back the captain's map, or I'll be scrubbing the fort's floors forever.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your real job secret for as long as you can.",
+          "Get the map back to the Governor.",
+          "Survive the night among pirates."
+        ],
+        "knows": [
+          "Quartermaster Flint left the storeroom at five past ten, saying he needed the surgeon's medicine chest for a splinter.",
+          "The Governor will pardon the whole crew if the treasure is shared fairly."
+        ],
+        "alibi": "I was in the storeroom counting with Mr. Flint from ten until the shanties started.",
+        "lines": {
+          "act1": [
+            "I'm a real pirate! Arr! Is that how you say it? Arr!"
+          ],
+          "act2": [
+            "Numbers never lie. Somebody's numbers on this ship do not add up."
+          ],
+          "act3": [
+            "Mr. Flint left the storeroom, you know. At five past ten. I wrote it down. I write everything down."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "empty-case",
+      "title": "The Empty Map Case",
+      "text": "The brass map case by the captain's bed is open and empty. The second half of the treasure map, the half showing where the real hoard is buried, is gone.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": []
+    },
+    {
+      "id": "angry-words",
+      "title": "Angry Words at the Feast",
+      "text": "Half the crew heard First Mate Grace shout at the captain over pudding: 'You promised me a ship! You'll regret this, Barnaby Bones!'",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "grace"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "cocoa-mug",
+      "title": "The Captain's Mug",
+      "text": "The captain's cocoa mug smells oddly sweet, like poppies. There are grains of something at the bottom. Whoever made that cocoa has some explaining to do.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "cookie"
+      ],
+      "recipient": "cookie",
+      "redHerring": true
+    },
+    {
+      "id": "medicine-chest",
+      "title": "The Surgeon's Chest",
+      "text": "The ship's surgeon went ashore last week, but his medicine chest is in the storeroom. The bottle of 'Dreamy Drops' sleeping draught is nearly empty. The lock hasn't been forced: somebody used a key.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "flint"
+      ]
+    },
+    {
+      "id": "rowing-boat",
+      "title": "A Boat Behind the Rocks",
+      "text": "A small rowing boat, packed with food, water and a lantern, has been hidden behind the rocks at the end of the beach. Somebody was planning a quiet getaway.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "nell"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "rigging-view",
+      "title": "What Pip Saw",
+      "text": "From up in the rigging at ten past ten, you saw someone in a long coat bending over the cocoa pot on the galley stove. You heard keys jangling. Two of the crew wear long coats: the First Mate and the Quartermaster.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "flint",
+        "grace"
+      ],
+      "recipient": "pip"
+    },
+    {
+      "id": "parrot-words",
+      "title": "Squawk's New Words",
+      "text": "Squawk the parrot, who sleeps in the captain's cabin, won't stop squawking two new phrases: 'Sweet dreams, Captain!' and 'Count the coins! Count the coins!'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "flint",
+        "beak"
+      ]
+    },
+    {
+      "id": "governor-letter",
+      "title": "The Governor's Letter",
+      "text": "A letter in your pocket, sealed with the Governor's crest: 'Bring back the captain's map by any means. Fail, and you scrub the fort floors for life.'",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "ledger"
+      ],
+      "recipient": "ledger",
+      "redHerring": true
+    },
+    {
+      "id": "spyglass",
+      "title": "A Crimson Spyglass",
+      "text": "A fancy spyglass engraved 'Crimson Dagger' lies in the sand right under the captain's porthole.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "scarlett"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "sugar-thief",
+      "title": "The Sugar Bowl",
+      "text": "The galley sugar bowl was found up the mast with Nutmeg the monkey, licked clean. The galley must have been empty while somebody chased him.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "cookie"
+      ],
+      "recipient": "cookie",
+      "redHerring": true
+    },
+    {
+      "id": "logbook",
+      "title": "The Captain's Logbook",
+      "text": "The captain's logbook is locked with a letter-lock. A riddle is carved on the clasp.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "flint"
+      ],
+      "puzzle": {
+        "prompt": "I have a head and a tail but no body. Pirates want me, and some count me twice. What am I?",
+        "answers": [
+          "coin",
+          "a coin",
+          "coins",
+          "doubloon",
+          "a doubloon",
+          "gold coin",
+          "a gold coin"
+        ],
+        "hint": "Somebody on this beach never stops counting them.",
+        "solvedText": "The last entry reads: 'Checked the Quartermaster's sums at last. Flint has been nibbling our shares for years like a ship's rat. After the feast he's marooned on Skull Rock with a spoon. Map half stays locked by my bed, and my key stays round my neck. Flint holds every other key on this ship.'"
+      }
+    },
+    {
+      "id": "will",
+      "title": "The Captain's Will",
+      "text": "Tucked in a book: 'When I'm gone, my share goes to Pip, who is the only one aboard who reads my books.' Pip had more to gain than anyone.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "pip"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "boot-prints",
+      "title": "Buckled Boot Prints",
+      "text": "In the damp sand between the galley and the captain's cabin: boot prints with a square buckle pressed into each heel. Only one member of the crew wears buckled boots.",
+      "visibility": "private",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "flint"
+      ],
+      "recipient": "grace"
+    },
+    {
+      "id": "palm-stash",
+      "title": "Under the Tall Palm",
+      "text": "Somebody's been digging under the tall palm. Buried there: a small chest of coins, AND the missing half of the treasure map, wrapped in a handkerchief embroidered 'M.F.'",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "flint"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "Skull Rock Cove, 1720. A bonfire crackles on the beach.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Skull Rock Cove, in the year 1720. After three long years of searching, the crew of the Salty Maiden have dug up the legendary treasure of Redbeard the Terrible. Tonight there's a feast on the beach: roast fish, sea shanties, and fair shares for all."
+    },
+    {
+      "type": "narration",
+      "text": "But the chest they found is only half the story. The treasure map was torn in two long ago, and the second half, showing where the REAL hoard is buried, belongs to Captain Barnaby Bones. He keeps it locked beside his bed."
+    },
+    {
+      "type": "line",
+      "speaker": "flint",
+      "text": "Fair shares for everyone! Count the coins, lads, count the coins!"
+    },
+    {
+      "type": "narration",
+      "text": "At ten o'clock, as he does every night, the captain retires to his cabin with a mug of Cookie's famous cocoa. The crew sing on around the fire."
+    },
+    {
+      "type": "image",
+      "text": "The captain's cabin. Moonlight through the porthole, a mug of cold cocoa.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At midnight, young Pip climbs aboard with the captain's slippers, and finds him still and silent in his chair. The captain's weak heart has stopped. His mug is empty. And his map case is open."
+    },
+    {
+      "type": "narration",
+      "text": "Somebody on this beach put something in the captain's cocoa, and walked off with the map. The tide is out. Nobody leaves Skull Rock until the scoundrel is found."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: A Cold Cup of Cocoa",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. A Cold Cup of Cocoa."
+        },
+        {
+          "type": "image",
+          "text": "The galley: a stove, a cocoa pot, and a very guilty-looking monkey.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The whole crew gathers round the fire. Everybody loved the old captain, or says they did. Somebody here is fibbing. Ask where everyone was at ten o'clock, when the cocoa was on the stove."
+        },
+        {
+          "type": "line",
+          "speaker": "cookie",
+          "text": "My cocoa? Nobody has ever been harmed by my cocoa! Somebody's been at my galley, I tell you!"
+        }
+      ],
+      "prompts": [
+        "Where was everyone at ten o'clock, when the cocoa was on the stove?",
+        "Who argued with the captain at the feast?",
+        "Who could open a locked medicine chest?",
+        "Where's the missing half of the map?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: The Parrot Talks",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. The Parrot Talks."
+        },
+        {
+          "type": "image",
+          "text": "Squawk the parrot, ruffled and chattering on his perch.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Squawk the parrot has been in the captain's cabin all night, and he's learned some new words. Parrots only repeat what they hear again and again. And the captain's logbook is locked with a riddle."
+        },
+        {
+          "type": "line",
+          "speaker": "pip",
+          "text": "Squawk keeps saying the same thing over and over. I've heard somebody say it too..."
+        }
+      ],
+      "prompts": [
+        "Whose words is Squawk repeating?",
+        "Solve the riddle on the captain's logbook.",
+        "Who had a reason to want the map for themselves?",
+        "Reveal one of your secrets if it helps clear your name."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: X Marks the Spot",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. X Marks the Spot."
+        },
+        {
+          "type": "image",
+          "text": "The tall palm tree, and fresh digging in the sand beneath it.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Dawn is coming. Fresh boot prints lead across the sand, and somebody has been digging under the tall palm tree. It's time to follow the footprints, and the coins."
+        },
+        {
+          "type": "line",
+          "speaker": "grace",
+          "text": "Buckled boots. I'd know those buckles anywhere."
+        }
+      ],
+      "prompts": [
+        "Whose boots have buckles?",
+        "Who was seen with a lantern near the tall palm?",
+        "Put the whole night in order: ten o'clock, half past ten, half past eleven, midnight.",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "map",
+        "text": "To steal the second half of the treasure map"
+      },
+      {
+        "id": "ship",
+        "text": "To take command of the Salty Maiden"
+      },
+      {
+        "id": "share",
+        "text": "Revenge for an unfair share of the treasure"
+      },
+      {
+        "id": "inherit",
+        "text": "To inherit the captain's share"
+      },
+      {
+        "id": "rival",
+        "text": "To win an old rivalry between ships"
+      }
+    ],
+    "methods": [
+      {
+        "id": "cocoa",
+        "text": "A double dose of sleeping draught in his cocoa"
+      },
+      {
+        "id": "coconut",
+        "text": "A coconut dropped from a great height"
+      },
+      {
+        "id": "hatch",
+        "text": "A tumble down the cabin hatch"
+      },
+      {
+        "id": "biscuit",
+        "text": "A poisoned ship's biscuit"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "flint",
+    "motiveId": "map",
+    "methodId": "cocoa",
+    "explanation": [
+      "Captain Bones was not killed by a coconut, a fall, or Cookie's cooking. He was given a double dose of the surgeon's Dreamy Drops, stirred into his cocoa while it sat on the galley stove. His weak old heart couldn't take it. And the only person with the key to the surgeon's chest was the Quartermaster, Morgan Flint.",
+      "For years Flint had nibbled a coin or two from every share and buried them under the tall palm. This week the captain checked the sums, found him out, and told him he'd be marooned on Skull Rock after the feast. Worse still, the captain would never let the second half of the map out of his sight.",
+      "So Flint made a plan. At dinner he asked Cookie, twice, when the captain had his cocoa. At five past ten he left the storeroom 'for a splinter', unlocked the medicine chest, and waited. When Nutmeg the monkey stole the sugar and Cookie gave chase, Flint slipped into the empty galley and emptied the Dreamy Drops into the cocoa pot. From up in the rigging, Pip saw a long coat and heard jangling keys.",
+      "At half past ten Flint made sure everyone saw him leading the shanties at the bonfire. At half past eleven he crept to the cabin in his buckled boots, lifted the key from round the captain's neck (he never stirred, thanks to the drops), took the map from the brass case, and muttered his favourite words, 'sweet dreams, Captain... count the coins', right in front of Squawk. Then he buried the map with his stash under the tall palm, wrapped in his own handkerchief.",
+      "He only meant the captain to sleep soundly while he stole the map. But a double dose and a weak heart don't mix, and a quartermaster who counts everything forgot to count the drops."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The treasure feast begins. Grace shouts at the captain over a promised ship."
+      },
+      {
+        "time": "9:45",
+        "event": "Captain Scarlett Vane rows in uninvited and offers pearls for the map. The captain laughs."
+      },
+      {
+        "time": "10:00",
+        "event": "Cookie puts the captain's cocoa on the stove, then chases Nutmeg the monkey, who has stolen the sugar."
+      },
+      {
+        "time": "10:05",
+        "event": "Flint leaves the storeroom and unlocks the surgeon's chest."
+      },
+      {
+        "time": "10:10",
+        "event": "Flint empties the Dreamy Drops into the cocoa pot. Pip sees a long coat from the rigging."
+      },
+      {
+        "time": "10:20",
+        "event": "Cookie carries the cocoa to the captain's cabin."
+      },
+      {
+        "time": "10:30",
+        "event": "Flint leads the shanties at the bonfire, in front of everyone."
+      },
+      {
+        "time": "11:30",
+        "event": "Flint takes the map half from the cabin, muttering in front of Squawk, and buries it under the palm."
+      },
+      {
+        "time": "12:00",
+        "event": "Pip brings the captain his slippers and finds him."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Sunrise over Skull Rock. A Navy ship on the horizon.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At sunrise, the Governor's ship sailed into the cove. Quartermaster Morgan Flint was taken ashore, where he'll have nothing to count but the bricks in his cell for a very long time."
+    },
+    {
+      "type": "narration",
+      "text": "The two halves of the map were joined at last, and the crew of the Salty Maiden shared Redbeard's treasure fairly, the way their old captain always wanted. And Pip kept the captain's books. Every single one. Fair winds, detectives!"
+    }
+  ]
+}

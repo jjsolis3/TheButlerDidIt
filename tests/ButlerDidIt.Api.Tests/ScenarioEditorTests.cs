@@ -138,7 +138,7 @@ public class ScenarioEditorTests(FakeAiFactory app) : IClassFixture<FakeAiFactor
 
         var played = await DuplicateAsync(host, Blackwood);
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(played, PartyMode.SharedScreen, ContentRating.Mature, null, UseAi: false), GameJson.Options));
+            new CreatePartyRequest(played, PartyMode.SharedScreen, null, UseAi: false), GameJson.Options));
         Assert.Equal(HttpStatusCode.Conflict, (await host.DeleteAsync($"/api/scenarios/{played}")).StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, (await SaveAsync(host, played, await DocumentAsync(host, played))).StatusCode);
 
@@ -151,7 +151,7 @@ public class ScenarioEditorTests(FakeAiFactory app) : IClassFixture<FakeAiFactor
         Assert.NotNull(row.ArchivedAt); // kept, so that party's recap still works
         Assert.DoesNotContain(await Read<List<MyMystery>>(await host.GetAsync("/api/scenarios/mine")), m => m.Id == played);
         Assert.Equal(HttpStatusCode.BadRequest, (await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(played, PartyMode.SharedScreen, ContentRating.Mature, null, UseAi: false), GameJson.Options)).StatusCode);
+            new CreatePartyRequest(played, PartyMode.SharedScreen, null, UseAi: false), GameJson.Options)).StatusCode);
     }
 
     private async Task<Dictionary<string, Guid>> MediaKeysAsync(string scenarioId)

@@ -26,7 +26,7 @@ public class PartyFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
     {
         var (host, cookie) = await app.RegisterHostAsync($"host{Guid.NewGuid():N}@example.com");
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(Scenario, PartyMode.SharedScreen, ContentRating.Mature, null), GameJson.Options));
+            new CreatePartyRequest(Scenario, PartyMode.SharedScreen, null), GameJson.Options));
         return (host, cookie, party);
     }
 
@@ -177,17 +177,33 @@ public class PartyFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
     public async Task Only_hosts_can_create_parties()
     {
         var res = await app.CreateClient().PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(Scenario, PartyMode.SharedScreen, ContentRating.Mature, null), GameJson.Options);
+            new CreatePartyRequest(Scenario, PartyMode.SharedScreen, null), GameJson.Options);
         Assert.Equal(HttpStatusCode.Unauthorized, res.StatusCode);
     }
 
     [Fact]
-    public async Task Family_parties_cannot_pick_mature_mysteries()
+    public async Task The_content_level_is_the_mysterys_own_rating_and_the_tone_is_the_hosts_choice()
     {
-        var (host, _) = await app.RegisterHostAsync($"fam{Guid.NewGuid():N}@example.com");
-        var res = await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(Scenario, PartyMode.SharedScreen, ContentRating.Family, null), GameJson.Options);
-        Assert.Equal(HttpStatusCode.BadRequest, res.StatusCode);
+        var (host, cookie) = await app.RegisterHostAsync($"fam{Guid.NewGuid():N}@example.com");
+        async Task<(PartyInfo Info, StageView Stage)> Create(string scenario, Tone tone)
+        {
+            var res = await host.PostAsJsonAsync("/api/parties",
+                new CreatePartyRequest(scenario, PartyMode.SharedScreen, null, UseAi: false, DrinkingPrompts: true, Tone: tone), GameJson.Options);
+            var info = GameJson.Deserialize<PartyInfo>(await res.Content.ReadAsStringAsync());
+            await using var stage = await app.ConnectAsync(cookie: cookie);
+            return (info, await stage.InvokeAsync<StageView>("WatchParty", info.Code));
+        }
+
+        var adults = await Create(Scenario, Tone.Clean);
+        Assert.Equal(ContentRating.Mature, adults.Info.ContentLevel);
+        Assert.Equal(Tone.Clean, adults.Stage.Options.Tone);
+        Assert.True(adults.Stage.Options.DrinkingPrompts);
+
+        // A Family mystery is always a Family party: toasts stay off even if asked for.
+        var family = await Create("the-captains-last-cocoa", Tone.Playful);
+        Assert.Equal(ContentRating.Family, family.Info.ContentLevel);
+        Assert.Equal(Tone.Playful, family.Stage.Options.Tone);
+        Assert.False(family.Stage.Options.DrinkingPrompts);
     }
 
     private static async Task WaitUntil(Func<bool> condition)

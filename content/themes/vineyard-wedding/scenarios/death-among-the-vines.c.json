@@ -1,0 +1,204 @@
+{
+  "variantOf": "death-among-the-vines",
+  "variant": "C",
+  "solution": {
+    "murdererId": "sofia",
+    "motiveId": "blackmail",
+    "methodId": "potion",
+    "explanation": [
+      "Aldo Moretti was not killed by the silver chalice or anything in the cellar. He drank his death forty minutes earlier, in a glass of vin santo brought to him as a 'peace offering' by his future daughter-in-law: Sofia Russo, the bride.",
+      "Sofia had gambled away far more than her savings: ninety thousand euros to a casino in Sanremo. The casino wrote to Aldo. At half past nine he cornered her on the terrace with the letter and made his terms: be 'nice' to him, or he'd tell Marco everything after the toast and there'd be no wedding. She slapped him. Everyone saw that. Nobody heard the rest.",
+      "At half past eleven Sofia slipped out of the bridal suite for ten minutes. On the terrace bench lay Chiara's handbag, left while Chiara met Marco in the olive grove, with a little brown bottle inside. The woman in the village sells it as a 'love potion'. It is, in fact, a strong tincture of foxglove. Sofia emptied it into a glass of vin santo and carried it to Aldo with a smile: 'Let's start again.'",
+      "Foxglove works slowly on the heart. Aldo made his toast at midnight, felt his heart racing by twenty past, and went to lie down in the library. Dario found him at one. And the potion bottle, empty, was back in Chiara's bag, with the bride's fresh nail varnish on the clasp.",
+      "The ex came to stop a wedding. The bride made sure nothing would."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The rehearsal dinner begins on the terrace."
+      },
+      {
+        "time": "9:30",
+        "event": "Aldo corners Sofia with the casino's letter. She slaps him in front of the guests."
+      },
+      {
+        "time": "10:00",
+        "event": "Aldo tells Marco: sign over your share, or there's no wedding."
+      },
+      {
+        "time": "11:00",
+        "event": "Chiara leaves her handbag on the terrace bench and meets Marco in the olive grove."
+      },
+      {
+        "time": "11:30",
+        "event": "Sofia slips out of the bridal suite and takes the 'love potion' from Chiara's bag."
+      },
+      {
+        "time": "11:40",
+        "event": "Sofia takes Aldo a glass of vin santo, 'a peace offering'. Tommy sees her."
+      },
+      {
+        "time": "12:00",
+        "event": "The midnight toast from the silver chalice."
+      },
+      {
+        "time": "12:20",
+        "event": "Aldo complains of a racing heart and goes to the library to lie down."
+      },
+      {
+        "time": "1:00",
+        "event": "Dario finds Aldo dead in the library."
+      }
+    ]
+  },
+  "characters": {
+    "sofia": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You gambled away ninety thousand euros at the casino in Sanremo, and the casino wrote to Aldo. At half past nine he cornered you: be 'nice' to him, or he'd tell Marco after the toast and there'd be no wedding. You slapped him; everyone saw that. At half past eleven you slipped out of the bridal suite, took the little 'love potion' bottle from Chiara's handbag on the terrace bench (foxglove, the village woman's speciality), emptied it into a glass of vin santo and gave it to Aldo as a peace offering. Then you put the empty bottle back in her bag. Let them blame the ex.",
+        "objectives": [
+          "Do not get caught. Your slap is public; your motive must not be.",
+          "Steer suspicion to Chiara (she came to ruin the wedding) and to Luca (the chalice).",
+          "The wedding goes ahead. Tomorrow. No matter what."
+        ],
+        "knows": [
+          "At half past nine Aldo cornered you on the terrace with the casino's letter. You slapped him.",
+          "Chiara keeps a little brown bottle in her handbag. You saw it when she arrived."
+        ],
+        "alibi": "From eleven until the toast I was in the bridal suite with my mother, trying on the veil. I never left."
+      }
+    },
+    "luca": {
+      "private": {
+        "backstory": "You are really Luca Ferrante. Twenty years ago Aldo Moretti sold fake vintages under his own label and, when he was caught, blamed your father. The Ferrante vineyard was ruined. You took this job to get close to Aldo and make him pay, but when the moment came you couldn't do it. Instead you've been quietly swapping his precious bottles for cheap wine and selling the real ones. At half past eleven you borrowed the pruning gloves to cut roses for the bridal table. You did NOT kill Aldo, but if anyone learns your real name, you're the obvious suspect.",
+        "objectives": [
+          "Keep your real name secret.",
+          "Keep the bottle-swapping quiet.",
+          "Find out who really killed Aldo. Justice for your father should be a trial, not a poisoning."
+        ],
+        "alibi": "From half past eleven I was cutting roses and then in the cellar choosing tomorrow's wines. I came up only to pour the midnight Riserva.",
+        "lines": {
+          "act3": [
+            "Everybody drank my Riserva at midnight. Ask instead what Signor Moretti drank before it."
+          ]
+        }
+      }
+    },
+    "chiara": {
+      "private": {
+        "knows": [
+          "You left your handbag on the terrace bench while you met Marco in the olive grove at eleven. When you picked it up, the clasp was open.",
+          "Aldo once told you, 'The Moretti name is built on good wine and better lies.'"
+        ]
+      }
+    },
+    "tommy": {
+      "private": {
+        "knows": [
+          "You saw Marco and Chiara in the olive grove at eleven.",
+          "At twenty to twelve Sofia carried a glass of vin santo to Aldo on the terrace: 'a peace offering,' she said. He drank it."
+        ]
+      }
+    },
+    "donatella": {
+      "private": {
+        "knows": [
+          "Your scrapbook has a clipping about the Ferrante wine-fraud scandal of twenty years ago.",
+          "At half past eleven Sofia stepped out of the bridal suite for ten minutes. She came back with sticky fingers and pink varnish on a nail she'd painted red."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "chalice": {
+      "text": "Aldo never drank a toast from an ordinary glass, only from the family's antique silver chalice. The staff confirm that only the sommelier polishes it, fills it and carries it. Everyone drank the same Riserva.",
+      "redHerring": true
+    },
+    "key-log": {
+      "text": "Your clipboard: 'Cellar key signed out 11:30 by L. Bellini, with a pair of pruning gloves from the garden shed ('roses for the bridal table'). Key returned 11:55.'",
+      "redHerring": true
+    },
+    "funnel": {
+      "text": "In the cellar, the decanting funnel holds crushed green leaves and a few petals. The gardener sniffs them: rosemary and rose petals, the makings of tomorrow's wedding punch.",
+      "redHerring": true
+    },
+    "gloves": {
+      "text": "Pushed into the old wine press: a pair of pruning gloves scratched by rose thorns and dusted with petals. Stitched inside the cuff: 'L.B.' Why hide gloves you borrowed for roses?",
+      "redHerring": true
+    },
+    "clipping": {
+      "redHerring": true
+    },
+    "potion": {
+      "text": "In Chiara's handbag: a small brown bottle labelled, in a shaky hand, 'For love. Three drops.' It is EMPTY, though Chiara swears it was full at eleven. The village woman who sells it deals in foxglove. And the bag's clasp is smeared with fresh pale-pink nail varnish, still tacky.",
+      "redHerring": false,
+      "pointsTo": [
+        "chiara",
+        "sofia"
+      ]
+    },
+    "cellar-book": {
+      "pointsTo": [
+        "sofia"
+      ],
+      "puzzle": {
+        "solvedText": "The last entry, in Aldo's hand: 'The Russo girl owes the casino at Sanremo ninety thousand. They wrote to me. Either she is sweet to her father-in-law, or Marco learns everything after the toast.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "vin-santo",
+      "title": "The Peace Offering",
+      "text": "On the terrace table, next to Aldo's place: a small glass that held vin santo, drained. A bitter green film clings to the bottom. The waiter says the bride herself carried it to him at twenty to twelve.",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "sofia"
+      ]
+    },
+    {
+      "id": "casino-letter",
+      "title": "A Letter from Sanremo",
+      "text": "Folded in your jacket pocket, where your father stuffed it at dinner: 'Casinò di Sanremo. Final demand, Signorina S. Russo: €90,000. We have written also to Signor Aldo Moretti.'",
+      "visibility": "private",
+      "recipient": "marco",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "sofia"
+      ]
+    },
+    {
+      "id": "varnish",
+      "title": "Ten Minutes Out",
+      "text": "Your own recollection: at half past eleven Sofia said she needed air and left the bridal suite for ten minutes. She came back with sticky fingers, and pale-pink varnish smudged on a nail she'd just painted red.",
+      "visibility": "private",
+      "recipient": "donatella",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "sofia"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning over the vineyard. A carabinieri car climbs the muddy road.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Espresso cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The carabinieri arrived at eight. Sofia Russo was already dressed for her wedding. She asked them, very politely, whether they could wait until after the photographs. They could not."
+    },
+    {
+      "type": "narration",
+      "text": "As for the groom, the ex, the wife, the planner and the best man: they all have some explaining to do. And there will be no 'I do' at noon. Buona notte, detectives."
+    }
+  ]
+}

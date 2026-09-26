@@ -64,7 +64,7 @@ Click **Deploy**. The first build takes a few minutes (it compiles both the Reac
 1. applies database migrations (creating the tables), then
 2. loads every theme and mystery from `content/` into the database.
 
-Check the app's logs for `Seeded 8 themes and 1 scenarios`, then open `https://mystery.example.com/healthz`, which should say `Healthy`.
+Check the app's logs for `Seeded 8 themes and 9 scenarios`, then open `https://mystery.example.com/healthz`, which should say `Healthy`.
 
 Optionally, in the app service's health check settings, use path `/healthz` on port `8080`.
 

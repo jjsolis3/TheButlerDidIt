@@ -7,6 +7,8 @@ export type ActStep = 'cinematic' | 'mingle'
 export type CueType = 'narration' | 'image' | 'music' | 'sfx' | 'video' | 'line' | 'toast'
 export type PartyMode = 'sharedScreen' | 'remote' | 'passAndPlay'
 export type ContentRating = 'family' | 'mature'
+/** How the AI game master plays it, within the mystery's rating. Mirrors the C# Tone enum. */
+export type Tone = 'standard' | 'clean' | 'playful'
 export type PartyStatus = 'lobby' | 'inProgress' | 'finished'
 
 export interface VoiceProfile {
@@ -185,7 +187,7 @@ export interface StageView {
   awards: AwardsView | null
   ai: AiFeatures
   interrogations: InterrogationView[]
-  options: { drinkingPrompts: boolean }
+  options: { drinkingPrompts: boolean; tone: Tone }
   spotlight: { seatId: string; playerName: string; characterName: string | null } | null
 }
 
@@ -307,6 +309,8 @@ export interface ScenarioCard {
   aiGenerated: boolean
   /** A host's own edited copy. */
   custom: boolean
+  /** Versions of this story (same place, different killer). Empty when there's only one. */
+  versions: VersionOption[]
 }
 
 export interface ThemeCard {
@@ -506,5 +510,12 @@ export interface MyMystery {
 export interface ValidationResult {
   valid: boolean
   errors: string[]
+}
+
+/** One version of a story. The label ("Version B") is deliberately bland, so it gives nothing away. */
+export interface VersionOption {
+  id: string
+  label: string
+  playedByMe: boolean
 }
 

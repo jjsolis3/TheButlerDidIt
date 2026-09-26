@@ -184,6 +184,21 @@ public class PromptTests
     }
 
     [Fact]
+    public void The_hosts_tone_changes_how_the_ai_speaks_within_the_mysterys_rating()
+    {
+        var scenario = Blackwood();
+        string Prompt(ContentRating level, Tone tone) => NpcPrompt.Build(scenario, GameWithNpcs(scenario), "hargrove", "Alice", "?", level, tone).System;
+
+        Assert.Contains("drinking", Prompt(ContentRating.Mature, Tone.Standard));
+        Assert.Contains("PG-13", Prompt(ContentRating.Mature, Tone.Clean));
+        Assert.DoesNotContain("drinking", Prompt(ContentRating.Mature, Tone.Clean));
+        Assert.Contains("silly and funny", Prompt(ContentRating.Family, Tone.Playful));
+        Assert.Contains("family-friendly", Prompt(ContentRating.Family, Tone.Playful));
+        // "Clean" can't loosen a Family mystery: it stays family-friendly.
+        Assert.Contains("family-friendly", Prompt(ContentRating.Family, Tone.Clean));
+    }
+
+    [Fact]
     public void Hint_safety_catches_any_part_of_the_killers_name()
     {
         var finch = Blackwood().FindCharacter("finch")!;

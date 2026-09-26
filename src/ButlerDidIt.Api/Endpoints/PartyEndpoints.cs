@@ -13,7 +13,11 @@ using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, ContentRating ContentLevel, DateTimeOffset? ScheduledFor, bool UseAi = true, bool DrinkingPrompts = false);
+/// <param name="Version">For stories with several versions: "surprise" to let the server pick one this host hasn't
+/// played, a version's id to choose it, or null for the original.</param>
+/// <param name="Tone">How the AI game master plays it. The content level itself isn't asked for: it's the mystery's own rating.</param>
+public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, DateTimeOffset? ScheduledFor,
+    bool UseAi = true, bool DrinkingPrompts = false, string? Version = null, Tone Tone = Tone.Standard);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -45,7 +49,7 @@ public static class PartyEndpoints
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var parties = await db.Parties.AsNoTracking()
-                .Where(p => p.HostUserId == userId)
+                .Where(p => p.HostUserId == userId && p.HiddenAt == null)
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(50)
                 .ToListAsync(ct);
@@ -63,12 +67,26 @@ public static class PartyEndpoints
             if (row is not null && ((row.OwnerUserId is not null && row.OwnerUserId != userId) || row.ArchivedAt is not null))
                 return Results.Problem("Pick a mystery to play.", statusCode: 400);
 
-            Scenario scenario;
-            try { scenario = await catalog.GetScenarioAsync(db, req.ScenarioId, ct); }
-            catch (KeyNotFoundException) { return Results.Problem("Pick a mystery to play.", statusCode: 400); }
+            // Which version of the story to play (same place and cast, different killer).
+            var versions = await db.Scenarios.AsNoTracking()
+                .Where(x => x.VariantOf == req.ScenarioId && x.ArchivedAt == null).OrderBy(x => x.Id).Select(x => x.Id).ToListAsync(ct);
+            versions.Insert(0, req.ScenarioId);
+            string scenarioId;
+            if (req.Version is null) scenarioId = req.ScenarioId;
+            else if (req.Version == VersionPicker.Surprise)
+            {
+                var played = await db.Parties.AsNoTracking()
+                    .Where(p => p.HostUserId == userId && p.Status != PartyStatus.Lobby && versions.Contains(p.ScenarioId))
+                    .GroupBy(p => p.ScenarioId).Select(g => new { g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.Key, x => x.Count, ct);
+                scenarioId = VersionPicker.Pick(versions, played, Random.Shared);
+            }
+            else if (versions.Contains(req.Version)) scenarioId = req.Version;
+            else return Results.Problem("That version doesn't belong to this mystery.", statusCode: 400);
 
-            if (scenario.ContentRating > req.ContentLevel)
-                return Results.Problem("That mystery is rated Mature. Choose the Mature content level to play it.", statusCode: 400);
+            Scenario scenario;
+            try { scenario = await catalog.GetScenarioAsync(db, scenarioId, ct); }
+            catch (KeyNotFoundException) { return Results.Problem("Pick a mystery to play.", statusCode: 400); }
 
             var party = new Party
             {
@@ -77,7 +95,8 @@ public static class PartyEndpoints
                 HostUserId = userId,
                 ScenarioId = scenario.Id,
                 Mode = req.Mode,
-                ContentLevel = req.ContentLevel,
+                // The level is the mystery's own rating, so a party can never be played "above" or "below" its story.
+                ContentLevel = scenario.ContentRating,
                 Status = PartyStatus.Lobby,
                 CreatedAt = parties.Now,
                 UpdatedAt = parties.Now,
@@ -86,7 +105,11 @@ public static class PartyEndpoints
                 {
                     Ai = await AiFeaturesFor(req.UseAi, ai, media, aiOptions.Value, ct),
                     // Drinking games are never offered at Family parties.
-                    Options = new PartyOptions { DrinkingPrompts = req.DrinkingPrompts && req.ContentLevel != ContentRating.Family },
+                    Options = new PartyOptions
+                    {
+                        DrinkingPrompts = req.DrinkingPrompts && scenario.ContentRating != ContentRating.Family,
+                        Tone = req.Tone,
+                    },
                 }),
             };
             db.Parties.Add(party);
@@ -98,6 +121,23 @@ public static class PartyEndpoints
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, scenario.Id, userId, clock, ct);
             return Results.Ok(await ToInfo(party, db, catalog, isHost: true, ct));
         }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
+
+        // ---- Host: remove a party from their list.
+        // An unfinished party (never started, or abandoned halfway) is deleted outright: its code
+        // stops working and any phones still open are told their seat is gone. A finished party
+        // is only hidden, so its recap link keeps working and "Surprise me" remembers the version.
+        group.MapDelete("/{code}", async (string code, ClaimsPrincipal user, PartyService parties, AppDbContext db, HttpContext http, CancellationToken ct) =>
+        {
+            var party = await parties.FindByCodeAsync(code, ct);
+            if (party is null) return Results.NotFound();
+            if (party.HostUserId != user.FindFirstValue(ClaimTypes.NameIdentifier)) return Results.Forbid();
+
+            if (party.Status == PartyStatus.Finished)
+                await db.Parties.Where(p => p.Id == party.Id).ExecuteUpdateAsync(u => u.SetProperty(p => p.HiddenAt, parties.Now), ct);
+            else
+                await RetentionWorker.DeletePartyAsync(http.RequestServices, party.Id, ct);
+            return Results.NoContent();
+        }).RequireAuthorization(AuthPolicies.Host);
 
         // ---- Public: what a guest sees on the join page
         group.MapGet("/{code}", async (string code, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties, CancellationToken ct) =>
@@ -183,7 +223,8 @@ public static class PartyEndpoints
     {
         var scenario = await catalog.GetScenarioAsync(db, p.ScenarioId, ct);
         var state = GameJson.Deserialize<GameState>(p.State);
-        return new PartyInfo(p.Code, scenario.Id, scenario.Title, scenario.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
+        // Guests see the shared story's id: a version's id would hint at which killer they're facing.
+        return new PartyInfo(p.Code, isHost ? scenario.Id : scenario.VariantOf ?? scenario.Id, scenario.Title, scenario.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
             p.CreatedAt, p.ScheduledFor, state.Players.Count, scenario.MaxPlayers, isHost);
     }
 }

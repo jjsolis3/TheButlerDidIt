@@ -26,7 +26,7 @@ public class RetentionTests(ApiFactory app) : IClassFixture<ApiFactory>
     {
         var (host, _) = await app.RegisterHostAsync($"r{Guid.NewGuid():N}@example.com");
         return await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, ContentRating.Mature, null, UseAi: false), GameJson.Options));
+            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, null, UseAi: false), GameJson.Options));
     }
 
     private async Task<(HttpClient Guest, string PhotoUrl)> GuestWithSelfieAsync(string code, string name)

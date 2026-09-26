@@ -23,7 +23,7 @@ public class RecapTests(ApiFactory app) : IClassFixture<ApiFactory>
     {
         var (host, cookie) = await app.RegisterHostAsync($"r{Guid.NewGuid():N}@example.com");
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, ContentRating.Mature, null, UseAi: false), GameJson.Options));
+            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, null, UseAi: false), GameJson.Options));
         foreach (var name in new[] { "Alice", "Bob", "Cara" })
             await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/join", new JoinRequest(name));
 

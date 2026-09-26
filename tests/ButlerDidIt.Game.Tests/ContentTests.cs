@@ -22,12 +22,21 @@ public class ContentTests
         Assert.Equal(themes.Count, themes.Select(t => t.Theme.Slug).Distinct().Count());
     }
 
-    [Fact]
-    public void Blackwood_manor_plays_from_start_to_finish_with_minimum_players()
+    /// <summary>Every hand-written mystery, by id, for the theory below. New files are picked up automatically.</summary>
+    public static TheoryData<string> ScenarioIds()
     {
-        var scenario = ContentLibrary.Load(ContentRoot())
-            .SelectMany(t => t.Scenarios)
-            .Single(s => s.Id == "death-at-blackwood-manor");
+        var data = new TheoryData<string>();
+        foreach (var s in ContentLibrary.Load(ContentRoot()).SelectMany(t => t.Scenarios)) data.Add(s.Id);
+        return data;
+    }
+
+    private static Scenario Load(string id) => ContentLibrary.Load(ContentRoot()).SelectMany(t => t.Scenarios).Single(s => s.Id == id);
+
+    [Theory]
+    [MemberData(nameof(ScenarioIds))]
+    public void Every_mystery_plays_from_start_to_finish_with_minimum_players(string id)
+    {
+        var scenario = Load(id);
         var now = TestScenario.T0;
         var seats = Enumerable.Range(1, scenario.MinPlayers).Select(_ => Guid.NewGuid()).ToList();
 
@@ -51,5 +60,51 @@ public class ContentTests
         }
 
         Assert.Equal(scenario.Clues.Count, s.DroppedClues.Count);
+        ViewProjector.Recap(s, scenario, now);
+    }
+
+    [Fact]
+    public void There_is_a_hand_written_mystery_on_both_the_family_and_the_adult_shelf()
+    {
+        var all = ContentLibrary.Load(ContentRoot()).SelectMany(t => t.Scenarios).ToList();
+        Assert.Contains(all, s => s.ContentRating == ContentRating.Family);
+        Assert.Contains(all, s => s.ContentRating == ContentRating.Mature);
+    }
+
+    [Fact]
+    public void Every_version_of_a_story_has_a_different_killer_in_the_same_setting_with_the_same_cast()
+    {
+        var all = ContentLibrary.Load(ContentRoot()).SelectMany(t => t.Scenarios).ToList();
+        foreach (var story in all.Where(s => s.VariantOf is null))
+        {
+            var versions = all.Where(s => s.Id == story.Id || s.VariantOf == story.Id).ToList();
+            Assert.Equal(versions.Count, versions.Select(v => v.Solution.MurdererId).Distinct().Count());
+            Assert.All(versions, v =>
+            {
+                Assert.Equal(story.Title, v.Title);
+                Assert.Equal(story.Setting.Place, v.Setting.Place);
+                Assert.Equal(story.Victim.Name, v.Victim.Name);
+                Assert.Equal(story.Characters.Select(c => c.Name), v.Characters.Select(c => c.Name));
+                Assert.Equal(story.ContentRating, v.ContentRating);
+            });
+        }
+    }
+
+    private static readonly string[] AlcoholWords = ["wine", "rum", "beer", "gin", "whisky", "whiskey", "vodka", "brandy", "grog", "cocktail", "drunk", "booze"];
+
+    [Theory]
+    [MemberData(nameof(ScenarioIds))]
+    public void Family_mysteries_never_mention_alcohol(string id)
+    {
+        var scenario = Load(id);
+        if (scenario.ContentRating != ContentRating.Family) return;
+
+        // Everything a family audience reads or hears, as one lowercase text.
+        var text = GameJson.Serialize(scenario).ToLowerInvariant();
+        foreach (var word in AlcoholWords)
+        {
+            // Whole words only, so "ginger" or "virginia" don't trip the check.
+            Assert.DoesNotMatch($@"\b{word}s?\b", text);
+        }
     }
 }

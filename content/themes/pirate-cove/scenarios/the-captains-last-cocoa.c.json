@@ -1,0 +1,233 @@
+{
+  "variantOf": "the-captains-last-cocoa",
+  "variant": "C",
+  "solution": {
+    "murdererId": "cookie",
+    "motiveId": "share",
+    "methodId": "cocoa",
+    "explanation": [
+      "Captain Bones wasn't harmed by the surgeon's drops, and Flint only stole his map. The captain's last cup of cocoa was made extra sleepy, on purpose, by Cookie Pottage, the ship's cook.",
+      "At supper the captain read out the treasure shares. Cookie's was a single coin: 'Cooks don't dig.' Cookie had fed that crew three times a day for three years of digging, and was furious.",
+      "Cookie didn't mean to harm anyone. The plan was to make the captain sleep straight through the share-out at dawn, so that Cookie could quietly take a fairer share from the chest. Into the ten o'clock cocoa went a whole jar of Grandma Pottage's Sleepy Spice, a recipe for crying babies, never meant for a weak old heart. From the rigging, Pip saw the apron and the jar.",
+      "Then Cookie told everyone a story: Nutmeg the monkey stole the sugar, the galley was left alone, anyone could have got at the cocoa. But Nutmeg had been asleep in his basket since nine o'clock, and Squawk had heard Cookie humming 'Sleepy spice, sleepy spice' all the way to the cabin.",
+      "The quartermaster is a thief, and he'll answer for the map. But the captain's last cocoa came from the one person everyone trusted with it."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The treasure feast begins. The captain reads out the shares: one coin for Cookie."
+      },
+      {
+        "time": "9:00",
+        "event": "Nutmeg the monkey falls asleep in his basket by the bonfire."
+      },
+      {
+        "time": "9:45",
+        "event": "Captain Scarlett Vane rows in uninvited and offers pearls for the map. The captain laughs."
+      },
+      {
+        "time": "10:00",
+        "event": "Cookie puts the cocoa on the stove."
+      },
+      {
+        "time": "10:10",
+        "event": "Cookie stirs a whole jar of Sleepy Spice into the cocoa. Pip sees an apron and a jar from the rigging."
+      },
+      {
+        "time": "10:20",
+        "event": "Cookie carries the cocoa to the captain's cabin, humming."
+      },
+      {
+        "time": "11:30",
+        "event": "Flint creeps in, takes the map from beside the 'sleeping' captain, and buries it under the palm."
+      },
+      {
+        "time": "12:00",
+        "event": "Pip brings the captain his slippers and finds him."
+      }
+    ]
+  },
+  "characters": {
+    "cookie": {
+      "private": {
+        "backstory": "YOU DID IT. At supper the captain gave you a single coin as your share: 'Cooks don't dig.' You've fed this crew three times a day for three years! You didn't want to hurt him. You only wanted him to sleep through the share-out at dawn so you could take a fairer share from the chest. So you stirred a whole jar of Grandma Pottage's Sleepy Spice into his ten o'clock cocoa. It was too much for his weak old heart. Now you've told everyone that Nutmeg the monkey stole the sugar while the cocoa sat alone. Stick to that story.",
+        "objectives": [
+          "Don't get caught. Stick to the monkey story: anyone could have got at the cocoa.",
+          "Point suspicion at Flint (the map, the medicine chest) and Grace (the angry words).",
+          "Get rid of the empty Sleepy Spice jar."
+        ],
+        "knows": [
+          "The captain gave you one coin as your share at supper: 'Cooks don't dig.'",
+          "Quartermaster Flint asked you twice at dinner what time the captain has his cocoa."
+        ],
+        "alibi": "I made the captain's cocoa at ten, same as always, and carried it to his cabin at twenty past. While it was on the stove, Nutmeg the monkey stole the sugar and I chased him all over the deck.",
+        "secrets": [
+          {
+            "id": "cookie-seagull",
+            "text": "I once served the captain boiled seagull and told him it was chicken. He had seconds.",
+            "unlockAct": 0
+          },
+          {
+            "id": "cookie-share",
+            "text": "The captain gave me a single coin as my share tonight. I told him he'd be sorry he ever tasted my cooking.",
+            "unlockAct": 2
+          }
+        ]
+      }
+    },
+    "flint": {
+      "private": {
+        "backstory": "For years you have shaved a coin or two off every crew member's share and buried your stash under the tall palm. This week the captain checked your sums and said you'd be marooned on Skull Rock after the feast. So at half past eleven you crept into his cabin to steal the second half of the treasure map. He was so still in his chair you thought he was fast asleep. You took the map and buried it with your stash. You did NOT hurt the captain, but if anyone finds that map, they'll think you did.",
+        "objectives": [
+          "Keep your stash and the stolen map hidden.",
+          "Prove you never harmed the captain: you only stole from him.",
+          "Find out who really did it, before the crew blames you."
+        ],
+        "alibi": "At ten I was in the storeroom counting shares with Mr. Ledger. From half past ten I led the sea shanties at the bonfire, apart from a quick walk at half past eleven.",
+        "lines": {
+          "act3": [
+            "All right, all right! I took the map. But the captain was sound asleep when I did. I never hurt a hair on his head!"
+          ]
+        }
+      }
+    },
+    "pip": {
+      "private": {
+        "secrets": [
+          {
+            "id": "pip-reading",
+            "text": "The captain was secretly teaching me to read. I sneak into his cabin to borrow his books.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pip-rigging",
+            "text": "I wasn't asleep at all. I was up the rigging, and at ten past ten I saw someone in an apron shaking a jar into the cocoa pot. Nobody else was in the galley.",
+            "unlockAct": 2
+          }
+        ]
+      }
+    },
+    "beak": {
+      "private": {
+        "knows": [
+          "Squawk sleeps in the captain's cabin, and tonight he came out chattering new words: 'Sleepy spice! Sleepy spice!'",
+          "Nutmeg the monkey was fast asleep in his basket by your squeezebox from nine o'clock. He never stole any sugar."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "medicine-chest": {
+      "text": "The ship's surgeon went ashore last week, but his medicine chest is in the storeroom, locked. Only the Quartermaster has the key. The bottle of 'Dreamy Drops' sleeping draught is full; nobody has touched it.",
+      "redHerring": true
+    },
+    "boot-prints": {
+      "text": "In the damp sand between the galley and the captain's cabin: boot prints with a square buckle pressed into each heel, made late at night. Only one member of the crew wears buckled boots.",
+      "redHerring": true
+    },
+    "palm-stash": {
+      "text": "Somebody's been digging under the tall palm. Buried there: a small chest of coins, AND the missing half of the treasure map, wrapped in a handkerchief embroidered 'M.F.' A thief, certainly. But a thief who stole from a sleeping captain, or a villain?",
+      "redHerring": true
+    },
+    "cocoa-mug": {
+      "text": "The captain's cocoa mug smells oddly sweet and spicy, like nutmeg and poppies. There are grains of something at the bottom. Whoever made that cocoa has some explaining to do.",
+      "visibility": "public",
+      "recipient": null,
+      "redHerring": false,
+      "pointsTo": [
+        "cookie"
+      ]
+    },
+    "sugar-thief": {
+      "title": "The Sugar Bowl",
+      "text": "The galley sugar bowl is on its shelf, full to the brim. Not a single sugar lump is missing.",
+      "visibility": "public",
+      "recipient": null,
+      "redHerring": false,
+      "pointsTo": [
+        "cookie"
+      ]
+    },
+    "rigging-view": {
+      "text": "From up in the rigging at ten past ten, you saw someone in an apron shaking a little jar over the cocoa pot on the galley stove. Nobody else was in the galley.",
+      "pointsTo": [
+        "cookie"
+      ]
+    },
+    "parrot-words": {
+      "text": "Squawk the parrot, who sleeps in the captain's cabin, won't stop squawking two new phrases: 'Sleepy spice! Sleepy spice!' and 'Count the coins! Count the coins!'",
+      "pointsTo": [
+        "cookie",
+        "flint"
+      ]
+    },
+    "logbook": {
+      "puzzle": {
+        "prompt": "I have a head and a tail but no body. Pirates want me, and some count me twice. What am I?",
+        "answers": [
+          "coin",
+          "a coin",
+          "coins",
+          "doubloon",
+          "a doubloon",
+          "gold coin",
+          "a gold coin"
+        ],
+        "hint": "Somebody on this beach never stops counting them.",
+        "solvedText": "The last entry reads: 'Cookie sulked all through supper about the shares. The cook's right, mind: no digger digs on an empty stomach. Tomorrow I'll double Cookie's share and tell the crew myself.'"
+      },
+      "pointsTo": [
+        "cookie"
+      ]
+    }
+  },
+  "addClues": [
+    {
+      "id": "spice-jar",
+      "title": "Grandma's Sleepy Spice",
+      "text": "Hidden behind the flour sack in the galley: a little jar labelled 'Grandma Pottage's Sleepy Spice. One pinch for crying babies.' It was full at supper. It is empty now.",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "cookie"
+      ]
+    },
+    {
+      "id": "share-list",
+      "title": "The Share List",
+      "text": "The captain's share list, read out at supper: 'First Mate, 50 coins. Navigator, 40. Quartermaster, 40. Cabin girl, 20. Cook, 1 coin. Cooks don't dig.' Somebody has scribbled 'UNFAIR!' across the bottom in gravy.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "cookie"
+      ]
+    },
+    {
+      "id": "sleeping-monkey",
+      "title": "A Sleepy Monkey",
+      "text": "Your own recollection: Nutmeg the monkey was fast asleep in his basket beside your squeezebox from nine o'clock until midnight. He never went near the galley.",
+      "visibility": "private",
+      "recipient": "beak",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "cookie"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Sunrise over Skull Rock. A Navy ship on the horizon.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At sunrise, the Governor's ship sailed into the cove. Cookie Pottage handed over the empty spice jar and a very soggy apology. Cookie had only wanted a fair share. Quartermaster Flint handed over the stolen map and a great many coins."
+    },
+    {
+      "type": "narration",
+      "text": "The two halves of the map were joined at last, and the crew of the Salty Maiden shared Redbeard's treasure fairly, cooks included, the way their old captain meant to. And Pip kept the captain's books. Every single one. Fair winds, detectives!"
+    }
+  ]
+}

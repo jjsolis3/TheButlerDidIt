@@ -23,11 +23,11 @@ public class MediaFlowTests(FakeAiFactory app) : IClassFixture<FakeAiFactory>
         return GameJson.Deserialize<T>(body);
     }
 
-    private async Task<(HttpClient Host, string Cookie, PartyInfo Party)> PartyAsync(ContentRating level = ContentRating.Mature, bool drinking = false)
+    private async Task<(HttpClient Host, string Cookie, PartyInfo Party)> PartyAsync(bool drinking = false)
     {
         var (host, cookie) = await app.RegisterHostAsync($"m{Guid.NewGuid():N}@example.com");
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, level, null, UseAi: true, DrinkingPrompts: drinking), GameJson.Options));
+            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, null, UseAi: true, DrinkingPrompts: drinking), GameJson.Options));
         return (host, cookie, party);
     }
 
@@ -189,7 +189,7 @@ public class MediaFlowTests(FakeAiFactory app) : IClassFixture<FakeAiFactory>
         }
         Assert.Equal(GenerationStatus.Succeeded, done.Status);
         var family = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(done.ScenarioId!, PartyMode.SharedScreen, ContentRating.Family, null, UseAi: true, DrinkingPrompts: true), GameJson.Options));
+            new CreatePartyRequest(done.ScenarioId!, PartyMode.SharedScreen, null, UseAi: true, DrinkingPrompts: true), GameJson.Options));
         await using var familyStage = await app.ConnectAsync(cookie: cookieFamily);
         Assert.False((await familyStage.InvokeAsync<StageView>("WatchParty", family.Code)).Options.DrinkingPrompts);
     }

@@ -26,7 +26,7 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
         try
         {
             var asker = snapshot.State.FindPlayer(seatId)?.Name ?? "A guest";
-            var (system, conversation) = NpcPrompt.Build(snapshot.Scenario, snapshot.State, characterId, asker, question.Trim(), snapshot.Party.ContentLevel);
+            var (system, conversation) = NpcPrompt.Build(snapshot.Scenario, snapshot.State, characterId, asker, question.Trim(), snapshot.Party.ContentLevel, snapshot.State.Options.Tone);
             var answer = await ai.CompleteAsync(AiRole.Actor, system, conversation,
                 new AiCallContext(snapshot.Party.HostUserId, partyId, Purpose: "npc-answer"), maxOutputTokens: 400, ct: ct);
             var answered = await parties.ExecuteAsync(partyId, (_, now) => new CompleteNpcQuestion(now, id, answer), ct: ct);
@@ -68,7 +68,7 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
             var scenario = snapshot.Scenario;
             // Built from the player's own view, so the prompt holds nothing they can't already see (apart from the confidential solution).
             var view = ViewProjector.Player(snapshot.State, scenario, seatId, parties.Now);
-            var system = InspectorPrompts.Hint(scenario, view, snapshot.Party.ContentLevel);
+            var system = InspectorPrompts.Hint(scenario, view, snapshot.Party.ContentLevel, snapshot.State.Options.Tone);
             var context = new AiCallContext(snapshot.Party.HostUserId, partyId, Purpose: "hint");
             var murderer = scenario.FindCharacter(scenario.Solution.MurdererId)!;
             var playerIsMurderer = view.Dossier?.Character.CharacterId == murderer.Id;
@@ -102,7 +102,7 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
         var snapshot = await parties.LoadAsync(partyId, ct);
         if (!snapshot.State.Ai.Verdicts || snapshot.State.Verdicts.Count > 0 || snapshot.State.Players.Count == 0) return;
 
-        var (system, seats) = InspectorPrompts.Verdicts(snapshot.Scenario, snapshot.State, snapshot.Party.ContentLevel);
+        var (system, seats) = InspectorPrompts.Verdicts(snapshot.Scenario, snapshot.State, snapshot.Party.ContentLevel, snapshot.State.Options.Tone);
         var reply = await ai.CompleteJsonAsync<InspectorPrompts.VerdictReply>(AiRole.Inspector, system,
             [new ChatMessage(ChatRole.User, "Deliver your verdicts.")], new AiCallContext(snapshot.Party.HostUserId, partyId, Purpose: "verdicts"), 2_000, ct);
 

@@ -134,8 +134,9 @@ public static class ViewProjector
 
     // ------------------------------------------------------------------ pieces
 
+    // A version shows the shared story's id, so no screen can tell which version (and so which killer) is being played.
     private static ScenarioSummary Summary(Scenario s) => new(
-        s.Id, s.ThemeSlug, s.Title, s.Synopsis, s.Setting.Place, s.Setting.Era, s.Setting.Description, s.Setting.Image,
+        s.VariantOf ?? s.Id, s.ThemeSlug, s.Title, s.Synopsis, s.Setting.Place, s.Setting.Era, s.Setting.Description, s.Setting.Image,
         s.Victim.Name, s.Victim.Description, s.Victim.Portrait, s.MinPlayers, s.MaxPlayers);
 
     private static TimerView Timer(Timer t, DateTimeOffset now) => new(

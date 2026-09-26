@@ -95,6 +95,57 @@ When you change words that have a generated voice or picture, only those are mad
 Media paths are served from the theme's `media/` folder:
 `"src": "/media/themes/the-butler-did-it/scenes/study.jpg"` → `content/themes/the-butler-did-it/media/scenes/study.jpg`.
 
+## Versions: a new killer for the same story
+
+A story can have several versions. Each has the same place, victim and suspects, but a different killer, so a group can play it again. A version is a small file next to the original that holds only what changes:
+
+```
+content/themes/the-butler-did-it/scenarios/
+  death-at-blackwood-manor.json      ← the original (Version A)
+  death-at-blackwood-manor.b.json    ← Version B
+  death-at-blackwood-manor.c.json    ← Version C
+```
+
+```json
+{
+  "variantOf": "death-at-blackwood-manor",
+  "variant": "B",
+  "solution": { "murdererId": "hargrove", "motiveId": "inheritance", "methodId": "candlestick", "explanation": [...], "timeline": [...] },
+  "characters": { "hargrove": { "private": { "backstory": "YOU ARE THE MURDERER...", "alibi": "..." } } },
+  "clues": { "candlestick": { "redHerring": false, "pointsTo": ["hargrove"] }, "some-old-clue": null },
+  "addClues": [ { "id": "cellar-door", "title": "...", "text": "...", "act": 1, "pointsTo": ["hargrove"] } ],
+  "acts": { "act3": { "cues": [...] } },
+  "finale": [...]
+}
+```
+
+- `characters`, `clues` and `acts` are keyed by id: name only the ones that change.
+- Objects merge field by field, so `"private": { "alibi": "..." }` changes just the alibi. Lists (secrets, cues, lines, pointsTo…) are replaced whole.
+- `null` removes a clue (or a field), and `addClues` appends new clues.
+- Every version is expanded and checked by the same validator as a full mystery. The killer must be an essential character, with 3 or more genuine clues against them.
+- **Checklist for a new version:**
+  - Rewrite the new killer's backstory, goals and alibi.
+  - Make the old killer innocent but still suspicious, and fix any lines of theirs that only made sense as the killer.
+  - Aim enough clues at the new truth, and turn the old ones into red herrings.
+  - Rewrite the solution, the timeline and any narration that names the killer.
+  - Read it through once as a player.
+
+Players never see which version they're playing: the title is shared, and screens show the original's id.
+
+## Family or Adults?
+
+Every mystery sits on one shelf, set by `contentRating`:
+
+| | `family` | `mature` |
+|---|---|---|
+| Who | All ages, kids and teens included | Grown-ups |
+| The crime | A murder that happens offstage, Cluedo-style: never gruesome | Described violence is fine, nothing graphic |
+| Romance | A crush at most | Affairs and scandal, nothing explicit |
+| Drink | None at all: toasts use lemonade, and drinking prompts are always off | Wine and cocktails, with a non-alcoholic alternative on every toast |
+| Language | No swearing | Salty, not crude |
+
+A test checks that no Family mystery mentions alcohol, so keep "rum", "wine" and friends out of pirate stories too.
+
 ## Cocktails (theme.json)
 
 Each theme can suggest drinks, shown in the lobby when toast prompts are on:

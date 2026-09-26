@@ -4,7 +4,7 @@ import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } f
 import { api } from '../lib/api'
 import { ConfirmEmailBanner } from './Account'
 import { useThemes } from '../lib/theme'
-import type { AiStatus, AuthOptions, ContentRating, GenerationJob, MysteryLength, PartyMode, ThemeCard } from '../lib/types'
+import type { AiStatus, AuthOptions, ContentRating, GenerationJob, MysteryLength, PartyMode, ThemeCard, Tone } from '../lib/types'
 import { useMe } from '../lib/useMe'
 
 const MODES: { id: PartyMode; title: string; body: string }[] = [
@@ -12,6 +12,21 @@ const MODES: { id: PartyMode; title: string; body: string }[] = [
   { id: 'remote', title: 'Video call', body: 'Screen-share the stage on Zoom, Meet or Teams (share tab audio). Guests join on their own devices.' },
   { id: 'passAndPlay', title: 'Pass & play', body: 'One device for everyone. Each guest takes a turn to read their private dossier.' },
 ]
+
+/**
+ * The tones on offer depend on the shelf. The mystery's rating sets the limits (a Family story
+ * is always Family); the tone only changes how the AI game master speaks within them.
+ */
+const TONES: Record<ContentRating, { id: Tone; title: string; body: string }[]> = {
+  mature: [
+    { id: 'standard', title: '🍷 Mature', body: 'The full adult experience: scandal, dark humour, the odd risqué remark.' },
+    { id: 'clean', title: '👔 Normal', body: 'For mixed company, like work friends or the in-laws: scandal yes, crude no.' },
+  ],
+  family: [
+    { id: 'standard', title: '🧸 Normal', body: 'A proper mystery for all ages: spooky, never scary.' },
+    { id: 'playful', title: '😂 Funny', body: 'Silly and over the top: puns, big reactions and jokes for kids.' },
+  ],
+}
 
 export default function NewParty() {
   const { me } = useMe()
@@ -22,8 +37,13 @@ export default function NewParty() {
   const [drinking, setDrinking] = useState(false)
   const navigate = useNavigate()
   const [chosenId, setScenarioId] = useState<string>()
+  // Which version of the chosen story to play. "surprise" by default, so even the host doesn't know the killer.
+  const [version, setVersion] = useState('surprise')
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
-  const [content, setContent] = useState<ContentRating>('mature')
+  // Two catalogs: Adults (Mature) and Family. Adults first, so Blackwood Manor stays the default.
+  // The shelf is also the party's content level: the server takes it from the mystery itself.
+  const [shelf, setShelf] = useState<ContentRating>('mature')
+  const [chosenTone, setTone] = useState<Tone>('standard')
   const [when, setWhen] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -35,18 +55,31 @@ export default function NewParty() {
   }, [me, navigate])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
-  // Until the host picks one, the first mystery is selected.
-  const scenarioId = chosenId ?? playable[0]?.scenario.id
+  const onShelf = playable.filter((p) => p.scenario.contentRating === shelf)
+  // The host's pick if it's on this shelf, otherwise the shelf's first mystery. Worked out
+  // during render, so switching shelves can never leave a mystery from the other shelf selected.
+  const scenarioId = onShelf.some((p) => p.scenario.id === chosenId) ? chosenId : onShelf[0]?.scenario.id
+
+  // Like the selected mystery, the tone is checked during render: "Funny" picked on the Family shelf
+  // falls back to "Normal" if the host then switches to Adults, which has no "Funny".
+  const tone = TONES[shelf].some((t) => t.id === chosenTone) ? chosenTone : 'standard'
 
   const selected = playable.find((p) => p.scenario.id === scenarioId)
-  const tooMature = selected?.scenario.contentRating === 'mature' && content === 'family'
+  const aiAvailable = !!ai && (ai.actor || ai.inspector)
 
   const create = async () => {
     if (!scenarioId) return
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createParty(scenarioId, mode, content, when ? new Date(when).toISOString() : null, useAi, drinking && content !== 'family')
+      const versions = selected?.scenario.versions ?? []
+      const chosenVersion = versions.length === 0 ? null : version === 'surprise' || versions.some((v) => v.id === version) ? version : 'surprise'
+      const party = await api.createParty(scenarioId, mode, when ? new Date(when).toISOString() : null, {
+        useAi,
+        drinkingPrompts: drinking && shelf === 'mature',
+        version: chosenVersion,
+        tone,
+      })
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -62,7 +95,33 @@ export default function NewParty() {
 
       <section className="space-y-3">
         <h2 className="font-display text-xl">1. Choose a mystery</h2>
-        {playable.map(({ theme, scenario }) => (
+        <div className="grid grid-cols-2 gap-2 rounded-xl border border-line bg-surface p-1" role="tablist" aria-label="Catalog">
+          {(['mature', 'family'] as const).map((s) => {
+            const count = playable.filter((p) => p.scenario.contentRating === s).length
+            return (
+              <button
+                key={s}
+                role="tab"
+                aria-selected={shelf === s}
+                onClick={() => setShelf(s)}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${shelf === s ? 'bg-accent text-bg' : 'text-muted hover:text-ink'}`}
+              >
+                {s === 'mature' ? '🍷 Adults' : '🧸 Family'} <span className="font-normal opacity-80">({count})</span>
+              </button>
+            )
+          })}
+        </div>
+        <p className="text-xs text-muted">
+          {shelf === 'mature'
+            ? 'For grown-ups: affairs, scandal, dark humour and drinking-game toasts. Nothing explicit.'
+            : 'For all ages: no gore, no alcohol, no swearing. Great with kids and teens.'}
+        </p>
+        {themes && onShelf.length === 0 && (
+          <p className="text-sm text-muted">
+            No {shelf === 'family' ? 'Family' : 'Adult'} mysteries yet.{ai?.storyteller ? ' Write one with AI below.' : ''}
+          </p>
+        )}
+        {onShelf.map(({ theme, scenario }) => (
           <button
             key={scenario.id}
             onClick={() => setScenarioId(scenario.id)}
@@ -77,20 +136,43 @@ export default function NewParty() {
               {scenario.contentRating === 'mature' ? 'Mature themes' : 'Family friendly'}
               {scenario.aiGenerated && ' · ✨ written by AI for you'}
               {scenario.custom && ' · ✏️ your edited copy'}
+              {scenario.versions.length > 1 && ` · 🎲 ${scenario.versions.length} versions, a different killer each`}
             </p>
           </button>
         ))}
+        {selected && selected.scenario.versions.length > 1 && (
+          <label className="block rounded-xl border border-line bg-surface p-4">
+            <span className="text-xs font-semibold tracking-widest text-accent uppercase">Version</span>
+            <select
+              className={`${inputClass} mt-2`}
+              aria-label="Version"
+              value={selected.scenario.versions.some((v) => v.id === version) ? version : 'surprise'}
+              onChange={(e) => setVersion(e.target.value)}
+            >
+              <option value="surprise">🎲 Surprise me: a version I haven't played</option>
+              {selected.scenario.versions.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.label}
+                  {v.playedByMe ? ' (played)' : ''}
+                </option>
+              ))}
+            </select>
+            <span className="mt-2 block text-xs text-muted">
+              Same place and suspects, a different killer and new clues. With “Surprise me” even you won't know whodunit, so you can play along.
+            </span>
+          </label>
+        )}
         {themes && playable.length === 0 && <p className="text-muted">No mysteries are installed yet.</p>}
         {ai?.storyteller && themes && (
           <GenerateMystery
             themes={themes}
-            content={content}
+            content={shelf}
             onReady={async (job) => {
               const fresh = await reloadThemes()
               const found = fresh.flatMap((t) => t.scenarios).find((x) => x.id === job.scenarioId)
               if (found) {
+                setShelf(found.contentRating)
                 setScenarioId(found.id)
-                setContent(found.contentRating)
               }
             }}
           />
@@ -119,24 +201,6 @@ export default function NewParty() {
         <p className="text-xs text-muted">You can always mix: guests with phones and pass-and-play seats work in every mode.</p>
       </section>
 
-      <section className="mt-8 space-y-3">
-        <h2 className="font-display text-xl">3. Content level</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {(['mature', 'family'] as const).map((c) => (
-            <button
-              key={c}
-              onClick={() => setContent(c)}
-              className={`rounded-xl border p-4 text-left transition ${content === c ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}
-            >
-              <p className="font-semibold">{c === 'mature' ? 'Mature' : 'Family'}</p>
-              <p className="mt-1 text-xs text-muted">
-                {c === 'mature' ? 'Affairs, scandal, dark humour, described violence. Nothing explicit.' : 'Suitable for teenagers and mixed company.'}
-              </p>
-            </button>
-          ))}
-        </div>
-        {tooMature && <p className="text-sm text-red-200">This mystery is rated Mature. Family-friendly mysteries arrive with the AI storyteller.</p>}
-      </section>
 
       <section className="mt-8">
         <Card>
@@ -148,7 +212,7 @@ export default function NewParty() {
 
       {/* Drinking games are an adults-only extra, so the option disappears for Family parties
           (the server also forces it off, in case an old browser tab still sends it). */}
-      {content !== 'family' && (
+      {shelf === 'mature' && (
         <section className="mt-8">
           <label className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4">
             <input type="checkbox" className="mt-1 accent-[var(--theme-accent)]" checked={drinking} onChange={(e) => setDrinking(e.target.checked)} />
@@ -163,7 +227,7 @@ export default function NewParty() {
         </section>
       )}
 
-      {ai && (ai.actor || ai.inspector) && (
+      {aiAvailable && ai && (
         <section className="mt-8">
           <label className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4">
             <input type="checkbox" className="mt-1 accent-[var(--theme-accent)]" checked={useAi} onChange={(e) => setUseAi(e.target.checked)} />
@@ -179,12 +243,33 @@ export default function NewParty() {
               </span>
             </span>
           </label>
+          {/* The tone only changes what the AI says, so it's offered only when the AI is on. */}
+          {useAi && (
+            <div className="mt-3 rounded-xl border border-line bg-surface p-4">
+              <p className="text-xs font-semibold tracking-widest text-accent uppercase">Tone</p>
+              <div className="mt-2 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Tone">
+                {TONES[shelf].map((t) => (
+                  <button
+                    key={t.id}
+                    role="radio"
+                    aria-checked={tone === t.id}
+                    onClick={() => setTone(t.id)}
+                    className={`rounded-xl border p-3 text-left transition ${tone === t.id ? 'border-accent bg-accent/10' : 'border-line bg-bg hover:border-accent/60'}`}
+                  >
+                    <p className="font-semibold">{t.title}</p>
+                    <p className="mt-1 text-xs text-muted">{t.body}</p>
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-muted">How the AI's characters, hints and verdicts sound. The written story stays the same.</p>
+            </div>
+          )}
         </section>
       )}
 
       <div className="mt-8 space-y-3">
         <ErrorText>{error}</ErrorText>
-        <Button onClick={create} disabled={!scenarioId || busy || tooMature} className="w-full text-base">
+        <Button onClick={create} disabled={!scenarioId || busy} className="w-full text-base">
           Create party and get the invite code
         </Button>
       </div>

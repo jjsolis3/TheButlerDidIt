@@ -21,6 +21,13 @@ public sealed class Scenario
     public required string Id { get; init; }
     public required string ThemeSlug { get; init; }
     public required string Title { get; init; }
+
+    /// <summary>For a version of another mystery (same story, different killer): the original's id. See ScenarioVariants.</summary>
+    public string? VariantOf { get; init; }
+
+    /// <summary>The version's name, e.g. "B". Never shown during play, so it can't give the killer away.</summary>
+    public string? Variant { get; init; }
+
     public string Synopsis { get; init; } = "";
     public ContentRating ContentRating { get; init; } = ContentRating.Mature;
     public int MinPlayers { get; init; } = 2;

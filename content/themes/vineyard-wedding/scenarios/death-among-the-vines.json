@@ -1,0 +1,861 @@
+{
+  "id": "death-among-the-vines",
+  "themeSlug": "vineyard-wedding",
+  "title": "Death Among the Vines",
+  "synopsis": "Villa Castellina, in the Chianti hills. Tomorrow Marco Moretti marries Sofia Russo. Tonight there's a rehearsal dinner under the stars, a 1982 Riserva, and more family secrets than bottles in the cellar. After the midnight toast, the groom's father, wine baron Aldo Moretti, is found dead in the library. A summer storm has washed out the road, and the carabinieri won't arrive until morning. The wedding is at noon. The killer is at the table.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Villa Castellina, in the Chianti hills of Tuscany",
+    "era": "The present day, the night before the wedding",
+    "description": "A honey-coloured villa among the vines, a terrace strung with lights, a rose garden, and a cellar older than the family that owns it. Outside, a summer storm has turned the only road into a river."
+  },
+  "victim": {
+    "name": "Aldo Moretti",
+    "description": "Sixty-eight, silver-haired and magnetic. The head of the Moretti wine dynasty and father of the groom. A charmer in public, a tyrant at home, and a man who made more enemies than vintages."
+  },
+  "characters": [
+    {
+      "id": "luca",
+      "name": "Luca Bellini",
+      "pronouns": "he/him",
+      "title": "The Sommelier",
+      "publicBio": "The villa's quiet, brilliant sommelier, hired this spring. He knows every bottle in the Moretti cellar by heart, and he alone polishes and fills the family's silver toasting chalice.",
+      "costumeTips": "A black waistcoat, white shirt, a silver tastevin on a chain, and a corkscrew in your pocket.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 0.95,
+        "rate": 0.95,
+        "style": "soft-spoken, precise, watchful"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Your real name is Luca Ferrante. Twenty years ago Aldo Moretti sold fake vintages under his label, and when he was caught he blamed your father. The Ferrante vineyard was ruined and your father never recovered. You changed your name, trained as a sommelier, and took this job to get close to Aldo. Tonight, at the midnight toast, you finally poured him what he deserved: the oleander from his own garden, in his own silver chalice.",
+        "secrets": [
+          {
+            "id": "luca-ferrante",
+            "text": "My real name is Luca Ferrante. Twenty years ago Aldo Moretti blamed my father for his own fake vintages and ruined my family.",
+            "unlockAct": 0
+          },
+          {
+            "id": "luca-bottles",
+            "text": "All month I've been swapping Aldo's most precious bottles for cheap wine and selling the real ones.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. You're staff; nobody looks at staff. Keep it that way.",
+          "Point suspicion at the family: they all had better reasons than you.",
+          "Get your pruning gloves back from wherever you left them."
+        ],
+        "knows": [
+          "Oleander grows by the terrace steps. Every part of it is poisonous, and it tastes of nothing in a strong red wine.",
+          "Aldo only ever drank toasts from the family's silver chalice, and only you fill it.",
+          "Tommy the best man owes Aldo a great deal of money."
+        ],
+        "alibi": "From half past eleven I was in the cellar choosing tomorrow's wines. I came up only to pour the midnight Riserva, and then I was clearing glasses.",
+        "lines": {
+          "act1": [
+            "Signor Moretti loved that chalice. He said wine tastes better from silver. I polished it myself this afternoon."
+          ],
+          "act2": [
+            "The 1982 Riserva is extraordinary. It deserves a better... that is, a more grateful drinker."
+          ],
+          "act3": [
+            "Everyone in this family wanted something from Aldo. Money, love, freedom. I only ever wanted to do my job."
+          ]
+        }
+      }
+    },
+    {
+      "id": "marco",
+      "name": "Marco Moretti",
+      "pronouns": "he/him",
+      "title": "The Groom",
+      "publicBio": "Aldo's only son, handsome, charming, and about to marry Sofia tomorrow. Everyone says he's nothing like his father. Marco very much hopes they're right.",
+      "costumeTips": "A sharp suit, a loosened tie, a boutonnière, and a slightly haunted expression.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.0,
+        "rate": 1.05,
+        "style": "warm, nervous, defensive"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Your father made his blessing conditional: sign over your share of the vineyard, or there's no wedding money and no villa. Tonight you also slipped away to the olive grove with Chiara, your ex, and kissed her. You're not sure what that means, and you're terrified someone saw.",
+        "secrets": [
+          {
+            "id": "marco-contract",
+            "text": "My father was forcing me to sign over my share of the vineyard as the price of his blessing.",
+            "unlockAct": 0
+          },
+          {
+            "id": "marco-chiara",
+            "text": "I'm still in love with Chiara. I kissed her in the olive grove tonight.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Protect your inheritance.",
+          "Keep the kiss with Chiara secret, at least until after the wedding.",
+          "Find out who really killed your father, however you felt about him."
+        ],
+        "knows": [
+          "Your father told you at ten o'clock: 'Sign, or there is no wedding.'",
+          "Luca the sommelier once asked you whether your father ever talked about the Ferrante vineyard."
+        ],
+        "alibi": "From eleven until the toast I was on the terrace with Tommy, practising his best-man speech.",
+        "lines": {
+          "act1": [
+            "He was my father. He was difficult, but he was my father."
+          ],
+          "act2": [
+            "Yes, we argued about the vineyard. Every Moretti argues about the vineyard. It's a family tradition."
+          ],
+          "act3": [
+            "Tomorrow was supposed to be the happiest day of my life. Now it's the second-strangest."
+          ]
+        }
+      }
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia Russo",
+      "pronouns": "she/her",
+      "title": "The Bride",
+      "publicBio": "Elegant, sharp and fiercely organised. Sofia planned every detail of this wedding, and she is not about to let a dead father-in-law ruin it.",
+      "costumeTips": "An elegant white or ivory dress (it's the rehearsal, not the wedding!), a sparkly hair clip, and a very determined smile.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.1,
+        "rate": 1.05,
+        "style": "poised, sharp, brittle"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You love Marco, mostly. You also gambled away most of your savings last year and have been quietly counting on the Moretti money to cover it. At the rehearsal dinner Aldo made a pass at you, and you slapped him in front of half the guests and told him you'd tell Marco everything.",
+        "secrets": [
+          {
+            "id": "sofia-debts",
+            "text": "I gambled away most of my savings, and I was counting on the Moretti money to pay my debts.",
+            "unlockAct": 0
+          },
+          {
+            "id": "sofia-slap",
+            "text": "Aldo made a pass at me at the rehearsal, so I slapped him, and threatened to tell Marco everything.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "The wedding goes ahead. Tomorrow. No matter what.",
+          "Keep your gambling debts secret.",
+          "Find out who's been lying to you tonight, starting with Marco."
+        ],
+        "knows": [
+          "At half past nine Aldo cornered you on the terrace. You slapped him.",
+          "Your mother and Aldo were once engaged. She's never said a kind word about him."
+        ],
+        "alibi": "From eleven until the toast I was in the bridal suite with my mother, trying on the veil.",
+        "lines": {
+          "act1": [
+            "I slapped him because he deserved it. Poisoning is not my style. I prefer witnesses."
+          ],
+          "act2": [
+            "Someone at this table has been lying all evening, and it isn't just my fiancé."
+          ],
+          "act3": [
+            "The flowers are arriving at nine. There will be a wedding. Somebody please arrest someone before then."
+          ]
+        }
+      }
+    },
+    {
+      "id": "vittoria",
+      "name": "Vittoria Moretti",
+      "pronouns": "she/her",
+      "title": "The Second Wife",
+      "publicBio": "Aldo's glamorous second wife, twenty-five years younger than him. She runs the villa's rose garden and, according to gossip, much else besides.",
+      "costumeTips": "A glamorous cocktail dress, big sunglasses on your head, gold jewellery and gardening gloves tucked into your bag.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.05,
+        "rate": 0.95,
+        "style": "languid, amused, dangerous"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Your marriage has been a business arrangement for years. You've been having an affair with Dario, the wedding planner, right under Aldo's nose. This evening you found Aldo's new will in his desk: he was leaving everything to a charity for retired racehorses. Not a single lira to you.",
+        "secrets": [
+          {
+            "id": "vittoria-affair",
+            "text": "I'm having an affair with Dario, the wedding planner.",
+            "unlockAct": 0
+          },
+          {
+            "id": "vittoria-will",
+            "text": "I found Aldo's new will tonight. He was leaving everything to a racehorse charity. Nothing to me.",
+            "unlockAct": 3
+          }
+        ],
+        "objectives": [
+          "Keep the affair with Dario hidden.",
+          "Make sure you still inherit something.",
+          "Enjoy watching the Morettis squirm."
+        ],
+        "knows": [
+          "You planted the oleander by the terrace steps yourself. Pretty, and poisonous.",
+          "At half past eleven you saw someone in a waistcoat cutting flowers by the terrace steps, which is odd at that hour."
+        ],
+        "alibi": "I was in the rose garden until half past eleven, then in the library with a book until the toast.",
+        "lines": {
+          "act1": [
+            "Grief suits some people. I'm told it suits me."
+          ],
+          "act2": [
+            "Of course I garden. Is gardening now a crime in this house?"
+          ],
+          "act3": [
+            "Aldo collected enemies the way he collected vintages. I was merely the most expensive."
+          ]
+        }
+      }
+    },
+    {
+      "id": "dario",
+      "name": "Dario Conti",
+      "pronouns": "he/him",
+      "title": "The Wedding Planner",
+      "publicBio": "Milan's most fashionable wedding planner: clipboard, headset, and a smile that never slips. He knows where everyone is supposed to be, every minute of the day.",
+      "costumeTips": "A slim suit, a headset or earpiece, a clipboard, and a pencil behind your ear.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.05,
+        "rate": 1.15,
+        "style": "brisk, flirtatious, stressed"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've been having an affair with Vittoria Moretti for a year. The Morettis haven't paid a single one of your invoices: you're owed forty thousand euros. You were the one who found Aldo, cold, in the library at one o'clock.",
+        "secrets": [
+          {
+            "id": "dario-affair",
+            "text": "I'm having an affair with Vittoria Moretti.",
+            "unlockAct": 0
+          },
+          {
+            "id": "dario-invoices",
+            "text": "The Morettis haven't paid a single invoice. I'm owed forty thousand euros, and Aldo laughed when I asked.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get paid, somehow.",
+          "Keep your affair with Vittoria quiet.",
+          "Keep the wedding on schedule. Somebody has to."
+        ],
+        "knows": [
+          "Your clipboard records who signed out the cellar key, and when.",
+          "You found Aldo in the library at one o'clock. His hand was on his chest."
+        ],
+        "alibi": "I was checking the ballroom seating plan from eleven until the toast. It takes that long; these families hate each other.",
+        "lines": {
+          "act1": [
+            "I found him. In the library. I screamed, and I never scream. It's terrible for the voice."
+          ],
+          "act2": [
+            "Everything is on schedule except the murder. The murder was not on my schedule."
+          ],
+          "act3": [
+            "My clipboard knows everything. Who had the cellar key, who ordered what, who was where."
+          ]
+        }
+      }
+    },
+    {
+      "id": "chiara",
+      "name": "Chiara Lombardi",
+      "pronouns": "she/her",
+      "title": "The Jilted Ex",
+      "publicBio": "Marco's ex-fiancée. She wasn't on the guest list, yet here she is, in red, with a smile that could curdle milk.",
+      "costumeTips": "A red dress, very red lipstick, dark glasses indoors, and an air of someone who has come to make a scene.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 1.1,
+        "rate": 1.0,
+        "style": "bold, witty, wounded"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You came uninvited, with one plan: stop this wedding. You kissed Marco in the olive grove tonight, and he kissed you back. You also bought a little bottle of 'love potion' from a woman in the village. It's only herbs. You think.",
+        "secrets": [
+          {
+            "id": "chiara-plan",
+            "text": "I came uninvited, with a plan to stop this wedding by any means.",
+            "unlockAct": 0
+          },
+          {
+            "id": "chiara-potion",
+            "text": "I bought a 'love potion' from a woman in the village to win Marco back. It's just herbs... I think.",
+            "unlockAct": 3
+          }
+        ],
+        "objectives": [
+          "Stop the wedding.",
+          "Make Marco admit how he feels.",
+          "Keep the love potion out of sight."
+        ],
+        "knows": [
+          "Marco kissed you in the olive grove at eleven. Tommy saw you both.",
+          "Aldo once told you, 'The Moretti name is built on good wine and better lies.'"
+        ],
+        "alibi": "I was at the village inn until quarter to twelve, then walked up for the toast. Everyone saw me arrive.",
+        "lines": {
+          "act1": [
+            "I wasn't invited? How strange. My invitation must have been lost. In 2019."
+          ],
+          "act2": [
+            "I wanted to stop a wedding, not a heart."
+          ],
+          "act3": [
+            "Somebody here was very careful tonight. I wasn't careful at all, which should tell you something."
+          ]
+        }
+      }
+    },
+    {
+      "id": "tommy",
+      "name": "Tommaso \"Tommy\" Greco",
+      "pronouns": "he/him",
+      "title": "The Best Man",
+      "publicBio": "Marco's oldest friend: loud, loyal and hopeless with money. He's been rehearsing his best-man speech all evening, with a glass in his hand.",
+      "costumeTips": "A tuxedo with the bow tie undone, a flower in your lapel, and index cards for your speech.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 0.95,
+        "rate": 1.15,
+        "style": "jolly, loud, evasive"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Last night you lost the wedding rings in a card game and bought fakes in the village this morning. Worse, two years ago you crashed your car into Aldo's prize vines, and Aldo has been blackmailing you over it ever since.",
+        "secrets": [
+          {
+            "id": "tommy-rings",
+            "text": "I lost the real wedding rings in a card game last night and bought fakes this morning.",
+            "unlockAct": 0
+          },
+          {
+            "id": "tommy-blackmail",
+            "text": "Aldo was blackmailing me over a car I crashed into his vines. I owe him a fortune.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Nobody finds out about the rings.",
+          "Get free of Aldo's IOU now that he's dead, if you can.",
+          "Cover for your best friend Marco, whatever he's done."
+        ],
+        "knows": [
+          "You saw Marco and Chiara in the olive grove at eleven.",
+          "At midnight you noticed Luca filled Aldo's chalice separately, at the sideboard, with his back to the room."
+        ],
+        "alibi": "I was on the terrace with Marco from eleven until the toast, practising my speech.",
+        "lines": {
+          "act1": [
+            "To Aldo! May he rest in peace, and may his accountant never find my file."
+          ],
+          "act2": [
+            "I don't know anything about any IOU. What IOU? Whose handwriting is that?"
+          ],
+          "act3": [
+            "I'll tell you one thing: that sommelier poured Aldo's glass with his back to the room. Who does that?"
+          ]
+        }
+      }
+    },
+    {
+      "id": "donatella",
+      "name": "Donatella Russo",
+      "pronouns": "she/her",
+      "title": "The Mother of the Bride",
+      "publicBio": "Sofia's formidable mother. Gracious in public, terrifying in private, and she has not stopped glaring at Aldo Moretti since she arrived.",
+      "costumeTips": "A tailored dress, a large hat, pearls, and a handbag big enough to hide anything.",
+      "voice": {
+        "accent": "it-IT",
+        "pitch": 0.95,
+        "rate": 0.9,
+        "style": "gracious, icy, formidable"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Thirty years ago you were engaged to Aldo Moretti, and he left you at the altar for a richer bride. You have kept a scrapbook of every scandal in his life since. And because the Morettis refused to pay their share of this wedding, you secretly borrowed the money from a loan shark.",
+        "secrets": [
+          {
+            "id": "donatella-altar",
+            "text": "Thirty years ago Aldo Moretti and I were engaged. He left me at the altar.",
+            "unlockAct": 0
+          },
+          {
+            "id": "donatella-loan",
+            "text": "I paid for this wedding with a loan from a loan shark, because the Morettis wouldn't pay their share.",
+            "unlockAct": 3
+          }
+        ],
+        "objectives": [
+          "See your daughter married, properly.",
+          "Keep the loan shark out of this.",
+          "Finally see Aldo's sins exposed, even if he's no longer here to suffer for them."
+        ],
+        "knows": [
+          "Your scrapbook has a clipping about the Ferrante wine-fraud scandal of twenty years ago.",
+          "At eleven Sofia was with you in the bridal suite, but she stepped out for ten minutes at half past."
+        ],
+        "alibi": "From eleven until the toast I was with Sofia in the bridal suite, helping with the veil.",
+        "lines": {
+          "act1": [
+            "I have waited thirty years to wear black at an event involving Aldo Moretti. I didn't expect it to be tonight."
+          ],
+          "act2": [
+            "Scandals, clippings, photographs. I keep everything. Old habits."
+          ],
+          "act3": [
+            "That young sommelier has a familiar face. Where have I seen it before?"
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "chalice",
+      "title": "The Silver Chalice",
+      "text": "Aldo never drank a toast from an ordinary glass, only from the family's antique silver chalice. The staff confirm that only the sommelier polishes it, fills it and carries it.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "luca"
+      ]
+    },
+    {
+      "id": "slap",
+      "title": "The Slap",
+      "text": "Half the guests saw Sofia slap Aldo on the terrace at half past nine, and heard her hiss: 'Touch me again and Marco will know everything.'",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "sofia"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "contract",
+      "title": "The Unsigned Contract",
+      "text": "In your jacket pocket: a contract transferring your share of the vineyard to your father. There's a space for your signature, and a note in his hand: 'Sign, or there is no wedding.'",
+      "visibility": "private",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "marco"
+      ],
+      "recipient": "marco",
+      "redHerring": true
+    },
+    {
+      "id": "lipstick",
+      "title": "Lipstick on a Napkin",
+      "text": "A napkin by Aldo's place, stained with a bold red lipstick. Two women tonight wear that exact shade: Chiara and Vittoria.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "chiara",
+        "vittoria"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "key-log",
+      "title": "The Cellar Key Log",
+      "text": "Your clipboard: 'Cellar key signed out 11:30 by L. Bellini, with a pair of pruning gloves from the garden shed. Key returned 11:55.' Why would a sommelier need pruning gloves?",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "luca"
+      ],
+      "recipient": "dario"
+    },
+    {
+      "id": "invoices",
+      "title": "Unpaid Invoices",
+      "text": "A thick envelope of wedding invoices addressed to Aldo Moretti, every one stamped 'OVERDUE'. The total is forty thousand euros.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "dario"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "funnel",
+      "title": "Leaves in the Funnel",
+      "text": "In the cellar, the decanting funnel holds crushed green leaves and a few pink petals. The gardener identifies them at once: oleander, from the bushes by the terrace steps. Vittoria planted them.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "luca",
+        "vittoria"
+      ]
+    },
+    {
+      "id": "iou",
+      "title": "The IOU",
+      "text": "Hidden in your wallet: an IOU to Aldo Moretti for eighty thousand euros, 'for damage to the vines', signed by you.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "tommy"
+      ],
+      "recipient": "tommy",
+      "redHerring": true
+    },
+    {
+      "id": "new-will",
+      "title": "The New Will",
+      "text": "Aldo's desk drawer holds a new will, dated last week: everything goes to a charity for retired racehorses. His wife and his son get nothing.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "vittoria",
+        "marco"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "cellar-book",
+      "title": "Aldo's Cellar Book",
+      "text": "Aldo's private cellar book is locked with a combination lock. A riddle is written on the cover.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "luca"
+      ],
+      "puzzle": {
+        "prompt": "I'm bottled but not wine, aged but not old, and I get better the longer I'm kept. Tonight I'm the reason someone came back. What am I?",
+        "answers": [
+          "grudge",
+          "a grudge",
+          "revenge",
+          "a revenge",
+          "vengeance"
+        ],
+        "hint": "It's something you hold, for years, against someone.",
+        "solvedText": "The last entry, in Aldo's hand: 'The new sommelier has his father's eyes. Ferrante's boy, I'd swear to it. Does he know what I did? Dismiss him quietly after the wedding.'"
+      }
+    },
+    {
+      "id": "potion",
+      "title": "A Little Brown Bottle",
+      "text": "In Chiara's handbag: a small brown bottle labelled, in a shaky hand, 'For love. Three drops.' It smells of rosemary and something sharper.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "chiara"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "clipping",
+      "title": "The Clipping",
+      "text": "In your scrapbook: 'FERRANTE VINEYARD RUINED BY FAKE-WINE SCANDAL. Aldo Moretti testifies against his neighbour.' The grainy photo shows the Ferrante family. The teenage son has a striking resemblance to the villa's new sommelier.",
+      "visibility": "private",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "luca"
+      ],
+      "recipient": "donatella"
+    },
+    {
+      "id": "gloves",
+      "title": "Gloves in the Wine Press",
+      "text": "Pushed deep into the old wine press: a pair of pruning gloves, stained green with sap and dusted with pink petals. Stitched inside the cuff: 'L.B.'",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "luca"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "Villa Castellina at dusk. Lights strung across the terrace, vines to the horizon.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Villa Castellina, in the hills of Chianti. Tomorrow at noon, Marco Moretti marries Sofia Russo among the vines his family has owned for two hundred years. Tonight, the rehearsal dinner."
+    },
+    {
+      "type": "toast",
+      "text": "Raise your glasses to the happy couple, and to Aldo Moretti, who is paying for all this wine!",
+      "alternative": "Not drinking? Raise your sparkling water, and try to look happy for them."
+    },
+    {
+      "type": "narration",
+      "text": "Aldo Moretti holds court at the head of the table: generous with the wine, stingy with everything else. By dessert, the bride has slapped him, his son isn't speaking to him, and his wife has left for the rose garden."
+    },
+    {
+      "type": "line",
+      "speaker": "luca",
+      "text": "The 1982 Riserva, Signor Moretti. For the midnight toast. In your silver chalice, as always."
+    },
+    {
+      "type": "narration",
+      "text": "At midnight, the sommelier pours the 1982 Riserva. Aldo raises the family's silver chalice, makes a speech nobody enjoys, and drains it to the last drop."
+    },
+    {
+      "type": "image",
+      "text": "The library, lamplight on leather chairs. A silver chalice on the floor.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At one o'clock, the wedding planner finds Aldo in the library, cold, one hand pressed to his heart. The storm has washed out the road. The carabinieri will come in the morning. The wedding is at noon. And one of you killed him."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Last Toast",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Last Toast."
+        },
+        {
+          "type": "image",
+          "text": "The terrace after the party: overturned chairs, candle stubs, a dropped napkin.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone saw Aldo drink the midnight toast. Everyone drank the same wine. So why is only Aldo dead? Start with the toast, and with everyone's whereabouts in the half hour before it."
+        },
+        {
+          "type": "line",
+          "speaker": "marco",
+          "text": "He drank the toast, gave a speech, and went to the library. That was the last time I saw my father."
+        }
+      ],
+      "prompts": [
+        "Everyone drank the same Riserva. What was different about Aldo's glass?",
+        "Where was everyone between eleven and midnight?",
+        "Who fought with Aldo tonight?",
+        "Who wasn't on the guest list?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Skeletons in the Cellar",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Skeletons in the Cellar."
+        },
+        {
+          "type": "image",
+          "text": "The wine cellar: racks of dusty bottles, a decanting funnel on the table.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Money makes families strange. The will has changed, the bills are unpaid, and someone has been in the cellar with something that doesn't belong in wine. Aldo's private cellar book is locked with a riddle."
+        },
+        {
+          "type": "toast",
+          "text": "A toast to the new will! Drink if you're in it. Drink twice if you're not.",
+          "alternative": "Or sip something fizzy and look innocent."
+        },
+        {
+          "type": "line",
+          "speaker": "sofia",
+          "text": "Everybody in this family owes somebody something. I'd like to know who owed Aldo the most."
+        }
+      ],
+      "prompts": [
+        "Who gains and who loses under the new will?",
+        "Whose debts were coming due?",
+        "Open Aldo's cellar book. The cover holds a riddle.",
+        "Reveal a secret if it helps explain a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: Something Old, Something Poisoned",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. Something Old, Something Poisoned."
+        },
+        {
+          "type": "image",
+          "text": "The old stone wine press, and a glimpse of green inside.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Dawn is breaking over the vines. The wedding is in a few hours, the carabinieri are on their way, and old grudges are ageing faster than the wine. Somebody here has waited a very long time for last night."
+        },
+        {
+          "type": "toast",
+          "text": "To the bride and groom, if there's still a wedding!",
+          "alternative": "Coffee cups up, if there's still a wedding!"
+        },
+        {
+          "type": "line",
+          "speaker": "vittoria",
+          "text": "Oleander is lovely, isn't it? Every part of it is poisonous. I planted it for the colour."
+        }
+      ],
+      "prompts": [
+        "Who handled Aldo's chalice last?",
+        "What happened to the Ferrante vineyard twenty years ago?",
+        "Whose initials are on those gloves?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "inheritance",
+        "text": "To inherit the Moretti fortune"
+      },
+      {
+        "id": "revenge",
+        "text": "Revenge for a family ruined long ago"
+      },
+      {
+        "id": "love",
+        "text": "Jealousy or a love affair"
+      },
+      {
+        "id": "blackmail",
+        "text": "To escape blackmail or debt"
+      },
+      {
+        "id": "wedding",
+        "text": "To stop the wedding"
+      }
+    ],
+    "methods": [
+      {
+        "id": "oleander",
+        "text": "Oleander poison in his silver chalice"
+      },
+      {
+        "id": "pills",
+        "text": "An overdose of his heart pills"
+      },
+      {
+        "id": "potion",
+        "text": "A 'love potion' slipped into his dessert wine"
+      },
+      {
+        "id": "stairs",
+        "text": "A push down the cellar stairs"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "luca",
+    "motiveId": "revenge",
+    "methodId": "oleander",
+    "explanation": [
+      "Aldo Moretti was not killed for his money, his marriage or his son's wedding. He was killed for a lie he told twenty years ago. The sommelier, Luca Bellini, is really Luca Ferrante, son of the neighbour Aldo framed for his own fake vintages. The scandal ruined the Ferrante vineyard and broke his father.",
+      "Luca took the job at Villa Castellina this spring and waited. He knew two things: that Aldo drank every toast from the family's silver chalice, which only Luca filled; and that the oleander by the terrace steps is poisonous in every part and invisible in a strong red wine.",
+      "At half past eleven he signed out the cellar key and a pair of pruning gloves. Vittoria glimpsed someone in a waistcoat cutting flowers by the terrace steps. In the cellar he crushed the oleander in the decanting funnel, steeped it in a splash of Riserva, and coated the inside of the chalice. He returned the key at five to twelve.",
+      "At midnight he poured the Riserva for everyone, but filled Aldo's chalice separately at the sideboard, with his back to the room, as Tommy noticed. Aldo drank it to the last drop, felt his heart racing, and went to lie down in the library. Luca hid the gloves in the old wine press. He forgot that his initials were stitched inside.",
+      "Aldo had recognised him too late. His own cellar book says it: 'Ferrante's boy... dismiss him quietly after the wedding.' Luca got there first. Some grudges, like some wines, only get stronger with age."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The rehearsal dinner begins on the terrace."
+      },
+      {
+        "time": "9:30",
+        "event": "Aldo makes a pass at Sofia. She slaps him in front of the guests."
+      },
+      {
+        "time": "10:00",
+        "event": "Aldo tells Marco: sign over your share, or there's no wedding."
+      },
+      {
+        "time": "11:00",
+        "event": "Marco and Chiara kiss in the olive grove. Tommy sees them."
+      },
+      {
+        "time": "11:30",
+        "event": "Luca signs out the cellar key and pruning gloves, and cuts oleander by the terrace steps."
+      },
+      {
+        "time": "11:40",
+        "event": "In the cellar, Luca steeps the oleander and coats the silver chalice."
+      },
+      {
+        "time": "11:55",
+        "event": "Luca returns the cellar key."
+      },
+      {
+        "time": "12:00",
+        "event": "The midnight toast. Luca fills Aldo's chalice at the sideboard, back to the room."
+      },
+      {
+        "time": "12:20",
+        "event": "Aldo complains of a racing heart and goes to the library to lie down."
+      },
+      {
+        "time": "1:00",
+        "event": "Dario finds Aldo dead in the library."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning over the vineyard. A carabinieri car climbs the muddy road.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Espresso cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The carabinieri arrived at eight. Luca Ferrante went with them without a word, still in his waistcoat, still polishing a glass."
+    },
+    {
+      "type": "narration",
+      "text": "As for the wedding: the bride, the groom, the ex, the wife, the planner and the best man all have some explaining to do. Whether anyone says 'I do' at noon is another mystery entirely. Buona notte, detectives."
+    }
+  ]
+}

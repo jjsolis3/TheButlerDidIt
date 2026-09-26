@@ -66,6 +66,10 @@ public sealed class ScenarioEntity
     /// it disappears from every list, but those parties' recaps still work.
     /// </summary>
     public DateTimeOffset? ArchivedAt { get; set; }
+
+    /// <summary>For a version of a hand-written story (same place, different killer): the original's id.</summary>
+    [MaxLength(120)]
+    public string? VariantOf { get; set; }
 }
 
 public enum PartyMode
@@ -114,6 +118,13 @@ public sealed class Party
     /// The party row itself is kept so its recap page keeps working.
     /// </summary>
     public DateTimeOffset? PrunedAt { get; set; }
+
+    /// <summary>
+    /// When the host removed this finished party from their list. The row is kept, so the
+    /// recap link keeps working and "Surprise me" still knows which versions were played.
+    /// (Unfinished parties are deleted outright instead.)
+    /// </summary>
+    public DateTimeOffset? HiddenAt { get; set; }
 
     /// <summary>
     /// Set when the host shares the after-party recap: the random part of its link.

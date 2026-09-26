@@ -1,0 +1,182 @@
+{
+  "variantOf": "death-among-the-vines",
+  "variant": "B",
+  "solution": {
+    "murdererId": "vittoria",
+    "motiveId": "inheritance",
+    "methodId": "pills",
+    "explanation": [
+      "Aldo Moretti was not poisoned by the toast, the chalice, or anything growing by the terrace steps. He died of a massive overdose of his own heart pills, ground into the glass of amaro his wife brought him in the library: Vittoria Moretti.",
+      "Vittoria's marriage had been a business arrangement for years, and the old will made her a very rich widow. Then, this evening, she found the new will in his desk: everything to a charity for retired racehorses, not a lira to her. Aldo meant to sign it after the wedding. She had one night.",
+      "Every evening Vittoria handed Aldo his heart pills. Tonight she emptied the whole new bottle, ground the tablets into powder, and waited. After the toast, when Aldo complained of indigestion and went to lie down in the library, she followed at quarter past twelve with a glass of amaro 'for your nerves, caro'.",
+      "Within the hour his heart gave out, one hand pressed to his chest, just as a heart patient might die. She rinsed the pill bottle, dropped it in the library bin and went to bed. Dario found him at one.",
+      "The sommelier had a secret, the bride had a temper and the best man had debts. But the rose garden's queen knew exactly how many pills a weak heart could take."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The rehearsal dinner begins on the terrace."
+      },
+      {
+        "time": "9:30",
+        "event": "Aldo makes a pass at Sofia. She slaps him in front of the guests."
+      },
+      {
+        "time": "10:00",
+        "event": "Aldo tells Marco: sign over your share, or there's no wedding."
+      },
+      {
+        "time": "10:30",
+        "event": "Vittoria finds the new will in Aldo's desk: everything to a racehorse charity."
+      },
+      {
+        "time": "11:30",
+        "event": "Luca borrows the cellar key and pruning gloves to cut roses for the bridal table."
+      },
+      {
+        "time": "12:00",
+        "event": "The midnight toast from the silver chalice. Everyone drinks the same Riserva."
+      },
+      {
+        "time": "12:10",
+        "event": "Aldo complains of indigestion and goes to the library to lie down."
+      },
+      {
+        "time": "12:15",
+        "event": "Vittoria takes him a glass of amaro laced with his entire bottle of heart pills. Dario sees her go in."
+      },
+      {
+        "time": "1:00",
+        "event": "Dario finds Aldo dead in the library."
+      }
+    ]
+  },
+  "characters": {
+    "vittoria": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Your marriage has been a business arrangement for years, and the old will made you a rich widow. Tonight you found the new will: everything to a charity for retired racehorses, nothing for you. Aldo meant to sign it after the wedding. Every evening you hand him his heart pills. Tonight you ground the whole new bottle into a glass of amaro and took it to him in the library at quarter past twelve, 'for your nerves'. Then you rinsed the bottle and went to bed. Blame the oleander, the sommelier, the bride: anyone.",
+        "objectives": [
+          "Do not get caught. Everyone will think of poison from the garden; let them.",
+          "Point suspicion at Luca (the chalice, the gloves) and at Sofia (the slap).",
+          "Keep Dario out of it, and keep your affair quiet as long as you can."
+        ],
+        "alibi": "I was in the rose garden until half past eleven, then in the library with a book until the toast. After the toast I went straight to bed."
+      }
+    },
+    "luca": {
+      "private": {
+        "backstory": "You are really Luca Ferrante. Twenty years ago Aldo Moretti sold fake vintages under his own label and, when he was caught, blamed your father. The Ferrante vineyard was ruined. You took this job to get close to Aldo and make him pay, but when the moment came you couldn't do it. Instead you've been quietly swapping his precious bottles for cheap wine and selling the real ones. At half past eleven you borrowed the pruning gloves to cut roses for the bridal table. You did NOT kill Aldo, but if anyone learns your real name, you're the obvious suspect.",
+        "objectives": [
+          "Keep your real name secret.",
+          "Keep the bottle-swapping quiet.",
+          "Find out who really killed Aldo. Justice for your father should be a trial, not a poisoning."
+        ],
+        "alibi": "From half past eleven I was cutting roses and then in the cellar choosing tomorrow's wines. After the toast I was clearing glasses in the kitchen.",
+        "lines": {
+          "act3": [
+            "I have my secrets, yes. But I poured one bottle for everyone at that toast. Look at what Signor Moretti drank afterwards."
+          ]
+        }
+      }
+    },
+    "dario": {
+      "private": {
+        "knows": [
+          "Your clipboard records who signed out the cellar key, and when.",
+          "At quarter past twelve Vittoria went into the library with a glass of amaro 'for Aldo's nerves'. She came out alone ten minutes later."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "chalice": {
+      "text": "Aldo never drank a toast from an ordinary glass, only from the family's antique silver chalice. The staff confirm that only the sommelier polishes it, fills it and carries it. Everyone drank the same Riserva.",
+      "redHerring": true
+    },
+    "key-log": {
+      "text": "Your clipboard: 'Cellar key signed out 11:30 by L. Bellini, with a pair of pruning gloves from the garden shed ('roses for the bridal table'). Key returned 11:55.'",
+      "redHerring": true
+    },
+    "funnel": {
+      "text": "In the cellar, the decanting funnel holds crushed green leaves and a few petals. The gardener sniffs them: rosemary and rose petals, the makings of tomorrow's wedding punch.",
+      "redHerring": true
+    },
+    "gloves": {
+      "text": "Pushed into the old wine press: a pair of pruning gloves scratched by rose thorns and dusted with petals. Stitched inside the cuff: 'L.B.' Why hide gloves you borrowed for roses?",
+      "redHerring": true
+    },
+    "clipping": {
+      "redHerring": true
+    },
+    "new-will": {
+      "text": "Aldo's desk drawer holds a new will, drafted last week, to be signed 'after the wedding': everything goes to a charity for retired racehorses. His wife and his son get nothing. The drawer's lock has been forced with a hairpin.",
+      "redHerring": false,
+      "pointsTo": [
+        "vittoria",
+        "marco"
+      ]
+    },
+    "cellar-book": {
+      "pointsTo": [
+        "vittoria"
+      ],
+      "puzzle": {
+        "solvedText": "The last entry, in Aldo's hand: 'V. has been reading my papers again. Let her. The day after the wedding I sign, and she can see how she likes the racehorses. Remember: new heart pills from the farmacia tomorrow.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "amaro-glass",
+      "title": "A Glass in the Library",
+      "text": "On the side table next to Aldo's armchair: a small glass of amaro, almost empty. White grit has settled at the bottom, as if something had been ground up and stirred in.",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "vittoria"
+      ]
+    },
+    {
+      "id": "pill-bottle",
+      "title": "The Empty Pill Bottle",
+      "text": "In the library waste-paper basket: Aldo's heart pills, 'Digoxin. A. Moretti. ONE tablet daily.' The pharmacy label is dated yesterday, a full bottle of thirty. It is empty, and rinsed clean. Who handed Aldo his pills every night?",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "vittoria"
+      ]
+    },
+    {
+      "id": "library-visit",
+      "title": "Quarter Past Twelve",
+      "text": "Your clipboard, because you log everything: '12:15. V.M. to library with amaro. 12:25. V.M. out, alone, no glass.'",
+      "visibility": "private",
+      "recipient": "dario",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "vittoria"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning over the vineyard. A carabinieri car climbs the muddy road.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last glass: to the detectives, and to justice!",
+      "alternative": "Espresso cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The carabinieri arrived at eight. Vittoria Moretti received them on the terrace in dark glasses and pearls, and asked whether they would like to see the roses before they took her away."
+    },
+    {
+      "type": "narration",
+      "text": "As for the wedding: the bride, the groom, the ex, the planner and the best man all have some explaining to do. Whether anyone says 'I do' at noon is another mystery entirely. Buona notte, detectives."
+    }
+  ]
+}
