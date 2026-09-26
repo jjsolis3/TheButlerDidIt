@@ -98,12 +98,16 @@ else
 }
 
 // ---------------------------------------------------------------- rate limiting
+// Joins per minute per address: enough for a whole party on one Wi-Fi, too few to guess party codes.
+// Configurable (RateLimits:JoinPerMinute) so the end-to-end tests, which seat dozens of guests from
+// one machine within a minute, can raise it. Real servers keep the default.
+var joinsPerMinute = builder.Configuration.GetValue("RateLimits:JoinPerMinute", 20);
 builder.Services.AddRateLimiter(o =>
 {
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     o.AddPolicy(PartyEndpoints.JoinRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-        _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1) }));
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = joinsPerMinute, Window = TimeSpan.FromMinutes(1) }));
     o.AddPolicy(AuthEndpoints.EmailRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15) }));
