@@ -193,6 +193,10 @@ export const FAQ: { q: string; a: string }[] = [
     a: 'Some clues are given to just one character. You can keep them or press Share to show everyone. Some clues are puzzles: solving one earns a point and reveals more information.',
   },
   {
+    q: 'Is the killer always one of the guests?',
+    a: 'With “Surprise me”, almost always. Each story has several versions with a different killer, and the version is dealt when the host begins the evening, from the characters guests chose, preferring one the host hasn’t played. If none fits and the host allowed it, the AI writes a version where a guest is the killer (about a minute). Otherwise the narrator plays the killer, and you must unmask them from the clues.',
+  },
+  {
     q: 'How does scoring work?',
     a: 'At the accusation: 3 points for naming the killer, 1 for the motive, 1 for the method, plus 1 per puzzle solved. The killer scores 1 for every guest who accused someone else. Everyone also votes for best performance and best costume.',
   },

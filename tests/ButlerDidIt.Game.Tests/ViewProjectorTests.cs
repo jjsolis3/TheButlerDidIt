@@ -88,6 +88,8 @@ public class ViewProjectorTests
         Assert.False(view.Dossier.Unlocked);
         Assert.Null(view.Dossier.Backstory);
         Assert.DoesNotContain("MAID_SECRET", GameJson.Serialize(view));
+        // Not even the number of secrets: a "Surprise me" version, which may have more or fewer, is dealt at the start.
+        Assert.Equal(0, view.Dossier.LockedSecrets);
     }
 
     [Fact]

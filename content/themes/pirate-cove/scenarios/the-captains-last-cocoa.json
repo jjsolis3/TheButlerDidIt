@@ -186,6 +186,7 @@
         "style": "bright, quick, a bit nervous"
       },
       "required": true,
+      "killerEligible": false,
       "private": {
         "backstory": "The captain was like a grandfather to you. He had been secretly teaching you to read from the books in his cabin. You were supposed to be asleep in your hammock tonight, but you climbed the rigging to watch the bonfire, and from up there you saw something you haven't told anyone.",
         "secrets": [

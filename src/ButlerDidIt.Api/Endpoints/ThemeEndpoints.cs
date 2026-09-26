@@ -37,10 +37,15 @@ public static class ThemeEndpoints
                 .Where(p => p.HostUserId == userId && p.Status != PartyStatus.Lobby).Select(p => p.ScenarioId).Distinct().ToListAsync(ct)).ToHashSet();
             IReadOnlyList<VersionOption> Versions(ScenarioEntity story)
             {
-                var variants = versionsOf[story.Id].OrderBy(v => v.Id).ToList();
+                var variants = versionsOf[story.Id].ToList();
                 if (variants.Count == 0) return [];
-                var all = new[] { story }.Concat(variants).ToList();
-                return all.Select((v, i) => new VersionOption(v.Id, $"Version {(char)('A' + i)}", played.Contains(v.Id))).ToList();
+                // Hand-written versions are lettered; versions the AI wrote for this host's parties
+                // (listed only to them) are numbered in the order they were written.
+                var written = new[] { story }.Concat(variants.Where(v => v.Source != ScenarioSource.AiGenerated).OrderBy(v => v.Id))
+                    .Select((v, i) => new VersionOption(v.Id, $"Version {(char)('A' + i)}", played.Contains(v.Id)));
+                var remixed = variants.Where(v => v.Source == ScenarioSource.AiGenerated).OrderBy(v => v.UpdatedAt)
+                    .Select((v, i) => new VersionOption(v.Id, $"✨ AI version {i + 1}", played.Contains(v.Id)));
+                return written.Concat(remixed).ToList();
             }
             return themes.Select(t =>
             {

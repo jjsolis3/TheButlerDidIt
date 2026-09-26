@@ -54,6 +54,7 @@ When you change words that have a generated voice or picture, only those are mad
 ```
 
 - **`required`**: essential characters. If no guest takes one, it becomes an **NPC** and the narrator speaks its `lines` at the end of each act's cinematic. Optional characters are simply left out. **The murderer must be required.**
+- **`killerEligible`** (optional, default `true`): set it to `false` for a character who must never be the killer in any version, like the child in a Family mystery. The validator enforces it, and the AI remix never picks them.
 - **`unlockAct`**: `0` means known from the start; `2` means the secret appears on their phone when act 2 begins.
 - **`lines`** are keyed by act id. Write them as things said aloud *to the room*: they're shown to the player, or voiced on stage for NPCs.
 
@@ -132,6 +133,21 @@ content/themes/the-butler-did-it/scenarios/
 
 Players never see which version they're playing: the title is shared, and screens show the original's id.
 
+### How "Surprise me" deals a version
+
+With **🎲 Surprise me** (the default), the version is dealt when the host presses **Begin the evening**, not when the party is created. By then everyone has a character, so the dealer:
+
+1. runs Auto-assign, so the cast is final;
+2. prefers a version this host has **never played**;
+3. among those, prefers one whose **killer is a guest** tonight rather than the narrator;
+4. otherwise picks at random.
+
+This is only safe because versions never change anything guests see in the lobby: public bios, costumes, the setting and the prologue. Keep it that way when you write a version.
+
+If no unplayed version's killer is a guest, and the host ticked **"let the AI write one"**, the AI Storyteller writes a new version as a patch, with a randomly chosen guest's character as the killer (see [ai-setup.md](ai-setup.md)). It must pass the same validator, and it's saved as one of that host's versions of the story (shown only to them) for later replays. Otherwise the narrator plays the killer.
+
+A "Surprise me" party has no printed booklets or clue cards before it begins, since the killer isn't dealt yet (the phones carry everything). To print them, pick a specific version.
+
 ## Family or Adults?
 
 Every mystery sits on one shelf, set by `contentRating`:
@@ -162,6 +178,8 @@ Each theme can suggest drinks, shown in the lobby when toast prompts are on:
 - At least **3 genuine clues** (not red herrings) point at the murderer.
 - Clues cast suspicion on at least **2 innocent characters**.
 - Every character has a public bio and an alibi. The solution has an explanation.
+- The murderer is `required` and not marked `killerEligible: false`.
+- A **Family** mystery never mentions alcohol (whole words, so "ginger" is fine). This applies to text written in the editor or by the AI too.
 
 ## Tips for a good evening
 

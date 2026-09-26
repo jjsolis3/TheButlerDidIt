@@ -89,6 +89,13 @@ public sealed class Character
     /// </summary>
     public bool Required { get; init; }
 
+    /// <summary>
+    /// False for characters who must never be the killer, whatever version is played or
+    /// written: for example a child in a Family mystery. The validator enforces it, and the
+    /// AI remix never picks them.
+    /// </summary>
+    public bool KillerEligible { get; init; } = true;
+
     public CharacterPrivate Private { get; init; } = new();
 }
 

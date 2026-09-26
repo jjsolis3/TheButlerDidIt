@@ -189,6 +189,8 @@ export interface StageView {
   interrogations: InterrogationView[]
   options: { drinkingPrompts: boolean; tone: Tone }
   spotlight: { seatId: string; playerName: string; characterName: string | null } | null
+  /** The AI is writing a version of the mystery for tonight's cast; the lobby is frozen. */
+  tailoring: boolean
 }
 
 export interface AiFeatures {
@@ -331,6 +333,8 @@ export interface PartyInfo {
   playerCount: number
   maxPlayers: number
   isHost: boolean
+  /** "Surprise me": the version (and so the killer) is dealt when the evening begins. Host only. */
+  dealAtStart: boolean
 }
 
 export interface SeatResponse {

@@ -31,6 +31,8 @@ export interface CreatePartyOptions {
   drinkingPrompts?: boolean
   version?: string | null
   tone?: Tone
+  /** With version "surprise": if no version's killer is a guest, let the AI write one. */
+  tailorWithAi?: boolean
 }
 
 /** An error whose message came from the server and is safe to show to the user. */
@@ -83,7 +85,7 @@ export const api = {
   // The content level isn't sent: the server uses the mystery's own rating.
   // version: 'surprise' lets the server pick one this host hasn't played; a version id picks it; null plays the original.
   createParty: (scenarioId: string, mode: PartyMode, scheduledFor: string | null, options: CreatePartyOptions = {}) =>
-    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, scheduledFor, useAi: true, drinkingPrompts: false, version: null, tone: 'standard', ...options }),
+    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, scheduledFor, useAi: true, drinkingPrompts: false, version: null, tone: 'standard', tailorWithAi: false, ...options }),
   // Unfinished parties are deleted; finished ones are only hidden from the list (their recap keeps working).
   removeParty: (code: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}`),
 

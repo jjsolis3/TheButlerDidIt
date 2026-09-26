@@ -39,6 +39,8 @@ export default function NewParty() {
   const [chosenId, setScenarioId] = useState<string>()
   // Which version of the chosen story to play. "surprise" by default, so even the host doesn't know the killer.
   const [version, setVersion] = useState('surprise')
+  // If no version's killer is one of tonight's guests, the AI may write one (only asked when a Storyteller is set up).
+  const [tailor, setTailor] = useState(true)
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   // Two catalogs: Adults (Mature) and Family. Adults first, so Blackwood Manor stays the default.
   // The shelf is also the party's content level: the server takes it from the mystery itself.
@@ -79,6 +81,7 @@ export default function NewParty() {
         drinkingPrompts: drinking && shelf === 'mature',
         version: chosenVersion,
         tone,
+        tailorWithAi: tailor && chosenVersion === 'surprise' && !!ai?.storyteller,
       })
       navigate(`/stage/${party.code}`)
     } catch (e) {
@@ -141,7 +144,7 @@ export default function NewParty() {
           </button>
         ))}
         {selected && selected.scenario.versions.length > 1 && (
-          <label className="block rounded-xl border border-line bg-surface p-4">
+          <div className="rounded-xl border border-line bg-surface p-4">
             <span className="text-xs font-semibold tracking-widest text-accent uppercase">Version</span>
             <select
               className={`${inputClass} mt-2`}
@@ -158,9 +161,21 @@ export default function NewParty() {
               ))}
             </select>
             <span className="mt-2 block text-xs text-muted">
-              Same place and suspects, a different killer and new clues. With “Surprise me” even you won't know whodunit, so you can play along.
+              Same place and suspects, a different killer and new clues. With “Surprise me” even you won't know whodunit, so you can play along,
+              and the version is dealt when you begin the evening, so that one of your guests is the killer whenever possible.
             </span>
-          </label>
+            {ai?.storyteller && !selected.scenario.versions.some((v) => v.id === version) && (
+              <label className="mt-3 flex items-start gap-3 text-sm">
+                <input type="checkbox" className="mt-1 accent-[var(--theme-accent)]" checked={tailor} onChange={(e) => setTailor(e.target.checked)} />
+                <span>
+                  ✨ If no version fits tonight's cast, let the AI write one
+                  <span className="block text-xs text-muted">
+                    About a minute when you begin, from your AI budget. It keeps the same story and suspects, and makes one of your guests the killer.
+                  </span>
+                </span>
+              </label>
+            )}
+          </div>
         )}
         {themes && playable.length === 0 && <p className="text-muted">No mysteries are installed yet.</p>}
         {ai?.storyteller && themes && (

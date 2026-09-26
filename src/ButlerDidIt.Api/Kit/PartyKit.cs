@@ -40,6 +40,12 @@ public static class PartyKit
             var party = await parties.FindByCodeAsync(code, ct);
             if (party is null || party.HostUserId != user.FindFirstValue(ClaimTypes.NameIdentifier)) return Results.NotFound();
 
+            // With "Surprise me" the killer is dealt when the evening begins, so the spoiler-filled
+            // booklets and clue cards can't be printed before then.
+            if (kind is "booklets" or "clues" && party.DealAtStart && party.Status == PartyStatus.Lobby)
+                return Results.Problem("Booklets and clue cards aren't available before a \"Surprise me\" party begins, because the killer is dealt then. " +
+                                       "To print them in advance, create the party with a specific version.", statusCode: 409);
+
             var snapshot = await parties.LoadAsync(party.Id, ct);
             var images = new ImageLoader(db, store);
             var joinUrl = $"{request.Scheme}://{request.Host}/join/{party.Code}";

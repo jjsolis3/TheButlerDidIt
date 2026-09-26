@@ -90,21 +90,13 @@ public class ContentTests
         }
     }
 
-    private static readonly string[] AlcoholWords = ["wine", "rum", "beer", "gin", "whisky", "whiskey", "vodka", "brandy", "grog", "cocktail", "drunk", "booze"];
-
     [Theory]
     [MemberData(nameof(ScenarioIds))]
     public void Family_mysteries_never_mention_alcohol(string id)
     {
         var scenario = Load(id);
         if (scenario.ContentRating != ContentRating.Family) return;
-
-        // Everything a family audience reads or hears, as one lowercase text.
-        var text = GameJson.Serialize(scenario).ToLowerInvariant();
-        foreach (var word in AlcoholWords)
-        {
-            // Whole words only, so "ginger" or "virginia" don't trip the check.
-            Assert.DoesNotMatch($@"\b{word}s?\b", text);
-        }
+        // The rule itself lives in ScenarioValidator, so AI and editor text is held to it too.
+        Assert.Empty(ScenarioValidator.AlcoholWordsIn(scenario));
     }
 }
