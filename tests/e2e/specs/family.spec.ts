@@ -32,6 +32,8 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await expect(host.getByRole('tab', { name: /Adults/ })).toHaveAttribute('aria-selected', 'true')
   await expect(host.getByText('Death at Blackwood Manor')).toBeVisible()
   await expect(host.getByText('Death Among the Vines')).toBeVisible()
+  await expect(host.getByRole('button', { name: /Last Stop: Murder/ })).toContainText('3 versions, a different killer each')
+  await expect(host.getByRole('button', { name: /Murder on the Red Carpet/ })).toContainText('3 versions, a different killer each')
   await expect(host.getByText("The Captain's Last Cocoa")).toHaveCount(0)
   await host.screenshot({ path: `${SHOTS}/70-adults-shelf.png`, fullPage: true })
 

@@ -1,0 +1,888 @@
+{
+  "id": "murder-on-the-red-carpet",
+  "themeSlug": "hollywood-premiere",
+  "title": "Murder on the Red Carpet",
+  "synopsis": "Hollywood, 1953. Monarch Pictures' most expensive picture ever, 'Desert Kings', premieres tonight at the Starlight Theatre. Its star, Rex Hartley, is due on stage for a bow at ten. He never makes it: at five past ten his dresser finds him dead in his dressing room. The doors are shut, the press is outside, and Sol Mandel wants the killer found before the morning papers. Everyone backstage had a reason.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "The Starlight Theatre on Hollywood Boulevard, backstage at the premiere",
+    "era": "Spring 1953, the golden age of Hollywood",
+    "description": "Searchlights sweeping the sky, a red carpet, flashbulbs and a crowd of fans on the boulevard. Inside: two thousand seats, a velvet curtain in front of the screen, the Mandel box, and backstage, a narrow corridor of dressing rooms, a darkroom for the press, and the stage doorman's desk. The studio has locked the doors until the police arrive."
+  },
+  "victim": {
+    "name": "Rex Hartley",
+    "description": "Forty-five. The biggest box-office star in the world: a jaw like a cliff, a voice like warm honey, and a heart like a cash register. Tonight he planned to settle a few scores, and to leave Monarch Pictures for good."
+  },
+  "characters": [
+    {
+      "id": "dolores",
+      "name": "Dolores Dare",
+      "pronouns": "she/her",
+      "title": "The Starlet",
+      "publicBio": "Monarch Pictures' newest sensation, and Rex Hartley's co-star in 'Desert Kings'. Platinum hair, a gold sequined gown and a smile the camera adores. Everyone knows she's engaged to the studio boss's son. Nobody knows anything else.",
+      "costumeTips": "A glamorous evening gown (gold if you have it), a stole or wrap, long gloves, and sunglasses at night.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 0.95,
+        "style": "breathy, sweet, steel underneath"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Four years ago, before anyone knew your name, you married Rex Hartley in Tijuana. It lasted a week, and neither of you ever got a divorce. Now you're engaged to Sol Mandel's son, and tonight Rex told you that unless you broke it off, the newspapers would have your marriage certificate on Monday. At half past nine you went to his dressing room to beg. He laughed and turned back to his mirror. You picked up his Golden Reel award and hit him with it, once. You wiped the base with your gold stole, walked out at twenty-five to ten, and stuffed the stole in the powder-room bin.",
+        "secrets": [
+          {
+            "id": "dolores-married",
+            "text": "I'm secretly married to Rex Hartley. We never divorced. My engagement to Sol's son is a lie.",
+            "unlockAct": 0
+          },
+          {
+            "id": "dolores-name",
+            "text": "My real name is Doris Dombrowski, and I grew up over a butcher's shop in Scranton.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Point everyone at Gloria's champagne, or Victor and those flickering lights.",
+          "Nobody must find your marriage certificate, or your gold stole.",
+          "Keep your engagement, and your career, alive."
+        ],
+        "knows": [
+          "Victor Kessler, the director, was in Rex's dressing room at a quarter to nine 'checking the lights'. He used to be an electrician.",
+          "Gloria Gale took champagne to Rex at nine. She hated him: he knew things about her."
+        ],
+        "alibi": "I watched the picture from the Mandel box until half past nine, then I went to powder my nose, and then back to the box.",
+        "lines": {
+          "act1": [
+            "Rex was the most generous leading man in Hollywood. Generous with everything except the truth."
+          ],
+          "act2": [
+            "Me and Rex? Darling, we were co-stars. Co-stars kiss. It's in the contract."
+          ],
+          "act3": [
+            "I did go to see him at half past nine. He was perfectly well when I left. Perfectly, horribly well."
+          ]
+        }
+      }
+    },
+    {
+      "id": "victor",
+      "name": "Victor Kessler",
+      "pronouns": "he/him",
+      "title": "The Director",
+      "publicBio": "The director of 'Desert Kings': a genius, a tyrant, and a former studio electrician who still carries a tool roll in his coat. He's been shouting at Rex Hartley for six months.",
+      "costumeTips": "A beret or flat cap, a turtleneck or loose tie, horn-rimmed glasses, and a rolled-up script.",
+      "voice": {
+        "accent": "de-DE",
+        "pitch": 0.9,
+        "rate": 1.05,
+        "style": "intense, clipped, dramatic"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Rex Hartley has demanded that you be taken off 'Desert Kings II', and that he direct it himself. Sol Mandel is thinking about it. Your whole career, and a picture you love, handed to a pretty face who can't find his own mark. At a quarter to nine you went to Rex's dressing room to check the lights on his makeup mirror for the stage bow: one was flickering, and you tightened a bulb. You wanted to strangle him. You didn't.",
+        "secrets": [
+          {
+            "id": "victor-fired",
+            "text": "Rex was getting me thrown off the sequel. He wanted to direct it himself.",
+            "unlockAct": 0
+          },
+          {
+            "id": "victor-electric",
+            "text": "Before I was a director I was a studio electrician for ten years. I still carry my tools.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your job on 'Desert Kings II'.",
+          "Find out who killed Rex, before the studio decides it was the man he was about to fire.",
+          "Protect your picture: tonight should be its triumph."
+        ],
+        "knows": [
+          "At a quarter to nine you checked Rex's mirror lights for the stage bow. One bulb was loose; you tightened it. Rex was reading his speech and sneering at it.",
+          "At nine, on your way out, you passed Gloria Gale coming in with a bottle of champagne and two glasses."
+        ],
+        "alibi": "At a quarter to nine I checked Rex's lights, then I went up to the projection booth and stayed there until the end of the picture.",
+        "lines": {
+          "act1": [
+            "Rex Hartley could not act. He could stand. He stood beautifully."
+          ],
+          "act2": [
+            "Direct? Rex? He couldn't direct a man to the bathroom."
+          ],
+          "act3": [
+            "I checked his lights at a quarter to nine. They worked. I am a professional."
+          ]
+        }
+      }
+    },
+    {
+      "id": "gloria",
+      "name": "Gloria Gale",
+      "pronouns": "she/her",
+      "title": "The Gossip Columnist",
+      "publicBio": "The most feared woman in Hollywood: her column is read by thirty million people every morning. Enormous hats, a poison pen and a champagne glass that's never empty. She came to the premiere for an exclusive interview with Rex Hartley.",
+      "costumeTips": "An enormous hat, a fur or wrap, pearls, a notebook, and a champagne glass.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.05,
+        "rate": 1.1,
+        "style": "sugary, sly, deadly"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Your column isn't all true. Some of it you make up; some of it you're paid to leave out. Rex Hartley had found out, and told you he had a folder of sworn statements from six stars. At nine you took him a bottle of champagne and two glasses for your 'exclusive interview', to charm him out of it. He drank a glass, laughed at you, and said, 'Monday, Gloria.' You left at five past nine, furious.",
+        "secrets": [
+          {
+            "id": "gloria-lies",
+            "text": "Half my column is invented, and some stars pay me to keep things out of it.",
+            "unlockAct": 0
+          },
+          {
+            "id": "gloria-pills",
+            "text": "I can't sleep without my pills. I haven't slept a night without them in ten years.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find Rex's folder before anyone else does.",
+          "Get the story of the century out of tonight: you're the only reporter backstage.",
+          "Find out who did it. Somebody in this theatre is going to be tomorrow's headline."
+        ],
+        "knows": [
+          "At nine you gave Rex a glass of champagne for your interview. He was wide awake and sneering. He mentioned 'a little visit from my wife' at half past nine, and laughed.",
+          "Dolores Dare left the Mandel box at twenty-five past nine and didn't come back until twenty to ten."
+        ],
+        "alibi": "At nine I interviewed Rex over a glass of champagne. At five past nine I went back to my seat and watched the picture to the end.",
+        "lines": {
+          "act1": [
+            "Darling, I don't spread gossip. I report it. Gossip spreads itself."
+          ],
+          "act2": [
+            "Rex and I were old friends. Old friends know where the bodies are buried. Figuratively."
+          ],
+          "act3": [
+            "His wife? He said 'my wife' at nine o'clock and laughed like a hyena. Now who do you suppose he meant?"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sol",
+      "name": "Sol Mandel",
+      "pronouns": "he/him",
+      "title": "The Studio Boss",
+      "publicBio": "The head of Monarch Pictures: a cigar, a temper, and twelve hundred people on the payroll. 'Desert Kings' cost more than any picture in the studio's history, and tonight it has to be a hit.",
+      "costumeTips": "A double-breasted suit, a big cigar, a pinky ring, and a scowl.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 1.0,
+        "style": "gruff, loud, shrewd"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Rex Hartley is under contract to you for three more pictures, and tonight at half past eight in his dressing room he tore that contract up in your face: he's signing with Paramount on Monday. Without Rex, 'Desert Kings II' is dead and the studio might be too. You shouted so loud the whole corridor heard. You did not kill him.",
+        "secrets": [
+          {
+            "id": "sol-contract",
+            "text": "Rex tore up his contract tonight. He was walking out on Monday, and the studio's in debt to the bank.",
+            "unlockAct": 0
+          },
+          {
+            "id": "sol-son",
+            "text": "My son is engaged to Dolores Dare. I don't trust her as far as I could throw her.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Save the studio.",
+          "Keep the scandal out of the papers, whatever it takes.",
+          "Find out who killed your biggest star."
+        ],
+        "knows": [
+          "At half past eight Rex tore up his contract in your face. He was very much alive and very pleased with himself.",
+          "Victor Kessler was waiting in the corridor when you came out, with his tool roll under his arm."
+        ],
+        "alibi": "At half past eight I had a word with Rex, and then I was in my box for the rest of the picture. Ask my wife. Ask the ushers. Ask anybody.",
+        "lines": {
+          "act1": [
+            "Rex Hartley was the biggest star in the world, and he knew it. Every morning, he knew it."
+          ],
+          "act2": [
+            "The contract? A little misunderstanding between friends."
+          ],
+          "act3": [
+            "I've buried a hundred scandals in this town. I'm not burying this one. Find me who did it."
+          ]
+        }
+      }
+    },
+    {
+      "id": "benny",
+      "name": "Benny Fisk",
+      "pronouns": "he/him",
+      "title": "The Dresser",
+      "publicBio": "Rex Hartley's dresser for twelve years: he irons his shirts, fixes his tie, and knows every one of his secrets. Tonight Rex sent him away early. At five past ten Benny went back for the curtain call and found him.",
+      "costumeTips": "A waistcoat, rolled sleeves, a tape measure round your neck and a pincushion on your wrist.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.0,
+        "style": "loyal, fussy, heartbroken"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Twelve years you've dressed Rex Hartley, and he never once said thank you. You've been quietly borrowing his cufflinks and selling them in Burbank, one pair at a time. Tonight at twenty past eight he sent you away. At five past ten you came back to get him ready for the stage bow, and found him on the floor.",
+        "secrets": [
+          {
+            "id": "benny-cufflinks",
+            "text": "I've been selling Rex's cufflinks in Burbank, one pair at a time. He never noticed.",
+            "unlockAct": 0
+          },
+          {
+            "id": "benny-will",
+            "text": "Rex told me last year he'd left me something in his will. I don't know if he meant it.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the cufflinks quiet.",
+          "Find out who did this to Rex. He was a pig, but he was your pig.",
+          "Look after his things. Somebody should."
+        ],
+        "knows": [
+          "At five past ten you found Rex on the floor by his dressing table. The mirror lights were off, the champagne was spilled, and the Golden Reel award was on the carpet.",
+          "At nine forty-five Marty Klein was hovering outside the door when you passed the end of the corridor."
+        ],
+        "alibi": "Rex sent me away at twenty past eight. I was in the wardrobe room pressing tomorrow's suits until five past ten.",
+        "lines": {
+          "act1": [
+            "Twelve years I dressed that man. I know how he took his coffee, his cufflinks and his insults."
+          ],
+          "act2": [
+            "He sent me away tonight. He never sends me away. He had company coming."
+          ],
+          "act3": [
+            "When I found him, I straightened his tie. Force of habit. I'm sorry, I know I shouldn't have."
+          ]
+        }
+      }
+    },
+    {
+      "id": "marty",
+      "name": "Marty Klein",
+      "pronouns": "he/him",
+      "title": "The Agent",
+      "publicBio": "Rex Hartley's agent: sharp suit, two telephones and ten per cent of everything. Marty made Rex a star and has never let him forget it.",
+      "costumeTips": "A loud suit, a bow tie, slicked hair, and a telephone (a banana will do in a pinch).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.05,
+        "rate": 1.25,
+        "style": "fast-talking, nervous, charming"
+      },
+      "required": false,
+      "private": {
+        "backstory": "For five years you've been taking a little more than ten per cent of Rex's money: forty thousand dollars in all. Rex's new lawyers were going to go through the books on Monday, when he signed with Paramount. At a quarter to ten you knocked on his dressing-room door to talk him round. No answer. You assumed he was napping, and went to the bar.",
+        "secrets": [
+          {
+            "id": "marty-money",
+            "text": "I've taken forty thousand dollars of Rex's money over five years. The lawyers were going to find it.",
+            "unlockAct": 0
+          },
+          {
+            "id": "marty-paramount",
+            "text": "I negotiated the Paramount deal behind Sol Mandel's back.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the missing forty thousand hidden.",
+          "Protect your other clients from the scandal.",
+          "Find the killer, before the police look at who handled Rex's money."
+        ],
+        "knows": [
+          "At a quarter to ten you knocked on Rex's door. No answer, not a sound. You thought he was napping.",
+          "Buck Rawlins came out of the next dressing room at nine forty, looking pale."
+        ],
+        "alibi": "I watched the picture from the back of the stalls, knocked on Rex's door at a quarter to ten, and went to the bar.",
+        "lines": {
+          "act1": [
+            "I made Rex Hartley. Found him pumping gas in Bakersfield. Ten per cent of a legend, that's me."
+          ],
+          "act2": [
+            "The books? The books are fine. The books are beautiful."
+          ],
+          "act3": [
+            "I knocked at a quarter to ten. If I'd pushed the door... I don't like to think about it."
+          ]
+        }
+      }
+    },
+    {
+      "id": "buck",
+      "name": "Buck Rawlins",
+      "pronouns": "he/him",
+      "title": "The Cowboy Star",
+      "publicBio": "Monarch's singing cowboy: a white Stetson, a guitar, and a tuxedo with spurs on the boots. He's been Rex Hartley's understudy in all but name for ten years, and his dressing room is right next door.",
+      "costumeTips": "A cowboy hat, a bolo tie or bandana, boots, and a big friendly grin.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "slow, folksy, sly"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Everyone thinks you're a simple cowboy, but you've wanted Rex's parts for ten years. You've already read the script for 'Desert Kings II' and pencilled your own name over Rex's. With Rex gone, the part is yours. You spent the picture in your own dressing room, next door to Rex's, because you can't stand watching him on screen.",
+        "secrets": [
+          {
+            "id": "buck-script",
+            "text": "I've pencilled my name over Rex's in the script for 'Desert Kings II'. Now it's mine.",
+            "unlockAct": 0
+          },
+          {
+            "id": "buck-city",
+            "text": "I grew up in Philadelphia and I'm scared of horses.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get Rex's part in 'Desert Kings II'.",
+          "Don't look too pleased about it.",
+          "Help catch the killer. Heroes always do."
+        ],
+        "knows": [
+          "At twenty-five to ten, through the wall, you heard a heavy thud and a woman's gasp. Then a door, and quick steps down the corridor.",
+          "Mickey the photographer was hanging about at the end of the corridor with his camera all evening."
+        ],
+        "alibi": "I was in my own dressing room, next door to Rex's, from eight until the end of the picture, tuning my guitar.",
+        "lines": {
+          "act1": [
+            "Howdy, folks. Terrible thing. Terrible. Pass the script, would you?"
+          ],
+          "act2": [
+            "Rex and me were like brothers. Cain and Abel sort of brothers."
+          ],
+          "act3": [
+            "Twenty-five to ten. A thud and a gasp, through the wall. I figured he'd dropped something. Guess he had."
+          ]
+        }
+      }
+    },
+    {
+      "id": "mickey",
+      "name": "Mickey Shaw",
+      "pronouns": "he/him",
+      "title": "The Photographer",
+      "publicBio": "A press photographer from the Examiner with a Speed Graphic camera and a flashbulb for every face. He's been shooting the red carpet all night, and slipped backstage when nobody was looking.",
+      "costumeTips": "A crumpled suit, a hat with a press card in the band, and a camera (any camera).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.2,
+        "style": "cheeky, fast, streetwise"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You sell your best pictures to Gloria Gale on the side, and you've got the negatives of Rex and Dolores's wedding in Tijuana, four years ago: you were there. Tonight you hung about the dressing-room corridor with your camera, waiting for something worth selling. You got more than you bargained for. Your pictures are developing in the theatre's darkroom now.",
+        "secrets": [
+          {
+            "id": "mickey-tijuana",
+            "text": "I have photographs of Rex Hartley marrying Dolores Dare in Tijuana four years ago.",
+            "unlockAct": 0
+          },
+          {
+            "id": "mickey-gloria",
+            "text": "I sell my best pictures to Gloria Gale on the side. She pays better than the paper.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the picture of the year.",
+          "Keep your deal with Gloria quiet.",
+          "Figure out who did it. Your pictures might already know."
+        ],
+        "knows": [
+          "You photographed everyone who went down the corridor tonight. The pictures are drying in the darkroom.",
+          "At twenty-five to ten Dolores Dare hurried out of the corridor, holding her gold stole balled up in her hands."
+        ],
+        "alibi": "I was on the red carpet until eight, then I hung around backstage all night with my camera. I've got the pictures to prove it.",
+        "lines": {
+          "act1": [
+            "Hold it! Smile! Say 'murder'! Sorry. Force of habit."
+          ],
+          "act2": [
+            "A picture's worth a thousand words, and a good one's worth a thousand bucks."
+          ],
+          "act3": [
+            "My camera doesn't lie. People do. Let's see what the pictures say."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "visitors",
+      "title": "The Stage Door Log",
+      "text": "The backstage doorman's clipboard: 8:30 Mr. Mandel. 8:45 Mr. Kessler, 'lighting check'. 9:00 Miss Gale, with champagne, 'interview'. 9:30 Miss Dare. 9:45 Mr. Klein knocked, no answer. Rex Hartley saw four people tonight, and one of them was the last.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "sol",
+        "victor",
+        "gloria",
+        "dolores"
+      ]
+    },
+    {
+      "id": "mirror",
+      "title": "The Dark Mirror",
+      "text": "The bulbs round Rex's makeup mirror are all dark. Victor Kessler, who started out as a studio electrician, was in here at a quarter to nine 'checking the lights'.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "victor"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "champagne",
+      "title": "Spilled Champagne",
+      "text": "A bottle of champagne on its side on the dressing table, and a glass broken on the floor. Gloria Gale brought them at nine for her 'exclusive interview'.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "gloria"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "statuette",
+      "title": "The Golden Reel",
+      "text": "Rex's Golden Reel award, the one he won last spring, lies on the carpet. Its heavy base has been wiped, hastily: there's still a dark smear in the engraving, and a single gold sequin caught in the crease.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "dolores"
+      ]
+    },
+    {
+      "id": "benny-knows",
+      "title": "Sent Away",
+      "text": "Your own memory: at twenty past eight Rex sent you away. 'Dolores is coming at half past nine,' he said. 'We've got business, and it's private. Very private.' He was grinning.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "dolores"
+      ],
+      "recipient": "benny"
+    },
+    {
+      "id": "contract",
+      "title": "The Torn Contract",
+      "text": "In the wastebasket: Rex's contract with Monarch Pictures, torn clean in half. Sol Mandel shouted so loud at half past eight that the ushers heard him in the lobby.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "sol"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "certificate",
+      "title": "A Marriage Certificate",
+      "text": "In Rex's wallet, folded very small: a marriage certificate from Tijuana, dated four years ago. 'Rex Hartley and Doris Dombrowski.' Clipped to it: a studio publicity photo of Dolores Dare, and a note in Rex's hand: 'To the papers, Monday.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "dolores"
+      ]
+    },
+    {
+      "id": "script",
+      "title": "The Pencilled Script",
+      "text": "In Buck Rawlins's dressing room: the script for 'Desert Kings II'. On every page, Rex Hartley's name has been crossed out and 'BUCK' pencilled in.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "buck"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "books",
+      "title": "Rex's Bank Book",
+      "text": "In Rex's briefcase: his bank book, with a note from his new lawyers. 'Forty thousand dollars unaccounted for. Agent's commissions to be audited Monday.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "marty"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "appointments",
+      "title": "Rex's Appointment Book",
+      "text": "Rex's appointment book is locked with a little combination lock. He wrote a riddle on the cover, because he could never remember the numbers.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "dolores"
+      ],
+      "puzzle": {
+        "prompt": "I have a thousand faces, I live in the dark, and I only come alive when the lights go out. What am I?",
+        "answers": [
+          "film",
+          "a film",
+          "the film",
+          "movie",
+          "a movie",
+          "the movies",
+          "movies",
+          "picture",
+          "a picture",
+          "the pictures",
+          "cinema"
+        ],
+        "hint": "Everyone in the theatre is watching me right now.",
+        "solvedText": "Tonight's entry, in Rex's big scrawl: 'Dolores, 9:30. Told her the papers get the Tijuana certificate on Monday unless she drops the Mandel boy. She said, \"Over my dead body, Rex. Or yours.\" What a line. She should say it on screen.'"
+      }
+    },
+    {
+      "id": "column",
+      "title": "Tomorrow's Column",
+      "text": "In Gloria Gale's handbag, typed and ready for the morning edition: 'Which leading man won't be smiling by Monday? This columnist knows, and soon you will too.'",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "gloria"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "photo",
+      "title": "A Wet Photograph",
+      "text": "Mickey's pictures, fresh from the darkroom. One, stamped 9:36, shows Dolores Dare hurrying out of the dressing-room corridor. Her gold stole is balled up in her hands, not round her shoulders.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "dolores"
+      ]
+    },
+    {
+      "id": "stole",
+      "title": "In the Powder Room",
+      "text": "Stuffed at the bottom of the bin in the ladies' powder room, under the paper towels: a gold sequined stole. There's a rusty-brown stain on one end, and a sequin missing.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "dolores"
+      ]
+    },
+    {
+      "id": "negatives",
+      "title": "Old Negatives",
+      "text": "Your own camera bag: a strip of old negatives from Tijuana, four years ago. A little chapel, and a bride and groom you'd recognise anywhere. You've been waiting for the right moment to sell them.",
+      "visibility": "private",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "mickey",
+        "dolores"
+      ],
+      "recipient": "mickey",
+      "redHerring": true
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "Hollywood Boulevard at night: searchlights, a red carpet, a crowd behind velvet ropes, and a marquee that reads DESERT KINGS.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The Starlight Theatre, spring 1953. Tonight Monarch Pictures premieres 'Desert Kings', the most expensive picture in the studio's history, starring the biggest name in the world: Rex Hartley."
+    },
+    {
+      "type": "narration",
+      "text": "Rex walked the red carpet, kissed his co-star, shook the studio boss's hand and waved to the crowd. Then, as the lights went down at eight, he slipped backstage to his dressing room, to rest before his stage bow at ten."
+    },
+    {
+      "type": "line",
+      "speaker": "benny",
+      "text": "He sent me away at twenty past eight. He never sends me away. He said he had business. Private business."
+    },
+    {
+      "type": "toast",
+      "text": "To 'Desert Kings', and the man who'd tell you he made it!",
+      "alternative": "Raise your sparkling cider to the silver screen!"
+    },
+    {
+      "type": "narration",
+      "text": "One by one, the people with reasons to hate Rex Hartley went down the dressing-room corridor. At ten, the picture ended to thunderous applause. The curtain rose for Rex's bow. He wasn't there."
+    },
+    {
+      "type": "image",
+      "text": "A dressing room with a star on the door, a lightbulb-framed mirror, and a trophy on the floor.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At five past ten Benny went to fetch him, and found Rex Hartley dead on the dressing-room floor. Sol Mandel has had the doors locked. The police are on their way through the crowds, and the press is outside. And one of you killed him."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Dressing Room",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Dressing Room."
+        },
+        {
+          "type": "image",
+          "text": "The dressing table: a dark mirror, a spilled bottle of champagne, a broken glass, and a gold statuette on the carpet.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The theatre's doctor, called from the stalls, kneels by the body. The back of Rex's head has been struck, once, very hard, with something heavy and square-edged. There's a golden award lying on the carpet beside him. Somebody wanted the curtain down on Rex Hartley."
+        },
+        {
+          "type": "line",
+          "speaker": "benny",
+          "text": "I straightened his tie. Force of habit. I'm sorry."
+        }
+      ],
+      "prompts": [
+        "Who went to Rex's dressing room tonight, and when?",
+        "What did each of them want from him?",
+        "Look at the mirror, the champagne and the award. What killed him?",
+        "Who left their seat during the picture?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Behind the Screen",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Behind the Screen."
+        },
+        {
+          "type": "image",
+          "text": "Backstage: a rack of costumes, a darkroom's red light, and a wastebasket with a torn contract.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "In Hollywood, everybody has a real name, a real past and a real price. Rex Hartley knew all of them. His wallet, his briefcase and his locked appointment book are full of other people's secrets."
+        },
+        {
+          "type": "toast",
+          "text": "To secrets! In this town, they're the only thing worth more than a star.",
+          "alternative": "Or clink your soda and keep your secrets to yourself."
+        },
+        {
+          "type": "line",
+          "speaker": "gloria",
+          "text": "Darling, I don't spread gossip. I report it."
+        }
+      ],
+      "prompts": [
+        "Open Rex's appointment book. The cover holds a riddle.",
+        "Who was Rex about to ruin on Monday?",
+        "Who has an old secret with Rex's name on it?",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Final Reel",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Final Reel."
+        },
+        {
+          "type": "image",
+          "text": "A darkroom under a red light, photographs hanging from a line to dry.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The police have fought their way through the crowd, and they're at the stage door now. Mickey's pictures are coming out of the darkroom. Before the detectives walk in, somebody in this theatre has a last scene to play."
+        },
+        {
+          "type": "toast",
+          "text": "To the final reel!",
+          "alternative": "Cider up for the final reel!"
+        },
+        {
+          "type": "line",
+          "speaker": "mickey",
+          "text": "My camera doesn't lie. People do."
+        }
+      ],
+      "prompts": [
+        "What do Mickey's pictures show?",
+        "What turned up in the bins, the bags or the booths?",
+        "Whose story about their visit doesn't add up?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "marriage",
+        "text": "To hide a secret marriage and save an engagement"
+      },
+      {
+        "id": "career",
+        "text": "To stop him taking over a picture and ending a career"
+      },
+      {
+        "id": "exposure",
+        "text": "To stop him exposing years of lies"
+      },
+      {
+        "id": "contract",
+        "text": "To stop him walking out on the studio"
+      },
+      {
+        "id": "money",
+        "text": "To hide stolen money before the audit"
+      },
+      {
+        "id": "role",
+        "text": "To take his starring role"
+      }
+    ],
+    "methods": [
+      {
+        "id": "statuette",
+        "text": "A blow from his own Golden Reel award"
+      },
+      {
+        "id": "electrocution",
+        "text": "A rewired makeup mirror"
+      },
+      {
+        "id": "pills",
+        "text": "Sleeping pills in his champagne"
+      },
+      {
+        "id": "stole",
+        "text": "Strangled with a silk stole"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "dolores",
+    "motiveId": "marriage",
+    "methodId": "statuette",
+    "explanation": [
+      "Rex Hartley wasn't poisoned by the champagne, and nothing was wrong with his lights. He was struck down with his own Golden Reel award, by the one person in the theatre who was secretly his wife: Dolores Dare.",
+      "Four years ago, before she was famous, Doris Dombrowski married Rex Hartley in Tijuana. They never divorced. Now she's engaged to Sol Mandel's son, and tonight Rex told her the papers would have the certificate on Monday unless she broke it off. 'Over my dead body, Rex. Or yours,' she said. He wrote it in his appointment book.",
+      "At half past nine she went to his dressing room. He laughed at her and turned back to the mirror. She picked up the award and hit him, once. Buck heard the thud and a gasp through the wall at twenty-five to ten.",
+      "She wiped the base with her gold stole, leaving a smear and a sequin behind, and hurried out at 9:36, the stole balled up in her hands. Mickey's camera caught her. She stuffed the stole in the powder-room bin and was back in the Mandel box by twenty to ten.",
+      "Gloria's champagne, Victor's lights and Sol's torn contract were all innocent. In Hollywood the leading lady always gets the last scene, but this one forgot the camera was rolling."
+    ],
+    "timeline": [
+      {
+        "time": "7:30",
+        "event": "Rex walks the red carpet with Dolores Dare."
+      },
+      {
+        "time": "8:00",
+        "event": "The picture begins. Rex slips backstage."
+      },
+      {
+        "time": "8:20",
+        "event": "Rex sends Benny away: 'Dolores is coming at half past nine.'"
+      },
+      {
+        "time": "8:30",
+        "event": "Sol Mandel visits. Rex tears up his contract."
+      },
+      {
+        "time": "8:45",
+        "event": "Victor Kessler checks the mirror lights and tightens a bulb."
+      },
+      {
+        "time": "9:00",
+        "event": "Gloria Gale brings champagne for her interview. Rex drinks a glass: 'Monday, Gloria.'"
+      },
+      {
+        "time": "9:30",
+        "event": "Dolores arrives. Rex threatens to give the papers their marriage certificate."
+      },
+      {
+        "time": "9:35",
+        "event": "Dolores strikes Rex with his Golden Reel award. Buck hears a thud through the wall."
+      },
+      {
+        "time": "9:36",
+        "event": "Dolores hurries out with her stole balled in her hands. Mickey photographs her."
+      },
+      {
+        "time": "9:38",
+        "event": "She stuffs the stole in the powder-room bin."
+      },
+      {
+        "time": "9:45",
+        "event": "Marty Klein knocks on Rex's door. No answer."
+      },
+      {
+        "time": "10:05",
+        "event": "Benny finds Rex dead."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "The Starlight Theatre's marquee at dawn, the searchlights off, a police car at the kerb.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Starlight Theatre!",
+      "alternative": "Cider up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came in through the stage door at eleven. Dolores Dare was waiting for them in the Mandel box, perfectly made up. 'Get my good side,' she told Mickey, and let him take one last picture."
+    },
+    {
+      "type": "narration",
+      "text": "'Desert Kings' was the biggest hit of the year. Buck got the sequel, Gloria got her headline, and Sol Mandel got a very long lunch with his bank. Goodnight, detectives."
+    }
+  ]
+}
