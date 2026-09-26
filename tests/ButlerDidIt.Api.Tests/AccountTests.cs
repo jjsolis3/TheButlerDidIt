@@ -74,7 +74,7 @@ public class AccountTests(EmailFactory app) : IClassFixture<EmailFactory>
     {
         var email = $"c{Guid.NewGuid():N}@example.com";
         var (host, _) = await app.RegisterHostAsync(email);
-        var request = new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, ContentRating.Mature, null, UseAi: false);
+        var request = new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, null, UseAi: false);
 
         var blocked = await host.PostAsJsonAsync("/api/parties", request, GameJson.Options);
         Assert.Equal(HttpStatusCode.Forbidden, blocked.StatusCode);

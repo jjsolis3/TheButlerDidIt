@@ -7,6 +7,8 @@ export type ActStep = 'cinematic' | 'mingle'
 export type CueType = 'narration' | 'image' | 'music' | 'sfx' | 'video' | 'line' | 'toast'
 export type PartyMode = 'sharedScreen' | 'remote' | 'passAndPlay'
 export type ContentRating = 'family' | 'mature'
+/** How the AI game master plays it, within the mystery's rating. Mirrors the C# Tone enum. */
+export type Tone = 'standard' | 'clean' | 'playful'
 export type PartyStatus = 'lobby' | 'inProgress' | 'finished'
 
 export interface VoiceProfile {
@@ -185,7 +187,7 @@ export interface StageView {
   awards: AwardsView | null
   ai: AiFeatures
   interrogations: InterrogationView[]
-  options: { drinkingPrompts: boolean }
+  options: { drinkingPrompts: boolean; tone: Tone }
   spotlight: { seatId: string; playerName: string; characterName: string | null } | null
 }
 

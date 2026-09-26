@@ -120,6 +120,13 @@ public sealed class Party
     public DateTimeOffset? PrunedAt { get; set; }
 
     /// <summary>
+    /// When the host removed this finished party from their list. The row is kept, so the
+    /// recap link keeps working and "Surprise me" still knows which versions were played.
+    /// (Unfinished parties are deleted outright instead.)
+    /// </summary>
+    public DateTimeOffset? HiddenAt { get; set; }
+
+    /// <summary>
     /// Set when the host shares the after-party recap: the random part of its link.
     /// Null means not shared. Stopping sharing clears it, so the old link dies.
     /// </summary>

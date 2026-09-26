@@ -26,7 +26,7 @@ public class VersionTests(ApiFactory app) : IClassFixture<ApiFactory>
 
     private static Task<HttpResponseMessage> CreateAsync(HttpClient host, string? version, string scenario = Blackwood) =>
         host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(scenario, PartyMode.SharedScreen, ContentRating.Mature, null, UseAi: false, Version: version), GameJson.Options);
+            new CreatePartyRequest(scenario, PartyMode.SharedScreen, null, UseAi: false, Version: version), GameJson.Options);
 
     /// <summary>Marks a party as played (started), which is what "played by me" counts.</summary>
     private async Task StartAsync(string code)

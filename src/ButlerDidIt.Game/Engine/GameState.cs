@@ -200,6 +200,25 @@ public sealed class PartyOptions
 {
     /// <summary>Show toast cues and themed cocktails. Off by default, never on for Family parties.</summary>
     public bool DrinkingPrompts { get; set; }
+
+    /// <summary>How the AI game master plays it: its characters' answers, hints and verdicts. The written script doesn't change.</summary>
+    public Tone Tone { get; set; }
+}
+
+/// <summary>
+/// A flavour on top of the mystery's content rating, chosen by the host. The rating
+/// (Family or Mature) belongs to the mystery; the tone only adjusts how the AI speaks.
+/// </summary>
+public enum Tone
+{
+    /// <summary>As the mystery is rated: full Mature for Adults, ordinary Family for Family.</summary>
+    Standard,
+
+    /// <summary>For an Adults mystery in mixed company (work friends, the in-laws): scandal yes, crude or graphic no.</summary>
+    Clean,
+
+    /// <summary>Silly and funny: hammed-up characters, puns and jokes. Made for Family parties with kids.</summary>
+    Playful,
 }
 
 public sealed class Interrogation

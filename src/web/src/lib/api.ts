@@ -20,9 +20,18 @@ import type {
   RoleView,
   SeatResponse,
   ThemeCard,
+  Tone,
   UsageReport,
 } from './types'
 import type { ScenarioDoc } from './scenarioDoc'
+
+/** The optional choices when creating a party. Named options, so a call reads as what it asks for. */
+export interface CreatePartyOptions {
+  useAi?: boolean
+  drinkingPrompts?: boolean
+  version?: string | null
+  tone?: Tone
+}
 
 /** An error whose message came from the server and is safe to show to the user. */
 export class ApiError extends Error {
@@ -71,9 +80,12 @@ export const api = {
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
+  // The content level isn't sent: the server uses the mystery's own rating.
   // version: 'surprise' lets the server pick one this host hasn't played; a version id picks it; null plays the original.
-  createParty: (scenarioId: string, mode: PartyMode, contentLevel: ContentRating, scheduledFor: string | null, useAi = true, drinkingPrompts = false, version: string | null = null) =>
-    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, contentLevel, scheduledFor, useAi, drinkingPrompts, version }),
+  createParty: (scenarioId: string, mode: PartyMode, scheduledFor: string | null, options: CreatePartyOptions = {}) =>
+    request<PartyInfo>('POST', '/api/parties', { scenarioId, mode, scheduledFor, useAi: true, drinkingPrompts: false, version: null, tone: 'standard', ...options }),
+  // Unfinished parties are deleted; finished ones are only hidden from the list (their recap keeps working).
+  removeParty: (code: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}`),
 
   // ---- Media
   partyMedia: (code: string) => request<{ ready: number; job: MediaJob | null }>('GET', `/api/parties/${encodeURIComponent(code)}/media`),

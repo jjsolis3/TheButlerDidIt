@@ -78,19 +78,27 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
         foreach (var id in ids)
         {
             using var scope = scopes.CreateScope();
-            var sp = scope.ServiceProvider;
-            var db = sp.GetRequiredService<AppDbContext>();
-            // Take the party's lock so we never delete it halfway through someone's command.
-            using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
-            {
-                var seatIds = await db.Seats.Where(s => s.PartyId == id).Select(s => s.Id).ToListAsync(ct);
-                await db.PlayerNotes.Where(n => seatIds.Contains(n.SeatId)).ExecuteDeleteAsync(ct);
-                await db.Parties.Where(p => p.Id == id).ExecuteDeleteAsync(ct); // seats go with it (cascade)
-                await DeletePartyPhotosAsync(sp, id, ct);
-                await NotifyRemovedAsync(sp, seatIds);
-            }
+            await DeletePartyAsync(scope.ServiceProvider, id, ct);
         }
         return ids.Count;
+    }
+
+    /// <summary>
+    /// Deletes a party and everything that belongs to it: seats, notes and selfies. Used by this
+    /// job for abandoned parties and by the host's "Remove" button for unfinished ones.
+    /// </summary>
+    public static async Task DeletePartyAsync(IServiceProvider sp, Guid id, CancellationToken ct)
+    {
+        var db = sp.GetRequiredService<AppDbContext>();
+        // Take the party's lock so we never delete it halfway through someone's command.
+        using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
+        {
+            var seatIds = await db.Seats.Where(s => s.PartyId == id).Select(s => s.Id).ToListAsync(ct);
+            await db.PlayerNotes.Where(n => seatIds.Contains(n.SeatId)).ExecuteDeleteAsync(ct);
+            await db.Parties.Where(p => p.Id == id).ExecuteDeleteAsync(ct); // seats go with it (cascade)
+            await DeletePartyPhotosAsync(sp, id, ct);
+            await NotifyRemovedAsync(sp, seatIds);
+        }
     }
 
     private async Task<int> PruneFinishedPartiesAsync(DateTimeOffset cutoff, CancellationToken ct)

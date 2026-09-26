@@ -46,7 +46,7 @@ export default function MyMysteries() {
   const playTest = (m: MyMystery) =>
     act(async () => {
       // A pass-and-play party on this device: add a few local guests and walk through it.
-      const party = await api.createParty(m.id, 'passAndPlay', m.contentRating, null, false)
+      const party = await api.createParty(m.id, 'passAndPlay', null, { useAi: false })
       navigate(`/stage/${party.code}`)
     })
 

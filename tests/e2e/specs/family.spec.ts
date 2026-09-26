@@ -40,6 +40,10 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await expect(host.getByText("The Captain's Last Cocoa")).toBeVisible()
   await expect(host.getByText('Death at Blackwood Manor')).toHaveCount(0)
   await expect(host.getByLabel(/Toast prompts/)).toHaveCount(0)
+  // No separate content-level step: the shelf is the level. The tone (offered when the AI game
+  // master is set up) only has Family choices here, never "Mature".
+  await expect(host.getByText('Content level')).toHaveCount(0)
+  await expect(host.getByRole('radio', { name: /Mature/ })).toHaveCount(0)
   await host.screenshot({ path: `${SHOTS}/71-family-shelf.png`, fullPage: true })
 
   await host.getByLabel('Version').selectOption('the-captains-last-cocoa') // Version A: this test knows the killer
@@ -71,8 +75,21 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   await expect(host.getByLabel('Version').locator('option', { hasText: 'Version A (played)' })).toHaveCount(1)
   await host.screenshot({ path: `${SHOTS}/74-version-picker.png`, fullPage: true })
   const again = await host.request.post('/api/parties', {
-    data: { scenarioId: 'the-captains-last-cocoa', mode: 'sharedScreen', contentLevel: 'family', scheduledFor: null, useAi: false, version: 'surprise' },
+    data: { scenarioId: 'the-captains-last-cocoa', mode: 'sharedScreen', scheduledFor: null, useAi: false, version: 'surprise' },
   })
   expect(again.ok()).toBeTruthy()
-  expect((await again.json()).scenarioId).toMatch(/^the-captains-last-cocoa--[bc]$/)
+  const second = await again.json()
+  expect(second.scenarioId).toMatch(/^the-captains-last-cocoa--[bc]$/)
+  expect(second.contentLevel).toBe('family') // the level comes from the mystery itself
+
+  // Tidying up: the host deletes the party that never started, from their list on the home page.
+  await host.goto('/')
+  await expect(host.getByRole('button', { name: new RegExp(`Remove .* \\(${second.code}\\)`) })).toBeVisible()
+  await expect(host.getByRole('button', { name: new RegExp(`Remove .* \\(${code}\\)`) })).toBeVisible()
+  await host.screenshot({ path: `${SHOTS}/75-your-parties.png`, fullPage: true })
+  host.once('dialog', (d) => d.accept())
+  await host.getByRole('button', { name: new RegExp(`Remove .* \\(${second.code}\\)`) }).click()
+  await expect(host.getByRole('button', { name: new RegExp(`Remove .* \\(${second.code}\\)`) })).toHaveCount(0)
+  await expect(host.getByRole('button', { name: new RegExp(`Remove .* \\(${code}\\)`) })).toBeVisible()
+  expect((await host.request.get(`/api/parties/${second.code}`)).status()).toBe(404)
 })

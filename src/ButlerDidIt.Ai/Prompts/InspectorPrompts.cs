@@ -17,7 +17,7 @@ public static class InspectorPrompts
     /// solution, so it can steer them in the right direction. It must not name the
     /// killer, and <see cref="HintSafety"/> double-checks the reply.
     /// </summary>
-    public static string Hint(Scenario scenario, PlayerView view, ContentRating level)
+    public static string Hint(Scenario scenario, PlayerView view, ContentRating level, Tone tone = Tone.Standard)
     {
         var murderer = scenario.FindCharacter(scenario.Solution.MurdererId)!;
         var sb = new StringBuilder();
@@ -46,7 +46,7 @@ public static class InspectorPrompts
         sb.AppendLine("- Point the guest at ONE clue they already have, or a question worth asking someone, that moves them closer to the truth.");
         sb.AppendLine("- If the guest is playing the murderer, suggest how to deflect suspicion instead.");
         sb.AppendLine("- One or two sentences, in character, under 50 words. No lists or markdown.");
-        sb.AppendLine(ContentGuidance.For(level));
+        sb.AppendLine(ContentGuidance.For(level, tone));
         return sb.ToString();
     }
 
@@ -57,7 +57,7 @@ public static class InspectorPrompts
     /// referred to by number rather than seat id, because models copy short
     /// numbers far more reliably than GUIDs.
     /// </summary>
-    public static (string System, IReadOnlyList<Guid> SeatOrder) Verdicts(Scenario scenario, GameState state, ContentRating level)
+    public static (string System, IReadOnlyList<Guid> SeatOrder) Verdicts(Scenario scenario, GameState state, ContentRating level, Tone tone = Tone.Standard)
     {
         var solution = scenario.Solution;
         var seats = state.Players.Select(p => p.SeatId).ToList();
@@ -82,7 +82,7 @@ public static class InspectorPrompts
         }
         sb.AppendLine();
         sb.AppendLine("For every guest, write one witty sentence (under 35 words) reacting to their accusation: praise sharp deductions, gently tease wild guesses.");
-        sb.AppendLine(ContentGuidance.For(level));
+        sb.AppendLine(ContentGuidance.For(level, tone));
         sb.AppendLine("Reply with JSON only, in this shape: {\"verdicts\":[{\"player\":1,\"text\":\"...\"}]}");
         return (sb.ToString(), seats);
     }

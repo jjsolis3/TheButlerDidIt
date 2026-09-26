@@ -28,7 +28,7 @@ public class AiFlowTests(FakeAiFactory app) : IClassFixture<FakeAiFactory>
     {
         if (host is null) (host, cookie) = await app.RegisterHostAsync($"host{Guid.NewGuid():N}@example.com");
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(scenarioId, PartyMode.SharedScreen, ContentRating.Mature, null), GameJson.Options));
+            new CreatePartyRequest(scenarioId, PartyMode.SharedScreen, null), GameJson.Options));
         return (host, cookie!, party);
     }
 
@@ -58,12 +58,12 @@ public class AiFlowTests(FakeAiFactory app) : IClassFixture<FakeAiFactory>
         Assert.DoesNotContain(done.ScenarioId!, await app.CreateClient().GetStringAsync("/api/themes"));
         var (other, _) = await app.RegisterHostAsync($"other{Guid.NewGuid():N}@example.com");
         Assert.DoesNotContain(done.ScenarioId!, await other.GetStringAsync("/api/themes"));
-        var stolen = await other.PostAsJsonAsync("/api/parties", new CreatePartyRequest(done.ScenarioId!, PartyMode.SharedScreen, ContentRating.Family, null), GameJson.Options);
+        var stolen = await other.PostAsJsonAsync("/api/parties", new CreatePartyRequest(done.ScenarioId!, PartyMode.SharedScreen, null), GameJson.Options);
         Assert.Equal(HttpStatusCode.BadRequest, stolen.StatusCode);
 
         // …and the owner can start a Family party with it.
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest(done.ScenarioId!, PartyMode.SharedScreen, ContentRating.Family, null), GameJson.Options));
+            new CreatePartyRequest(done.ScenarioId!, PartyMode.SharedScreen, null), GameJson.Options));
         Assert.Equal("The Fake Affair", party.Title);
     }
 
@@ -189,7 +189,7 @@ public class AiBudgetTests(TinyBudgetAiFactory app) : IClassFixture<TinyBudgetAi
         (await admin.PutAsJsonAsync("/api/admin/ai/prices", new PriceView("fake-model", 100m, 100m), GameJson.Options)).EnsureSuccessStatusCode();
 
         var party = GameJson.Deserialize<PartyInfo>(await (await admin.PostAsJsonAsync("/api/parties",
-            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, ContentRating.Mature, null), GameJson.Options)).Content.ReadAsStringAsync());
+            new CreatePartyRequest("death-at-blackwood-manor", PartyMode.SharedScreen, null), GameJson.Options)).Content.ReadAsStringAsync());
         var seats = new List<SeatResponse>();
         foreach (var name in new[] { "Alice", "Bob", "Cara" })
         {
