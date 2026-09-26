@@ -24,6 +24,8 @@ export default function NewParty() {
   const [chosenId, setScenarioId] = useState<string>()
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   const [content, setContent] = useState<ContentRating>('mature')
+  // Two catalogs: Adults (Mature) and Family. Adults first, so Blackwood Manor stays the default.
+  const [shelf, setShelf] = useState<ContentRating>('mature')
   const [when, setWhen] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -35,8 +37,17 @@ export default function NewParty() {
   }, [me, navigate])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
-  // Until the host picks one, the first mystery is selected.
-  const scenarioId = chosenId ?? playable[0]?.scenario.id
+  const onShelf = playable.filter((p) => p.scenario.contentRating === shelf)
+  // The host's pick if it's on this shelf, otherwise the shelf's first mystery. Worked out
+  // during render, so switching shelves can never leave a mystery from the other shelf selected.
+  const scenarioId = onShelf.some((p) => p.scenario.id === chosenId) ? chosenId : onShelf[0]?.scenario.id
+
+  const chooseShelf = (s: ContentRating) => {
+    setShelf(s)
+    setContent(s) // a Family mystery is played at the Family level, and the same for Adults
+  }
+  // The content level and the shelf mirror each other, so the two controls never disagree.
+  const chooseContent = (c: ContentRating) => chooseShelf(c)
 
   const selected = playable.find((p) => p.scenario.id === scenarioId)
   const tooMature = selected?.scenario.contentRating === 'mature' && content === 'family'
@@ -62,7 +73,33 @@ export default function NewParty() {
 
       <section className="space-y-3">
         <h2 className="font-display text-xl">1. Choose a mystery</h2>
-        {playable.map(({ theme, scenario }) => (
+        <div className="grid grid-cols-2 gap-2 rounded-xl border border-line bg-surface p-1" role="tablist" aria-label="Catalog">
+          {(['mature', 'family'] as const).map((s) => {
+            const count = playable.filter((p) => p.scenario.contentRating === s).length
+            return (
+              <button
+                key={s}
+                role="tab"
+                aria-selected={shelf === s}
+                onClick={() => chooseShelf(s)}
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${shelf === s ? 'bg-accent text-bg' : 'text-muted hover:text-ink'}`}
+              >
+                {s === 'mature' ? '🍷 Adults' : '🧸 Family'} <span className="font-normal opacity-80">({count})</span>
+              </button>
+            )
+          })}
+        </div>
+        <p className="text-xs text-muted">
+          {shelf === 'mature'
+            ? 'For grown-ups: affairs, scandal, dark humour and drinking-game toasts. Nothing explicit.'
+            : 'For all ages: no gore, no alcohol, no swearing. Great with kids and teens.'}
+        </p>
+        {themes && onShelf.length === 0 && (
+          <p className="text-sm text-muted">
+            No {shelf === 'family' ? 'Family' : 'Adult'} mysteries yet.{ai?.storyteller ? ' Write one with AI below.' : ''}
+          </p>
+        )}
+        {onShelf.map(({ theme, scenario }) => (
           <button
             key={scenario.id}
             onClick={() => setScenarioId(scenario.id)}
@@ -89,6 +126,7 @@ export default function NewParty() {
               const fresh = await reloadThemes()
               const found = fresh.flatMap((t) => t.scenarios).find((x) => x.id === job.scenarioId)
               if (found) {
+                setShelf(found.contentRating)
                 setScenarioId(found.id)
                 setContent(found.contentRating)
               }
@@ -125,7 +163,7 @@ export default function NewParty() {
           {(['mature', 'family'] as const).map((c) => (
             <button
               key={c}
-              onClick={() => setContent(c)}
+              onClick={() => chooseContent(c)}
               className={`rounded-xl border p-4 text-left transition ${content === c ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}
             >
               <p className="font-semibold">{c === 'mature' ? 'Mature' : 'Family'}</p>
@@ -135,7 +173,7 @@ export default function NewParty() {
             </button>
           ))}
         </div>
-        {tooMature && <p className="text-sm text-red-200">This mystery is rated Mature. Family-friendly mysteries arrive with the AI storyteller.</p>}
+        {tooMature && <p className="text-sm text-red-200">This mystery is rated Mature. Pick one from the Family shelf for a Family party.</p>}
       </section>
 
       <section className="mt-8">

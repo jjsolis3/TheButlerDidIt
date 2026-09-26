@@ -112,7 +112,7 @@ export default function Home() {
               </p>
               <h3 className="font-display mt-2 text-2xl">{theme.name}</h3>
               <p className="mt-2 text-sm opacity-80">{theme.tagline}</p>
-              <div className="mt-4 text-xs">
+              <div className="mt-4 flex flex-wrap gap-1 text-xs">
                 {scenarios.length > 0 ? (
                   <span className="rounded-full px-2 py-1 font-semibold" style={{ background: theme.palette.accent, color: theme.palette.background }}>
                     {scenarios.length} {scenarios.length === 1 ? 'mystery' : 'mysteries'} ready to play
@@ -120,6 +120,17 @@ export default function Home() {
                 ) : (
                   <span className="rounded-full border px-2 py-1 opacity-80" style={{ borderColor: theme.palette.accent }}>
                     {me ? 'Generate a mystery with AI' : 'AI-generated mysteries'}
+                  </span>
+                )}
+                {/* Which catalog(s) this theme has something on. */}
+                {scenarios.some((x) => x.contentRating === 'family') && (
+                  <span className="rounded-full border px-2 py-1" style={{ borderColor: theme.palette.accent }}>
+                    🧸 Family
+                  </span>
+                )}
+                {scenarios.some((x) => x.contentRating === 'mature') && (
+                  <span className="rounded-full border px-2 py-1" style={{ borderColor: theme.palette.accent }}>
+                    🍷 Adults
                   </span>
                 )}
               </div>

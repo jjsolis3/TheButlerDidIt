@@ -7,7 +7,12 @@ An interactive murder-mystery party game for the web. Every guest plays a suspec
 
 Play it around the dinner table, over Zoom/Meet/Teams (share the stage tab with audio), or pass a single device around with press-and-hold private hand-offs. Guests who don't turn up are replaced by NPCs voiced by the narrator.
 
-The hand-written flagship mystery is **Death at Blackwood Manor** (1920s country house, 3–8 players, about 2 hours). With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
+Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family** (for all ages). The hand-written ones:
+- **Death at Blackwood Manor** (Adults): a 1920s country house, a séance and a new will.
+- **Death Among the Vines** (Adults): a Tuscan wedding where the groom's father doesn't survive the rehearsal-dinner toast.
+- **The Captain's Last Cocoa** (Family): pirates, buried treasure and a very suspicious mug of cocoa.
+
+All three play with 3–8 guests in about two hours. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
 - generate new mysteries for any of the eight themes, family-friendly or mature
 - let guests question characters nobody is playing
 - get private hints from the Inspector

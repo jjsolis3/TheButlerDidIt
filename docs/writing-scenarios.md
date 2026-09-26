@@ -95,6 +95,20 @@ When you change words that have a generated voice or picture, only those are mad
 Media paths are served from the theme's `media/` folder:
 `"src": "/media/themes/the-butler-did-it/scenes/study.jpg"` → `content/themes/the-butler-did-it/media/scenes/study.jpg`.
 
+## Family or Adults?
+
+Every mystery sits on one shelf, set by `contentRating`:
+
+| | `family` | `mature` |
+|---|---|---|
+| Who | All ages, kids and teens included | Grown-ups |
+| The crime | A murder that happens offstage, Cluedo-style: never gruesome | Described violence is fine, nothing graphic |
+| Romance | A crush at most | Affairs and scandal, nothing explicit |
+| Drink | None at all: toasts use lemonade, and drinking prompts are always off | Wine and cocktails, with a non-alcoholic alternative on every toast |
+| Language | No swearing | Salty, not crude |
+
+A test checks that no Family mystery mentions alcohol, so keep "rum", "wine" and friends out of pirate stories too.
+
 ## Cocktails (theme.json)
 
 Each theme can suggest drinks, shown in the lobby when toast prompts are on:
