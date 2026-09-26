@@ -32,11 +32,30 @@ public sealed record StageView(
     IReadOnlyList<InterrogationView> Interrogations,
     PartyOptions Options,
     SpotlightView? Spotlight,
+    // "Who looks guiltiest?" totals per character, during the acts only. Never who voted for whom.
+    IReadOnlyList<SuspicionView> Suspicion,
     // True while the AI writes a version of the mystery for tonight's cast; the lobby is frozen meanwhile.
     bool Tailoring);
 
-/// <summary>Whose turn it is to speak (see GameState.SpotlightSeatId).</summary>
-public sealed record SpotlightView(Guid SeatId, string PlayerName, string? CharacterName);
+/// <summary>
+/// Whose turn it is to speak (see GameState.SpotlightCharacterId). SeatId and PlayerName are set when a
+/// guest plays the character; for a narrator-played character (IsNpc) NpcLine is what the narrator says.
+/// Question is the card shown on the big screen; Confrontation is set when a guest made the challenge.
+/// </summary>
+public sealed record SpotlightView(
+    string CharacterId,
+    string CharacterName,
+    Guid? SeatId,
+    string? PlayerName,
+    bool IsNpc,
+    string? NpcLine,
+    string Question,
+    DateTimeOffset? EndsAt,
+    ConfrontationView? Confrontation);
+
+public sealed record ConfrontationView(string AccuserName, string ClueTitle, string ClueText);
+
+public sealed record SuspicionView(string CharacterId, string Name, int Votes);
 
 /// <summary>A question to an NPC and its answer. Public: the whole room hears the interrogation.</summary>
 public sealed record InterrogationView(
@@ -140,6 +159,9 @@ public sealed record PlayerView(
     int QuestionsLeft,
     int HintsLeft,
     IReadOnlyList<HintView> MyHints,
+    // This guest's own "who looks guiltiest?" pick, and whether they can still confront someone this act.
+    string? MySuspicion,
+    bool CanConfront,
     StageView Stage);
 
 public sealed record Dossier(

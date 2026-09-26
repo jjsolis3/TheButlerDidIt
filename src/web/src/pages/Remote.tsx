@@ -108,27 +108,34 @@ function Controls({ stage, info, invoke, status }: { stage: StageView; info: Par
         )}
       </div>
 
-      {spotlightTime(stage) && stage.players.length > 0 && (
+      {spotlightTime(stage) && stage.cast.length > 0 && (
         <section className="rounded-xl border border-line bg-surface p-3">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">🎤 Spotlight</h2>
-            <button type="button" className="text-xs text-muted underline" disabled={busy} onClick={() => call('Spotlight', nextSpeaker(stage))}>
-              {stage.spotlight ? 'Next speaker' : 'Start from the first'}
-            </button>
+            <div className="flex gap-3 text-xs">
+              <button type="button" className="text-muted underline" disabled={busy} onClick={() => call('SpinSpotlight')}>
+                🎲 Spin
+              </button>
+              <button type="button" className="text-muted underline" disabled={busy} onClick={() => call('Spotlight', nextSpeaker(stage))}>
+                {stage.spotlight ? 'Next speaker' : 'Start from the first'}
+              </button>
+            </div>
           </div>
+          {stage.spotlight && <p className="mt-2 text-sm text-muted">Card on screen: {stage.spotlight.question}</p>}
           <div className="mt-2 grid grid-cols-2 gap-2">
-            {stage.players.map((p) => {
-              const on = stage.spotlight?.seatId === p.seatId
+            {stage.cast.map((c) => {
+              const on = stage.spotlight?.characterId === c.characterId
               return (
                 <button
-                  key={p.seatId}
+                  key={c.characterId}
                   type="button"
                   disabled={busy}
                   aria-pressed={on}
-                  onClick={() => call('Spotlight', on ? null : p.seatId)}
+                  onClick={() => call('Spotlight', on ? null : c.characterId)}
                   className={`min-h-11 rounded-lg border px-2 text-left text-sm ${on ? 'border-accent bg-accent/15' : 'border-line'}`}
                 >
-                  {p.name}
+                  {c.isNpc ? c.name : c.playedBy}
+                  <span className="block text-xs text-muted">{c.isNpc ? 'the narrator' : c.name}</span>
                 </button>
               )
             })}

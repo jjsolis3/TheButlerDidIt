@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { CuePlayer } from '../components/CuePlayer'
 import { GuideButton } from '../components/Guide'
-import { nextAction, nextSpeaker, spotlightTime, useHostCall, type Invoke } from '../components/HostControls'
+import { nextAction, nextSpeaker, spotlightTime, turnSecondsLeft, useHostCall, type Invoke } from '../components/HostControls'
 import { Portrait } from '../components/Portrait'
 import { ClueCard, Countdown, FeedToasts, QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
@@ -12,7 +12,7 @@ import { useParty } from '../lib/hub'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
-import type { InterrogationView, MediaJob, PartyInfo, StageView } from '../lib/types'
+import type { InterrogationView, MediaJob, PartyInfo, SpotlightView, StageView } from '../lib/types'
 
 
 /**
@@ -55,6 +55,7 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
   const [muted, setMuted] = useState(false)
   useThemePalette(info.themeSlug)
   useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted, stage?.ai.voices ?? false)
+  useSpeakNpcSpotlight(stage, begun && !muted)
 
   // Keep the TV or laptop from going to sleep mid-mystery.
   useEffect(() => {
@@ -408,7 +409,8 @@ function MingleView({ stage }: { stage: StageView }) {
           <Countdown timer={stage.timer} large />
         </div>
         <SpotlightBanner stage={stage} />
-        {stage.prompts.length > 0 && (
+        {/* While someone has the floor, their question card is the prompt. */}
+        {!stage.spotlight && stage.prompts.length > 0 && (
           <p key={promptIndex} className="font-display mx-auto mt-4 max-w-3xl text-2xl text-ink/90 italic sm:text-3xl">
             “{stage.prompts[promptIndex % stage.prompts.length]}”
           </p>
@@ -428,6 +430,7 @@ function MingleView({ stage }: { stage: StageView }) {
           )}
         </section>
         <section className="space-y-8">
+          <SuspicionMeter stage={stage} />
           {stage.ai.npcQuestions && stage.cast.some((c) => c.isNpc) && <InterrogationRoom stage={stage} />}
           {stage.options.drinkingPrompts && <Cocktails themeSlug={stage.scenario.themeSlug} />}
           <div>
@@ -771,10 +774,15 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
               Start without it
             </Button>
           )}
-          {spotlightTime(stage) && stage.players.length > 0 && (
-            <Button variant="ghost" disabled={busy} onClick={() => call('Spotlight', nextSpeaker(stage))}>
-              🎤 {stage.spotlight ? 'Next speaker' : 'Spotlight a guest'}
-            </Button>
+          {spotlightTime(stage) && stage.cast.length > 0 && (
+            <>
+              <Button variant="ghost" disabled={busy} onClick={() => call('SpinSpotlight')}>
+                🎲 Spin
+              </Button>
+              <Button variant="ghost" disabled={busy} onClick={() => call('Spotlight', nextSpeaker(stage))}>
+                🎤 {stage.spotlight ? 'Next speaker' : 'Spotlight'}
+              </Button>
+            </>
           )}
           {stage.spotlight && (
             <Button variant="quiet" disabled={busy} onClick={() => call('Spotlight', null)}>
@@ -842,18 +850,87 @@ function RemoteQr({ code, onClose, onHide }: { code: string; onClose: () => void
 /** Whose turn it is to speak, big enough to read across the room. */
 function SpotlightBanner({ stage }: { stage: StageView }) {
   const s = stage.spotlight
+  const now = useNow(1000)
   if (!s) return null
+  const left = turnSecondsLeft(s.endsAt, now)
   return (
-    <div className="mx-auto my-4 max-w-2xl rounded-2xl border-2 border-accent bg-accent/10 px-6 py-4 text-center" role="status">
-      <p className="text-xs tracking-[0.3em] text-accent uppercase">🎤 In the spotlight</p>
+    <div className="mx-auto my-4 max-w-3xl rounded-2xl border-2 border-accent bg-accent/10 px-6 py-4 text-center" role="status">
+      <p className="text-xs tracking-[0.3em] text-accent uppercase">
+        {s.confrontation ? `⚖️ ${s.confrontation.accuserName} confronts` : '🎤 In the spotlight'}
+        {left !== null && <span className={`ml-3 font-mono ${left <= 10 ? 'text-red-300' : 'text-muted'}`}>{formatTurn(left)}</span>}
+      </p>
       <p className="font-display mt-1 text-3xl sm:text-4xl">
-        {s.playerName}
-        {s.characterName && <span className="text-muted"> as {s.characterName}</span>}
+        {s.isNpc ? s.characterName : s.playerName}
+        <span className="text-muted">{s.isNpc ? ' (played by the narrator)' : ` as ${s.characterName}`}</span>
       </p>
-      <p className="mt-1 text-sm text-muted">
-        {stage.phase === 'castReveal' ? 'Introduce your character to the room.' : 'Say your line, share a theory, or put a question to someone.'}
-      </p>
+      {s.confrontation && (
+        <div className="mx-auto mt-3 max-w-2xl rounded-xl border border-line bg-bg/60 p-3 text-left">
+          <p className="text-xs tracking-widest text-accent uppercase">The evidence: {s.confrontation.clueTitle}</p>
+          <p className="mt-1 text-sm">{s.confrontation.clueText}</p>
+        </div>
+      )}
+      {s.isNpc && s.npcLine && <p className="font-display mx-auto mt-3 max-w-2xl text-xl italic">“{s.npcLine}”</p>}
+      <p className="mx-auto mt-3 max-w-2xl text-lg">{s.question}</p>
+      {s.isNpc && stage.ai.npcQuestions && stage.phase === 'act' && (
+        <p className="mt-2 text-xs text-muted">Put the question to {s.characterName} from the Question tab on any phone. The whole room hears the answer.</p>
+      )}
     </div>
+  )
+}
+
+function formatTurn(seconds: number) {
+  return seconds === 0 ? "time's up" : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+}
+
+/** The current time, updated every `ms`, for countdowns that aren't driven by the server. */
+function useNow(ms: number) {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), ms)
+    return () => clearInterval(id)
+  }, [ms])
+  return now
+}
+
+/**
+ * When the host spotlights a character nobody is playing, the narrator speaks for them in their
+ * own voice. Keyed on the character and the turn's end time, so each turn is spoken once.
+ */
+function useSpeakNpcSpotlight(stage: StageView | null, enabled: boolean) {
+  const spot: SpotlightView | null | undefined = stage?.spotlight
+  const key = spot?.isNpc ? `${spot.characterId}@${spot.endsAt}` : null
+  const heard = useRef<string | null>(null)
+  useEffect(() => {
+    if (!key || !spot || key === heard.current) return
+    heard.current = key
+    if (!enabled) return
+    const voice = stage?.cast.find((c) => c.characterId === spot.characterId)?.voice
+    void narrator.speak([spot.npcLine, spot.confrontation ? spot.question : null].filter(Boolean).join(' '), voice)
+  }, [key, spot, stage, enabled])
+}
+
+/** "Who looks guiltiest?": the room's running totals. Only totals: nobody's vote is shown. */
+function SuspicionMeter({ stage }: { stage: StageView }) {
+  const total = stage.suspicion.reduce((sum, s) => sum + s.votes, 0)
+  if (total === 0) return null
+  return (
+    <section className="rounded-xl border border-line bg-surface p-4">
+      <h2 className="font-display mb-2 text-xl">🔥 Who looks guiltiest?</h2>
+      <ul className="space-y-2">
+        {stage.suspicion.map((s) => (
+          <li key={s.characterId}>
+            <div className="flex justify-between text-sm">
+              <span>{s.name}</span>
+              <span className="text-muted">{s.votes}</span>
+            </div>
+            <div className="mt-1 h-2 rounded-full bg-bg">
+              <div className="h-2 rounded-full bg-accent transition-all" style={{ width: `${(s.votes / total) * 100}%` }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-xs text-muted">Change your pick on your phone at any time. Only totals are shown.</p>
+    </section>
   )
 }
 

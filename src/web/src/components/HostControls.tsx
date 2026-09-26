@@ -59,12 +59,21 @@ export function nextAction(stage: StageView): { label: string; method: string; d
   }
 }
 
-/** Guests take turns in the order they joined; after the last one, the spotlight goes off. */
+/**
+ * "Next speaker": everyone at the party takes a turn in cast order, including characters the
+ * narrator plays; after the last one, the spotlight goes off. (For a random, fair order, use Spin.)
+ */
 export function nextSpeaker(stage: StageView): string | null {
-  const order = stage.players.map((p) => p.seatId)
+  const order = stage.cast.map((c) => c.characterId)
   if (!stage.spotlight) return order[0] ?? null
-  const i = order.indexOf(stage.spotlight.seatId)
+  const i = order.indexOf(stage.spotlight.characterId)
   return i >= 0 && i + 1 < order.length ? order[i + 1] : null
+}
+
+/** Seconds left in the current speaker's turn, or null. */
+export function turnSecondsLeft(endsAt: string | null, now: number): number | null {
+  if (!endsAt) return null
+  return Math.max(0, Math.round((Date.parse(endsAt) - now) / 1000))
 }
 
 /** When the spotlight is useful: introductions, and mingling. */

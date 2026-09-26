@@ -37,6 +37,11 @@ public sealed record RevealSecret(DateTimeOffset Now, Guid SeatId, string Secret
 public sealed record ShareClue(DateTimeOffset Now, Guid SeatId, string ClueId) : Command(Now);
 public sealed record SolvePuzzle(DateTimeOffset Now, Guid SeatId, string ClueId, string Answer) : Command(Now);
 public sealed record SubmitAccusation(DateTimeOffset Now, Guid SeatId, string SuspectId, string MotiveId, string MethodId) : Command(Now);
+/// <summary>A guest challenges another character with a clue they can see. Once per guest per act.</summary>
+public sealed record Confront(DateTimeOffset Now, Guid SeatId, string ClueId, string SuspectId) : Command(Now);
+
+/// <summary>A guest's current pick for "who looks guiltiest?" (null to take it back). Only totals are shown.</summary>
+public sealed record SetSuspicion(DateTimeOffset Now, Guid SeatId, string? CharacterId) : Command(Now);
 public sealed record CastAwardVote(DateTimeOffset Now, Guid SeatId, string AwardId, Guid NomineeSeatId) : Command(Now);
 
 /// <summary>Thrown when a command breaks a game rule. The message is safe to show to players.</summary>
@@ -69,7 +74,11 @@ public sealed record SetPartyOptions(DateTimeOffset Now, PartyOptions Options) :
 
 /// <summary>Set or clear (null) a guest's costume selfie.</summary>
 /// <summary>Host puts one guest "in the spotlight" (their turn to speak), or clears it with null.</summary>
-public sealed record SetSpotlight(DateTimeOffset Now, Guid? SeatId) : Command(Now);
+/// <summary>Give the floor to a character in play (a guest's, or one the narrator plays), or clear it with null.</summary>
+public sealed record SetSpotlight(DateTimeOffset Now, string? CharacterId) : Command(Now);
+
+/// <summary>Give the floor to someone who hasn't had a turn in this scene, at random.</summary>
+public sealed record SpinSpotlight(DateTimeOffset Now) : Command(Now);
 
 public sealed record SetPlayerPhoto(DateTimeOffset Now, Guid SeatId, string? PhotoUrl) : Command(Now);
 

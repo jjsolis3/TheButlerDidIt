@@ -74,7 +74,10 @@ public static partial class GameEngine
             case BeginTailoring: RequirePhase(s, Phase.Lobby); s.Tailoring = true; break;
             case CancelTailoring: s.Tailoring = false; break;
             case SetPartyOptions c: RequirePhase(s, Phase.Lobby); s.Options = c.Options; break;
-            case SetSpotlight c: SetSpotlight(s, c); break;
+            case SetSpotlight c: SetSpotlight(s, scenario, c); break;
+            case SpinSpotlight c: SpinSpotlight(s, scenario, c.Now); break;
+            case Confront c: Confront(s, scenario, c); break;
+            case SetSuspicion c: SetSuspicion(s, scenario, c); break;
             case SetPlayerPhoto c: RequirePlayer(s, c.SeatId).PhotoUrl = c.PhotoUrl; break;
             case SetInterrogationAudio c: RequireInterrogation(s, c.Id).AudioUrl = c.AudioUrl; break;
             default: throw new ArgumentOutOfRangeException(nameof(command), command.GetType().Name, "Unknown command.");
@@ -177,18 +180,69 @@ public static partial class GameEngine
 
     // ------------------------------------------------------------------ Flow
 
-    private static void SetSpotlight(GameState s, SetSpotlight c)
+    /// <summary>How long a turn in the spotlight lasts: a guide for the room, not enforced.</summary>
+    public static readonly TimeSpan SpeakerTurn = TimeSpan.FromSeconds(90);
+    public static readonly TimeSpan ConfrontationTurn = TimeSpan.FromSeconds(60);
+
+    private static void RequireSpotlightTime(GameState s)
     {
         if (s.Phase is not (Phase.CastReveal or Phase.Act))
             throw new GameRuleException("The spotlight is for introductions and the investigation.");
-        if (c.SeatId is { } seat) RequirePlayer(s, seat);
-        s.SpotlightSeatId = c.SeatId;
+    }
+
+    private static void SetSpotlight(GameState s, Scenario scenario, SetSpotlight c)
+    {
+        RequireSpotlightTime(s);
+        if (c.CharacterId is null)
+        {
+            ClearSpotlight(s);
+            return;
+        }
+        if (!CharactersInPlay(s, scenario).Any(ch => ch.Id == c.CharacterId)) throw new GameRuleException("That character isn't at the party.");
+        GiveTheFloor(s, c.CharacterId, c.Now, SpeakerTurn);
+    }
+
+    /// <summary>
+    /// A random pick among characters who haven't spoken in this scene (everyone again once all have).
+    /// The seed comes from the command's timestamp, like AutoAssign, so Apply stays pure.
+    /// </summary>
+    private static void SpinSpotlight(GameState s, Scenario scenario, DateTimeOffset now)
+    {
+        RequireSpotlightTime(s);
+        var inPlay = CharactersInPlay(s, scenario).Select(ch => ch.Id).ToList();
+        if (inPlay.Count == 0) throw new GameRuleException("There's nobody to spotlight yet.");
+        var waiting = inPlay.Where(id => !s.SpotlightSpoken.Contains(id) && id != s.SpotlightCharacterId).ToList();
+        if (waiting.Count == 0)
+        {
+            s.SpotlightSpoken.Clear();
+            waiting = inPlay.Where(id => id != s.SpotlightCharacterId).ToList();
+            if (waiting.Count == 0) waiting = inPlay;
+        }
+        var random = new Random((int)(now.UtcTicks % int.MaxValue));
+        GiveTheFloor(s, waiting[random.Next(waiting.Count)], now, SpeakerTurn);
+    }
+
+    private static void GiveTheFloor(GameState s, string characterId, DateTimeOffset now, TimeSpan turn)
+    {
+        s.SpotlightCharacterId = characterId;
+        s.SpotlightEndsAt = now + turn;
+        s.SpotlightTurns++;
+        s.Confrontation = null;
+        if (!s.SpotlightSpoken.Contains(characterId)) s.SpotlightSpoken.Add(characterId);
+    }
+
+    private static void ClearSpotlight(GameState s)
+    {
+        s.SpotlightCharacterId = null;
+        s.SpotlightEndsAt = null;
+        s.Confrontation = null;
     }
 
     private static void Advance(GameState s, Scenario scenario, DateTimeOffset now)
     {
-        // A new scene starts with nobody in the spotlight.
-        s.SpotlightSeatId = null;
+        // A new scene starts with nobody in the spotlight, and everyone waiting for a turn.
+        ClearSpotlight(s);
+        s.SpotlightSpoken.Clear();
         switch (s.Phase)
         {
             case Phase.CastReveal:
@@ -379,7 +433,7 @@ public static partial class GameEngine
         s.Players.Remove(player);
         s.Accusations.Remove(c.SeatId);
         s.AwardVotes.Remove(c.SeatId);
-        if (s.SpotlightSeatId == c.SeatId) s.SpotlightSeatId = null;
+        s.Suspicions.Remove(c.SeatId);
     }
 
     // ------------------------------------------------------------------ Player actions
@@ -409,6 +463,44 @@ public static partial class GameEngine
         var clue = scenario.FindClue(c.ClueId)!;
         var who = player.CharacterId is { } id ? scenario.FindCharacter(id)?.Name ?? player.Name : player.Name;
         AddFeed(s, c.Now, $"{who} shared a clue: {clue.Title}");
+    }
+
+    private static void Confront(GameState s, Scenario scenario, Confront c)
+    {
+        RequireMingle(s);
+        var player = RequirePlayer(s, c.SeatId);
+        if (player.CharacterId is null) throw new GameRuleException("Choose a character first.");
+        if (c.SuspectId == player.CharacterId) throw new GameRuleException("You can't confront yourself. Well, you can, but not here.");
+        var suspect = CharactersInPlay(s, scenario).FirstOrDefault(ch => ch.Id == c.SuspectId)
+            ?? throw new GameRuleException("That character isn't at the party.");
+        if (!CanSeeClue(s, c.SeatId, c.ClueId)) throw new GameRuleException("You haven't found that clue.");
+        var act = CurrentActNumber(s);
+        if (s.ConfrontedInAct.TryGetValue(c.SeatId, out var last) && last == act)
+            throw new GameRuleException("You've already confronted someone this act. Save your evidence for the next one.");
+
+        // Evidence is shown to the whole room: a private clue used this way is shared.
+        var dropped = s.DroppedClues.First(d => d.ClueId == c.ClueId);
+        if (dropped.RecipientSeatId is not null) dropped.SharedPublicly = true;
+
+        s.ConfrontedInAct[c.SeatId] = act;
+        GiveTheFloor(s, suspect.Id, c.Now, ConfrontationTurn);
+        s.Confrontation = new Confrontation { AccuserSeatId = c.SeatId, ClueId = c.ClueId };
+        var accuser = scenario.FindCharacter(player.CharacterId)?.Name ?? player.Name;
+        AddFeed(s, c.Now, $"{accuser} confronts {suspect.Name} with “{scenario.FindClue(c.ClueId)!.Title}”!");
+    }
+
+    private static void SetSuspicion(GameState s, Scenario scenario, SetSuspicion c)
+    {
+        if (s.Phase != Phase.Act) throw new GameRuleException("You can point the finger during the acts.");
+        var player = RequirePlayer(s, c.SeatId);
+        if (c.CharacterId is null)
+        {
+            s.Suspicions.Remove(c.SeatId);
+            return;
+        }
+        if (c.CharacterId == player.CharacterId) throw new GameRuleException("Suspecting yourself? Very modern. Pick someone else.");
+        if (!CharactersInPlay(s, scenario).Any(ch => ch.Id == c.CharacterId)) throw new GameRuleException("That character isn't at the party.");
+        s.Suspicions[c.SeatId] = c.CharacterId;
     }
 
     private static void SolvePuzzle(GameState s, Scenario scenario, SolvePuzzle c)

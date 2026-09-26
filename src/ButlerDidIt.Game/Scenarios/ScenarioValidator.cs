@@ -95,6 +95,13 @@ public static class ScenarioValidator
         Check(cluesAgainstMurderer >= MinCluesAgainstMurderer,
             $"Only {cluesAgainstMurderer} genuine clue(s) point to the murderer; at least {MinCluesAgainstMurderer} are needed.");
 
+        // Solvable by the room, not just on paper: a private clue's holder may keep it to themselves
+        // (the murderer certainly will), so enough of the evidence must be seen by everyone.
+        var publicAgainstMurderer = s.Clues.Count(c => !c.RedHerring && c.Visibility == ClueVisibility.Public && c.PointsTo.Contains(s.Solution.MurdererId));
+        Check(publicAgainstMurderer >= MinCluesAgainstMurderer,
+            $"Only {publicAgainstMurderer} genuine public clue(s) point to the murderer; at least {MinCluesAgainstMurderer} must be public, " +
+            "because a private clue's holder may never share it.");
+
         // Suspense: the murderer must not be the only suspect clues point at.
         var otherSuspects = s.Clues.SelectMany(c => c.PointsTo).Where(id => id != s.Solution.MurdererId).Distinct().Count();
         Check(otherSuspects >= 2, "Clues should cast suspicion on at least two innocent characters.");

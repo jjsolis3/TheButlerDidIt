@@ -52,16 +52,16 @@ test('the host runs the evening from a phone remote while the TV shows only the 
   await remote.waitForURL(`**/remote/${code}`)
   await expect(remote.getByText('📱 Host remote')).toBeVisible()
 
-  await joinAs(browser, code, 'Ada', /Dr\. Cornelius Finch/)
-  await joinAs(browser, code, 'Ben', /Hargrove/)
-  await joinAs(browser, code, 'Cy', /Lady Evelyn/)
+  const ada = await joinAs(browser, code, 'Ada', /Dr\. Cornelius Finch/)
+  const ben = await joinAs(browser, code, 'Ben', /Hargrove/)
+  const cy = await joinAs(browser, code, 'Cy', /Lady Evelyn/)
   await expect(remote.getByText('Ada as Dr. Cornelius Finch')).toBeVisible()
   await remote.screenshot({ path: `${SHOTS}/81-remote-lobby.png`, fullPage: true })
 
   // Everything from here is pressed on the phone; the TV is never touched again.
   await remote.getByRole('button', { name: 'Begin the evening' }).click()
   await expect(tv.getByRole('heading', { name: 'The suspects' })).toBeVisible() // no "Tap to begin": sound was unlocked in the lobby
-  await remote.getByRole('button', { name: 'Ben', exact: true }).click()
+  await remote.getByRole('button', { name: /^Ben/ }).click()
   await expect(tv.getByRole('status').filter({ hasText: 'In the spotlight' })).toContainText('Ben as Mr. Alistair Hargrove')
 
   await remote.getByRole('button', { name: 'Play the prologue' }).click()
@@ -70,6 +70,29 @@ test('the host runs the evening from a phone remote while the TV shows only the 
   await expect(remote.getByRole('button', { name: /Drop next clue/ })).toBeVisible()
   await expect(remote.getByText('What now?')).toBeVisible()
   await remote.screenshot({ path: `${SHOTS}/82-remote-mingle.png`, fullPage: true })
+  // Violet is played by the narrator: she gets the floor too, and says her line.
+  await remote.getByRole('button', { name: /Miss Violet Blackwood/ }).click()
+  const banner = tv.getByRole('status').filter({ hasText: 'In the spotlight' })
+  await expect(banner).toContainText('played by the narrator')
+  await remote.getByRole('button', { name: '🎲 Spin' }).click()
+  await expect(banner).not.toContainText('Miss Violet Blackwood (played by the narrator)')
+
+  // Ada confronts Ben with a clue from her phone: it goes on the big screen, and Ben must answer.
+  await ada.getByRole('button', { name: /^Clues/ }).click()
+  await ada.getByRole('button', { name: '⚖️ Confront someone with this' }).first().click()
+  await ada.getByRole('button', { name: 'Mr. Alistair Hargrove' }).click()
+  await expect(tv.getByRole('status').filter({ hasText: 'confronts' })).toContainText('The evidence')
+  await expect(ben.getByText('is confronting you!')).toBeVisible()
+  await expect(ada.getByRole('button', { name: '⚖️ Confront someone with this' })).toHaveCount(0) // once per act
+  await tv.screenshot({ path: `${SHOTS}/84-tv-confrontation.png` })
+
+  // Two phones pick Hargrove as the guiltiest-looking: the big screen shows only the total.
+  await ada.getByLabel('Who looks guiltiest').selectOption({ label: 'Mr. Alistair Hargrove' })
+  await cy.getByRole('button', { name: /^Clues/ }).click()
+  await cy.getByLabel('Who looks guiltiest').selectOption({ label: 'Mr. Alistair Hargrove' })
+  await expect(tv.getByRole('heading', { name: '🔥 Who looks guiltiest?' })).toBeVisible()
+  await expect(tv.locator('li', { hasText: 'Mr. Alistair Hargrove' })).toContainText('2')
+
   await remote.getByRole('button', { name: '⏸ Pause' }).click()
   await expect(remote.getByRole('button', { name: '▶ Resume' })).toBeVisible()
   await expect(tv.getByRole('button', { name: 'Show host controls' })).toBeVisible() // still hidden on the TV

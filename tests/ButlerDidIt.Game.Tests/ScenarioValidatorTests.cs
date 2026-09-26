@@ -32,6 +32,17 @@ public class ScenarioValidatorTests
         Assert.Contains(ScenarioValidator.Validate(s), e => e.Contains("point to the murderer"));
     }
 
+    [Fact]
+    public void Enough_evidence_must_be_public_because_private_clues_may_never_be_shared()
+    {
+        // Make the public "flour" clue private: three clues still point at the cook, but only two are public.
+        var s = With(n => n["clues"]!.AsArray().Single(c => c!["id"]!.GetValue<string>() == "c6")!.AsObject()
+            .Merge(("visibility", "private"), ("recipient", "maid")));
+        var errors = ScenarioValidator.Validate(s);
+        Assert.Contains(errors, e => e.Contains("must be public"));
+        Assert.DoesNotContain(errors, e => e.StartsWith("Only 2 genuine clue(s)"));
+    }
+
     /// <summary>A copy of the test scenario with one JSON change (Scenario is init-only, like the files it's read from).</summary>
     private static Scenario With(Action<System.Text.Json.Nodes.JsonObject> change)
     {
@@ -71,5 +82,14 @@ public class ScenarioValidatorTests
         var s = TestScenario.Create();
         s.Clues.Add(new Clue { Id = "c1", Title = "Dup", Text = "x" });
         Assert.Contains(ScenarioValidator.Validate(s), e => e.Contains("Duplicate clue id 'c1'"));
+    }
+}
+
+internal static class JsonNodeTestExtensions
+{
+    /// <summary>Sets several properties on a JSON object, for concise test edits.</summary>
+    public static void Merge(this System.Text.Json.Nodes.JsonObject node, params (string Key, string Value)[] values)
+    {
+        foreach (var (key, value) in values) node[key] = value;
     }
 }

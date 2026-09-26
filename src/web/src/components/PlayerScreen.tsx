@@ -354,9 +354,16 @@ function tabForPhase(phase: StageView['phase'], current: Tab): Tab {
 function YoureUp({ view }: { view: PlayerView }) {
   const lines = view.dossier?.linesThisAct ?? []
   const intro = view.stage.phase === 'castReveal'
+  const spot = view.stage.spotlight
   return (
     <section className="rounded-xl border-2 border-accent bg-accent/10 p-4" role="status">
-      <p className="font-display text-2xl">🎤 You're up!</p>
+      <p className="font-display text-2xl">{spot?.confrontation ? `⚖️ ${spot.confrontation.accuserName} is confronting you!` : "🎤 You're up!"}</p>
+      {spot?.confrontation && (
+        <p className="mt-1 text-sm">
+          The evidence: <b>{spot.confrontation.clueTitle}</b>. You have a minute to explain yourself. Stay in character!
+        </p>
+      )}
+      {spot && <p className="mt-2 rounded-lg bg-bg/60 p-2 text-sm">{spot.question}</p>}
       <p className="mt-1 text-sm">
         {intro
           ? `Introduce ${view.dossier?.character.name ?? 'your character'} to the room: name, who you are, and anything from "What everyone knows about you".`
@@ -489,20 +496,77 @@ function SecretsTab({ view, run }: { view: PlayerView; run: (m: string, ...a: un
 
 function CluesTab({ view, invoke, run }: { view: PlayerView; invoke: Invoke; run: (m: string, ...a: unknown[]) => Promise<unknown> }) {
   const clues = [...view.myClues].reverse()
-  if (clues.length === 0) return <p className="py-10 text-center text-muted">No clues yet. They'll appear here as the evening unfolds.</p>
+  const [confronting, setConfronting] = useState<string | null>(null)
+  const others = view.stage.cast.filter((c) => c.characterId !== view.dossier?.character.characterId)
   return (
     <div className="space-y-3">
+      {view.stage.phase === 'act' && view.dossier && <SuspicionPicker view={view} run={run} />}
+      {clues.length === 0 && <p className="py-10 text-center text-muted">No clues yet. They'll appear here as the evening unfolds.</p>}
       {clues.map((c) => (
-        <ClueCard
-          key={c.id}
-          clue={c}
-          onShare={() => {
-            if (confirm('Show this clue to everyone?')) void run('ShareClue', c.id)
-          }}
-          onSolve={(answer) => invoke('SolvePuzzle', c.id, answer)}
-        />
+        <div key={c.id}>
+          <ClueCard
+            clue={c}
+            onShare={() => {
+              if (confirm('Show this clue to everyone?')) void run('ShareClue', c.id)
+            }}
+            onSolve={(answer) => invoke('SolvePuzzle', c.id, answer)}
+          />
+          {/* A confrontation puts the clue on the big screen and gives the suspect the floor. One per act. */}
+          {view.canConfront &&
+            (confronting === c.id ? (
+              <div className="mt-2 rounded-lg border border-accent/60 bg-surface p-3">
+                <p className="text-sm font-semibold">Who do you confront with “{c.title}”?</p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {others.map((o) => (
+                    <button
+                      key={o.characterId}
+                      type="button"
+                      className="min-h-11 rounded-lg border border-line px-2 text-left text-sm hover:border-accent"
+                      onClick={() => {
+                        setConfronting(null)
+                        void run('Confront', c.id, o.characterId)
+                      }}
+                    >
+                      {o.name}
+                    </button>
+                  ))}
+                </div>
+                <button type="button" className="mt-2 text-xs text-muted underline" onClick={() => setConfronting(null)}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button type="button" className="mt-1 text-sm text-accent underline" onClick={() => setConfronting(c.id)}>
+                ⚖️ Confront someone with this
+              </button>
+            ))}
+        </div>
       ))}
     </div>
+  )
+}
+
+/** "Who looks guiltiest right now?" Change it any time; the big screen only shows totals. */
+function SuspicionPicker({ view, run }: { view: PlayerView; run: (m: string, ...a: unknown[]) => Promise<unknown> }) {
+  const others = view.stage.cast.filter((c) => c.characterId !== view.dossier?.character.characterId)
+  return (
+    <label className="block rounded-xl border border-line bg-surface p-3">
+      <span className="text-xs font-semibold tracking-widest text-accent uppercase">🔥 Who looks guiltiest right now?</span>
+      <select
+        aria-label="Who looks guiltiest"
+        className="mt-2 w-full rounded-lg border border-line bg-bg px-3 py-2"
+        value={view.mySuspicion ?? ''}
+        onChange={(e) => void run('SetSuspicion', e.target.value || null)}
+      >
+        <option value="">Nobody yet</option>
+        {others.map((o) => (
+          <option key={o.characterId} value={o.characterId}>
+            {o.name}
+          </option>
+        ))}
+      </select>
+      <span className="mt-1 block text-xs text-muted">Anonymous: the big screen shows only the totals.</span>
+    </label>
   )
 }
 

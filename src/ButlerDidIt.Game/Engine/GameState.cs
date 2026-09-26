@@ -84,11 +84,29 @@ public sealed class GameState
     public PartyOptions Options { get; set; } = new();
 
     /// <summary>
-    /// The guest whose turn it is to speak, chosen by the host. It gives new groups a
-    /// speaking order: introductions during the cast reveal, then lines and theories while
-    /// mingling. Cleared whenever the game moves on.
+    /// The character whose turn it is to speak: a guest's character, or one the narrator plays.
+    /// It gives new groups a speaking order: introductions during the cast reveal, then lines,
+    /// theories and confrontations while mingling. Cleared whenever the game moves on.
     /// </summary>
-    public Guid? SpotlightSeatId { get; set; }
+    public string? SpotlightCharacterId { get; set; }
+
+    /// <summary>When the current speaker's turn is up. A guide for the room, not enforced.</summary>
+    public DateTimeOffset? SpotlightEndsAt { get; set; }
+
+    /// <summary>How many turns there have been, so the question cards vary.</summary>
+    public int SpotlightTurns { get; set; }
+
+    /// <summary>Characters who have had a turn in this scene, so "Spin" picks someone who hasn't.</summary>
+    public List<string> SpotlightSpoken { get; set; } = [];
+
+    /// <summary>Set when the spotlight is a challenge: a guest confronting another with a clue.</summary>
+    public Confrontation? Confrontation { get; set; }
+
+    /// <summary>The act in which each guest last confronted someone. One confrontation per guest per act.</summary>
+    public Dictionary<Guid, int> ConfrontedInAct { get; set; } = [];
+
+    /// <summary>Each guest's current "who looks guiltiest?" pick. Shown to the room only as totals.</summary>
+    public Dictionary<Guid, string> Suspicions { get; set; } = [];
 
     /// <summary>
     /// The host pressed "Begin the evening" and the AI is writing a version of the mystery
@@ -143,6 +161,12 @@ public sealed class PlayerState
 
     /// <summary>A costume selfie the guest uploaded, used as their avatar.</summary>
     public string? PhotoUrl { get; set; }
+}
+
+public sealed class Confrontation
+{
+    public Guid AccuserSeatId { get; set; }
+    public required string ClueId { get; set; }
 }
 
 public sealed class DroppedClue
