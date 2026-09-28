@@ -1,0 +1,215 @@
+{
+  "variantOf": "death-in-room-13",
+  "variant": "B",
+  "solution": {
+    "murdererId": "julian",
+    "motiveId": "inheritance",
+    "methodId": "chloral",
+    "explanation": [
+      "Nobody strangled Cordelia Mortimer, and no ghost laid a finger on her. She was poisoned before the lights ever went out, by the one person who poured her drink: her nephew, Julian.",
+      "Julian owes thirty thousand dollars to very dangerous men, due on Monday. At dinner his aunt announced a new will: the hotel to the city, and nothing for Julian. 'You won't live to sign it, Aunt,' he said. She wrote it in her diary, as a joke.",
+      "At five to eleven he poured her sherry from the decanter everyone drank from, but he tipped a dose of chloral hydrate, knockout drops, into her glass alone, from his own pocket decanter. She carried the glass into Room 13 and drank the rest greeting the bride. Her old heart gave out in minutes.",
+      "At nine minutes past, in the dark, Julian slipped into Room 13 by the ballroom door to wipe the glass. Lucky saw a figure with a cane, and Vivienne smelled bay rum pass behind her. But the dregs still smelled of pears, the chemist's receipt was in his coat, and his pocket decanter smelled the same.",
+      "Madame Zora's cord, Mrs. Pruitt's pillow, Eddie's pearls and the doctor's certificates were all red herrings. Julian always said he'd inherit the hotel one way or another. He just didn't read the new will carefully enough."
+    ],
+    "timeline": [
+      {
+        "time": "10:00",
+        "event": "Dinner. Cordelia announces a new will: nothing for Julian. 'You won't live to sign it, Aunt.'"
+      },
+      {
+        "time": "10:55",
+        "event": "Julian pours Cordelia's sherry, with chloral hydrate from his pocket decanter in her glass alone."
+      },
+      {
+        "time": "11:00",
+        "event": "The lights go out. Mrs. Pruitt unlocks Room 13. Zora enters her cabinet."
+      },
+      {
+        "time": "11:05",
+        "event": "Cordelia goes into Room 13 with her glass and drinks the rest to the bride."
+      },
+      {
+        "time": "11:06",
+        "event": "Mrs. Pruitt goes for candles. Julian leaves the table, supposedly for air."
+      },
+      {
+        "time": "11:08",
+        "event": "Cordelia collapses beside the bridal bed."
+      },
+      {
+        "time": "11:09",
+        "event": "Julian slips into Room 13 by the ballroom door to wipe the glass. Lucky sees a figure with a cane."
+      },
+      {
+        "time": "11:13",
+        "event": "The lights come up. Four chairs are empty."
+      },
+      {
+        "time": "11:19",
+        "event": "Eddie finds Cordelia's pearls in the corridor and pockets them."
+      },
+      {
+        "time": "11:20",
+        "event": "Eddie opens Room 13 and finds Cordelia."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. Room 13."
+        },
+        {
+          "type": "image",
+          "text": "The bridal suite by candlelight: a four-poster bed made up with lace, a spilled sherry glass, feathers on the rug, and an open window with the curtains blowing.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Dr. Crowe kneels by the body. There isn't a mark on Cordelia's throat. Her lips are blue, and there's a sweet smell of pears from the sherry spilled by her hand. 'Chloral hydrate,' he says. 'Knockout drops. Enough to stop an old woman's heart. She was poisoned before she ever walked into this room.'"
+        },
+        {
+          "type": "line",
+          "speaker": "eddie",
+          "text": "I opened the door and there she was. And the bed was all made up, like somebody expected a bride."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "julian": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You owe thirty thousand dollars to men in Chicago who break fingers, due on Monday. At dinner Aunt Cordelia announced her new will: the hotel to the city, nothing for you. You said, 'You won't live to sign it, Aunt,' and she laughed. At five to eleven you poured her sherry from the decanter everyone drank from, and tipped chloral hydrate into her glass alone, from your own silver pocket decanter. She carried it into Room 13 and drank the rest to the bride. At nine minutes past you slipped in by the ballroom door to wipe the glass. She was already on the floor.",
+        "objectives": [
+          "Don't get caught. Point everyone at Madame Zora (the cord!) or Mrs. Pruitt (the key! the pillow!).",
+          "Get rid of the chemist's receipt in your coat, and rinse your pocket decanter.",
+          "Get your hands on the hotel before Monday."
+        ],
+        "knows": [
+          "Chloral hydrate smells of pears. Sherry hides most of it.",
+          "Madame Zora was about to be exposed as a fraud at the end of the séance."
+        ],
+        "lines": {
+          "act3": [
+            "Everyone drank from that decanter. Everyone! If there was anything in her glass, somebody put it there after I poured it."
+          ]
+        }
+      }
+    },
+    "zora": {
+      "private": {
+        "backstory": "Your séances are a trick: a spirit cabinet with a false back, spirit hands made of gloves on wires. Cordelia hired a detective who found it all out, and at dinner she told you she'd expose you at the end of the séance. You'd be finished. When the lights went out you stayed in your cabinet, working the spirit hands through the curtain as usual. At nine minutes past, through the curtain, you heard the ballroom door of Room 13 creak open, and a cane tapping on the floor. You did not kill her. But you had every reason to.",
+        "objectives": [
+          "Clear your name without anyone looking behind your cabinet.",
+          "Find the detective's report before it's read aloud.",
+          "Find out who really killed Cordelia. It would make a marvellous séance."
+        ],
+        "knows": [
+          "Cordelia drinks a sherry toast just before the séance, and Julian always pours it.",
+          "Agnes the housekeeper keeps the only key to Room 13, and unlocks it every Halloween."
+        ],
+        "alibi": "I was in my spirit cabinet from eleven until the lights came up, working. The spirits don't summon themselves.",
+        "lines": {
+          "act3": [
+            "Yes, my cabinet has a false back. Every medium's does. I used it to make the spirit hands wave, not to kill anyone."
+          ]
+        }
+      }
+    },
+    "vivienne": {
+      "private": {
+        "knows": [
+          "At eight minutes past eleven, in the dark, you smelled bay rum pass behind your chair, towards the ballroom corridor. Julian wears bay rum.",
+          "At nineteen past eleven, with the lights up, you saw Eddie the bellhop come out of the Room 13 corridor with one hand stuffed in his pocket."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "cord": {
+      "text": "On the floor of Room 13: a purple silk cord with a tassel, the one from Madame Zora's spirit trumpet. It slips off the trumpet every year. Dr. Crowe says there isn't a mark on Cordelia's throat.",
+      "redHerring": true
+    },
+    "report": {
+      "redHerring": true
+    },
+    "cabinet": null,
+    "bangle": null,
+    "sherry": {
+      "text": "Cordelia's sherry glass lies on its side by the bridal bed. It's been wiped clean on the outside, but the few drops left in the bottom smell sweetly of pears. The decanter on the séance table doesn't. Julian poured her glass.",
+      "redHerring": false
+    },
+    "will": {
+      "redHerring": false
+    },
+    "lucky-saw": {
+      "text": "Your own memory: by the red lamp, at nine minutes past eleven, a tall figure with a cane slipped into Room 13 by the ballroom door. A minute later it came out again, wiping something with a handkerchief.",
+      "pointsTo": [
+        "julian"
+      ]
+    },
+    "diary": {
+      "pointsTo": [
+        "julian"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Told Julian about the new will at dinner. He said, \"You won't live to sign it, Aunt.\" So dramatic. He'll pour my sherry at five to eleven, as always, and sulk.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "debts",
+      "title": "Letters from Chicago",
+      "text": "In Julian's room: three letters from a Chicago 'sporting club'. 'Thirty thousand dollars by Monday, Mr. Mortimer, or we'll send some friends.' The last one has a photograph of a smashed piano enclosed.",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "julian"
+      ]
+    },
+    {
+      "id": "chemist",
+      "title": "A Chemist's Receipt",
+      "text": "In the pocket of Julian's overcoat: a receipt from a Hollywood chemist, dated yesterday. 'Chloral hydrate, two ounces. For sleeplessness.' Signed 'J. Mortimer'.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "julian"
+      ]
+    },
+    {
+      "id": "decanter",
+      "title": "The Pocket Decanter",
+      "text": "Julian's silver pocket decanter, left on the terrace wall. Unscrew the cap: it smells sweetly of pears, not of brandy.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "julian"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Police cars winding up a wet canyon road at dawn, towards a gothic hotel.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Hotel Mortimer!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came up the canyon road at six. Julian Mortimer was waiting in the lobby, leaning on his cane, a sherry in his hand. 'I suppose,' he said, 'this means I won't be getting the hotel after all.'"
+    },
+    {
+      "type": "narration",
+      "text": "The Hotel Mortimer went to the city as a museum, and Room 13 was locked again. But the night clerk swears that at three o'clock the next morning, the bell for Room 13 rang at the front desk. When he went to look, the door was still locked, the room was empty, and the bridal bed had been freshly made. Goodnight, detectives. Please don't check out."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "slug": "hollowmere",
+  "name": "Hollowmere",
+  "tagline": "A New England Halloween: a harvest festival, a witch trial reenactment, and a curse that's three hundred years old.",
+  "era": "1990s New England witch town",
+  "description": "Every Halloween the little town of Hollowmere, Massachusetts, puts on its Harvest Festival: hayrides, cider, candlelit walking tours and, at midnight, a reenactment of the 1692 trial of Goody Abigail Thorne, the town's own witch. The festival chairman always plays the accused. This year, he didn't survive the part. A folk-horror Halloween mystery.",
+  "palette": {
+    "background": "#0d0b08",
+    "surface": "#1d1811",
+    "accent": "#d9822b",
+    "ink": "#efe4cf"
+  },
+  "artStyle": "New England folk horror, bare autumn trees, a white clapboard church, an old mill by a black pond, lantern light and falling leaves",
+  "sortOrder": 13,
+  "cocktails": [
+    {
+      "name": "The Witch's Cup",
+      "recipe": "Hot mulled cider with a shot of applejack, cinnamon and a star anise.",
+      "mocktail": "Hot mulled cider with cinnamon, cloves and a star anise."
+    }
+  ]
+}

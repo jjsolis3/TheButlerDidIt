@@ -1,0 +1,227 @@
+{
+  "variantOf": "the-witching-hour",
+  "variant": "B",
+  "solution": {
+    "murdererId": "grant",
+    "motiveId": "land",
+    "methodId": "hemlock",
+    "explanation": [
+      "No witch killed Josiah Whitcombe, and nobody struck him. He was poisoned with water hemlock, the deadliest plant in New England, which grows on the bank of Mill Pond. The poisoner was the developer, Grant Holloway.",
+      "Grant has borrowed three million dollars against his resort in the Thorne Woods, and Josiah's vote was the last he needed. Tonight Josiah told him he'd vote no, and announce it at midnight. 'Then you'd better enjoy your cider, Josiah,' Grant said. It's in Josiah's notebook.",
+      "That evening Grant dug up a hemlock root on the pond bank. At eleven, at the Crooked Broom, while Molly fetched cinnamon sticks, he slipped scrapings of it into Josiah's pewter flask. By twenty to twelve Josiah was sweating and twitching, and told Prudence the cider tasted of parsnips.",
+      "At a quarter to twelve Grant went into the mill to make sure. He poured the salt circle and left a poppet from Morgana's shop, so the town would blame the witch, and threw the rest of the root into the pond on his way out. Kendra's camera caught him. The parsnip smell in the flask, the dug-up hole by the pond with his loafer prints and the shavings in his gloves told the rest.",
+      "Prudence's bridle, the Reverend's deed, Molly's bills and Winston's gavel were all red herrings. Grant said Hollowmere needed jobs, not ghosts. It turns out it needed neither."
+    ],
+    "timeline": [
+      {
+        "time": "Afternoon",
+        "event": "Grant buys a straw poppet and salt from Morgana's shop."
+      },
+      {
+        "time": "9:00",
+        "event": "At the festival supper, Josiah promises to 'shake Hollowmere to its roots' at midnight."
+      },
+      {
+        "time": "10:15",
+        "event": "Josiah tells Grant he'll vote no. 'Then you'd better enjoy your cider, Josiah.'"
+      },
+      {
+        "time": "10:30",
+        "event": "Grant digs up a water hemlock root on the bank of Mill Pond."
+      },
+      {
+        "time": "11:00",
+        "event": "Molly fills Josiah's flask and goes for cinnamon. Grant doses the flask."
+      },
+      {
+        "time": "11:30",
+        "event": "Josiah goes into the old mill, sipping from his flask."
+      },
+      {
+        "time": "11:35",
+        "event": "Morgana brings Josiah a sprig of rowan. He's cheerful."
+      },
+      {
+        "time": "11:40",
+        "event": "Prudence fits the bridle. Josiah is sweating and twitching: 'This cider tastes like parsnips.'"
+      },
+      {
+        "time": "11:45",
+        "event": "Grant goes in, pours the salt and leaves the poppet as Josiah collapses."
+      },
+      {
+        "time": "11:47",
+        "event": "Grant comes out and throws the rest of the root into the pond."
+      },
+      {
+        "time": "11:50",
+        "event": "The Reverend prays on the step. No answer."
+      },
+      {
+        "time": "12:05",
+        "event": "The procession opens the mill and finds Josiah."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Old Mill."
+        },
+        {
+          "type": "image",
+          "text": "Inside the old mill by lantern light: a circle of salt, a straw doll, an iron bridle on the floorboards, and a pewter flask on its side.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Sheriff Hatch kneels inside the salt circle. There isn't a wound on Josiah. But there's froth at his lips, his jaw is clenched tight, and the cider spilled from his flask smells of raw parsnip. 'Water hemlock,' the sheriff says. 'Grows by the pond. One bite of the root will kill a cow.'"
+        },
+        {
+          "type": "line",
+          "speaker": "hatch",
+          "text": "Somebody wants us to think a witch did this. Somebody wants it very badly."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "grant": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Your resort in the Thorne Woods needs Josiah's vote, and you've borrowed three million dollars against it. Tonight he told you he'd vote no, at midnight, in front of everyone. You said, 'Then you'd better enjoy your cider, Josiah.' At half past ten you dug up a water hemlock root on the bank of Mill Pond. At eleven, at the inn, while Molly went for cinnamon sticks, you scraped some into his pewter flask. At a quarter to twelve you went into the mill to make sure. You poured a circle of salt and left the poppet you'd bought from Morgana's shop, and on your way out you threw the rest of the root into the pond.",
+        "objectives": [
+          "Don't get caught. Point everyone at the witch (the salt! the poppet!) or at Prudence and her bridle.",
+          "Get rid of your leather gloves, and clean your loafers.",
+          "Get the resort approved."
+        ],
+        "knows": [
+          "Water hemlock root smells of raw parsnip, and mulled cider hides it. It takes half an hour or so.",
+          "Prudence Alden went into the mill just before you, and she's terrified of something Josiah knows."
+        ],
+        "alibi": "At a quarter to twelve I went to the mill to talk to Josiah. He was sick as a dog, and told me to get out, so I went back to the inn.",
+        "lines": {
+          "act3": [
+            "He was already sick when I got there! Ask Prudence. Ask anyone. I'm a businessman, not a botanist."
+          ]
+        }
+      }
+    },
+    "prudence": {
+      "private": {
+        "backstory": "The museum's star exhibit, the 1692 Hollowmere Charter, is your forgery, made in 1978 to save the museum. Tonight Josiah told you he'd had the paper tested, and he'd announce it at midnight. You were terrified. At twenty to twelve you went into the mill to fit his costume's iron bridle, as every year. He was sweating and twitching, clutching his flask, and he said the cider 'tasted like parsnips'. You thought he'd had too much. You left at a quarter to twelve. You did not kill him. But you had every reason to.",
+        "objectives": [
+          "Clear your name without anyone finding out about the Charter.",
+          "Keep your museum office locked.",
+          "Find out who really killed Josiah."
+        ],
+        "lines": {
+          "act3": [
+            "I fitted his bridle, as I do every year, and I left him alive. Whatever happened in that mill happened after me."
+          ]
+        }
+      }
+    },
+    "molly": {
+      "private": {
+        "knows": [
+          "At eleven you filled Josiah's pewter flask with mulled cider from the big pot, the same as everyone's, and left it on the bar while you fetched cinnamon sticks.",
+          "Grant Holloway came back into the inn at ten to twelve and ordered a double, with his hands shaking."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "bridle": {
+      "text": "On the floor beside Josiah: the iron witch's bridle, lent by the Historical Society for his costume. It lies where it fell off his head. Sheriff Hatch says there isn't a mark on it, or on him from it. Prudence Alden fitted it at twenty to twelve.",
+      "redHerring": true
+    },
+    "charter": {
+      "redHerring": true
+    },
+    "office": null,
+    "cuff": null,
+    "resort": {
+      "redHerring": false
+    },
+    "kendra-saw": {
+      "text": "Your own memory, from the camera's zoom: at 11:45 Grant Holloway went into the mill. At 11:47 he came out, looked round, and threw something small and pale into the pond. Then he wiped his hands very carefully on a handkerchief.",
+      "pointsTo": [
+        "grant"
+      ]
+    },
+    "notebook": {
+      "pointsTo": [
+        "grant"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Told Holloway I'm voting no, and I'll say so at midnight. He smiled and said, \"Then you'd better enjoy your cider, Josiah.\" Odd fellow. Flask from Molly at eleven, as always.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "flask",
+      "title": "The Pewter Flask",
+      "text": "Josiah's pewter flask on its side by the salt circle. The cider left in it smells strongly of raw parsnip. The big cider pot at the Crooked Broom smells of nothing but cinnamon. Molly left the flask on the bar at eleven, and Grant Holloway was standing right beside it.",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "grant"
+      ]
+    },
+    {
+      "id": "molly-saw",
+      "title": "At the Bar",
+      "text": "Your own memory: at eleven, when you came back from fetching cinnamon sticks, Grant Holloway was standing right by Josiah's flask on the bar. He jumped a foot when he saw you.",
+      "visibility": "private",
+      "recipient": "molly",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "grant"
+      ]
+    },
+    {
+      "id": "hole",
+      "title": "A Hole by the Pond",
+      "text": "On the bank of Mill Pond, where the water hemlock grows: a freshly dug hole where a root has been pulled up. Beside it, in the mud, the prints of expensive city loafers. Nobody in Hollowmere wears loafers.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "grant"
+      ]
+    },
+    {
+      "id": "gloves",
+      "title": "Driving Gloves",
+      "text": "On the passenger seat of Grant Holloway's car: a pair of leather driving gloves, flecked with pale root shavings. They smell of raw parsnip.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "grant"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "State police cars crossing a narrow bridge at dawn, blue lights on the mist over Mill Pond.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of Hollowmere!",
+      "alternative": "Hot cider up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The state police came over the bridge at six. Grant Holloway was sitting in his car with the engine running, and the bridge still closed. 'It was just one vote,' he said. 'One little vote.'"
+    },
+    {
+      "type": "narration",
+      "text": "They buried Josiah Whitcombe in the churchyard a week later, a few rows from Abigail Thorne. On the morning after the funeral, the groundskeeper found a fresh circle of coarse grey salt poured around his grave. Nobody in Hollowmere would admit to pouring it. Morgana Thorne says she didn't. And the salt, they say, was still warm. Goodnight, detectives."
+    }
+  ]
+}

@@ -1,0 +1,875 @@
+{
+  "id": "death-in-room-13",
+  "themeSlug": "hotel-mortimer",
+  "title": "Death in Room 13",
+  "synopsis": "Halloween, 1926. Every year the Hotel Mortimer holds a séance to greet the bride who vanished from Room 13 in 1901, and every year its owner, Cordelia Mortimer, goes into Room 13 alone in the dark to 'greet her'. Tonight, when the lights came up after thirteen minutes of darkness, Cordelia didn't come back. She was found on the floor of Room 13. The storm has flooded the canyon road. Nobody checks out until the killer is found.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "The Hotel Mortimer, a gothic grand hotel in the Hollywood Hills",
+    "era": "Halloween night, 1926",
+    "description": "A lobby of gilt mirrors and potted palms, a ballroom with a chandelier and a minstrels' gallery, a séance table under black velvet, a medium's curtained spirit cabinet, a servants' passage behind the walls, and off the ballroom corridor, Room 13: the bridal suite, sealed since 1901 and opened once a year. A storm has flooded the canyon road."
+  },
+  "victim": {
+    "name": "Cordelia Mortimer",
+    "description": "Seventy. Owner of the Hotel Mortimer, daughter of its founder, and the keeper of its legend. Imperious, generous with her money and stingy with the truth. Tonight she promised to expose a fraud and announced a new will."
+  },
+  "characters": [
+    {
+      "id": "zora",
+      "name": "Madame Zora Vex",
+      "pronouns": "she/her",
+      "title": "The Medium",
+      "publicBio": "The most famous spirit medium in America: black lace, a veil, a dozen silver bangles and a voice like smoke. Every Halloween she leads the Hotel Mortimer's séance from her curtained spirit cabinet, with her silver spirit trumpet.",
+      "costumeTips": "Black lace or velvet, a veil, lots of jangling bracelets, dark lipstick, and a crystal or trumpet.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 0.85,
+        "style": "hypnotic, slow, theatrical"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Your séances are a trick: a spirit cabinet with a false back, spirit hands made of gloves on wires. Cordelia Mortimer hired a detective who found it all out, and at dinner she told you she'd expose you at the end of tonight's séance, in front of the newspapers. You'd be finished. So when the lights went out at eleven, you slipped out of the false back of your cabinet, along the servants' passage and in through Room 13's side door. Cordelia was there alone, greeting the bride as she does every Halloween. You strangled her with the silk cord from your spirit trumpet, left it on the floor, and were back in your cabinet before the lights came up at thirteen minutes past. You lost a bangle somewhere.",
+        "secrets": [
+          {
+            "id": "zora-fraud",
+            "text": "My spirit cabinet has a false back, and the spirit hands are gloves on wires. I've never spoken to a ghost in my life.",
+            "unlockAct": 0
+          },
+          {
+            "id": "zora-passage",
+            "text": "The false back of my cabinet opens onto the servants' passage, which leads to Room 13's side door.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Point everyone at Julian (he poured her sherry and he's broke) or at Agnes (she has the key to Room 13).",
+          "Nobody must look at the back of your spirit cabinet.",
+          "Find the detective's report before it's read aloud."
+        ],
+        "knows": [
+          "Cordelia drinks a sherry toast just before the séance, and Julian always pours it.",
+          "Agnes the housekeeper keeps the only key to Room 13, and unlocks it every Halloween."
+        ],
+        "alibi": "I was in my spirit cabinet from eleven until the lights came up. Communing. You can't commune with the curtains open.",
+        "lines": {
+          "act1": [
+            "The spirits are restless tonight. I felt them the moment I crossed the threshold."
+          ],
+          "act2": [
+            "A fraud? My dear, if I were a fraud, would the chandelier have flickered when I said her name?"
+          ],
+          "act3": [
+            "The bride of Room 13 has taken another soul. I warned her. The spirits warned her."
+          ]
+        }
+      }
+    },
+    {
+      "id": "julian",
+      "name": "Julian Mortimer",
+      "pronouns": "he/him",
+      "title": "The Nephew",
+      "publicBio": "Cordelia's nephew and, until tonight, her heir: a silk cravat, a silver-topped cane, a pocket decanter, and gambling debts in three cities. He pours her Halloween sherry every year.",
+      "costumeTips": "A tuxedo or smart suit, a cravat, a cane, and slicked-back hair.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.0,
+        "rate": 1.05,
+        "style": "charming, careless, brittle"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You owe thirty thousand dollars to men in Chicago who break fingers, and you were counting on inheriting the hotel. At dinner Aunt Cordelia announced she's rewritten her will: the Hotel Mortimer goes to the city as a museum, and you get nothing. At five to eleven you poured her Halloween sherry, as every year. When the lights went out, you went out on the terrace for air. You didn't kill her. But you had every reason to.",
+        "secrets": [
+          {
+            "id": "julian-debts",
+            "text": "I owe thirty thousand dollars to very dangerous men in Chicago. The debt is due on Monday.",
+            "unlockAct": 0
+          },
+          {
+            "id": "julian-pawn",
+            "text": "I've been pawning the hotel's silver, one candlestick at a time.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find a way to pay your debts before Monday.",
+          "Find out who killed Aunt Cordelia before someone decides it was the disinherited nephew.",
+          "Get a look at the new will."
+        ],
+        "knows": [
+          "At five to eleven you poured Aunt Cordelia her sherry from the decanter on the séance table. She drank it and was perfectly well.",
+          "Out on the terrace at ten past eleven, you heard bangles jangling in the servants' passage below."
+        ],
+        "alibi": "At five to eleven I poured my aunt's sherry. When the lights went out I went on the terrace for air, and came back when they came up.",
+        "lines": {
+          "act1": [
+            "Aunt Cordelia loved this hotel more than any living person. Certainly more than me."
+          ],
+          "act2": [
+            "The will? A museum? She'd leave it to the ghosts if she could."
+          ],
+          "act3": [
+            "I poured her a sherry. The same sherry I pour every year. From a decanter everyone drank from."
+          ]
+        }
+      }
+    },
+    {
+      "id": "agnes",
+      "name": "Mrs. Agnes Pruitt",
+      "pronouns": "she/her",
+      "title": "The Housekeeper",
+      "publicBio": "Housekeeper of the Hotel Mortimer for forty years: black dress, a white apron smelling of lavender starch, and a chatelaine of keys on her belt. She keeps the only key to Room 13, and unlocks it once a year, on Halloween.",
+      "costumeTips": "A long black dress, a white apron, your hair in a tight bun, and a big ring of keys.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.9,
+        "rate": 0.9,
+        "style": "stern, quiet, unreadable"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You were raised in this hotel. Your mother was Eliza Mortimer, the bride who 'vanished' from Room 13 in 1901; you were a baby. You've always believed old Mr. Mortimer, Cordelia's father, knew what happened to her. Tonight, making up the bridal bed, you found a letter hidden behind the headboard, and you haven't decided what to do. At eleven you unlocked Room 13 for the ritual and stood by the ballroom door. At six minutes past you went to the linen room for more candles.",
+        "secrets": [
+          {
+            "id": "agnes-mother",
+            "text": "The bride who vanished from Room 13 in 1901 was my mother. Nobody here knows.",
+            "unlockAct": 0
+          },
+          {
+            "id": "agnes-letter",
+            "text": "Tonight I found a letter hidden behind the bridal headboard. It says who made my mother disappear.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out the truth about your mother.",
+          "Keep your secret until you're ready.",
+          "Keep the hotel running, whatever happens. Guests still need towels."
+        ],
+        "knows": [
+          "At eleven you unlocked Room 13 for the ritual, as every year. Cordelia went in alone at five past, carrying her glass of sherry.",
+          "Madame Zora's spirit cabinet stands against the wall of the servants' passage. The passage leads to Room 13's side door."
+        ],
+        "alibi": "At eleven I unlocked Room 13 and stood by the ballroom door. At six minutes past I went to the linen room for candles, and was back before the lights came up.",
+        "lines": {
+          "act1": [
+            "Forty years I've kept this hotel. I know every creak, every draught, every key."
+          ],
+          "act2": [
+            "Room 13 is opened once a year. Tonight. I unlocked it at eleven, as I always do."
+          ],
+          "act3": [
+            "Some doors in this hotel should stay shut. Room 13 is one of them."
+          ]
+        }
+      }
+    },
+    {
+      "id": "vivienne",
+      "name": "Vivienne LaRue",
+      "pronouns": "she/her",
+      "title": "The Silent-Film Star",
+      "publicBio": "The Queen of the Silent Screen: kohl-rimmed eyes, a cigarette holder and a cloud of French perfume. The talkies have arrived and her voice is all wrong for them. She's lived in the Hotel Mortimer's Room 12, next door to Room 13, for a year, and hasn't paid a cent.",
+      "costumeTips": "A beaded flapper dress or satin gown, dramatic eye make-up, a long cigarette holder, and a feather boa.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 0.95,
+        "style": "dramatic, weary, sharp"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You owe Cordelia a year's rent, and tonight she told you you'd be put out on Monday. Your career is over: the studio says your voice 'records like a duck'. You sat at the séance table in the dark, holding hands with the guests on either side, and you noticed things. An actress always notices things.",
+        "secrets": [
+          {
+            "id": "vivienne-rent",
+            "text": "I owe Cordelia a year's rent. She was throwing me out on Monday.",
+            "unlockAct": 0
+          },
+          {
+            "id": "vivienne-voice",
+            "text": "I've been taking elocution lessons in secret. It isn't working.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Stay in Room 12, somehow.",
+          "Find out who did it: you'd like one last great scene.",
+          "Keep your voice a secret."
+        ],
+        "knows": [
+          "At ten past eleven, in the dark, you smelled sandalwood pass behind your chair, towards the ballroom corridor. Madame Zora wears sandalwood.",
+          "At nineteen past eleven, with the lights up, you saw Eddie the bellhop come out of the Room 13 corridor with one hand stuffed in his pocket."
+        ],
+        "alibi": "I sat at the séance table from eleven until the lights came up, holding hands with my neighbours. Ask them.",
+        "lines": {
+          "act1": [
+            "In my day, darling, we didn't need to talk. We had faces."
+          ],
+          "act2": [
+            "The rent? I'm an artist. Artists don't pay rent. They pay attention."
+          ],
+          "act3": [
+            "In the dark you can't see, so you smell. And I smelled somebody pass behind me."
+          ]
+        }
+      }
+    },
+    {
+      "id": "crowe",
+      "name": "Dr. Silas Crowe",
+      "pronouns": "he/him",
+      "title": "The Hotel Doctor",
+      "publicBio": "The Hotel Mortimer's resident doctor: a black bag, a pince-nez and a great deal of discretion. He has signed the death certificates for three 'accidents' at the hotel over the years, all very quietly.",
+      "costumeTips": "A dark frock coat, a pince-nez or round glasses, a doctor's bag, and a pocket watch.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.9,
+        "rate": 0.95,
+        "style": "dry, precise, cold"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Over the years you've signed three death certificates at the Hotel Mortimer as 'accidents' when they probably weren't, because Cordelia paid you well to keep scandals out of the newspapers. Tonight you examined her body, and this time you intend to tell the truth.",
+        "secrets": [
+          {
+            "id": "crowe-certificates",
+            "text": "I've signed three death certificates at this hotel as 'accidents'. Cordelia paid me to.",
+            "unlockAct": 0
+          },
+          {
+            "id": "crowe-laudanum",
+            "text": "I take a little laudanum to sleep. Rather more than a little, lately.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Tell the truth about how Cordelia died, for once.",
+          "Keep your old certificates quiet.",
+          "Find the killer, before the police look at your bag."
+        ],
+        "knows": [
+          "You examined Cordelia at twenty past eleven, on the floor of Room 13. You know how she died, and you'll say so.",
+          "Mrs. Pruitt's apron always smells of lavender starch. You'd know it anywhere."
+        ],
+        "alibi": "I sat at the séance table from eleven until the lights came up, next to Miss LaRue.",
+        "lines": {
+          "act1": [
+            "I've pronounced a great many people dead in this hotel. Tonight I'll tell you how."
+          ],
+          "act2": [
+            "The certificates? A doctor's discretion is his most valuable instrument."
+          ],
+          "act3": [
+            "Ghosts don't leave marks on a body. People do."
+          ]
+        }
+      }
+    },
+    {
+      "id": "eddie",
+      "name": "Eddie Tate",
+      "pronouns": "he/him",
+      "title": "The Bellhop",
+      "publicBio": "Seventeen, in a red jacket and a pillbox hat, and he knows every guest's business. Eddie runs the lift, carries the bags and, tonight, stood guard at the ballroom doors during the séance.",
+      "costumeTips": "A red jacket with brass buttons (or any smart jacket), a little round hat, and white gloves.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.2,
+        "rate": 1.25,
+        "style": "quick, cheeky, nervous"
+      },
+      "required": false,
+      "private": {
+        "backstory": "At nineteen past eleven, when the lights were up and everyone was looking for Cordelia, you found her black pearl necklace lying in the corridor outside Room 13, snapped. You put it in your pocket without thinking. Then you opened Room 13 and found her. You haven't told anyone about the pearls.",
+        "secrets": [
+          {
+            "id": "eddie-pearls",
+            "text": "I found Cordelia's black pearls in the corridor outside Room 13 at nineteen past eleven. They're in my pocket.",
+            "unlockAct": 0
+          },
+          {
+            "id": "eddie-tips",
+            "text": "I've been reading guests' telegrams before I deliver them. It's how I know everything.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the pearls back where they belong before anyone thinks you're a thief. Or worse.",
+          "Find out who did it. You've read everyone's telegrams.",
+          "Keep your job."
+        ],
+        "knows": [
+          "At twenty past eleven you opened Room 13 and found Cordelia on the floor by the bridal bed. The window was open and a candle was guttering.",
+          "When the lights came up at thirteen past, three chairs at the séance table were empty besides Cordelia's: Madame Zora's, Mr. Julian's and Mrs. Pruitt's."
+        ],
+        "alibi": "I stood at the ballroom doors all through the séance, then I went looking for Miss Cordelia and found her.",
+        "lines": {
+          "act1": [
+            "Front! Bags! Telegrams! Murders! We do it all at the Hotel Mortimer."
+          ],
+          "act2": [
+            "I don't read the telegrams. I just... know what's in them. It's a gift."
+          ],
+          "act3": [
+            "I opened the door and there she was. And the bed was all made up, like somebody expected a bride."
+          ]
+        }
+      }
+    },
+    {
+      "id": "lucky",
+      "name": "Lucky Bell",
+      "pronouns": "he/him",
+      "title": "The Jazz Violinist",
+      "publicBio": "The hotel's resident musician: a sharp suit, a battered violin and a smile that never quite reaches his eyes. During the séance he plays in the dark from the minstrels' gallery, by a little red lamp, looking down on the ballroom corridor and the door of Room 13.",
+      "costumeTips": "A pinstripe suit or waistcoat, a loose tie, two-tone shoes, and a violin (or a bow).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 1.0,
+        "style": "smooth, soft-spoken, sly"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Cordelia paid you to play spooky music during the séance, and to rattle a chain on cue. You play by a little red lamp in the gallery, and from up there you can see the door of Room 13 and the entrance to the servants' passage. You also owe Julian two hundred dollars from cards, and he's been leaning on you.",
+        "secrets": [
+          {
+            "id": "lucky-chain",
+            "text": "Cordelia paid me to rattle a chain in the gallery during the séance. The 'ghost' was me.",
+            "unlockAct": 0
+          },
+          {
+            "id": "lucky-cards",
+            "text": "I owe Julian two hundred dollars from cards. He's been getting nasty about it.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the chain-rattling quiet. Nobody likes a fake ghost.",
+          "Tell what you saw from the gallery, when it matters.",
+          "Get out of this hotel alive. It has a reputation."
+        ],
+        "knows": [
+          "From the gallery, by the red lamp, you saw Cordelia go into Room 13 at five past eleven, carrying her glass of sherry.",
+          "At thirteen past, when the lights came up, the side door of Room 13, into the servants' passage, was swinging shut."
+        ],
+        "alibi": "I was in the minstrels' gallery playing the violin from eleven until the lights came up. You heard me. Everybody heard me.",
+        "lines": {
+          "act1": [
+            "I play what the dead like to hear. Mostly minor keys."
+          ],
+          "act2": [
+            "From up in that gallery you see everything. Even in the dark. Especially in the dark."
+          ],
+          "act3": [
+            "Something went into Room 13 after she did. I saw it by the red lamp."
+          ]
+        }
+      }
+    },
+    {
+      "id": "quill",
+      "name": "Harriet Quill",
+      "pronouns": "she/her",
+      "title": "The Hotel Detective",
+      "publicBio": "A private detective from Pinkerton's, hired by Cordelia for 'a delicate matter'. Sensible shoes, a notebook and a revolver she's never fired. She's been watching Madame Zora for a week.",
+      "costumeTips": "A trench coat or tweed suit, a sensible hat, a notebook and pencil, and a magnifying glass.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.05,
+        "rate": 1.05,
+        "style": "brisk, dry, observant"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Cordelia hired you to prove Madame Zora is a fraud, and you have: you found the false back of her spirit cabinet and the gloves on wires. Your report was to be read at the end of tonight's séance. You also know about the new will: you witnessed it this afternoon.",
+        "secrets": [
+          {
+            "id": "quill-report",
+            "text": "I proved Madame Zora is a fraud. My report was to be read at the end of tonight's séance.",
+            "unlockAct": 0
+          },
+          {
+            "id": "quill-will",
+            "text": "I witnessed Cordelia's new will this afternoon. Julian gets nothing.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find the killer. It's the first murder of your career.",
+          "Protect your report until the police arrive.",
+          "Don't fire your revolver. You've never fired it."
+        ],
+        "knows": [
+          "Madame Zora's spirit cabinet has a false back that opens onto the servants' passage. You found it yesterday.",
+          "The servants' passage runs from behind the cabinet to Room 13's side door, and from the linen room too."
+        ],
+        "alibi": "I sat at the séance table from eleven until the lights came up, watching Madame Zora's cabinet the whole time. Well. Watching the curtain.",
+        "lines": {
+          "act1": [
+            "A detective notices things. The things people touch, and the things they don't."
+          ],
+          "act2": [
+            "I was hired to catch a fraud, not a murderer. It seems I may catch both."
+          ],
+          "act3": [
+            "In the dark, everyone has an alibi and nobody has a witness. That's what makes it perfect."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "chairs",
+      "title": "Empty Chairs",
+      "text": "When the lights came up at thirteen minutes past eleven, four chairs at the séance table were empty: Cordelia's, of course, and three more. Madame Zora's (she was 'in her cabinet'), Julian's (he says he went for air), and Mrs. Pruitt's (she says she went for candles).",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "zora",
+        "julian",
+        "agnes"
+      ]
+    },
+    {
+      "id": "cord",
+      "title": "A Silk Cord",
+      "text": "On the floor of Room 13: a purple silk cord with a tassel on one end. On the séance table, Madame Zora's silver spirit trumpet has lost its cord.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "zora"
+      ]
+    },
+    {
+      "id": "sherry",
+      "title": "The Sherry Glass",
+      "text": "Cordelia's sherry glass lies on its side by the bridal bed, a little sherry spilled on the rug. Julian poured it from the decanter at five to eleven, and Julian has just been disinherited.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "julian"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "pillow",
+      "title": "The Bridal Pillow",
+      "text": "A lace pillow from the bridal bed lies on the floor, and white feathers are scattered on the rug. Mrs. Pruitt makes up that bed herself, every Halloween, and she has the only key.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "agnes"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "lucky-saw",
+      "title": "From the Gallery",
+      "text": "Your own memory: by the red lamp, at seven minutes past eleven, a figure came out of the servants' passage and slipped into Room 13 through the side door, bangles jangling. At eleven minutes past it slipped back into the passage.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "zora"
+      ],
+      "recipient": "lucky"
+    },
+    {
+      "id": "report",
+      "title": "The Detective's Report",
+      "text": "Harriet Quill's report for Cordelia, to be read aloud at the end of the séance: 'Madame Zora's spirit cabinet has a false back panel. The spirit hands are gloves on wires. The medium is a fraud. Recommend public exposure tonight.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "zora"
+      ]
+    },
+    {
+      "id": "will",
+      "title": "The New Will",
+      "text": "In Cordelia's writing case: a will, dated today and witnessed by Harriet Quill. 'The Hotel Mortimer shall pass to the City of Los Angeles as a museum. To my nephew Julian, nothing.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "julian"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "bride-letter",
+      "title": "A Letter from 1901",
+      "text": "Tucked in Mrs. Pruitt's apron pocket: an old letter in faded ink, found behind the bridal headboard. 'My dear Eliza will never leave Room 13. Nor will the child ever know.' It's signed with old Mr. Mortimer's initials.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "agnes"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "eddie-pearls",
+      "title": "In Your Pocket",
+      "text": "In your jacket pocket: Cordelia's black pearl necklace, snapped. You found it in the corridor outside Room 13 at nineteen past eleven, and pocketed it without thinking.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "eddie"
+      ],
+      "recipient": "eddie",
+      "redHerring": true
+    },
+    {
+      "id": "diary",
+      "title": "Cordelia's Diary",
+      "text": "Cordelia's black leather diary is locked with a little silver clasp. On the cover she wrote a riddle, because she could never remember the combination.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "zora"
+      ],
+      "puzzle": {
+        "prompt": "I speak without a mouth and hear without ears. I have no body, but I answer whenever you call in an empty hall. What am I?",
+        "answers": [
+          "echo",
+          "an echo",
+          "the echo",
+          "echoes"
+        ],
+        "hint": "Shout in the ballroom and see what answers.",
+        "solvedText": "Tonight's entry: 'Told Zora at dinner that Miss Quill's report will be read at the end of the séance. She said, \"Then the spirits will speak first, Cordelia.\" Theatrical creature. Room 13 at five past eleven, as always.'"
+      }
+    },
+    {
+      "id": "certificates",
+      "title": "Three Certificates",
+      "text": "In Dr. Crowe's bag: carbon copies of three death certificates from the Hotel Mortimer, 1919, 1922 and 1925. All 'accidental'. All signed by Dr. Crowe. All very quiet.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "crowe"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "cabinet",
+      "title": "The Spirit Cabinet",
+      "text": "Behind the black curtains of Madame Zora's spirit cabinet, the back panel slides open onto the servants' passage. There are fresh scuffs in the dust, going towards Room 13's side door, and back.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "zora"
+      ]
+    },
+    {
+      "id": "holder",
+      "title": "A Cigarette Holder",
+      "text": "On the threshold of Room 13: a long jade cigarette holder. Vivienne LaRue lives in Room 12, right next door, and owes a year's rent.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "vivienne"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "bangle",
+      "title": "A Silver Bangle",
+      "text": "Under the bridal bed in Room 13: a thin silver bangle hung with tiny moons. Madame Zora wears a dozen of them. Count them: she's wearing eleven.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "zora"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A gothic grand hotel on a hill at night, lightning over its towers, one window glowing green.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The Hotel Mortimer, Halloween 1926. They say that in 1901 a young bride named Eliza vanished from Room 13 on her wedding night, and that she's never checked out. Every Halloween, the hotel holds a séance to greet her."
+    },
+    {
+      "type": "narration",
+      "text": "At dinner, Cordelia Mortimer, the owner, made two announcements. First: at the end of tonight's séance, she would expose a fraud in this very room. Second: she had rewritten her will."
+    },
+    {
+      "type": "line",
+      "speaker": "julian",
+      "text": "She smiled at every one of us, one at a time. She did so love a scene."
+    },
+    {
+      "type": "toast",
+      "text": "To the bride of Room 13! May she rest.",
+      "alternative": "Raise your tea to the bride of Room 13."
+    },
+    {
+      "type": "narration",
+      "text": "At five to eleven Julian poured his aunt a sherry. At eleven the chandelier went dark, and for thirteen minutes the ballroom was pitch black. As she does every year, Cordelia rose in the dark and went into Room 13 alone, to greet the bride."
+    },
+    {
+      "type": "image",
+      "text": "A door with a brass 13, slightly ajar, candlelight flickering beyond it.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "When the lights came up at thirteen past eleven, Cordelia hadn't come back. At twenty past, Eddie the bellhop opened the door of Room 13. She lay on the floor beside the bridal bed. The storm has flooded the canyon road. Nobody checks out. And one of you killed her."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: Room 13",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. Room 13."
+        },
+        {
+          "type": "image",
+          "text": "The bridal suite by candlelight: a four-poster bed made up with lace, a spilled sherry glass, feathers on the rug, and an open window with the curtains blowing.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Dr. Crowe kneels by the body. There are deep red marks around Cordelia's throat: a thin cord, pulled very tight from behind. 'She didn't faint and she didn't fall,' he says. 'And no ghost ever did this.'"
+        },
+        {
+          "type": "line",
+          "speaker": "eddie",
+          "text": "I opened the door and there she was. And the bed was all made up, like somebody expected a bride."
+        }
+      ],
+      "prompts": [
+        "Who left the séance table in the dark, and why?",
+        "What was left behind in Room 13?",
+        "What did Cordelia's two announcements mean for each of you?",
+        "Is the bride of Room 13 real? Who wants you to think so?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Behind the Walls",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Behind the Walls."
+        },
+        {
+          "type": "image",
+          "text": "A narrow servants' passage behind the ballroom wall, lit by a single bulb, dust thick on the floor.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The Hotel Mortimer has passages behind its walls, secrets in its drawers, and a diary with a riddle on the cover. Some of the guests are not who they say they are. Some of them never were."
+        },
+        {
+          "type": "toast",
+          "text": "To the ones who never checked out!",
+          "alternative": "Raise your ginger ale to the ghosts. Carefully."
+        },
+        {
+          "type": "line",
+          "speaker": "lucky",
+          "text": "From up in that gallery you see everything. Even in the dark. Especially in the dark."
+        }
+      ],
+      "prompts": [
+        "Open Cordelia's diary. The cover holds a riddle.",
+        "Who was about to be exposed, and who was about to be ruined?",
+        "What happened to the bride in 1901?",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: Checkout",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. Checkout."
+        },
+        {
+          "type": "image",
+          "text": "The hotel's front desk at dawn: a brass bell, a register, and a row of keys on hooks, with one hook empty.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The storm is passing, and the police will be up the canyon road by dawn. The guests of the Hotel Mortimer have one last chance to name the killer before checkout."
+        },
+        {
+          "type": "toast",
+          "text": "To checkout time!",
+          "alternative": "Coffee up for checkout time!"
+        },
+        {
+          "type": "line",
+          "speaker": "quill",
+          "text": "In the dark, everyone has an alibi and nobody has a witness. That's what makes it perfect."
+        }
+      ],
+      "prompts": [
+        "What was found behind the curtain, under the bed, or in a pocket?",
+        "Whose story about the dark doesn't hold together?",
+        "Who had the most to lose at the end of the séance?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "exposure",
+        "text": "To stop being exposed as a fraud"
+      },
+      {
+        "id": "inheritance",
+        "text": "To inherit the hotel before the new will was signed"
+      },
+      {
+        "id": "revenge",
+        "text": "Revenge for what happened in Room 13 in 1901"
+      },
+      {
+        "id": "rent",
+        "text": "To avoid being thrown out on the street"
+      },
+      {
+        "id": "certificates",
+        "text": "To bury old secrets about the hotel's 'accidents'"
+      }
+    ],
+    "methods": [
+      {
+        "id": "cord",
+        "text": "Strangled with the silk cord of the spirit trumpet"
+      },
+      {
+        "id": "chloral",
+        "text": "Knockout drops in her sherry"
+      },
+      {
+        "id": "pillow",
+        "text": "Smothered with a pillow from the bridal bed"
+      },
+      {
+        "id": "push",
+        "text": "Pushed from the open window"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "zora",
+    "motiveId": "exposure",
+    "methodId": "cord",
+    "explanation": [
+      "The bride of Room 13 didn't take Cordelia Mortimer. The spirits didn't speak. A woman who pretends to talk to the dead made one: Madame Zora Vex.",
+      "Cordelia had hired a Pinkerton detective, Harriet Quill, who found the false back of Zora's spirit cabinet and the gloves on wires. The report was to be read aloud at the end of the séance, in front of the newspapers. 'Then the spirits will speak first, Cordelia,' Zora said. It's in the diary.",
+      "At eleven the lights went out, and Zora slipped through the false back of her cabinet into the servants' passage. Vivienne smelled her sandalwood pass behind her chair; Julian heard her bangles in the passage below the terrace; Lucky saw a jangling figure slip in through Room 13's side door at seven minutes past.",
+      "Cordelia was alone, greeting the bride. Zora strangled her with the silk cord from her own spirit trumpet, dropped it, and lost a bangle under the bed in the struggle. She was back in her cabinet before the lights came up at thirteen past. The scuffs in the passage dust, the cord and the bangle told the rest.",
+      "Julian's sherry, Mrs. Pruitt's pillow and letter, Eddie's pearls and the doctor's certificates were all red herrings. Madame Zora always said the dead can't lie. She never said anything about the living."
+    ],
+    "timeline": [
+      {
+        "time": "10:00",
+        "event": "Dinner. Cordelia promises to expose a fraud and announces a new will."
+      },
+      {
+        "time": "10:30",
+        "event": "Cordelia tells Zora the report will be read tonight. 'Then the spirits will speak first.'"
+      },
+      {
+        "time": "10:55",
+        "event": "Julian pours Cordelia's sherry. Everyone drinks from the same decanter."
+      },
+      {
+        "time": "11:00",
+        "event": "The lights go out. Mrs. Pruitt unlocks Room 13. Zora enters her cabinet."
+      },
+      {
+        "time": "11:05",
+        "event": "Cordelia goes into Room 13 alone with her sherry. Lucky sees her from the gallery."
+      },
+      {
+        "time": "11:06",
+        "event": "Mrs. Pruitt goes to the linen room for candles. Julian steps out on the terrace."
+      },
+      {
+        "time": "11:07",
+        "event": "Zora slips through the false back of her cabinet and into Room 13 by the side door."
+      },
+      {
+        "time": "11:08",
+        "event": "Zora strangles Cordelia with the spirit-trumpet cord, and loses a bangle."
+      },
+      {
+        "time": "11:11",
+        "event": "Zora slips back through the passage into her cabinet."
+      },
+      {
+        "time": "11:13",
+        "event": "The lights come up. Four chairs are empty."
+      },
+      {
+        "time": "11:19",
+        "event": "Eddie finds Cordelia's pearls in the corridor and pockets them."
+      },
+      {
+        "time": "11:20",
+        "event": "Eddie opens Room 13 and finds Cordelia."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Police cars winding up a wet canyon road at dawn, towards a gothic hotel.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Hotel Mortimer!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came up the canyon road at six. Madame Zora was waiting in the lobby in her veil, eleven bangles on her wrist. 'The spirits told me you were coming,' she said. For once, nobody believed her, and for once, she was telling the truth."
+    },
+    {
+      "type": "narration",
+      "text": "The Hotel Mortimer went to the city as a museum, and Room 13 was locked again. But the night clerk swears that at three o'clock the next morning, the bell for Room 13 rang at the front desk. When he went to look, the door was still locked, the room was empty, and the bridal bed had been freshly made. Goodnight, detectives. Please don't check out."
+    }
+  ]
+}

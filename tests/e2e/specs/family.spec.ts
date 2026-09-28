@@ -233,6 +233,8 @@ test('Halloween: the Hollow Hill House party deals a version whose culprit is at
 
   // The camp slasher is on the Adults shelf; the haunted-house party is on the Family shelf.
   await expect(host.getByRole('button', { name: /Last Night at Camp Blackwater/ })).toContainText('3 versions, a different killer each')
+  await expect(host.getByRole('button', { name: /Death in Room 13/ })).toContainText('3 versions, a different killer each')
+  await expect(host.getByRole('button', { name: /The Witching Hour/ })).toContainText('3 versions, a different killer each')
   await host.getByRole('tab', { name: /Family/ }).click()
   await expect(host.getByText('Last Night at Camp Blackwater')).toHaveCount(0)
   await host.getByRole('button', { name: /Who Spooked the Halloween Party\?/ }).click()
