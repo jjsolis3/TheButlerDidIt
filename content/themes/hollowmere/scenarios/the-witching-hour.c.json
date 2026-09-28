@@ -1,0 +1,224 @@
+{
+  "variantOf": "the-witching-hour",
+  "variant": "C",
+  "solution": {
+    "murdererId": "ward",
+    "motiveId": "ancestor",
+    "methodId": "rope",
+    "explanation": [
+      "No witch killed Josiah Whitcombe, and the bridle never touched him. He was strangled with the reenactment's hangman's rope, by the man who came to bless the reenactment: the Reverend Elias Ward.",
+      "The Reverend's ancestor, Judge Obadiah Ward, condemned Abigail Thorne in 1692, then took her family's land and built a church on it. Josiah found the deed and would announce it at midnight, and the Thornes would want their land back. 'Let the dead lie, Josiah, or join them,' the Reverend told him. It's in Josiah's notebook.",
+      "At ten to twelve Josiah opened the mill door and let the Reverend in, alive. Then Kendra's tape ran out. In the six missing minutes the Reverend took the hangman's rope from its hook on the mill wall and strangled Josiah with it. He poured the salt and left a poppet from Morgana's shop, so the town would blame the witch, as it did in 1692.",
+      "He was gone before the tape came back at 11:58, with the rope under his cloak. But the rope turned up in the vestry, a button from his cassock was lying inside the salt circle, and his family Bible names Judge Obadiah Ward.",
+      "Prudence's bridle, Grant's resort, Molly's bills and Winston's gavel were all red herrings. Three hundred years ago a Ward blamed a Thorne. Tonight a Ward tried it again."
+    ],
+    "timeline": [
+      {
+        "time": "Afternoon",
+        "event": "The Reverend buys a straw poppet and salt from Morgana's shop."
+      },
+      {
+        "time": "9:00",
+        "event": "At the festival supper, Josiah promises to 'shake Hollowmere to its roots' at midnight."
+      },
+      {
+        "time": "10:15",
+        "event": "Josiah shows the Reverend the deed. 'Let the dead lie, Josiah, or join them.'"
+      },
+      {
+        "time": "11:30",
+        "event": "Josiah goes into the old mill. Kendra starts filming."
+      },
+      {
+        "time": "11:35",
+        "event": "Morgana brings Josiah a sprig of rowan. He's cheerful."
+      },
+      {
+        "time": "11:40",
+        "event": "Prudence fits the bridle. Josiah is cheerful."
+      },
+      {
+        "time": "11:45",
+        "event": "Grant argues with Josiah, and is thrown out."
+      },
+      {
+        "time": "11:50",
+        "event": "Josiah lets the Reverend in."
+      },
+      {
+        "time": "11:52",
+        "event": "Kendra's tape runs out. The Reverend strangles Josiah with the hangman's rope."
+      },
+      {
+        "time": "11:56",
+        "event": "The Reverend leaves the salt and poppet and slips away with the rope."
+      },
+      {
+        "time": "11:58",
+        "event": "Kendra's tape resumes. The mill door is shut."
+      },
+      {
+        "time": "12:05",
+        "event": "The procession opens the mill and finds Josiah."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Old Mill."
+        },
+        {
+          "type": "image",
+          "text": "Inside the old mill by lantern light: a circle of salt, a straw doll, an iron bridle on the floorboards, and a pewter flask on its side.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Sheriff Hatch kneels inside the salt circle. There's no wound on Josiah's head, and the bridle is lying where it fell. But there's a raw red mark all the way round his neck, and on the mill wall, the hook where the reenactment's hangman's rope always hangs is empty. 'Somebody used the prop,' the sheriff says quietly. 'For real.'"
+        },
+        {
+          "type": "line",
+          "speaker": "hatch",
+          "text": "Somebody wants us to think a witch did this. Somebody wants it very badly."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "ward": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Your ancestor, Judge Obadiah Ward, condemned Abigail Thorne in 1692 and took her family's land for the church. Tonight Josiah showed you the deed, and said he'd announce it at midnight. You told him, 'Let the dead lie, Josiah, or join them.' At ten to twelve he let you into the mill to bless the reenactment. You took the hangman's rope from its hook on the wall and strangled him with it. You poured a circle of salt and left the poppet you'd bought from Morgana's shop, and slipped out with the rope under your cloak. The TV camera, you later learned, was being changed.",
+        "objectives": [
+          "Don't get caught. Point everyone at the witch (the salt! the poppet!) or at Prudence and Grant, who went in before you.",
+          "Get the rope out of the vestry, and find your missing cassock button.",
+          "Keep the church, and your family's name."
+        ],
+        "knows": [
+          "The hangman's rope for the reenactment hangs on a hook on the mill wall.",
+          "Prudence and Grant both went into the mill before you, and both had reasons to hate Josiah."
+        ],
+        "alibi": "At ten to twelve I went into the mill and gave Josiah my blessing. He was alive when I left, and I went to lead the procession.",
+        "lines": {
+          "act3": [
+            "I blessed him and I left him alive. I am a man of God. Look to the salt and the poppet. Look to the witch."
+          ]
+        }
+      }
+    },
+    "prudence": {
+      "private": {
+        "backstory": "The museum's star exhibit, the 1692 Hollowmere Charter, is your forgery, made in 1978 to save the museum. Tonight Josiah told you he'd had the paper tested, and he'd announce it at midnight. You were terrified. At twenty to twelve you went into the mill to fit his costume's iron bridle, as every year. He was cheerful, and teased you about the Charter the whole time. You left at a quarter to twelve. You did not kill him. But you had every reason to.",
+        "objectives": [
+          "Clear your name without anyone finding out about the Charter.",
+          "Keep your museum office locked.",
+          "Find out who really killed Josiah."
+        ],
+        "lines": {
+          "act3": [
+            "I fitted his bridle, as I do every year, and I left him alive. Whatever happened in that mill happened after me."
+          ]
+        }
+      }
+    },
+    "grant": {
+      "private": {
+        "knows": [
+          "At a quarter to twelve you went into the mill. Josiah was alive, shouted that he'd never vote for your resort, and threw you out.",
+          "The Reverend was coming along the pond path towards the mill as you left, with his cloak pulled tight."
+        ],
+        "alibi": "At a quarter to twelve I went into the mill to talk to Josiah. He threw me out, alive and shouting, and I went back to the inn.",
+        "lines": {
+          "act3": [
+            "He was alive when I left. Shouting at me. Ask the Reverend: he was on the path right behind me."
+          ]
+        }
+      }
+    }
+  },
+  "clues": {
+    "bridle": {
+      "text": "On the floor beside Josiah: the iron witch's bridle, lent by the Historical Society for his costume. It lies where it fell off his head. Sheriff Hatch says there isn't a mark on it, or on him from it. Prudence Alden fitted it at twenty to twelve.",
+      "redHerring": true
+    },
+    "charter": {
+      "redHerring": true
+    },
+    "office": null,
+    "cuff": null,
+    "deed": {
+      "redHerring": false,
+      "pointsTo": [
+        "ward"
+      ]
+    },
+    "kendra-saw": {
+      "text": "Your own memory, from the camera's zoom: at 11:50 Josiah opened the mill door himself and let the Reverend in, alive and laughing. Then your tape ran out. When you'd changed it, at 11:58, the door was shut, and the Reverend was nowhere to be seen.",
+      "pointsTo": [
+        "ward"
+      ]
+    },
+    "notebook": {
+      "pointsTo": [
+        "ward"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Showed Ward the 1693 deed. He said, \"Let the dead lie, Josiah, or join them.\" From a man of God! He's coming to bless the mill at ten to twelve, as always.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "rope",
+      "title": "The Hangman's Rope",
+      "text": "Stuffed at the back of a cupboard in the church vestry: the reenactment's hangman's rope, from the hook on the mill wall. There's a single white hair caught in its fibres. Josiah had a white beard.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "ward"
+      ]
+    },
+    {
+      "id": "bible",
+      "title": "The Family Bible",
+      "text": "On the lectern in the Reverend's study: the Ward family Bible, with a family tree inked inside the cover. At the top: 'Judge Obadiah Ward, 1641 to 1710.' At the bottom: 'Elias.'",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "ward"
+      ]
+    },
+    {
+      "id": "button",
+      "title": "A Black Button",
+      "text": "Inside the salt circle, half buried in the grains: a small, black, cloth-covered button. The Reverend's cassock is missing one at the cuff.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "ward"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "State police cars crossing a narrow bridge at dawn, blue lights on the mist over Mill Pond.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of Hollowmere!",
+      "alternative": "Hot cider up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The state police came over the bridge at six. The Reverend Elias Ward was in his church, kneeling at the front pew. He didn't turn round. 'My family has been paying for 1692 for three hundred years,' he said. 'I thought I could finally stop.'"
+    },
+    {
+      "type": "narration",
+      "text": "They buried Josiah Whitcombe in the churchyard a week later, a few rows from Abigail Thorne. On the morning after the funeral, the groundskeeper found a fresh circle of coarse grey salt poured around his grave. Nobody in Hollowmere would admit to pouring it. Morgana Thorne says she didn't. And the salt, they say, was still warm. Goodnight, detectives."
+    }
+  ]
+}

@@ -1,0 +1,877 @@
+{
+  "id": "the-witching-hour",
+  "themeSlug": "hollowmere",
+  "title": "The Witching Hour",
+  "synopsis": "Halloween, 1994. Hollowmere, Massachusetts, 'America's oldest witch town', is holding its Harvest Festival. At midnight, as every year, the town will reenact the 1692 trial of Goody Abigail Thorne, with the festival chairman, Josiah Whitcombe, playing the accused witch. But when the procession opens the old mill at five past twelve, Josiah is dead inside a circle of salt, a straw poppet with a nail through its heart at his feet. The storm has closed the only bridge out of town. Nobody leaves until the killer is found.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Hollowmere, a small town in the woods of Massachusetts",
+    "era": "Halloween night, 1994",
+    "description": "A town green with a white clapboard church, the Crooked Broom Inn, a witch shop on Main Street, and hayrides under bare autumn trees. At the edge of town, the old mill stands beside black Mill Pond, where Abigail Thorne was ducked in 1692 and where the reenactment is held every year. A storm has closed the only bridge out of town."
+  },
+  "victim": {
+    "name": "Josiah Whitcombe",
+    "description": "Sixty-five. Festival chairman, town councillor and amateur historian, with a white beard and a booming laugh. Every Halloween he plays the accused witch in the reenactment. This year he promised the town 'a night to remember'."
+  },
+  "characters": [
+    {
+      "id": "prudence",
+      "name": "Prudence Alden",
+      "pronouns": "she/her",
+      "title": "The Town Historian",
+      "publicBio": "Curator of the Hollowmere Historical Society museum, and author of 'Hollowmere: America's Oldest Witch Town'. Lace collar, reading glasses on a chain, and an answer for every question about 1692. She dresses the festival chairman for his role every year.",
+      "costumeTips": "A long skirt and blouse with a lace collar, reading glasses on a chain, a cardigan, and an old book.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.0,
+        "style": "precise, proud, clipped"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. The museum's star exhibit, the 1692 Hollowmere Charter with Abigail Thorne's trial record, is your forgery. You made it in 1978, when the museum was about to close, and it turned Hollowmere into 'America's oldest witch town'. Tonight Josiah Whitcombe told you he'd had the paper tested: made in 1890. He'd announce it at midnight, at the reenactment. At twenty to twelve you went into the old mill, as every year, to fit him with the iron witch's bridle for his costume. He laughed at you. You struck him with the bridle. Then you drew a salt circle, left a straw poppet from Morgana's shop at his feet, and walked out at sixteen minutes to twelve.",
+        "secrets": [
+          {
+            "id": "prudence-forgery",
+            "text": "The 1692 Charter in my museum is a forgery. I made it myself, in 1978.",
+            "unlockAct": 0
+          },
+          {
+            "id": "prudence-museum",
+            "text": "Without the Charter, the museum closes and the town loses its tourists. I did it for Hollowmere.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Point everyone at the witch: Morgana's poppet and salt are right there.",
+          "Nobody must find your ink and your blank old paper in the museum office.",
+          "Protect the Charter's reputation, and the town's."
+        ],
+        "knows": [
+          "Josiah drinks mulled cider from his pewter flask all evening. Molly at the inn fills it.",
+          "Morgana Thorne sells straw poppets and bags of 'protection salt' in her shop."
+        ],
+        "alibi": "At twenty to twelve I went into the old mill to fit Josiah's costume, as every year. I was out again in five minutes, and walked round the pond to the procession.",
+        "lines": {
+          "act1": [
+            "Hollowmere has the finest collection of 1692 documents in New England. Ask anyone. Ask the tourists."
+          ],
+          "act2": [
+            "Abigail Thorne was tried, found guilty and ducked in Mill Pond. It's all in the Charter. Every word."
+          ],
+          "act3": [
+            "Look at the salt circle. Look at the poppet. This town has a witch, and she's in this room."
+          ]
+        }
+      }
+    },
+    {
+      "id": "grant",
+      "name": "Grant Holloway",
+      "pronouns": "he/him",
+      "title": "The Developer",
+      "publicBio": "A Boston developer in a camel coat and loafers, with plans for a luxury resort in the Thorne Woods. He's been buying the town one handshake at a time. Josiah Whitcombe's vote was the last one he needed.",
+      "costumeTips": "A camel coat or blazer, a silk tie, slicked-back hair, a mobile phone the size of a brick, and a briefcase.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 1.1,
+        "style": "smooth, pushy, impatient"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Your resort in the Thorne Woods needs one more vote on the town council: Josiah Whitcombe's. Tonight he told you he'd vote no, and announce it at the reenactment. You've borrowed three million dollars against this deal. At a quarter to twelve you went to the old mill to change his mind. You knocked, and knocked; the door was latched and nobody answered. You went back to the inn for a drink.",
+        "secrets": [
+          {
+            "id": "grant-loan",
+            "text": "I've borrowed three million dollars against the resort deal. If it fails, I'm ruined.",
+            "unlockAct": 0
+          },
+          {
+            "id": "grant-bribe",
+            "text": "I offered two other councillors new cars for their votes. They said yes.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the resort approved, now that Josiah's vote is gone.",
+          "Keep the bribes quiet.",
+          "Find out who killed Josiah. It's bad for business."
+        ],
+        "knows": [
+          "At a quarter to twelve you knocked on the mill door. It was latched from inside, and nobody answered.",
+          "The Reverend was coming along the pond path towards the mill as you left."
+        ],
+        "alibi": "At a quarter to twelve I went to the old mill to talk to Josiah, but nobody answered, so I went back to the inn.",
+        "lines": {
+          "act1": [
+            "Hollowmere needs jobs, not ghosts. A resort brings jobs."
+          ],
+          "act2": [
+            "Bribes? I prefer to call them community gifts."
+          ],
+          "act3": [
+            "I knocked at a quarter to twelve. Nobody answered. That's all I know."
+          ]
+        }
+      }
+    },
+    {
+      "id": "ward",
+      "name": "Reverend Elias Ward",
+      "pronouns": "he/him",
+      "title": "The Minister",
+      "publicBio": "Minister of the white clapboard church on the green, whose family has led it since 1680. Every Halloween he blesses the reenactment, 'so the past may rest'. He's never approved of the festival.",
+      "costumeTips": "A dark suit or cassock, a clerical collar, a Bible, and a stern expression.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "grave, formal, troubled"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Your ancestor, Judge Obadiah Ward, presided over Abigail Thorne's trial in 1692. Tonight Josiah told you he'd found proof that the judge seized the Thorne family's land after her death, and that the church stands on it. He'd announce it at midnight, and the Thornes would want it back. At ten to twelve you went to the mill to bless the reenactment, as every year. The door was latched and nobody answered, so you prayed on the step and left.",
+        "secrets": [
+          {
+            "id": "ward-judge",
+            "text": "My ancestor was the judge who condemned Abigail Thorne. My family has hidden it for three hundred years.",
+            "unlockAct": 0
+          },
+          {
+            "id": "ward-land",
+            "text": "The church stands on the Thorne family's land, taken after the trial.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Protect the church, and your family's name.",
+          "Find out who killed Josiah.",
+          "Let the past rest, if it will."
+        ],
+        "knows": [
+          "At ten to twelve you went to bless the reenactment. The mill door was latched, and nobody answered, so you said a prayer on the step.",
+          "Prudence Alden came round the pond path from the mill at a quarter to twelve, walking very fast."
+        ],
+        "alibi": "At ten to twelve I went to the mill to give my blessing. Nobody answered. I prayed on the step, and went to lead the procession.",
+        "lines": {
+          "act1": [
+            "Every Halloween this town plays at hanging a woman. Every year I pray for her."
+          ],
+          "act2": [
+            "The past is past. It should stay buried. All of it."
+          ],
+          "act3": [
+            "I prayed on the step of that mill at ten to twelve, and heard nothing. Nothing at all."
+          ]
+        }
+      }
+    },
+    {
+      "id": "morgana",
+      "name": "Morgana Thorne",
+      "pronouns": "she/her",
+      "title": "The Herbalist",
+      "publicBio": "Owns Thorne's Herbs & Curios on Main Street: dried flowers from the rafters, a black cat on the counter, and straw poppets in the window. She says she's descended from Abigail Thorne, the witch of 1692, and half the town believes she's a witch too.",
+      "costumeTips": "A long dark dress, a shawl, silver rings, a pentacle or moon necklace, and a bundle of dried herbs.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 0.9,
+        "style": "wry, dry, unbothered"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You are descended from Abigail Thorne, and you've spent years trying to get her name cleared. Josiah promised he'd help. At twenty-five to twelve you took him a sprig of rowan in the mill, for luck, as you do every year. He was cheerful and wide awake, and said midnight would be 'a night to remember'. Your shop sells straw poppets and protection salt to tourists; anybody could have bought them.",
+        "secrets": [
+          {
+            "id": "morgana-abigail",
+            "text": "I'm Abigail Thorne's great-great-great-great-granddaughter. I want her name cleared.",
+            "unlockAct": 0
+          },
+          {
+            "id": "morgana-shop",
+            "text": "I sold a straw poppet and a bag of salt to somebody this afternoon who asked me not to say who.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Clear Abigail Thorne's name.",
+          "Stop this town blaming the witch, again.",
+          "Find out who killed Josiah. He was on your side."
+        ],
+        "knows": [
+          "At twenty-five to twelve you took Josiah a sprig of rowan in the mill. He was cheerful, wide awake, and said midnight would be 'a night to remember'.",
+          "Your shop's poppets have a little tag sewn into the hem: a thorn."
+        ],
+        "alibi": "At twenty-five to twelve I took Josiah his rowan. Then I stood with the crowd on the green until the procession.",
+        "lines": {
+          "act1": [
+            "Three hundred years, and this town still wants a witch. Well. Here I am."
+          ],
+          "act2": [
+            "Poppets? I sell them to tourists. Ten dollars. They make lovely Christmas ornaments."
+          ],
+          "act3": [
+            "Whoever left that poppet wanted you to look at me. So don't."
+          ]
+        }
+      }
+    },
+    {
+      "id": "molly",
+      "name": "Molly Brewster",
+      "pronouns": "she/her",
+      "title": "The Innkeeper",
+      "publicBio": "Runs the Crooked Broom Inn on the green, and the festival's cider stand. Molly knows every face in town, fills every flask, and hears every argument across her bar.",
+      "costumeTips": "An apron, rolled sleeves, a checked shirt, and a big wooden ladle.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.05,
+        "rate": 1.1,
+        "style": "warm, chatty, nosy"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Josiah owed the inn two years of festival bills, and you'd told him you'd take him to court. You fill his pewter flask with mulled cider at the inn every year at eleven, before he goes to the mill. Tonight the bar was packed, and you left the flask on the counter while you fetched cinnamon sticks from the back.",
+        "secrets": [
+          {
+            "id": "molly-bills",
+            "text": "Josiah owed my inn two years of festival bills. I was going to take him to court.",
+            "unlockAct": 0
+          },
+          {
+            "id": "molly-recipe",
+            "text": "My famous mulled cider comes out of a carton. I just add cinnamon sticks.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get your bills paid, somehow.",
+          "Find out who killed Josiah.",
+          "Keep the cider flowing. People need something warm tonight."
+        ],
+        "knows": [
+          "At eleven you filled Josiah's pewter flask with mulled cider from the big pot, the same as everyone's.",
+          "Grant Holloway came back into the inn at ten to twelve and ordered a double, with his hands shaking."
+        ],
+        "alibi": "I was behind the bar at the Crooked Broom all night, apart from the cider stand on the green.",
+        "lines": {
+          "act1": [
+            "Everyone in Hollowmere comes through my door sooner or later. Everyone."
+          ],
+          "act2": [
+            "Two years of bills. Two years! I don't wish a man dead, but I did wish him broke."
+          ],
+          "act3": [
+            "I filled his flask at eleven, from the big pot. Half the town drank that cider."
+          ]
+        }
+      }
+    },
+    {
+      "id": "winston",
+      "name": "Winston Pryce",
+      "pronouns": "he/him",
+      "title": "The Actor",
+      "publicBio": "A retired Shakespearean actor who plays Judge Obadiah Ward in the reenactment every year: black robes, a white wig, and a gavel he bangs a great deal. He takes the part very seriously.",
+      "costumeTips": "A black robe or gown, a white powdered wig (or a white scarf), and a gavel or hammer.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.9,
+        "rate": 0.9,
+        "style": "booming, theatrical, vain"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've played the judge for twenty years, and this year Josiah told you he was replacing you with 'somebody from the TV'. You were humiliated. You spent the evening rehearsing on the green, and lost your gavel somewhere around eleven.",
+        "secrets": [
+          {
+            "id": "winston-replaced",
+            "text": "Josiah was replacing me as the judge with a TV actor. Twenty years, and replaced.",
+            "unlockAct": 0
+          },
+          {
+            "id": "winston-wig",
+            "text": "My 'powdered wig' is my late wife's poodle's grooming mat, sprayed white. Don't tell.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your role as the judge.",
+          "Find your gavel.",
+          "Solve the mystery. It's the role of a lifetime."
+        ],
+        "knows": [
+          "You lost your gavel at about eleven, on the green. You haven't seen it since.",
+          "Kendra Lake's camera was pointed at the mill door all night, from across the pond."
+        ],
+        "alibi": "I was rehearsing my lines on the green from eleven until the procession. Loudly.",
+        "lines": {
+          "act1": [
+            "'Abigail Thorne, how do you plead?' Every year I say it. Every year it gives me chills."
+          ],
+          "act2": [
+            "Replaced by a TV actor. A TV actor! Over my dead... well. Never mind."
+          ],
+          "act3": [
+            "My gavel is missing. A judge without a gavel is just a man in a dress."
+          ]
+        }
+      }
+    },
+    {
+      "id": "kendra",
+      "name": "Kendra Lake",
+      "pronouns": "she/her",
+      "title": "The TV Reporter",
+      "publicBio": "A Boston TV reporter doing a Halloween special on 'America's Spookiest Town': big hair, a shoulder-pad blazer and a cameraman she sends for coffee a lot. She filmed the old mill door from across the pond all night, waiting for the midnight reenactment.",
+      "costumeTips": "A blazer with shoulder pads, big hair, a microphone, and a notepad.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.2,
+        "style": "bright, pushy, fearless"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Your camera was trained on the old mill door from across the pond from half past eleven, for a spooky establishing shot. You've got every visitor on tape, except for six minutes when you had to change the tape. You also planned to make Josiah look like a fool on air.",
+        "secrets": [
+          {
+            "id": "kendra-tape",
+            "text": "My camera missed six minutes, from 11:52 to 11:58, while I changed the tape.",
+            "unlockAct": 0
+          },
+          {
+            "id": "kendra-edit",
+            "text": "I was going to edit the reenactment to make the town look like crazy people. It's better TV.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get the story, and get it first.",
+          "Keep the missing six minutes quiet.",
+          "Solve the murder on camera. That's an Emmy."
+        ],
+        "knows": [
+          "Your tape shows the mill door: Morgana at 11:35, Prudence at 11:40, Grant at 11:45, the Reverend at 11:50. Then six missing minutes while you changed the tape.",
+          "At 12:05 the procession opened the mill, and you were right behind them with the camera."
+        ],
+        "alibi": "I was across the pond with my camera from half past eleven until the procession. I've got it all on tape. Nearly all.",
+        "lines": {
+          "act1": [
+            "This is Kendra Lake, live from Hollowmere, where tonight a three-hundred-year-old curse may have claimed a new victim."
+          ],
+          "act2": [
+            "Six minutes of tape. That's all I'm missing. Six little minutes."
+          ],
+          "act3": [
+            "The camera doesn't lie. It just sometimes needs changing."
+          ]
+        }
+      }
+    },
+    {
+      "id": "hatch",
+      "name": "Sheriff Tom Hatch",
+      "pronouns": "he/him",
+      "title": "The Sheriff",
+      "publicBio": "Hollowmere's sheriff for twenty-five years: a big hat, a bigger moustache, and very little patience for witches, curses or Boston reporters. He examined the body himself.",
+      "costumeTips": "A sheriff's hat, a star badge, a moustache (real or drawn), and a notebook.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "slow, gruff, shrewd"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've been Josiah's fishing buddy for thirty years. You also took a new pickup truck from Grant Holloway last month, 'as a gift', and you're starting to wish you hadn't. You examined Josiah's body when the procession found him, and you know how he died.",
+        "secrets": [
+          {
+            "id": "hatch-truck",
+            "text": "Grant Holloway gave me a new pickup truck last month. I shouldn't have taken it.",
+            "unlockAct": 0
+          },
+          {
+            "id": "hatch-fishing",
+            "text": "Josiah and I have fished Mill Pond every Sunday for thirty years. He told me everything.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find Josiah's killer. He was your friend.",
+          "Keep the truck quiet.",
+          "Keep order. This town panics easy."
+        ],
+        "knows": [
+          "You examined Josiah at five past twelve. You know how he died, and you'll say so.",
+          "Josiah told you on Sunday he'd 'found out something about this town that'll curl your moustache'."
+        ],
+        "alibi": "I was keeping order on the green all night, and led the procession to the mill at midnight with the Reverend.",
+        "lines": {
+          "act1": [
+            "There's no such thing as witches in Hollowmere. There's just people. And people are worse."
+          ],
+          "act2": [
+            "The truck? A loan. Between friends."
+          ],
+          "act3": [
+            "Curses don't carry weapons, folks. Somebody walked into that mill tonight."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "tape",
+      "title": "The Camera Tape",
+      "text": "Kendra Lake's camera was trained on the old mill door from across the pond, for her TV special. The tape shows Josiah go in at 11:30, and four visitors after him: Morgana Thorne at 11:35, Prudence Alden at 11:40, Grant Holloway at 11:45 and the Reverend at 11:50.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "morgana",
+        "prudence",
+        "grant",
+        "ward"
+      ]
+    },
+    {
+      "id": "poppet",
+      "title": "A Straw Poppet",
+      "text": "At Josiah's feet: a little straw doll in a black dress, a rusty nail driven through its chest. Sewn into its hem is a tiny tag in the shape of a thorn. Morgana Thorne sells these in her shop.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "morgana"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "salt",
+      "title": "A Circle of Salt",
+      "text": "Around the body, poured carefully on the floorboards: a circle of coarse grey salt. Morgana Thorne's shop sells little bags of 'protection salt' just like it.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "morgana"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "bridle",
+      "title": "The Witch's Bridle",
+      "text": "On the floor beside Josiah: an iron witch's bridle, a cage for the head from the 1690s. Its tag reads 'On loan from the Hollowmere Historical Society. P. Alden, Curator.' One heavy iron edge has a dark stain.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "prudence"
+      ]
+    },
+    {
+      "id": "kendra-saw",
+      "title": "Through the Lens",
+      "text": "Your own memory, from the camera's zoom: at 11:40 Prudence Alden went into the mill carrying the iron bridle for Josiah's costume. At 11:44 she came out without it, wiping her hands on her skirt, and hurried round the pond.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "prudence"
+      ],
+      "recipient": "kendra"
+    },
+    {
+      "id": "charter",
+      "title": "Josiah's Notes",
+      "text": "In Josiah's coat pocket: a lab report on 'Hollowmere Charter, 1692 (museum exhibit)'. 'Paper manufactured c. 1890. Ink modern.' Across the top, in Josiah's hand: 'FORGERY! Announce at midnight.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "prudence"
+      ]
+    },
+    {
+      "id": "resort",
+      "title": "The Resort Plans",
+      "text": "In Grant Holloway's briefcase: plans for the 'Thorne Woods Luxury Resort & Spa', and a council vote tally with one name circled in red: 'Whitcombe: NO'.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "grant"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "deed",
+      "title": "An Old Deed",
+      "text": "In Josiah's notebook, a copy of a deed from 1693: 'The lands of the condemned witch Abigail Thorne are granted to Judge Obadiah Ward, for the building of a church.' The Reverend's church stands on it.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "ward",
+        "morgana"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "gavel",
+      "title": "The Missing Gavel",
+      "text": "The reenactment judge's heavy wooden gavel is missing from its stand. Winston Pryce, who plays the judge, was about to be replaced by a TV actor.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "winston"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "notebook",
+      "title": "Josiah's Notebook",
+      "text": "Josiah's leather notebook is locked with a little combination lock. He scratched a riddle on the cover, because he never could remember the numbers.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "prudence"
+      ],
+      "puzzle": {
+        "prompt": "I'm tall when I'm young and short when I'm old, and on Halloween night I glow in every window. What am I?",
+        "answers": [
+          "candle",
+          "a candle",
+          "candles",
+          "the candle",
+          "a lit candle"
+        ],
+        "hint": "Every jack-o'-lantern has one inside.",
+        "solvedText": "Tonight's entry: 'Told Prudence about the lab report. She went white and said, \"Some truths should stay three hundred years old, Josiah.\" I'll announce it at midnight. She's fitting my bridle at twenty to twelve, as always.'"
+      }
+    },
+    {
+      "id": "bills",
+      "title": "The Inn's Ledger",
+      "text": "Behind the bar at the Crooked Broom: the inn's ledger. 'J. Whitcombe, festival accounts: $4,280, unpaid two years.' Underlined three times. Molly filled his flask at eleven.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "molly"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "office",
+      "title": "The Museum Office",
+      "text": "In Prudence Alden's office at the museum, in a locked drawer: bottles of old-fashioned iron-gall ink, a stack of blank yellowed paper, and a practice sheet covered in 1692-style signatures of 'Obadiah Ward'.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "prudence"
+      ]
+    },
+    {
+      "id": "tape-gap",
+      "title": "Six Missing Minutes",
+      "text": "Kendra Lake's tape jumps from 11:52 to 11:58. She says she was changing the tape. Anyone could have gone in or out of the mill in those six minutes.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "kendra"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "cuff",
+      "title": "A Rusty Cuff",
+      "text": "Prudence Alden's lace cuff is torn, and there's a smear of rust on it, the dark orange rust of very old iron.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "prudence"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A small New England town at night: a white church on a green, lanterns in bare trees, and an old mill by a black pond.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Hollowmere, Massachusetts. Halloween, 1994. In 1692 this town tried a woman named Abigail Thorne for witchcraft, and ducked her in Mill Pond until she confessed. Every Halloween since, the town has reenacted it."
+    },
+    {
+      "type": "narration",
+      "text": "Tonight, at the festival supper, the chairman, Josiah Whitcombe, tapped his cider mug and made a promise. At midnight, when the reenactment began, he would tell the town something about its history that would 'shake Hollowmere to its roots'."
+    },
+    {
+      "type": "line",
+      "speaker": "morgana",
+      "text": "He looked right at three people when he said it. I noticed. I always notice."
+    },
+    {
+      "type": "toast",
+      "text": "To Hollowmere, and all her ghosts!",
+      "alternative": "Raise your hot cider to Hollowmere's ghosts!"
+    },
+    {
+      "type": "narration",
+      "text": "At half past eleven Josiah went into the old mill to change into the accused witch's costume. One by one, four people crossed the pond path to see him. A TV camera across the water was rolling the whole time."
+    },
+    {
+      "type": "image",
+      "text": "The old mill at midnight, a lantern procession winding towards its door along the edge of the pond.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At five past twelve the procession opened the mill door. Josiah Whitcombe lay dead on the floor in his costume, inside a circle of salt, with a straw poppet at his feet, a nail through its heart. The storm has closed the bridge. Nobody leaves Hollowmere tonight. And one of you killed him."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Old Mill",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Old Mill."
+        },
+        {
+          "type": "image",
+          "text": "Inside the old mill by lantern light: a circle of salt, a straw doll, an iron bridle on the floorboards, and a pewter flask on its side.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Sheriff Hatch kneels inside the salt circle. There's a heavy wound on the side of Josiah's head: something iron, swung hard. 'That's no curse,' the sheriff says. 'Curses don't swing.'"
+        },
+        {
+          "type": "line",
+          "speaker": "hatch",
+          "text": "Somebody wants us to think a witch did this. Somebody wants it very badly."
+        }
+      ],
+      "prompts": [
+        "Who crossed the pond path to the mill, and when?",
+        "Who left the poppet and the salt, and why?",
+        "What was Josiah going to announce at midnight?",
+        "Who had something to lose from the town's history?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: The Trial",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. The Trial."
+        },
+        {
+          "type": "image",
+          "text": "The white church at night, its windows glowing, and an old gravestone leaning in the yard: ABIGAIL THORNE, 1692.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Hollowmere's history is written in its museum, its church and its deeds. Josiah had been reading them all. His notebook has a riddle on the cover, and his pockets are full of other people's secrets."
+        },
+        {
+          "type": "toast",
+          "text": "To Abigail Thorne! May she finally rest.",
+          "alternative": "Raise your cider, and your conscience."
+        },
+        {
+          "type": "line",
+          "speaker": "ward",
+          "text": "The past should stay buried. All of it."
+        }
+      ],
+      "prompts": [
+        "Open Josiah's notebook. The cover holds a riddle.",
+        "What really happened in 1692, and who profited?",
+        "Who was about to be ruined at midnight?",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Witching Hour",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Witching Hour."
+        },
+        {
+          "type": "image",
+          "text": "Dawn over Mill Pond: mist on the water, the bridge washed clear, and state police lights on the far bank.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The storm has passed, and the state police are coming over the bridge. The town has blamed a witch once before. Before the police arrive, Hollowmere has one last chance to blame the right person."
+        },
+        {
+          "type": "toast",
+          "text": "To the truth, three hundred years late!",
+          "alternative": "Coffee up for the truth!"
+        },
+        {
+          "type": "line",
+          "speaker": "kendra",
+          "text": "This is Kendra Lake, live from Hollowmere, and in the next few minutes we'll know who did it."
+        }
+      ],
+      "prompts": [
+        "What was hidden in the museum, the church or someone's pocket?",
+        "Whose visit to the mill doesn't match the tape?",
+        "Who most needed Josiah silenced before midnight?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "forgery",
+        "text": "To hide a forged historical document"
+      },
+      {
+        "id": "land",
+        "text": "To push through a land deal"
+      },
+      {
+        "id": "ancestor",
+        "text": "To hide an ancestor's crime and keep the church's land"
+      },
+      {
+        "id": "witch",
+        "text": "Revenge for an ancestor condemned as a witch"
+      },
+      {
+        "id": "bills",
+        "text": "Over years of unpaid bills"
+      },
+      {
+        "id": "role",
+        "text": "Revenge for being replaced in the reenactment"
+      }
+    ],
+    "methods": [
+      {
+        "id": "bridle",
+        "text": "A blow from the iron witch's bridle"
+      },
+      {
+        "id": "hemlock",
+        "text": "Water hemlock in his cider flask"
+      },
+      {
+        "id": "rope",
+        "text": "Strangled with the reenactment's rope"
+      },
+      {
+        "id": "gavel",
+        "text": "A blow from the judge's gavel"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "prudence",
+    "motiveId": "forgery",
+    "methodId": "bridle",
+    "explanation": [
+      "No witch killed Josiah Whitcombe, and no curse either. The poppet and the salt were stage dressing, left by someone who knows exactly how Hollowmere blames its witches: the town historian, Prudence Alden.",
+      "The museum's star exhibit, the 1692 Charter, is Prudence's own forgery, made in 1978 to save the museum. Josiah had the paper tested: made in 1890. He'd announce it at midnight. 'Some truths should stay three hundred years old, Josiah,' she told him. He wrote it in his notebook.",
+      "At twenty to twelve she went into the mill to fit his costume's iron bridle, as every year. He laughed at her, and she struck him with it. Then she poured a circle of salt, left a poppet she'd bought from Morgana's shop at his feet, and walked out at sixteen minutes to twelve, wiping her hands. Kendra's camera saw her; the Reverend saw her hurrying round the pond.",
+      "Grant and the Reverend found the door latched and got no answer, because Josiah was already dead. The rust on Prudence's cuff, the stain on the bridle and the forger's kit in her museum office told the rest.",
+      "Morgana's poppet, the Reverend's deed, Grant's resort, Molly's bills and Winston's gavel were all red herrings. Hollowmere wanted a witch. Prudence gave them one, and wrote the history herself."
+    ],
+    "timeline": [
+      {
+        "time": "Afternoon",
+        "event": "Prudence buys a straw poppet and protection salt from Morgana's shop."
+      },
+      {
+        "time": "9:00",
+        "event": "At the festival supper, Josiah promises to 'shake Hollowmere to its roots' at midnight."
+      },
+      {
+        "time": "10:30",
+        "event": "Josiah tells Prudence about the lab report. 'Some truths should stay three hundred years old.'"
+      },
+      {
+        "time": "11:00",
+        "event": "Molly fills Josiah's flask at the inn."
+      },
+      {
+        "time": "11:30",
+        "event": "Josiah goes into the old mill to change. Kendra starts filming the door."
+      },
+      {
+        "time": "11:35",
+        "event": "Morgana brings Josiah a sprig of rowan. He's cheerful."
+      },
+      {
+        "time": "11:40",
+        "event": "Prudence goes in with the iron bridle and strikes Josiah with it."
+      },
+      {
+        "time": "11:44",
+        "event": "Prudence leaves the salt and poppet and hurries out, wiping her hands."
+      },
+      {
+        "time": "11:45",
+        "event": "Grant knocks. The door is latched. No answer."
+      },
+      {
+        "time": "11:50",
+        "event": "The Reverend prays on the step. No answer."
+      },
+      {
+        "time": "12:05",
+        "event": "The procession opens the mill and finds Josiah."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "State police cars crossing a narrow bridge at dawn, blue lights on the mist over Mill Pond.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of Hollowmere!",
+      "alternative": "Hot cider up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The state police came over the bridge at six. Prudence Alden was waiting on the museum steps with the 1692 Charter in her arms. 'It was a very good forgery,' she said. 'This town needed a history. I gave it one.'"
+    },
+    {
+      "type": "narration",
+      "text": "They buried Josiah Whitcombe in the churchyard a week later, a few rows from Abigail Thorne. On the morning after the funeral, the groundskeeper found a fresh circle of coarse grey salt poured around his grave. Nobody in Hollowmere would admit to pouring it. Morgana Thorne says she didn't. And the salt, they say, was still warm. Goodnight, detectives."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "slug": "hotel-mortimer",
+  "name": "The Hotel Mortimer",
+  "tagline": "A Halloween séance at the grand hotel where no guest ever checks out.",
+  "era": "1920s haunted grand hotel",
+  "description": "Every Halloween the Hotel Mortimer holds a séance in its ballroom to greet the bride who vanished from Room 13 in 1901. Gilt mirrors, flickering chandeliers, a medium in black lace and thirteen minutes of total darkness. Tonight, when the lights came back on, the hotel's owner was gone. A gothic Halloween mystery.",
+  "palette": {
+    "background": "#0c0a0a",
+    "surface": "#1c1414",
+    "accent": "#b5ce5a",
+    "ink": "#efe6da"
+  },
+  "artStyle": "Gothic 1920s art deco horror, a grand hotel lobby lit by guttering candles, gilt mirrors, green gaslight, sepia photographs",
+  "sortOrder": 12,
+  "cocktails": [
+    {
+      "name": "The Vanishing Bride",
+      "recipe": "Gin, elderflower liqueur and lemon, shaken and topped with sparkling wine.",
+      "mocktail": "Elderflower cordial, lemon and sparkling white grape juice."
+    },
+    {
+      "name": "Room 13",
+      "recipe": "Absinthe rinse, rye whiskey, a sugar cube and bitters.",
+      "mocktail": "Black tea, a sugar cube, orange bitters (just a dash) and a twist of anise."
+    }
+  ]
+}

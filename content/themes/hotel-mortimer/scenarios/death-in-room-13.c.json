@@ -1,0 +1,234 @@
+{
+  "variantOf": "death-in-room-13",
+  "variant": "C",
+  "solution": {
+    "murdererId": "agnes",
+    "motiveId": "revenge",
+    "methodId": "pillow",
+    "explanation": [
+      "Nobody strangled Cordelia Mortimer, and nobody poisoned her sherry. She was smothered with a pillow from the bridal bed, by the woman who had made up that bed every Halloween for forty years: Mrs. Agnes Pruitt, the housekeeper.",
+      "The bride who 'vanished' from Room 13 in 1901 was Agnes's mother, Eliza. Tonight, making up the bed, Agnes found a letter behind the headboard in old Mr. Mortimer's hand: Eliza never left Room 13. Cordelia had known all along. Agnes told her, 'You'll greet her tonight, Miss Cordelia. In person.' Cordelia wrote it in her diary.",
+      "At six minutes past eleven, in the dark, Agnes left for 'candles'. She went through the linen room into the servants' passage, and in through Room 13's side door, keys jingling. Lucky saw her. She took a pillow from the bed she had made, and held it over Cordelia's face.",
+      "She was back by the ballroom door before the lights came up. But she left a trail: Cordelia's lipstick on the lace pillow, which smelled of her lavender starch; a feather caught in her key ring; feathers in her apron pocket; and the photograph of Eliza and her baby behind the bridal portrait.",
+      "Madame Zora's cord, Julian's sherry, Eddie's pearls and the doctor's certificates were all red herrings. Agnes waited forty years for the truth about Room 13. In the end, she kept the family tradition."
+    ],
+    "timeline": [
+      {
+        "time": "Afternoon",
+        "event": "Making up the bridal bed, Agnes finds old Mr. Mortimer's letter behind the headboard."
+      },
+      {
+        "time": "10:00",
+        "event": "Dinner. Cordelia promises to expose a fraud and announces a new will."
+      },
+      {
+        "time": "10:30",
+        "event": "Agnes confronts Cordelia: 'You'll greet her tonight, Miss Cordelia. In person.'"
+      },
+      {
+        "time": "10:55",
+        "event": "Julian pours Cordelia's sherry."
+      },
+      {
+        "time": "11:00",
+        "event": "The lights go out. Agnes unlocks Room 13. Zora enters her cabinet."
+      },
+      {
+        "time": "11:05",
+        "event": "Cordelia goes into Room 13 alone with her sherry."
+      },
+      {
+        "time": "11:06",
+        "event": "Agnes leaves 'for candles', through the linen room into the servants' passage."
+      },
+      {
+        "time": "11:07",
+        "event": "Agnes enters Room 13 by the side door, keys jingling. Lucky sees her."
+      },
+      {
+        "time": "11:08",
+        "event": "Agnes smothers Cordelia with a pillow from the bridal bed."
+      },
+      {
+        "time": "11:12",
+        "event": "Agnes is back at the ballroom door, with candles."
+      },
+      {
+        "time": "11:13",
+        "event": "The lights come up. Four chairs are empty."
+      },
+      {
+        "time": "11:20",
+        "event": "Eddie opens Room 13 and finds Cordelia."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. Room 13."
+        },
+        {
+          "type": "image",
+          "text": "The bridal suite by candlelight: a four-poster bed made up with lace, a spilled sherry glass, feathers on the rug, and an open window with the curtains blowing.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Dr. Crowe kneels by the body. There isn't a mark on Cordelia's throat, and the sherry smells like sherry. But there are tiny white feathers caught in her nose and on her lips, and the little veins in her eyes have burst. 'Smothered,' he says quietly. 'With something soft. Somebody held it there a long time.'"
+        },
+        {
+          "type": "line",
+          "speaker": "eddie",
+          "text": "I opened the door and there she was. And the bed was all made up, like somebody expected a bride."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "agnes": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You were raised in this hotel. Your mother was Eliza, the bride who 'vanished' from Room 13 in 1901. This afternoon, making up the bridal bed, you found a letter behind the headboard in old Mr. Mortimer's hand: your mother never left Room 13. And Cordelia had always known. At dinner you told her, 'You'll greet her tonight, Miss Cordelia. In person.' At six minutes past eleven you left the ballroom door 'for candles', went through the linen room and the servants' passage, and in through Room 13's side door. You took a pillow from the bed you had made, and held it over her face.",
+        "objectives": [
+          "Don't get caught. Point everyone at Madame Zora (the cord! the passage!) or at Julian and the sherry.",
+          "Brush the feathers off your apron and your keys.",
+          "Let the truth about your mother come out, but not the truth about tonight."
+        ],
+        "knows": [
+          "Madame Zora's spirit cabinet backs onto the servants' passage. Everyone will think she used it.",
+          "Julian poured Cordelia's sherry, and Julian was just disinherited."
+        ],
+        "lines": {
+          "act3": [
+            "I went for candles. Forty years I've fetched candles in this hotel, and never once has anyone asked me why."
+          ]
+        }
+      }
+    },
+    "zora": {
+      "private": {
+        "backstory": "Your séances are a trick: a spirit cabinet with a false back, spirit hands made of gloves on wires. Cordelia hired a detective who found it all out, and at dinner she told you she'd expose you at the end of the séance. You'd be finished. When the lights went out you stayed in your cabinet, working the spirit hands through the curtain as usual. At seven minutes past, through the back of your cabinet, you heard keys jingling in the servants' passage, heading towards Room 13. You did not kill her. But you had every reason to.",
+        "objectives": [
+          "Clear your name without anyone looking behind your cabinet.",
+          "Find the detective's report before it's read aloud.",
+          "Find out who really killed Cordelia. It would make a marvellous séance."
+        ],
+        "knows": [
+          "Cordelia drinks a sherry toast just before the séance, and Julian always pours it.",
+          "Agnes the housekeeper keeps the only key to Room 13, and unlocks it every Halloween."
+        ],
+        "alibi": "I was in my spirit cabinet from eleven until the lights came up, working. The spirits don't summon themselves.",
+        "lines": {
+          "act3": [
+            "Yes, my cabinet has a false back. Every medium's does. I used it to make the spirit hands wave, not to kill anyone."
+          ]
+        }
+      }
+    },
+    "vivienne": {
+      "private": {
+        "knows": [
+          "At six minutes past eleven, in the dark, you smelled lavender starch pass behind your chair, towards the linen room. Mrs. Pruitt's apron always smells of lavender starch.",
+          "At nineteen past eleven, with the lights up, you saw Eddie the bellhop come out of the Room 13 corridor with one hand stuffed in his pocket."
+        ]
+      }
+    },
+    "julian": {
+      "private": {
+        "knows": [
+          "At five to eleven you poured Aunt Cordelia her sherry from the decanter on the séance table. She drank it and was perfectly well.",
+          "Out on the terrace at seven minutes past eleven, you heard keys jingling in the servants' passage below."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "cord": {
+      "text": "On the floor of Room 13: a purple silk cord with a tassel, the one from Madame Zora's spirit trumpet. It slips off the trumpet every year. Dr. Crowe says there isn't a mark on Cordelia's throat.",
+      "redHerring": true
+    },
+    "report": {
+      "redHerring": true
+    },
+    "cabinet": null,
+    "bangle": null,
+    "pillow": {
+      "text": "A lace pillow from the bridal bed lies on the floor, feathers spilling from a split seam. On the lace there's a smear of Cordelia's plum lipstick. The pillowcase smells of lavender starch. Mrs. Pruitt makes up that bed herself.",
+      "redHerring": false
+    },
+    "bride-letter": {
+      "redHerring": false,
+      "pointsTo": [
+        "agnes"
+      ]
+    },
+    "lucky-saw": {
+      "text": "Your own memory: by the red lamp, at seven minutes past eleven, a figure came out of the servants' passage and slipped into Room 13 through the side door. You heard keys jingling. At eleven minutes past it slipped back into the passage.",
+      "pointsTo": [
+        "agnes"
+      ]
+    },
+    "diary": {
+      "pointsTo": [
+        "agnes"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Pruitt found Father's letter. She knows about her mother. She looked at me and said, \"You'll greet her tonight, Miss Cordelia. In person.\" I have never been afraid of a servant. Room 13 at five past eleven, as always.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "keys",
+      "title": "The Chatelaine",
+      "text": "Mrs. Pruitt's ring of keys. The big brass key to Room 13 is freshly oiled, and caught in the ring is a single white down feather.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "agnes"
+      ]
+    },
+    {
+      "id": "photograph",
+      "title": "Behind the Portrait",
+      "text": "Behind the portrait of the bride over the bed in Room 13: an old photograph of a young woman in a wedding dress, holding a baby. On the back: 'Eliza and little Agnes, 1900.'",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "agnes"
+      ]
+    },
+    {
+      "id": "apron",
+      "title": "The Apron Pocket",
+      "text": "In the linen room, Mrs. Pruitt's spare apron hangs on its hook, still warm. The pocket is full of white down feathers, and there's a smear of plum lipstick on the hem.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "agnes"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Police cars winding up a wet canyon road at dawn, towards a gothic hotel.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of the Hotel Mortimer!",
+      "alternative": "Coffee cups up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The police came up the canyon road at six. Mrs. Pruitt met them at the door with the register open and her keys in her hand. 'Room 13 is ready,' she said. 'It always is.' Then she gave them the letter, and the photograph, and her keys."
+    },
+    {
+      "type": "narration",
+      "text": "The Hotel Mortimer went to the city as a museum, and Room 13 was locked again. But the night clerk swears that at three o'clock the next morning, the bell for Room 13 rang at the front desk. When he went to look, the door was still locked, the room was empty, and the bridal bed had been freshly made. Goodnight, detectives. Please don't check out."
+    }
+  ]
+}
