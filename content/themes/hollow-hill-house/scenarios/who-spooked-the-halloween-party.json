@@ -1,0 +1,855 @@
+{
+  "id": "who-spooked-the-halloween-party",
+  "themeSlug": "hollow-hill-house",
+  "title": "Who Spooked the Halloween Party?",
+  "synopsis": "It's Halloween, and the whole village has come in costume to kindly old Mr. Bramble's party at creaky Hollow Hill House: apple-bobbing, a fortune teller, a witch's-brew punch bowl, and the famous pumpkin contest, with the Golden Pumpkin trophy for the winner. But before the ten o'clock Pumpkin Parade, Mr. Bramble is found asleep forever in his armchair, and the Golden Pumpkin has vanished. A storm has flooded the lane. Nobody goes home until the mystery is solved.",
+  "contentRating": "family",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Hollow Hill House, a creaky old mansion on the hill above the village",
+    "era": "Halloween night",
+    "description": "A crooked old house with a turret, a ballroom full of costumes and cobwebs, an apple-bobbing tub, a fortune teller's tent, a DJ table, a library with a crackling fire, and a big old kitchen with a very high cupboard. Jack-o'-lanterns grin from every window. Outside, a storm has flooded the lane down to the village."
+  },
+  "victim": {
+    "name": "Mr. Barnaby Bramble",
+    "description": "Eighty years old, with a velvet waistcoat, a twinkly smile and a weak heart. He has thrown the village Halloween party for fifty years, and he judges the pumpkin contest himself, very strictly."
+  },
+  "characters": [
+    {
+      "id": "betty",
+      "name": "Betty Butterworth",
+      "pronouns": "she/her",
+      "title": "The Baker",
+      "publicBio": "The village baker: flour in her hair, a rolling pin in her apron, and nine Golden Pumpkins on her shop shelf. Every year she makes the caramel apples for Mr. Bramble's party, and every year she wins the pumpkin contest.",
+      "costumeTips": "An apron dusted with flour, a chef's hat or headscarf, oven gloves, and a caramel apple (or a real apple on a stick).",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.05,
+        "rate": 1.05,
+        "style": "cheerful, proud, a little bossy"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU DID IT. This year your pumpkin didn't carve properly, so you secretly bought a ready-carved one from the costume shop and entered it as your own. Mr. Bramble found the shop's price sticker on the bottom. At the ten o'clock Pumpkin Parade he was going to announce that you were disqualified, in front of the whole village. So at a quarter past eight you crept into his kitchen, reached up to the high cupboard for his bottle of Sleepy Syrup, and stirred some into the caramel for his special apple. You only meant him to snooze through the parade. You didn't know how weak his heart was. Now he'll never wake up, and nobody must find out.",
+        "secrets": [
+          {
+            "id": "betty-shop",
+            "text": "My pumpkin this year was bought from the costume shop. I pretended I carved it myself.",
+            "unlockAct": 0
+          },
+          {
+            "id": "betty-syrup",
+            "text": "I put some of Mr. Bramble's Sleepy Syrup in the caramel for his apple.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get found out. Point everyone at the pumpkin soup or the witch's-brew punch.",
+          "Hide your sticky oven gloves and your measuring spoon.",
+          "Keep your nine Golden Pumpkins. Make it ten, if you can."
+        ],
+        "knows": [
+          "Mr. Bramble had three treats tonight: your caramel apple, Mr. Hodge's pumpkin soup and Zandini's witch's-brew punch.",
+          "DJ Jax was hanging about the trophy shelf at twenty past nine."
+        ],
+        "alibi": "At half past eight I gave Mr. Bramble his caramel apple, then I was at the bobbing-for-apples tub all evening, getting splashed.",
+        "lines": {
+          "act1": [
+            "Nine Golden Pumpkins in a row! Well. Ten, after tonight. Probably."
+          ],
+          "act2": [
+            "Carved it myself. Every bit. With a... spoon. A carving spoon."
+          ],
+          "act3": [
+            "Look at the soup! Look at the punch! Nobody ever looks at a nice caramel apple."
+          ]
+        }
+      }
+    },
+    {
+      "id": "hodge",
+      "name": "Mr. Hodge",
+      "pronouns": "he/him",
+      "title": "The Gardener",
+      "publicBio": "Mr. Bramble's gardener for forty years: muddy boots, a straw hat, and the biggest pumpkins in the county. He grows every pumpkin for the party, and makes a famous pot of pumpkin soup.",
+      "costumeTips": "Muddy boots or wellies, a straw hat, a checked shirt, gardening gloves, and a small pumpkin.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.85,
+        "rate": 0.9,
+        "style": "slow, grumbly, soft-hearted"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Tonight Mr. Bramble told you he's selling the pumpkin patch to the village council, to make a car park. Forty years of pumpkins, gone under tarmac. You were heartbroken, and you told him so. At twenty to nine you still took him a bowl of your pumpkin soup, because that's what you always do. You did not hurt him. But everyone heard you grumbling.",
+        "secrets": [
+          {
+            "id": "hodge-patch",
+            "text": "Mr. Bramble was selling my pumpkin patch to make a car park. I told him he'd regret it.",
+            "unlockAct": 0
+          },
+          {
+            "id": "hodge-giant",
+            "text": "My prize-winning giant pumpkin was grown with a secret fertiliser: the donkey's leftovers.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Save the pumpkin patch.",
+          "Find out who made Mr. Bramble sleep forever.",
+          "Keep your fertiliser secret. A gardener has his pride."
+        ],
+        "knows": [
+          "You took Mr. Bramble his pumpkin soup at twenty to nine. He'd just finished a caramel apple, and he was yawning already.",
+          "At a quarter past eight you saw Betty coming out of Mr. Bramble's kitchen, licking her fingers."
+        ],
+        "alibi": "After the soup I went back to the pumpkin patch to put the lanterns out, and stayed there until the parade bell.",
+        "lines": {
+          "act1": [
+            "Forty years I've grown pumpkins on that hill. Forty years. You don't park cars on a pumpkin patch."
+          ],
+          "act2": [
+            "My soup's the same as always. Pumpkin, onion, a pinch of salt. No funny business."
+          ],
+          "act3": [
+            "When I took the soup in, he was yawning like a sleepy old dog. And he'd only just had his apple."
+          ]
+        }
+      }
+    },
+    {
+      "id": "zandini",
+      "name": "The Great Zandini",
+      "pronouns": "he/him",
+      "title": "The Magician",
+      "publicBio": "Mr. Bramble's next-door neighbour: a cape, a top hat, a wand, and a magic cauldron that bubbles green smoke. He makes the witch's-brew punch every year, with a flourish and a cloud of mist.",
+      "costumeTips": "A cape, a top hat, a magic wand, and a painted-on curly moustache.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 1.0,
+        "style": "grand, mysterious, twinkly"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You've wanted to buy Hollow Hill House for years, to turn it into a Museum of Magic. Mr. Bramble always says no. Tonight he told you, 'Not while I'm alive, Zandini.' You were cross, but at ten to nine you still took him a cup of your witch's-brew punch with a big puff of smoke. It was just punch. You did not hurt him.",
+        "secrets": [
+          {
+            "id": "zandini-museum",
+            "text": "I want to buy Hollow Hill House for a Museum of Magic. Mr. Bramble always said no.",
+            "unlockAct": 0
+          },
+          {
+            "id": "zandini-tricks",
+            "text": "My magic cauldron is just a bucket with dry ice in the bottom. Don't tell anyone.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Buy Hollow Hill House, somehow.",
+          "Find out who spoiled the party.",
+          "Keep your magic tricks secret."
+        ],
+        "knows": [
+          "You took Mr. Bramble his punch at ten to nine. He could hardly keep his eyes open. There was a sticky caramel-apple stick on his plate.",
+          "Mrs. Stitch made every cape at the party, including one with a torn hem."
+        ],
+        "alibi": "After the punch I did card tricks in the ballroom until the parade bell.",
+        "lines": {
+          "act1": [
+            "Abracadabra! A little puff of smoke, and your punch is ready, sir."
+          ],
+          "act2": [
+            "The house? A Museum of Magic would be lovely here. That's all. Nothing sinister. Mwa-ha-ha. Sorry, habit."
+          ],
+          "act3": [
+            "When I brought the punch he was nodding off. Before he'd even had a sip."
+          ]
+        }
+      }
+    },
+    {
+      "id": "milo",
+      "name": "Milo Bramble",
+      "pronouns": "he/him",
+      "title": "The Littlest Trick-or-Treater",
+      "publicBio": "Age nine. Mr. Bramble's great-nephew, dressed as a very small skeleton. Milo knows every secret passage in Hollow Hill House, and he notices everything, because grown-ups forget he's there.",
+      "costumeTips": "A skeleton costume (or any costume you like), a trick-or-treat bucket, and a torch.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.3,
+        "rate": 1.15,
+        "style": "bright, curious, brave"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Great-Uncle Barnaby is your favourite person in the whole world. Every Halloween he lets you help judge the pumpkins, and at nine o'clock you go to the library to say goodnight before your mum takes you home. Tonight he was yawning so much he could hardly say it back. You also know where he keeps his Sleepy Syrup: in the high cupboard in the kitchen, for when his knees keep him awake. Somebody else knew too.",
+        "secrets": [
+          {
+            "id": "milo-cupboard",
+            "text": "I know Great-Uncle keeps his Sleepy Syrup in the high kitchen cupboard, and somebody else found out.",
+            "unlockAct": 0
+          },
+          {
+            "id": "milo-passage",
+            "text": "There's a secret passage from the library to the kitchen behind the big bookcase. I use it all the time.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who spooked Great-Uncle Barnaby.",
+          "Get the Golden Pumpkin back where it belongs.",
+          "Keep the secret passage secret, unless it helps."
+        ],
+        "knows": [
+          "At nine you said goodnight to Great-Uncle in the library. He was yawning like a hippo. 'That caramel apple tasted of cinnamon tonight, Milo,' he said.",
+          "At a quarter past eight you saw Betty in the kitchen, standing on the stool by the high cupboard."
+        ],
+        "alibi": "I was trick-or-treating round the house all evening, except at nine when I said goodnight to Great-Uncle.",
+        "lines": {
+          "act1": [
+            "Great-Uncle Barnaby says Hollow Hill House has thirteen ghosts. I've only met two. They're very polite."
+          ],
+          "act2": [
+            "Grown-ups say all sorts of things in front of kids. They think we're furniture. Spooky furniture."
+          ],
+          "act3": [
+            "Somebody knew where the Sleepy Syrup was. Somebody who went in the kitchen."
+          ]
+        }
+      },
+      "killerEligible": false
+    },
+    {
+      "id": "moonbeam",
+      "name": "Madame Moonbeam",
+      "pronouns": "she/her",
+      "title": "The Fortune Teller",
+      "publicBio": "Reads palms and tea leaves in a tent in the corner of the ballroom, with a crystal ball and a black cat called Midnight. At dinner she predicted 'a long, long sleep' for Mr. Bramble. She says she meant a nap.",
+      "costumeTips": "A shawl, lots of jangly bracelets, a headscarf, and a crystal ball (a round bowl or balloon works).",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.0,
+        "rate": 0.9,
+        "style": "dreamy, dramatic, mysterious"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Your 'crystal ball' is a goldfish bowl turned upside down, and you make up every fortune on the spot. At a quarter past nine you went to the library to read Mr. Bramble's palm. He was nodding off in his chair, mumbling about cinnamon. At dinner you'd predicted 'a long, long sleep' for him, and now everyone is staring at you.",
+        "secrets": [
+          {
+            "id": "moonbeam-bowl",
+            "text": "My crystal ball is a goldfish bowl turned upside down. I make up every fortune.",
+            "unlockAct": 0
+          },
+          {
+            "id": "moonbeam-midnight",
+            "text": "Midnight the cat isn't mine. I borrowed her from the vicar for the evening.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your 'powers' a mystery.",
+          "Prove your prediction was just a guess.",
+          "Help solve the mystery. The spirits would want you to."
+        ],
+        "knows": [
+          "At a quarter past nine you tried to read Mr. Bramble's palm, but he was nodding off. 'Cinnamon,' he mumbled. 'Why did the apple taste of cinnamon?'",
+          "At twenty past nine, leaving the library, you saw DJ Jax tiptoe past with something round and golden under their jacket."
+        ],
+        "alibi": "I was in my fortune-telling tent all evening, except at a quarter past nine, when I went to read Mr. Bramble's palm.",
+        "lines": {
+          "act1": [
+            "The spirits tell me... that someone in this room is hiding something. Probably several someones."
+          ],
+          "act2": [
+            "A long, long sleep, I said. I meant a nap! A nice nap!"
+          ],
+          "act3": [
+            "The crystal ball is cloudy tonight. That means somebody's fibbing."
+          ]
+        }
+      }
+    },
+    {
+      "id": "pumphrey",
+      "name": "Reverend Pumphrey",
+      "pronouns": "he/him",
+      "title": "The Vicar",
+      "publicBio": "The village vicar, dressed as a very friendly ghost (a sheet with a dog collar pinned on). He runs the apple-bobbing, and he's the one who found Mr. Bramble.",
+      "costumeTips": "A white sheet with eye holes (or a white shirt), a dog collar, and a kindly smile.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 0.95,
+        "rate": 0.95,
+        "style": "gentle, flustered, kind"
+      },
+      "required": false,
+      "private": {
+        "backstory": "At half past nine you went to the library to fetch Mr. Bramble for the Pumpkin Parade, and found him asleep forever in his armchair. You've also been secretly entering the pumpkin contest every year under a made-up name, 'Mrs. Gourd', and losing every time.",
+        "secrets": [
+          {
+            "id": "pumphrey-gourd",
+            "text": "I enter the pumpkin contest every year as 'Mrs. Gourd'. I've never won.",
+            "unlockAct": 0
+          },
+          {
+            "id": "pumphrey-cat",
+            "text": "I lent my cat, Midnight, to Madame Moonbeam for the evening.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who did this to your old friend.",
+          "Keep 'Mrs. Gourd' a secret.",
+          "Look after everyone, especially Milo."
+        ],
+        "knows": [
+          "At half past nine you found Mr. Bramble in his armchair in the library. On the table: a caramel-apple stick, an empty soup bowl, and an empty punch cup.",
+          "The Golden Pumpkin wasn't on its shelf in the hall when you walked past at half past nine."
+        ],
+        "alibi": "I was running the apple-bobbing all evening until half past nine, when I went to fetch Mr. Bramble for the parade.",
+        "lines": {
+          "act1": [
+            "I went to fetch him for the parade. He looked so peaceful. Like he was dreaming of pumpkins."
+          ],
+          "act2": [
+            "Mrs. Gourd? Never heard of her. A very talented lady, I'm sure."
+          ],
+          "act3": [
+            "Let's all be kind to each other tonight. And let's find out who did this."
+          ]
+        }
+      }
+    },
+    {
+      "id": "stitch",
+      "name": "Mrs. Stitch",
+      "pronouns": "she/her",
+      "title": "The Costume-Shop Owner",
+      "publicBio": "Owns the village costume shop: a tape measure round her neck, pins in her mouth, and a hand in every costume at the party. She also sells ready-carved pumpkins, 'for people in a hurry'.",
+      "costumeTips": "A tape measure round your neck, a pincushion bracelet, spectacles, and a bag of fabric scraps.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.1,
+        "rate": 1.15,
+        "style": "chatty, nosy, sharp-eyed"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You sold a ready-carved pumpkin to somebody this week, and they made you promise never to tell who. You also made every cape at the party, so you know whose is whose. Mr. Bramble owed your shop for forty costumes, and never paid.",
+        "secrets": [
+          {
+            "id": "stitch-pumpkin",
+            "text": "I sold a ready-carved pumpkin to someone this week. They made me promise to keep it quiet.",
+            "unlockAct": 0
+          },
+          {
+            "id": "stitch-bill",
+            "text": "Mr. Bramble owed my shop for forty costumes. He never paid a penny.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your promise about the pumpkin, unless it matters.",
+          "Get the costume bill paid, somehow.",
+          "Find out who did it. You know every cape at this party."
+        ],
+        "knows": [
+          "You made every cape at the party. One has a torn hem, and the missing scrap is caught on the library door.",
+          "Your shop's price stickers are orange with a black cat on them."
+        ],
+        "alibi": "I was fixing costumes in the cloakroom all evening. Somebody always tears something at Halloween.",
+        "lines": {
+          "act1": [
+            "Every costume at this party has passed through my hands. Every single one."
+          ],
+          "act2": [
+            "I sell pumpkins, yes. Ready-carved. For busy people. Who buys them is between me and my till."
+          ],
+          "act3": [
+            "I know whose cape is whose. That's all I'll say. For now."
+          ]
+        }
+      }
+    },
+    {
+      "id": "jax",
+      "name": "DJ Jax",
+      "pronouns": "they/them",
+      "title": "The Teenage DJ",
+      "publicBio": "Sixteen, with enormous headphones and a laptop full of spooky songs. Jax runs the music for the party, and has very strong opinions about the Monster Mash.",
+      "costumeTips": "Big headphones, a hoodie, glow-stick bracelets, and something spooky printed on your T-shirt.",
+      "voice": {
+        "accent": "en-GB",
+        "pitch": 1.15,
+        "rate": 1.2,
+        "style": "cool, cheeky, secretly kind"
+      },
+      "required": false,
+      "private": {
+        "backstory": "At twenty past nine you sneaked the Golden Pumpkin off its shelf and hid it in your record bag, for a prank: you were going to make it 'appear by magic' during the parade. You walked past the library on the way and saw Mr. Bramble fast asleep in his chair. You thought he was just napping.",
+        "secrets": [
+          {
+            "id": "jax-trophy",
+            "text": "At twenty past nine I hid the Golden Pumpkin in my record bag, for a prank. It's still there.",
+            "unlockAct": 0
+          },
+          {
+            "id": "jax-songs",
+            "text": "I only know three spooky songs. I've been playing them on repeat all night.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Put the Golden Pumpkin back before anyone blames you for something worse.",
+          "Decide when to own up.",
+          "Help find out what really happened. Mr. Bramble was cool."
+        ],
+        "knows": [
+          "At twenty past nine Mr. Bramble was fast asleep in his chair in the library. You walked right past.",
+          "There was a caramel-apple stick on his plate, and the library smelled of cinnamon."
+        ],
+        "alibi": "I was at the DJ table all night, except at twenty past nine, when I nipped out to the hall.",
+        "lines": {
+          "act1": [
+            "This next one goes out to everyone who's scared of the dark. Which is everyone. It's the Monster Mash. Again."
+          ],
+          "act2": [
+            "The Golden Pumpkin? Missing? Wow. Spooky. Who'd do that?"
+          ],
+          "act3": [
+            "Okay, okay! I took the trophy! For a prank! But he was already asleep. I thought he was just napping!"
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "treats",
+      "title": "Mr. Bramble's Three Treats",
+      "text": "Every Halloween, three friends bring Mr. Bramble a treat in the library after the pumpkin judging. Tonight: a caramel apple from Betty at half past eight, a bowl of pumpkin soup from Mr. Hodge at twenty to nine, and a cup of witch's-brew punch from the Great Zandini at ten to nine. He finished all three.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "betty",
+        "hodge",
+        "zandini"
+      ]
+    },
+    {
+      "id": "empty-shelf",
+      "title": "The Empty Shelf",
+      "text": "The Golden Pumpkin trophy is missing from its shelf in the hall. It was there at nine. Whoever wins the pumpkin contest gets to keep it for a year.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "jax"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "crystal-ball",
+      "title": "A Spooky Prediction",
+      "text": "At dinner, Madame Moonbeam gazed into her crystal ball and announced that Mr. Bramble would have 'a long, long sleep'. Everyone laughed. Nobody's laughing now.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "moonbeam"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "apple-stick",
+      "title": "The Caramel-Apple Stick",
+      "text": "On Mr. Bramble's plate: a bare caramel-apple stick with a few sticky crumbs. The caramel smells strongly of cinnamon. Betty's caramel is always plain vanilla, but Mr. Bramble's Sleepy Syrup tastes of cinnamon.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "betty"
+      ]
+    },
+    {
+      "id": "milo-saw",
+      "title": "What Milo Saw",
+      "text": "Your own memory: at a quarter past eight, you peeked into the kitchen. Betty was standing on the step stool, reaching into the high cupboard where Great-Uncle keeps his Sleepy Syrup.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "betty"
+      ],
+      "recipient": "milo"
+    },
+    {
+      "id": "soup-bowl",
+      "title": "The Soup Bowl",
+      "text": "An empty soup bowl on the library table. Mr. Hodge made the soup himself, and he was grumbling all evening about the pumpkin patch.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "hodge"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "punch-cup",
+      "title": "The Punch Cup",
+      "text": "An empty cup of the Great Zandini's witch's-brew punch, still a little misty. Zandini has always wanted to buy Hollow Hill House.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "zandini"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "record-bag",
+      "title": "In Your Record Bag",
+      "text": "In your record bag, under your spare headphones: the Golden Pumpkin trophy. You took it at twenty past nine, for a prank. Engraved on the bottom: 'Winners never cheat. B.B.'",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "jax"
+      ],
+      "recipient": "jax",
+      "redHerring": true
+    },
+    {
+      "id": "parade-card",
+      "title": "The Parade Card",
+      "text": "In Mr. Bramble's waistcoat pocket: his card for the ten o'clock Pumpkin Parade. 'Three announcements: 1. Betty's pumpkin is DISQUALIFIED: shop-bought! 2. The pumpkin patch goes to the council for a car park. 3. Hollow Hill House is NOT for sale, Zandini.'",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "betty",
+        "hodge",
+        "zandini"
+      ]
+    },
+    {
+      "id": "diary",
+      "title": "Mr. Bramble's Diary",
+      "text": "Mr. Bramble's diary is locked with a little pumpkin-shaped padlock. He wrote a riddle on the cover, because he always forgot the code.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "betty"
+      ],
+      "puzzle": {
+        "prompt": "I have a face but no head, a candle for a heart, and I only come out at Halloween. What am I?",
+        "answers": [
+          "jack-o'-lantern",
+          "jack o lantern",
+          "jack-o-lantern",
+          "jackolantern",
+          "a jack-o'-lantern",
+          "pumpkin",
+          "a pumpkin",
+          "a carved pumpkin",
+          "lantern"
+        ],
+        "hint": "There's one grinning on the front porch right now.",
+        "solvedText": "Tonight's entry: 'Found a price sticker from Mrs. Stitch's shop under Betty's pumpkin! Told her I'll announce it at the parade. She went pink as a jelly and said, \"You'll sleep through your own parade, Barnaby.\" What a thing to say. Caramel apple at half past eight as usual.'"
+      }
+    },
+    {
+      "id": "cape",
+      "title": "A Torn Cape",
+      "text": "Caught on a nail by the library door: a scrap of black velvet from a cape hem. Half the party is wearing a cape tonight, and Mrs. Stitch made every one of them.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "stitch",
+        "zandini"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "gloves",
+      "title": "Sticky Oven Gloves",
+      "text": "Stuffed in the umbrella stand by the back door: Betty's flowery oven gloves, sticky with caramel. They smell of cinnamon.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "betty"
+      ]
+    },
+    {
+      "id": "sticker",
+      "title": "An Orange Sticker",
+      "text": "Under Betty's prize pumpkin on the contest table: a little orange price sticker with a black cat on it, from Mrs. Stitch's costume shop.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "betty"
+      ]
+    },
+    {
+      "id": "spoon",
+      "title": "A Measuring Spoon",
+      "text": "Tucked behind the kitchen bread bin: a tiny silver measuring spoon from Betty's baking box, sticky with pink syrup that smells of cinnamon.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "betty"
+      ]
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A crooked old mansion on a hill on Halloween night, every window glowing with a jack-o'-lantern, and bats against a purple sky.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Hollow Hill House, Halloween night. The whole village has come in costume to Mr. Bramble's famous party: witches and skeletons, ghosts and pirates, and one very small skeleton called Milo."
+    },
+    {
+      "type": "narration",
+      "text": "At eight o'clock Mr. Bramble judged the pumpkin contest. He peered under every pumpkin, wrote on his little card, and announced that the results, and some other news, would be read out at the ten o'clock Pumpkin Parade."
+    },
+    {
+      "type": "line",
+      "speaker": "milo",
+      "text": "Great-Uncle Barnaby winked at me and said, 'Three surprises tonight, Milo. Three!'"
+    },
+    {
+      "type": "narration",
+      "text": "After the judging, as every year, three friends brought him a treat in the library: a caramel apple from Betty the baker, a bowl of pumpkin soup from Mr. Hodge the gardener, and a cup of bubbling witch's-brew punch from the Great Zandini."
+    },
+    {
+      "type": "image",
+      "text": "A cosy library with a crackling fire, an armchair, and a little table with a plate, a bowl and a cup.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At half past nine the vicar went to fetch Mr. Bramble for the parade. He was in his armchair, asleep. Fast asleep. Asleep forever. Somebody gave him far too much of his own Sleepy Syrup, and his old heart simply stopped. And the Golden Pumpkin has vanished from its shelf. The lane is flooded. Nobody goes home until we know who spooked the Halloween party."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Library",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Library."
+        },
+        {
+          "type": "image",
+          "text": "The library by firelight: an armchair, a plate with a caramel-apple stick, an empty soup bowl and an empty punch cup.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Mr. Bramble had three treats tonight, from three different friends. Somebody put his Sleepy Syrup, which tastes of cinnamon, into one of them. Which treat, and whose?"
+        },
+        {
+          "type": "line",
+          "speaker": "pumphrey",
+          "text": "I went to fetch him for the parade. He looked so peaceful. Like he was dreaming of pumpkins."
+        }
+      ],
+      "prompts": [
+        "Who brought Mr. Bramble a treat, and when?",
+        "What were his three surprises for the parade?",
+        "Where is the Golden Pumpkin?",
+        "Who knew where the Sleepy Syrup was kept?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: Creaks and Cobwebs",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. Creaks and Cobwebs."
+        },
+        {
+          "type": "image",
+          "text": "A long corridor full of portraits whose eyes seem to follow you, and a bookcase standing slightly open.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Hollow Hill House is full of creaks, cobwebs and secrets. Mr. Bramble's diary has a riddle on the cover, and somebody in this room has the Golden Pumpkin."
+        },
+        {
+          "type": "line",
+          "speaker": "moonbeam",
+          "text": "The spirits are restless tonight. So am I."
+        }
+      ],
+      "prompts": [
+        "Open Mr. Bramble's diary. Can you solve the riddle?",
+        "Who had a reason to be cross with Mr. Bramble tonight?",
+        "Who has the Golden Pumpkin, and why?",
+        "Share a secret if it helps clear your name."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: The Pumpkin Parade",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. The Pumpkin Parade."
+        },
+        {
+          "type": "image",
+          "text": "Jack-o'-lanterns lined up on the front steps, flickering in the wind.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The rain is stopping, and the lane will soon be clear. The jack-o'-lanterns are lined up for a parade that can't happen without the truth."
+        },
+        {
+          "type": "line",
+          "speaker": "milo",
+          "text": "Great-Uncle always said: a mystery is just a story that hasn't finished yet."
+        }
+      ],
+      "prompts": [
+        "Which treat had the Sleepy Syrup in it?",
+        "What was hidden in the kitchen, the hall or the contest table?",
+        "Who most wanted Mr. Bramble to sleep through the parade?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "trophy",
+        "text": "To keep a prize won by cheating"
+      },
+      {
+        "id": "patch",
+        "text": "To save the pumpkin patch from becoming a car park"
+      },
+      {
+        "id": "house",
+        "text": "To get Hollow Hill House"
+      },
+      {
+        "id": "prank",
+        "text": "A Halloween prank that went too far"
+      },
+      {
+        "id": "bill",
+        "text": "Over a bill that was never paid"
+      }
+    ],
+    "methods": [
+      {
+        "id": "apple",
+        "text": "Sleepy Syrup in the caramel apple"
+      },
+      {
+        "id": "soup",
+        "text": "Sleepy Syrup in the pumpkin soup"
+      },
+      {
+        "id": "punch",
+        "text": "Sleepy Syrup in the witch's-brew punch"
+      },
+      {
+        "id": "cake",
+        "text": "Sleepy Syrup in a spooky cupcake"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "betty",
+    "motiveId": "trophy",
+    "methodId": "apple",
+    "explanation": [
+      "No ghost spooked Mr. Bramble, and it wasn't a spell or a curse. Somebody wanted him to snooze right through the Pumpkin Parade, so he couldn't read out his three surprises. That somebody was Betty Butterworth, the baker.",
+      "Betty has won the Golden Pumpkin nine years in a row. This year her pumpkin wouldn't carve, so she bought a ready-carved one from Mrs. Stitch's shop and pretended it was hers. Mr. Bramble found the orange price sticker underneath, and told her he'd announce it at the parade. 'You'll sleep through your own parade, Barnaby,' she said. He wrote it in his diary.",
+      "At a quarter past eight, while everyone was at the contest table, Betty stood on the kitchen stool and took his Sleepy Syrup from the high cupboard. Milo saw her. She stirred it into the caramel for his special apple, and at half past eight she gave it to him with a smile.",
+      "By twenty to nine he was yawning; by nine he told Milo the apple 'tasted of cinnamon'. His old heart couldn't take so much Sleepy Syrup. Betty only meant him to nap through the parade, but it was a very dangerous thing to do, and she left a trail: cinnamon caramel on the stick, sticky gloves in the umbrella stand, and her measuring spoon behind the bread bin.",
+      "DJ Jax took the Golden Pumpkin, but only for a prank. The soup and the punch were perfectly innocent. As the bottom of the trophy says: winners never cheat."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "Mr. Bramble judges the pumpkin contest, and finds a shop sticker under Betty's pumpkin."
+      },
+      {
+        "time": "8:10",
+        "event": "He tells Betty he'll announce it at the parade. 'You'll sleep through your own parade, Barnaby.'"
+      },
+      {
+        "time": "8:15",
+        "event": "Betty takes the Sleepy Syrup from the high kitchen cupboard. Milo sees her."
+      },
+      {
+        "time": "8:30",
+        "event": "Betty gives Mr. Bramble his caramel apple."
+      },
+      {
+        "time": "8:40",
+        "event": "Mr. Hodge brings the pumpkin soup. Mr. Bramble is already yawning."
+      },
+      {
+        "time": "8:50",
+        "event": "Zandini brings the witch's-brew punch. Mr. Bramble can hardly keep his eyes open."
+      },
+      {
+        "time": "9:00",
+        "event": "Milo says goodnight. Great-Uncle: 'That caramel apple tasted of cinnamon tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Madame Moonbeam tries to read his palm. He's nodding off."
+      },
+      {
+        "time": "9:20",
+        "event": "Jax hides the Golden Pumpkin for a prank. Madame Moonbeam sees him."
+      },
+      {
+        "time": "9:30",
+        "event": "Reverend Pumphrey goes to fetch Mr. Bramble for the parade, and finds him asleep forever."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning sunshine on Hollow Hill House, and a policeman wheeling his bicycle up the drying lane.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The village policeman arrived on his bicycle at breakfast time. Betty Butterworth met him at the door with a tray of plain, ordinary, cinnamon-free buns. 'I only wanted ten in a row,' she said, and gave all nine of her Golden Pumpkins back."
+    },
+    {
+      "type": "narration",
+      "text": "Jax put the Golden Pumpkin back on its shelf, and Milo read out Great-Uncle Barnaby's last surprise from his card, the one nobody had noticed: 'The house goes to Milo, and the party goes on forever.' As everyone went home, the last jack-o'-lantern on the porch, the one that had blown out hours ago, flickered back to life all by itself. And winked. Happy Halloween, detectives."
+    }
+  ]
+}

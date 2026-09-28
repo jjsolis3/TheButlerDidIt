@@ -1,0 +1,880 @@
+{
+  "id": "last-night-at-camp-blackwater",
+  "themeSlug": "camp-blackwater",
+  "title": "Last Night at Camp Blackwater",
+  "synopsis": "August 1984. The campers have gone home, and the staff of Camp Blackwater are having one last bonfire before the season ends. Tonight the owner, Walt Harlan, announced he's selling the camp to a condo developer. At half past twelve he's found dead at the edge of the boat slip, and beside him lies the burlap mask of the Lakeside Man, the camp's oldest legend. The storm has cut the phone line and washed out the road. Nobody leaves until dawn.",
+  "contentRating": "mature",
+  "minPlayers": 3,
+  "maxPlayers": 8,
+  "estimatedMinutes": 120,
+  "murdererKnows": true,
+  "setting": {
+    "place": "Camp Blackwater, on the shore of Blackwater Lake, deep in the Michigan pines",
+    "era": "August 1984, the last night of summer camp",
+    "description": "Log cabins under tall pines, a mess hall, a crafts cabin, a radio shack on the hill, a campfire circle by the water, and down a muddy path, the boathouse where Walt keeps his office. A storm has knocked out the phone line and washed out the only road."
+  },
+  "victim": {
+    "name": "Walt Harlan",
+    "description": "Fifty-eight. The owner of Camp Blackwater for thirty years: big laugh, bigger temper, and a diabetic who never skips his nightly insulin. Tonight he told everyone he was selling the camp for condos."
+  },
+  "characters": [
+    {
+      "id": "dana",
+      "name": "Dana Reyes",
+      "pronouns": "she/her",
+      "title": "The Lifeguard",
+      "publicBio": "Head lifeguard at Camp Blackwater for four summers: red jacket, silver whistle, and a stare that stops horseplay at fifty yards. Her dad, the county sheriff, was a lifeguard here too, a long time ago.",
+      "costumeTips": "A red jacket or hoodie, a whistle on a cord, sunglasses on your head, and a towel over your shoulder.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.05,
+        "rate": 1.05,
+        "style": "calm, sharp, controlled"
+      },
+      "required": true,
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. In the summer of 1962 a boy called Tommy Vail drowned in Blackwater Lake. The lifeguard on duty that day was your father, Ed Reyes: he'd fallen asleep at his post. Walt Harlan covered it up, and for twenty-two years he kept the incident report in his safe. Tonight Walt told you he was handing it to the Vail family's lawyer on Monday as part of the land sale. Your father would lose everything. At a quarter past eleven, securing the canoes in the storm, you went into the boathouse to beg him. He laughed. You held him under at the edge of the boat slip until he stopped moving. At ten to midnight you came back in the Lakeside Man's burlap mask and left it on the dock, so everyone would blame the legend.",
+        "secrets": [
+          {
+            "id": "dana-father",
+            "text": "The lifeguard on duty when Tommy Vail drowned in 1962 was my father. Walt covered it up.",
+            "unlockAct": 0
+          },
+          {
+            "id": "dana-mask",
+            "text": "I know where the Lakeside Man's burlap mask is kept: on a hook in the crafts cabin. Everybody does.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Don't get caught. Point everyone at the legend, at Earl in his mask, or at the nurse and her needles.",
+          "Nobody must read the 1962 report in Walt's safe.",
+          "Get rid of your soaked red jacket and find your lost whistle."
+        ],
+        "knows": [
+          "Walt is diabetic. Nurse Brenda gives him his insulin shot every night at a quarter to eleven.",
+          "Earl the caretaker plays the Lakeside Man at the campfire every summer, in the burlap mask."
+        ],
+        "alibi": "At a quarter past eleven I went down to tie up the canoes in the storm. I looked in on Walt, and went back to my cabin at half past.",
+        "lines": {
+          "act1": [
+            "Rule one at Camp Blackwater: never swim alone. Rule two: never, ever go in the lake after dark."
+          ],
+          "act2": [
+            "Everybody knows the Lakeside Man story. It's a campfire tale. Masks don't kill people."
+          ],
+          "act3": [
+            "The storm was wild tonight. Anyone could have slipped on that dock. Anyone."
+          ]
+        }
+      }
+    },
+    {
+      "id": "brenda",
+      "name": "Nurse Brenda Harlan",
+      "pronouns": "she/her",
+      "title": "The Camp Nurse",
+      "publicBio": "The camp nurse for fifteen summers: white shoes, a clipboard and a bag full of bandages and lollipops. She was married to Walt once. Nobody talks about it.",
+      "costumeTips": "A white coat or cardigan, a nurse's cap or badge, sensible shoes, and a first-aid bag.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.95,
+        "rate": 1.0,
+        "style": "brisk, dry, watchful"
+      },
+      "required": true,
+      "private": {
+        "backstory": "You and Walt divorced in 1979, but you stayed on as camp nurse because you love the place and the kids. He still has a life insurance policy with your name on it, from when you were married; he mentioned tonight that he was cancelling it. At a quarter to eleven you gave him his insulin shot in the boathouse, like every night, and told him exactly what you thought of the land sale. You did not kill him.",
+        "secrets": [
+          {
+            "id": "brenda-ex",
+            "text": "Walt and I were married for twelve years. We divorced in 1979.",
+            "unlockAct": 0
+          },
+          {
+            "id": "brenda-policy",
+            "text": "Walt's life insurance still names me. He said tonight he was cancelling it.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your past with Walt private, if you can.",
+          "Find out who killed him. You were married to him; that makes you suspect number one.",
+          "Look after everyone tonight. Somebody always needs a bandage."
+        ],
+        "knows": [
+          "At a quarter to eleven you gave Walt his usual twenty units of insulin. He was grumpy, healthy and very much alive.",
+          "Dana came back from the boathouse at half past eleven soaked to the shoulders, though the rain had barely started."
+        ],
+        "alibi": "At a quarter to eleven I gave Walt his shot, and then I was in the infirmary doing the end-of-season stocktake until the scream.",
+        "lines": {
+          "act1": [
+            "Fifteen summers of skinned knees and poison ivy. I thought I'd seen everything."
+          ],
+          "act2": [
+            "Yes, Walt and I were married once. It didn't take. Neither did his promises."
+          ],
+          "act3": [
+            "Twenty units. The same shot I've given him every night for fifteen years. Check my log."
+          ]
+        }
+      }
+    },
+    {
+      "id": "mitch",
+      "name": "Mitch Callahan",
+      "pronouns": "he/him",
+      "title": "The Head Counselor",
+      "publicBio": "Came to Camp Blackwater as a skinny eight-year-old and never left. Now he's head counselor: clipboard, whistle, and a canoe paddle with his name burned into the handle that he carries everywhere.",
+      "costumeTips": "A camp T-shirt, shorts or khakis, a baseball cap, a clipboard, and a paddle (or a broom) with your name on it.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.1,
+        "style": "earnest, loud, sentimental"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Camp Blackwater is the only home you've ever really had. Tonight at the bonfire Walt announced he's selling the land to Lakeview Condos on Monday: bulldozers by Christmas. You know something he didn't say: if Walt died before the sale, the camp would go to Danny, who swore he'd never sell. At half past eleven you went down to the boathouse to beg Walt one last time. The door was banging in the wind and the lamp was lit, but nobody answered, so you went back to your cabin. You didn't kill him.",
+        "secrets": [
+          {
+            "id": "mitch-will",
+            "text": "I know Walt's will: if he died before the sale, the camp would go to Danny, who'd never sell.",
+            "unlockAct": 0
+          },
+          {
+            "id": "mitch-letters",
+            "text": "I wrote to Lakeview Condos pretending to be Walt, trying to scare them off. It didn't work.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Save Camp Blackwater, whatever happens.",
+          "Find out who killed Walt.",
+          "Keep the counselors together and calm. That's your job."
+        ],
+        "knows": [
+          "At half past eleven the boathouse door was banging in the wind, the lamp was lit, and nobody answered. You thought Walt had gone back to his cabin.",
+          "At ten to midnight, from your cabin window, you saw a figure in the burlap mask on the dock."
+        ],
+        "alibi": "At half past eleven I went to the boathouse to talk to Walt, but he didn't answer, so I went back to my cabin.",
+        "lines": {
+          "act1": [
+            "I've been coming to Blackwater since I was eight. I learned to swim in that lake. I learned everything here."
+          ],
+          "act2": [
+            "Condos. On the archery field. Over my dead body. That's just an expression."
+          ],
+          "act3": [
+            "I knocked at half past eleven. If I'd gone in... I don't want to think about it."
+          ]
+        }
+      }
+    },
+    {
+      "id": "danny",
+      "name": "Danny Harlan",
+      "pronouns": "he/him",
+      "title": "The Owner's Son",
+      "publicBio": "Walt's son: a leather jacket, a Walkman, and a chip on his shoulder the size of the boathouse. He's supposed to inherit the camp one day. He and his father haven't had a civil word in years.",
+      "costumeTips": "A leather or denim jacket, a band T-shirt, a Walkman or headphones, and a scowl.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.0,
+        "rate": 1.05,
+        "style": "sulky, defensive, surprisingly kind"
+      },
+      "required": true,
+      "private": {
+        "backstory": "Tonight your dad told you in front of everyone that you'd get nothing: not a canoe, not a pine tree. At eleven you went to the boathouse to have it out with him and you shouted a lot of things you can't take back. He was alive when you slammed the door. You've been secretly meeting Tina, the arts counselor, and at half past twelve she went to the boathouse to find you, and found him.",
+        "secrets": [
+          {
+            "id": "danny-fight",
+            "text": "I shouted at my dad at eleven tonight. The last thing I said to him was 'I hope the Lakeside Man gets you.'",
+            "unlockAct": 0
+          },
+          {
+            "id": "danny-tina",
+            "text": "Tina and I have been seeing each other all summer. Dad would have fired her.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who killed your father, even if you hated him.",
+          "Keep Tina out of trouble.",
+          "Save the camp. It turns out you care about it after all."
+        ],
+        "knows": [
+          "At eleven your dad was angry and very much alive. He threw his clipboard at the door as you left.",
+          "Nurse Brenda was coming up the path from the boathouse as you went down, just before eleven."
+        ],
+        "alibi": "At eleven I had a fight with my dad in the boathouse. Then I walked round the lake in the rain until Tina found me.",
+        "lines": {
+          "act1": [
+            "My dad loved this camp more than he loved me. Now he's selling it. Figures."
+          ],
+          "act2": [
+            "Yeah, I told him I hoped the Lakeside Man got him. I didn't mean it. Mostly."
+          ],
+          "act3": [
+            "He was alive when I slammed that door. I swear it on this lake."
+          ]
+        }
+      }
+    },
+    {
+      "id": "earl",
+      "name": "Earl Tubbs",
+      "pronouns": "he/him",
+      "title": "The Caretaker",
+      "publicBio": "The caretaker, as old as the pines: overalls, a lantern and a limp. Earl has lived in the shack by the lake since 1962, and every summer he plays the Lakeside Man at the campfire, in the burlap mask.",
+      "costumeTips": "Overalls, a flannel shirt, a battered hat, and a lantern or torch.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.8,
+        "rate": 0.85,
+        "style": "slow, gravelly, ominous"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You were a young handyman at Camp Blackwater the day Tommy Vail drowned in 1962. You pulled him out of the water yourself. You've told the story of the Lakeside Man every summer since, because it keeps the kids out of the lake after dark. Tonight at eight the burlap mask wasn't on its hook in the crafts cabin. Somebody took it. You were checking the generator by the boathouse at midnight and you saw nothing but rain.",
+        "secrets": [
+          {
+            "id": "earl-tommy",
+            "text": "I pulled Tommy Vail out of the lake in 1962. I've never forgotten his face.",
+            "unlockAct": 0
+          },
+          {
+            "id": "earl-mask",
+            "text": "The Lakeside Man mask went missing from the crafts cabin at eight tonight. It wasn't me who took it.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Find out who took the mask.",
+          "Keep the legend alive: it keeps kids out of the water.",
+          "Find the killer. You've been blamed for things before."
+        ],
+        "knows": [
+          "At eight tonight the burlap mask was missing from its hook in the crafts cabin.",
+          "In 1962 the lifeguard on duty when Tommy drowned was a young fellow called Ed Reyes. Dana's father."
+        ],
+        "alibi": "I was checking the generator by the shore from half past eleven until midnight. In the dark. In the rain. Nobody saw me.",
+        "lines": {
+          "act1": [
+            "They say the Lakeside Man comes back every summer. I say: stay out of the water after dark, and you'll never find out."
+          ],
+          "act2": [
+            "Yes, I wear the mask at the campfire. It wasn't on my face tonight."
+          ],
+          "act3": [
+            "I know this lake better than anyone. It doesn't give back what it takes. Most of the time."
+          ]
+        }
+      }
+    },
+    {
+      "id": "gus",
+      "name": "Gus Kowalski",
+      "pronouns": "he/him",
+      "title": "The Cook",
+      "publicBio": "The camp cook: a stained apron, a spatula, and a laugh like a foghorn. He served twenty years as a Navy medic before he took up sloppy joes, and he's the nearest thing to a doctor for miles.",
+      "costumeTips": "An apron, a chef's hat or bandana, a spatula, and a tattoo (drawn on is fine).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 0.85,
+        "rate": 1.0,
+        "style": "gruff, jolly, blunt"
+      },
+      "required": false,
+      "private": {
+        "backstory": "Walt owed you three months' wages, and tonight he told you there'd be no job at the condos. You've been quietly taking the camp's leftover steaks home to your sister's family all summer. You were in the kitchen all night, until the scream. When they fetched you, you examined the body: you were a Navy medic for twenty years.",
+        "secrets": [
+          {
+            "id": "gus-wages",
+            "text": "Walt owed me three months' wages. He wasn't going to pay.",
+            "unlockAct": 0
+          },
+          {
+            "id": "gus-steaks",
+            "text": "I've been taking the camp's leftover steaks home to my sister's kids all summer.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Get your back wages, somehow.",
+          "Use your medic's eye to work out what really killed Walt.",
+          "Feed everyone. Scared people need pancakes."
+        ],
+        "knows": [
+          "You examined Walt at half past twelve. You know how he died, and you'll say so.",
+          "Earl was not by the generator at a quarter to twelve: you looked, and his lantern wasn't there."
+        ],
+        "alibi": "I was in the kitchen all night, scraping pans and listening to the radio, until Tina screamed.",
+        "lines": {
+          "act1": [
+            "Twenty years a Navy medic. I've seen what water does to a man. And what men do to each other."
+          ],
+          "act2": [
+            "Three months' wages, and he tells me 'there's no kitchen in a condo'. Nice."
+          ],
+          "act3": [
+            "A legend doesn't leave bruises. People do."
+          ]
+        }
+      }
+    },
+    {
+      "id": "tina",
+      "name": "Tina Marsh",
+      "pronouns": "she/her",
+      "title": "The Arts & Crafts Counselor",
+      "publicBio": "The arts and crafts counselor: paint on her overalls, beads in her hair, and a laugh you can hear across the lake. She keeps the crafts cabin, where the Lakeside Man mask hangs on its hook.",
+      "costumeTips": "Paint-splattered overalls, a scrunchie or hair beads, friendship bracelets, and a sketchbook.",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.2,
+        "rate": 1.15,
+        "style": "bubbly, nervous, observant"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You've been secretly meeting Danny all summer. At half past twelve you sneaked down to the boathouse to find him, and found Walt instead, at the edge of the boat slip, with the burlap mask beside him on the dock. You screamed loud enough to wake the whole camp. You lost your hair ribbon somewhere in there.",
+        "secrets": [
+          {
+            "id": "tina-danny",
+            "text": "I've been secretly seeing Danny all summer. I was going to meet him at the boathouse.",
+            "unlockAct": 0
+          },
+          {
+            "id": "tina-cabin",
+            "text": "I lock the crafts cabin every night. Tonight I forgot. Anyone could have taken the mask.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep your romance with Danny quiet.",
+          "Find out who took the mask from your cabin.",
+          "Find out who killed Walt. You can't stop seeing his face."
+        ],
+        "knows": [
+          "At half past twelve you found Walt at the edge of the boat slip. The burlap mask was on the dock beside him, and his insulin kit was open on the bench.",
+          "You forgot to lock the crafts cabin tonight. At eight, when you went back for your sketchbook, the mask was already gone."
+        ],
+        "alibi": "I was in my cabin sketching until half past twelve, then I went down to the boathouse to meet someone, and I found him.",
+        "lines": {
+          "act1": [
+            "I found him. I'll never forget it. The mask was just lying there, looking at me."
+          ],
+          "act2": [
+            "The crafts cabin was unlocked tonight. It's my fault. Anyone could have gone in."
+          ],
+          "act3": [
+            "I lost my hair ribbon in the boathouse. That's all it is. A ribbon."
+          ]
+        }
+      }
+    },
+    {
+      "id": "skip",
+      "name": "Skip Tanaka",
+      "pronouns": "he/him",
+      "title": "The Camp DJ",
+      "publicBio": "Runs WBLK, Camp Blackwater's radio station, from a shack on the hill above the boathouse: two turntables, a microphone and a window with the best view of the lake. He broadcast all night, storm or no storm.",
+      "costumeTips": "Big headphones, a Hawaiian shirt or a DJ jacket, sunglasses, and a microphone (a hairbrush will do).",
+      "voice": {
+        "accent": "en-US",
+        "pitch": 1.1,
+        "rate": 1.25,
+        "style": "fast, funny, a bit spooked"
+      },
+      "required": false,
+      "private": {
+        "backstory": "You broadcast from the radio shack all night, and your window looks straight down the path to the boathouse. You've been playing records and telling ghost stories on air, and watching everyone who went down that path. You also know you shouldn't have been drinking Walt's beer from the boathouse fridge.",
+        "secrets": [
+          {
+            "id": "skip-beer",
+            "text": "I took a six-pack from Walt's boathouse fridge this afternoon. It's under the turntable.",
+            "unlockAct": 0
+          },
+          {
+            "id": "skip-tape",
+            "text": "I record every broadcast. The tape of tonight is still running. Maybe it caught something.",
+            "unlockAct": 2
+          }
+        ],
+        "objectives": [
+          "Keep the station on the air: people need to hear a friendly voice tonight.",
+          "Tell what you saw from the window, when it helps.",
+          "Find the killer. It would make a great broadcast."
+        ],
+        "knows": [
+          "From the radio shack you watched the path: Nurse Brenda at a quarter to eleven, Danny at eleven, Dana at a quarter past, Mitch at half past, and at ten to midnight a figure in the burlap mask on the dock.",
+          "Earl's lantern wasn't by the generator when you looked out at a quarter to twelve."
+        ],
+        "alibi": "Broadcasting from the radio shack from nine until Tina screamed. Ask anybody who was listening.",
+        "lines": {
+          "act1": [
+            "This is WBLK, Camp Blackwater, and it is a dark and stormy night. Stay in your cabins, campers."
+          ],
+          "act2": [
+            "I see everything from my window. Everything. Tonight, I kind of wish I didn't."
+          ],
+          "act3": [
+            "Ten to midnight: a figure on the dock, in the mask. I nearly dropped the needle on the record."
+          ]
+        }
+      }
+    }
+  ],
+  "clues": [
+    {
+      "id": "visitors",
+      "title": "The Path to the Boathouse",
+      "text": "The camp radio shack overlooks the path to the boathouse, and Skip Tanaka saw everyone who went down it tonight: Nurse Brenda at a quarter to eleven with Walt's insulin, Danny at eleven, Dana at a quarter past eleven, Mitch at half past.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "brenda",
+        "danny",
+        "dana",
+        "mitch"
+      ]
+    },
+    {
+      "id": "mask",
+      "title": "The Burlap Mask",
+      "text": "On the dock beside the body: a burlap sack mask with two ragged eye holes, soaked by the rain. It's the Lakeside Man's mask, and Earl Tubbs wears it at the campfire every summer.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "earl"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "insulin-kit",
+      "title": "The Insulin Kit",
+      "text": "On the bench by Walt's desk, open: his insulin kit, with a used syringe. Nurse Brenda gives him his shot every night. She was married to him once.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "start",
+      "pointsTo": [
+        "brenda"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "bruises",
+      "title": "Marks on His Shoulders",
+      "text": "Gus, the old Navy medic, points them out: two dark bruises on the back of each of Walt's shoulders, the shape of strong fingers. And caught under his watch strap, a torn scrap of red nylon.",
+      "visibility": "public",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "dana"
+      ]
+    },
+    {
+      "id": "skip-saw",
+      "title": "From the Radio Shack",
+      "text": "Your own memory: at a quarter past eleven Dana went into the boathouse. She came out ten minutes later, soaked to the shoulders, though the rain had barely started. She ran all the way up the path.",
+      "visibility": "private",
+      "act": 1,
+      "wave": "midway",
+      "pointsTo": [
+        "dana"
+      ],
+      "recipient": "skip"
+    },
+    {
+      "id": "sale",
+      "title": "The Sale Contract",
+      "text": "On Walt's desk: a contract selling Camp Blackwater to Lakeview Condos, to be signed on Monday. Bulldozers by Christmas. Mitch has been at this camp since he was eight, and Danny was going to inherit it.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "mitch",
+        "danny"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "report",
+      "title": "The 1962 Report",
+      "text": "In Walt's safe, which stands open: a yellowed incident report on the drowning of Tommy Vail, July 1962. 'Lifeguard on duty: E. Reyes. Found asleep at post.' Stamped WITHHELD. Clipped to it, in Walt's hand: 'Give to the Vail family's lawyer, Monday.' Dana's father is Sheriff Ed Reyes.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "dana"
+      ]
+    },
+    {
+      "id": "letter",
+      "title": "A Letter to Danny",
+      "text": "In Walt's desk drawer, unsent: 'Danny, you'll get nothing from me. Not a canoe, not a pine tree. Dad.' Danny was the first to go down to the boathouse after the nurse.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "danny"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "earl-knows",
+      "title": "The Empty Hook",
+      "text": "Your own memory: at eight tonight, the burlap mask was gone from its hook in the crafts cabin. You've worn it every summer since 1965. Tonight, somebody else took it.",
+      "visibility": "private",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "earl"
+      ],
+      "recipient": "earl",
+      "redHerring": true
+    },
+    {
+      "id": "logbook",
+      "title": "Walt's Logbook",
+      "text": "Walt's camp logbook has a little padlock, and a riddle scratched on the cover, because he never could remember the combination.",
+      "visibility": "public",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "dana"
+      ],
+      "puzzle": {
+        "prompt": "I can run but never walk, I have a mouth but never talk, and I have a bed but never sleep. What am I?",
+        "answers": [
+          "river",
+          "a river",
+          "the river",
+          "stream",
+          "a stream",
+          "creek"
+        ],
+        "hint": "One of them feeds Blackwater Lake.",
+        "solvedText": "Tonight's entry, in Walt's blocky hand: 'Told Dana the '62 report goes to the Vail lawyer Monday. She went white as a sheet and said, \"Then you'll drown in it, Walt.\" Storm coming. Boathouse tonight, paperwork.'"
+      }
+    },
+    {
+      "id": "ribbon",
+      "title": "A Hair Ribbon",
+      "text": "On the boathouse floor, near the door: a purple hair ribbon with little beads on it. Tina Marsh wears ribbons like this. She says she only arrived at half past twelve.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "tina"
+      ],
+      "redHerring": true
+    },
+    {
+      "id": "jacket",
+      "title": "The Red Jacket",
+      "text": "Stuffed behind the lifeguard shack: Dana's red nylon lifeguard jacket, soaking wet from collar to cuffs. A scrap is torn out of one cuff.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "dana"
+      ]
+    },
+    {
+      "id": "whistle",
+      "title": "Something in the Slip",
+      "text": "When the boat slip is dragged at dawn, something comes up tangled in the mooring rope: a silver lifeguard whistle on a red cord. Only one lifeguard works here.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "dana"
+      ]
+    },
+    {
+      "id": "cleaver",
+      "title": "A Missing Cleaver",
+      "text": "A cleaver is missing from the kitchen's knife rack. Gus the cook says he lent it to Earl for the pumpkins yesterday. Earl says he never had it.",
+      "visibility": "public",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "gus",
+        "earl"
+      ],
+      "redHerring": true
+    }
+  ],
+  "prologue": [
+    {
+      "type": "image",
+      "text": "A summer camp at night: log cabins under black pines, a campfire burning by a misty lake, a wooden boathouse at the water's edge.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "Camp Blackwater, August 1984. The last campers went home this afternoon. Tonight the staff gathered round the campfire one last time."
+    },
+    {
+      "type": "narration",
+      "text": "Walt Harlan, the owner, stood up and told them two things. First, the story of the Lakeside Man: a boy who drowned in the lake in 1962, and who comes back every summer in a burlap mask to find the people who let him drown. Second, that he's selling the camp to Lakeview Condos on Monday."
+    },
+    {
+      "type": "line",
+      "speaker": "earl",
+      "text": "The Lakeside Man doesn't forgive. And he never forgets a face."
+    },
+    {
+      "type": "toast",
+      "text": "To the last night of summer!",
+      "alternative": "Raise your root beer to the last night of summer!"
+    },
+    {
+      "type": "narration",
+      "text": "At ten the storm broke. The phone line went dead. Walt went down to the boathouse to do his paperwork, and one by one, the people with reasons to hate him went down that muddy path."
+    },
+    {
+      "type": "image",
+      "text": "The boathouse in the rain: a single lamp in the window, the door banging in the wind, and a canoe rocking in the slip.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "At half past twelve Tina Marsh screamed. Walt Harlan lay at the edge of the boat slip, soaking wet and very still. Beside him on the dock was the burlap mask of the Lakeside Man. The road is washed out. Nobody leaves until dawn. And one of you killed him."
+    }
+  ],
+  "acts": [
+    {
+      "id": "act1",
+      "title": "Act One: The Boathouse",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Boathouse."
+        },
+        {
+          "type": "image",
+          "text": "The boathouse by lamplight: a desk, an open safe, an insulin kit on a bench, and the dark water of the boat slip.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Gus the cook, twenty years a Navy medic, kneels beside the body. There's lake water in Walt's mouth and nose: he drowned, right there at the edge of the slip. But he didn't fall in. Somebody held him down. The mask on the dock is soaking wet, and so is everything else."
+        },
+        {
+          "type": "line",
+          "speaker": "tina",
+          "text": "I came to meet somebody. I found him instead. And that mask was just lying there, looking at me."
+        }
+      ],
+      "prompts": [
+        "Who went down the path to the boathouse tonight, and when?",
+        "Is the Lakeside Man real? Who wore the mask tonight?",
+        "What did Walt's announcement cost each of you?",
+        "Who was wet, and who stayed dry?"
+      ]
+    },
+    {
+      "id": "act2",
+      "title": "Act Two: The Legend",
+      "mingleMinutes": 25,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Two. The Legend."
+        },
+        {
+          "type": "image",
+          "text": "A yellowed newspaper clipping pinned to a cabin wall: BOY DROWNS AT CAMP BLACKWATER, 1962.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Every summer camp has a ghost story. Camp Blackwater's has a name: Tommy Vail, who drowned in 1962. Walt's safe, his desk and his locked logbook say the story isn't over."
+        },
+        {
+          "type": "toast",
+          "text": "To the Lakeside Man! May he stay in the lake.",
+          "alternative": "Raise your cocoa, and don't look behind you."
+        },
+        {
+          "type": "line",
+          "speaker": "earl",
+          "text": "I pulled that boy out of the water myself. I never told anyone what I saw that day."
+        }
+      ],
+      "prompts": [
+        "Open Walt's logbook. The cover holds a riddle.",
+        "What really happened in the summer of 1962?",
+        "Who took the mask from the crafts cabin?",
+        "Reveal a secret if it explains a suspicious clue."
+      ]
+    },
+    {
+      "id": "act3",
+      "title": "Act Three: First Light",
+      "mingleMinutes": 20,
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act Three. First Light."
+        },
+        {
+          "type": "image",
+          "text": "Dawn mist on Blackwater Lake, and a rowing boat dragging a rope along the boat slip.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "The rain has stopped, and in an hour the road crew will clear the washout. The counselors are dragging the boat slip. Before the sheriff's car comes up that road, the camp needs to know who put Walt in the water."
+        },
+        {
+          "type": "toast",
+          "text": "To first light!",
+          "alternative": "Orange juice up for first light!"
+        },
+        {
+          "type": "line",
+          "speaker": "skip",
+          "text": "This is WBLK. It's dawn at Camp Blackwater, and one of us is lying."
+        }
+      ],
+      "prompts": [
+        "What came up out of the boat slip?",
+        "Whose story about the storm doesn't hold water?",
+        "Who had the most to lose from what's in Walt's safe?",
+        "Last chance: who did it, why, and how?"
+      ]
+    }
+  ],
+  "accusation": {
+    "motives": [
+      {
+        "id": "father",
+        "text": "To bury an old secret that would ruin a father"
+      },
+      {
+        "id": "insurance",
+        "text": "To collect on a life insurance policy"
+      },
+      {
+        "id": "camp",
+        "text": "To stop the sale and save the camp"
+      },
+      {
+        "id": "inheritance",
+        "text": "Revenge for being cut out of the will"
+      },
+      {
+        "id": "wages",
+        "text": "Over wages that were never going to be paid"
+      },
+      {
+        "id": "legend",
+        "text": "Revenge for Tommy Vail"
+      }
+    ],
+    "methods": [
+      {
+        "id": "drowned",
+        "text": "Held under in the boat slip"
+      },
+      {
+        "id": "insulin",
+        "text": "An overdose of insulin"
+      },
+      {
+        "id": "paddle",
+        "text": "Struck with a canoe paddle"
+      },
+      {
+        "id": "cleaver",
+        "text": "The missing kitchen cleaver"
+      }
+    ]
+  },
+  "solution": {
+    "murdererId": "dana",
+    "motiveId": "father",
+    "methodId": "drowned",
+    "explanation": [
+      "The Lakeside Man didn't kill Walt Harlan. A lifeguard did: the one person at Camp Blackwater who knows exactly how long a man can stay under water. Dana Reyes.",
+      "In 1962 Tommy Vail drowned while the lifeguard on duty slept at his post. That lifeguard was Dana's father, Ed Reyes, now the county sheriff. Walt kept the report for twenty-two years, and tonight he told Dana it was going to the Vail family's lawyer on Monday. 'Then you'll drown in it, Walt,' she said. He wrote it in his logbook.",
+      "At a quarter past eleven, tying up the canoes, she went into the boathouse. Walt laughed at her. She pushed him to the edge of the slip and held him under. Gus found the bruises of her fingers on his shoulders, and a scrap of her red jacket under his watch strap. Skip watched her come out ten minutes later, soaked to the shoulders, though the rain had barely started.",
+      "At ten to midnight she came back in the Lakeside Man's burlap mask, taken from the unlocked crafts cabin, and left it on the dock so everyone would blame the legend. Her wet jacket was behind the lifeguard shack, and her whistle came up in the slip at dawn.",
+      "The insulin kit, the sale contract, the missing cleaver and Earl's empty lantern were all innocent. A legend is a story. It takes a person to hold someone under."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The Lakeside Man mask is taken from the unlocked crafts cabin."
+      },
+      {
+        "time": "9:00",
+        "event": "At the campfire, Walt tells the legend and announces the sale to Lakeview Condos."
+      },
+      {
+        "time": "9:30",
+        "event": "Walt tells Dana the 1962 report goes to the Vail lawyer. 'Then you'll drown in it, Walt.'"
+      },
+      {
+        "time": "10:00",
+        "event": "The storm breaks. The phone line goes dead. Walt goes down to the boathouse."
+      },
+      {
+        "time": "10:45",
+        "event": "Nurse Brenda gives Walt his usual insulin shot."
+      },
+      {
+        "time": "11:00",
+        "event": "Danny and Walt have a shouting match. Walt is alive when Danny leaves."
+      },
+      {
+        "time": "11:15",
+        "event": "Dana goes into the boathouse and holds Walt under at the edge of the slip."
+      },
+      {
+        "time": "11:25",
+        "event": "Dana runs back up the path, soaked to the shoulders. Skip sees her."
+      },
+      {
+        "time": "11:30",
+        "event": "Mitch knocks. No answer. He goes back to his cabin."
+      },
+      {
+        "time": "11:50",
+        "event": "A figure in the burlap mask leaves it on the dock."
+      },
+      {
+        "time": "12:30",
+        "event": "Tina finds Walt at the edge of the boat slip."
+      }
+    ]
+  },
+  "finale": [
+    {
+      "type": "image",
+      "text": "A sheriff's car bumping up a muddy road at dawn, headlights in the mist.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of Camp Blackwater!",
+      "alternative": "Root beers up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The sheriff's car came up the road at seven. It was Ed Reyes himself, and when he saw his daughter's face, he knew before anyone said a word. Dana handed him her whistle. 'I did it for you, Dad,' she said. 'I know,' he said. 'That's the worst part.'"
+    },
+    {
+      "type": "narration",
+      "text": "The mask went into an evidence box, sealed and signed, and the box went into the trunk of the sheriff's car. When they opened it at the station that afternoon, the box was empty. There was lake water on the bottom. And the smell of pine. Goodnight, detectives. Stay out of the water."
+    }
+  ]
+}

@@ -220,3 +220,46 @@ test("the '80s reunion: Surprise me deals the version whose killer is at the par
   await host.getByRole('button', { name: 'Start mingling' }).click()
   await expect(host.getByText("The Principal's Plate")).toBeVisible()
 })
+
+test('Halloween: the Hollow Hill House party deals a version whose culprit is at the party, never the littlest trick-or-treater', async ({ browser }) => {
+  const host = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage()
+  await host.goto('/login')
+  await host.getByRole('button', { name: 'Create an account' }).click()
+  await host.getByLabel('Your name').fill('Pumpkin Pat')
+  await host.getByLabel('Email').fill(`halloween-${Date.now()}@example.com`)
+  await host.getByLabel('Password').fill('password123')
+  await host.getByRole('button', { name: 'Create account' }).click()
+  await host.waitForURL('**/host/new')
+
+  // The camp slasher is on the Adults shelf; the haunted-house party is on the Family shelf.
+  await expect(host.getByRole('button', { name: /Last Night at Camp Blackwater/ })).toContainText('3 versions, a different killer each')
+  await host.getByRole('tab', { name: /Family/ }).click()
+  await expect(host.getByText('Last Night at Camp Blackwater')).toHaveCount(0)
+  await host.getByRole('button', { name: /Who Spooked the Halloween Party\?/ }).click()
+  await expect(host.getByRole('button', { name: /Who Spooked the Halloween Party\?/ })).toContainText('3 versions, a different killer each')
+  await host.getByLabel(/let the AI write one/).uncheck() // only the hand-written versions
+  await host.screenshot({ path: `${SHOTS}/87-halloween-family.png`, fullPage: true })
+  await host.getByRole('button', { name: 'Create party and get the invite code' }).click()
+  await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
+  const code = host.url().split('/').pop()!
+
+  // Betty (version A's culprit) isn't taken, so the dealer must pick B (Mr. Hodge) or C (Zandini).
+  const hodge = await joinAs(browser, code, 'Hal', /Mr\. Hodge/)
+  const zandini = await joinAs(browser, code, 'Zoe', /The Great Zandini/)
+  const milo = await joinAs(browser, code, 'Max', /Milo Bramble/)
+
+  await host.getByRole('button', { name: 'Begin the evening' }).click()
+  await host.getByRole('button', { name: 'Tap to begin the evening' }).click()
+  await expect(host.getByRole('heading', { name: 'The suspects' })).toBeVisible()
+  const isCulprit = (p: typeof hodge) => p.getByText('You are the murderer.', { exact: true }).count()
+  await expect.poll(async () => (await isCulprit(hodge)) + (await isCulprit(zandini))).toBe(1)
+  expect(await isCulprit(milo)).toBe(0)
+  const dealt = await (await host.request.get(`/api/parties/${code}`)).json()
+  expect(dealt.scenarioId).toMatch(/^who-spooked-the-halloween-party--[bc]$/)
+  await host.screenshot({ path: `${SHOTS}/88-halloween-cast.png` })
+
+  await host.getByRole('button', { name: 'Play the prologue' }).click()
+  await host.getByRole('button', { name: 'Begin Act One' }).click()
+  await host.getByRole('button', { name: 'Start mingling' }).click()
+  await expect(host.getByText("Mr. Bramble's Three Treats")).toBeVisible()
+})

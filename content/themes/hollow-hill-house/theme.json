@@ -1,0 +1,22 @@
+{
+  "slug": "hollow-hill-house",
+  "name": "Hollow Hill House",
+  "tagline": "A Halloween party at the spookiest house in the village: costumes, pumpkins, and a mystery for the whole family.",
+  "era": "A village Halloween party",
+  "description": "Every Halloween, kindly old Mr. Bramble opens creaky Hollow Hill House for the village costume party: a pumpkin contest, a witch's-brew punch bowl, and a trophy called the Golden Pumpkin. This year, somebody spoiled the fun. Spooky, never scary: a family-friendly mystery for all ages.",
+  "palette": {
+    "background": "#110a14",
+    "surface": "#1f1426",
+    "accent": "#f28c28",
+    "ink": "#f5ecff"
+  },
+  "artStyle": "Storybook Halloween illustration, a crooked old mansion on a hill, glowing jack-o'-lanterns, friendly bats, purple night sky",
+  "sortOrder": 11,
+  "cocktails": [
+    {
+      "name": "Witch's Brew Punch",
+      "recipe": "Green apple juice, lemonade and lime sherbet, with gummy worms hanging over the rim.",
+      "mocktail": "It's already alcohol-free. Add dry ice (carefully, with a grown-up) for spooky mist."
+    }
+  ]
+}
