@@ -1,0 +1,232 @@
+{
+  "variantOf": "last-night-at-camp-blackwater",
+  "variant": "C",
+  "solution": {
+    "murdererId": "mitch",
+    "motiveId": "camp",
+    "methodId": "paddle",
+    "explanation": [
+      "Walt Harlan didn't drown, and the Lakeside Man never touched him. He was struck down at half past eleven with a canoe paddle, by the man who loves Camp Blackwater more than anyone: Mitch Callahan, the head counselor.",
+      "Mitch knew Walt's will: if Walt died before the sale was signed, the camp would go to Danny, who'd sworn never to sell. Tonight Mitch told Walt, 'Over my dead body, Walt. Or yours.' Walt wrote it in his logbook.",
+      "At half past eleven Mitch went to the boathouse to beg one last time. Walt laughed at him. Mitch swung the paddle he always carries, the one with his name burned into the handle. Walt fell at the edge of the slip. Skip saw Mitch come out five minutes later without his paddle.",
+      "Mitch threw the paddle into the reeds. At ten to midnight he came back in the burlap mask, taken from the unlocked crafts cabin, and left it on the dock so everyone would blame the legend. But a splinter of varnished ash was caught in Walt's hair, the paddle came out of the reeds with a cracked blade, and Mitch's boots were black with lake silt.",
+      "The 1962 report, the insulin kit and Earl's empty lantern were all innocent. Mitch always said he'd do anything to save Camp Blackwater. He was the only one who meant it."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The Lakeside Man mask is taken from the unlocked crafts cabin."
+      },
+      {
+        "time": "9:00",
+        "event": "At the campfire, Walt tells the legend and announces the sale."
+      },
+      {
+        "time": "9:30",
+        "event": "Mitch begs Walt not to sell: 'Over my dead body, Walt. Or yours.'"
+      },
+      {
+        "time": "10:00",
+        "event": "The storm breaks. Walt goes down to the boathouse."
+      },
+      {
+        "time": "10:45",
+        "event": "Nurse Brenda gives Walt his usual insulin shot."
+      },
+      {
+        "time": "11:00",
+        "event": "Danny and Walt have a shouting match. Walt is alive when Danny leaves."
+      },
+      {
+        "time": "11:15",
+        "event": "Dana ties up the canoes. Walt yells at her to do it properly."
+      },
+      {
+        "time": "11:30",
+        "event": "Mitch goes in and strikes Walt with his canoe paddle."
+      },
+      {
+        "time": "11:35",
+        "event": "Mitch comes out without his paddle and throws it into the reeds."
+      },
+      {
+        "time": "11:50",
+        "event": "A figure in the burlap mask leaves it on the dock."
+      },
+      {
+        "time": "12:30",
+        "event": "Tina finds Walt at the edge of the boat slip."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Boathouse."
+        },
+        {
+          "type": "image",
+          "text": "The boathouse by lamplight: a desk, an open safe, an insulin kit on a bench, and the dark water of the boat slip.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Gus the cook, twenty years a Navy medic, kneels beside the body. Walt didn't drown: there's no water in his lungs. The back of his head was struck, once, very hard, with something long and flat. The wound is as straight as the edge of a board. And the mask on the dock is soaking wet."
+        },
+        {
+          "type": "line",
+          "speaker": "tina",
+          "text": "I came to meet somebody. I found him instead. And that mask was just lying there, looking at me."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "mitch": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. Camp Blackwater is the only home you've ever had, and tonight Walt announced he's selling it for condos on Monday. You know his will: if he died before the sale, the camp would go to Danny, who'd never sell. You told Walt, 'Over my dead body, Walt. Or yours.' At half past eleven you went to the boathouse to beg one last time. He laughed at you. You swung your canoe paddle, the one with your name burned into the handle, and he fell at the edge of the slip. You threw the paddle into the reeds. At ten to midnight you came back in the burlap mask from the unlocked crafts cabin and left it on the dock.",
+        "objectives": [
+          "Don't get caught. Point everyone at Dana and the 1962 report, or at the legend.",
+          "Get your paddle out of the reeds before the boat slip is dragged.",
+          "Save Camp Blackwater. That was the whole point."
+        ],
+        "knows": [
+          "Walt's will leaves the camp to Danny if Walt dies before the sale is signed.",
+          "Dana came back from the boathouse soaked to the shoulders. She'd been tying up canoes in the storm."
+        ],
+        "alibi": "At half past eleven I went to the boathouse to talk to Walt, but he didn't answer, so I went back to my cabin.",
+        "lines": {
+          "act3": [
+            "My paddle? I lost it days ago. Anybody could have picked it up. I carry a clipboard now."
+          ]
+        }
+      }
+    },
+    "dana": {
+      "private": {
+        "backstory": "In the summer of 1962 a boy called Tommy Vail drowned in Blackwater Lake while the lifeguard on duty, your father Ed Reyes, slept at his post. Walt kept the report in his safe for twenty-two years, and tonight he told you it was going to the Vail family's lawyer on Monday. At a quarter past eleven, tying up the canoes in the storm, you looked into the boathouse. You were furious, and you'd have said something you'd regret. You did not kill him. But you have the best reason of anyone to hate him, and you snagged your red jacket on a nail on the dock.",
+        "objectives": [
+          "Clear your name without anyone reading the 1962 report.",
+          "Protect your father.",
+          "Find out who really killed Walt."
+        ],
+        "knows": [
+          "Walt is diabetic. Nurse Brenda gives him his insulin shot every night at a quarter to eleven.",
+          "Earl the caretaker plays the Lakeside Man at the campfire every summer, in the burlap mask."
+        ],
+        "lines": {
+          "act3": [
+            "I'm a lifeguard. I pull people out of the water. I don't put them in it."
+          ]
+        },
+        "alibi": "At a quarter past eleven I went down to tie up the canoes. Walt yelled at me to do it properly. I was back in my cabin at half past."
+      }
+    },
+    "danny": {
+      "private": {
+        "knows": [
+          "At eleven your dad was angry and very much alive. He threw his clipboard at the door as you left.",
+          "Walt's will says that if he dies before the sale, the camp comes to you. Only one other person knew: Mitch."
+        ]
+      }
+    },
+    "brenda": {
+      "private": {
+        "knows": [
+          "At a quarter to eleven you gave Walt his usual twenty units of insulin. He was grumpy, healthy and very much alive.",
+          "Mitch came back up the path at twenty-five to twelve without his paddle. He never goes anywhere without that paddle."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "bruises": {
+      "text": "Gus, the old Navy medic, points out a bruise on Walt's forehead where he hit the edge of the dock as he fell. Caught on a nail by the slip: a torn scrap of red nylon. Dana snagged her lifeguard jacket there tonight, tying up the canoes.",
+      "redHerring": true
+    },
+    "report": {
+      "redHerring": true
+    },
+    "jacket": null,
+    "whistle": null,
+    "skip-saw": {
+      "text": "Your own memory: at half past eleven Mitch went into the boathouse carrying his canoe paddle, like always. Five minutes later he came out without it, and walked very fast up the path in the rain.",
+      "pointsTo": [
+        "mitch"
+      ]
+    },
+    "logbook": {
+      "pointsTo": [
+        "mitch"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry, in Walt's blocky hand: 'Mitch begged me not to sell. Said, \"Over my dead body, Walt. Or yours.\" Sentimental fool. Signing Monday. Boathouse tonight, paperwork.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "will",
+      "title": "Walt's Will",
+      "text": "In Walt's open safe: his will. 'Should I die before the sale of Camp Blackwater is completed, the camp passes to my son, Daniel.' Danny has sworn he'd never sell. In the margin, in pencil: 'Mitch knows about this. Must change it.'",
+      "act": 2,
+      "wave": "start",
+      "pointsTo": [
+        "mitch",
+        "danny"
+      ]
+    },
+    {
+      "id": "paddle",
+      "title": "A Paddle in the Reeds",
+      "text": "Pulled out of the reeds beside the boathouse at dawn: a canoe paddle with 'M. CALLAHAN – HEAD COUNSELOR' burned into the handle. The blade is cracked across, and there's a dark smear on the edge.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "mitch"
+      ]
+    },
+    {
+      "id": "boots",
+      "title": "Black Silt",
+      "text": "Mitch's boots, drying by his cabin door, are caked with the black silt from the boat slip, not the red clay of the path. Nobody but the lifeguard should have been down by the slip tonight.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "mitch"
+      ]
+    },
+    {
+      "id": "splinter",
+      "title": "A Splinter",
+      "text": "Gus finds it on a second look: a splinter of varnished ash wood caught in Walt's hair. Camp Blackwater's canoe paddles are made of varnished ash.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "mitch"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "A sheriff's car bumping up a muddy road at dawn, headlights in the mist.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of Camp Blackwater!",
+      "alternative": "Root beers up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The sheriff's car came up the road at seven. Mitch Callahan was sitting on the end of the dock, looking at the lake. 'I learned to swim here,' he said. 'I just wanted it to be here for the next kid.' Then he held out his hands."
+    },
+    {
+      "type": "narration",
+      "text": "The mask went into an evidence box, sealed and signed, and the box went into the trunk of the sheriff's car. When they opened it at the station that afternoon, the box was empty. There was lake water on the bottom. And the smell of pine. Goodnight, detectives. Stay out of the water."
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "variantOf": "last-night-at-camp-blackwater",
+  "variant": "B",
+  "solution": {
+    "murdererId": "brenda",
+    "motiveId": "insurance",
+    "methodId": "insulin",
+    "explanation": [
+      "Walt Harlan didn't drown, and the Lakeside Man never touched him. He was killed at a quarter to eleven by the woman who gave him his shot every night: his ex-wife, Nurse Brenda Harlan.",
+      "Walt still carried a hundred-thousand-dollar life insurance policy naming Brenda, from their marriage. Tonight he told her he'd cancel it on Monday, along with her job. 'You'll be sorry you ever married me,' she said. He wrote it in his logbook.",
+      "At a quarter to eleven she didn't give him twenty units of insulin. She gave him three hundred. Insulin works slowly and quietly: at eleven Danny found his father sweating and slurring, and at a quarter past Dana saw him slumped over his desk. Confused and gasping, he staggered to the edge of the slip for air, fell, and struck his head. The lake water on his face was rain and spray.",
+      "At ten to midnight Brenda came back in the burlap mask, which she'd taken from the unlocked crafts cabin, and left it on the dock so everyone would blame the legend. But the vial in the kit was nearly empty, three broken vials were in the infirmary sharps bin, and Skip saw her stay in the boathouse far too long.",
+      "The torn red jacket, the 1962 report and Earl's empty lantern were all innocent. A nurse's first rule is 'do no harm'. Brenda forgot it."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "The Lakeside Man mask is taken from the unlocked crafts cabin."
+      },
+      {
+        "time": "9:00",
+        "event": "At the campfire, Walt tells the legend and announces the sale."
+      },
+      {
+        "time": "9:30",
+        "event": "Walt tells Brenda he'll cancel the insurance on Monday. 'You'll be sorry you ever married me.'"
+      },
+      {
+        "time": "10:00",
+        "event": "The storm breaks. Walt goes down to the boathouse."
+      },
+      {
+        "time": "10:45",
+        "event": "Brenda injects three hundred units of insulin instead of twenty, and stays twenty minutes."
+      },
+      {
+        "time": "11:00",
+        "event": "Danny finds Walt sweating and slurring: 'Brenda gave me my shot. I feel strange.'"
+      },
+      {
+        "time": "11:15",
+        "event": "Dana sees Walt slumped over his desk and thinks he's asleep."
+      },
+      {
+        "time": "11:25",
+        "event": "Walt staggers to the slip for air, falls and strikes his head."
+      },
+      {
+        "time": "11:30",
+        "event": "Mitch knocks. No answer."
+      },
+      {
+        "time": "11:50",
+        "event": "A figure in the burlap mask leaves it on the dock."
+      },
+      {
+        "time": "12:30",
+        "event": "Tina finds Walt at the edge of the boat slip."
+      }
+    ]
+  },
+  "acts": {
+    "act1": {
+      "cues": [
+        {
+          "type": "narration",
+          "text": "Act One. The Boathouse."
+        },
+        {
+          "type": "image",
+          "text": "The boathouse by lamplight: a desk, an open safe, an insulin kit on a bench, and the dark water of the boat slip.",
+          "effect": "kenburns"
+        },
+        {
+          "type": "narration",
+          "text": "Gus the cook, twenty years a Navy medic, kneels beside the body. Walt didn't drown: there's no water in his lungs, and the bump on his head is from a fall. His skin is cold and clammy, and his pupils are wide. 'I've seen this in diabetics,' Gus says slowly. 'His sugar went through the floor. Something made it.'"
+        },
+        {
+          "type": "line",
+          "speaker": "tina",
+          "text": "I came to meet somebody. I found him instead. And that mask was just lying there, looking at me."
+        }
+      ]
+    }
+  },
+  "characters": {
+    "brenda": {
+      "private": {
+        "backstory": "YOU ARE THE MURDERER. You and Walt divorced in 1979, but his hundred-thousand-dollar life insurance policy still names you. Tonight he told you he'd cancel it on Monday, and your job with it. At a quarter to eleven, in the boathouse, you didn't give him twenty units of insulin. You gave him three hundred, from three vials, and stayed to watch him start to sweat. You threw the empty vials in the infirmary sharps bin. At ten to midnight you took the burlap mask from the unlocked crafts cabin and left it on the dock, so everyone would blame the legend.",
+        "objectives": [
+          "Don't get caught. Point everyone at Dana (she was soaked and furious) or at the legend.",
+          "Nobody must count the vials in Walt's kit, or look in the sharps bin.",
+          "Collect on the policy, if you can."
+        ],
+        "knows": [
+          "Too much insulin makes a man sweat, shake, slur and stumble, then sleep, then die. It takes about half an hour.",
+          "Dana came back from the boathouse soaked to the shoulders at half past eleven."
+        ],
+        "lines": {
+          "act3": [
+            "I gave him twenty units. The same as every night for fifteen years. If somebody tampered with his kit after I left, that isn't my doing."
+          ]
+        }
+      }
+    },
+    "dana": {
+      "private": {
+        "backstory": "In the summer of 1962 a boy called Tommy Vail drowned in Blackwater Lake while the lifeguard on duty, your father Ed Reyes, slept at his post. Walt kept the report in his safe for twenty-two years, and tonight he told you it was going to the Vail family's lawyer on Monday. At a quarter past eleven, tying up the canoes in the storm, you looked into the boathouse. You were furious, and you'd have said something you'd regret. You did not kill him. But you have the best reason of anyone to hate him, and you snagged your red jacket on a nail on the dock.",
+        "objectives": [
+          "Clear your name without anyone reading the 1962 report.",
+          "Protect your father.",
+          "Find out who really killed Walt."
+        ],
+        "knows": [
+          "Walt is diabetic. Nurse Brenda gives him his insulin shot every night at a quarter to eleven.",
+          "Earl the caretaker plays the Lakeside Man at the campfire every summer, in the burlap mask."
+        ],
+        "lines": {
+          "act3": [
+            "I'm a lifeguard. I pull people out of the water. I don't put them in it."
+          ]
+        },
+        "alibi": "At a quarter past eleven I went down to tie up the canoes. Walt was slumped over his desk; I thought he was asleep, so I left him. I was back in my cabin at half past."
+      }
+    },
+    "danny": {
+      "private": {
+        "knows": [
+          "At eleven your dad was sweating, shaking and slurring. He said, 'Brenda gave me my shot. I feel strange.' You thought he was drunk.",
+          "Nurse Brenda was coming up the path from the boathouse as you went down, just before eleven. She'd been there a long time."
+        ],
+        "lines": {
+          "act3": [
+            "He said Brenda gave him his shot and he felt strange. I thought he'd been drinking. I walked out on him."
+          ]
+        }
+      }
+    }
+  },
+  "clues": {
+    "bruises": {
+      "text": "Gus, the old Navy medic, points out a bruise on Walt's forehead where he hit the edge of the dock as he fell. Caught on a nail by the slip: a torn scrap of red nylon. Dana snagged her lifeguard jacket there tonight, tying up the canoes.",
+      "redHerring": true
+    },
+    "report": {
+      "redHerring": true
+    },
+    "jacket": null,
+    "whistle": null,
+    "insulin-kit": {
+      "text": "On the bench by Walt's desk, open: his insulin kit. The vial in it is nearly empty, but the label says it was opened this morning. A night's dose is twenty units; nearly three hundred are gone. Nurse Brenda gives him his shot every night.",
+      "redHerring": false
+    },
+    "skip-saw": {
+      "text": "Your own memory: at a quarter to eleven Nurse Brenda went into the boathouse. She usually stays two minutes. Tonight she stayed twenty, and came out stuffing something into her bag.",
+      "pointsTo": [
+        "brenda"
+      ]
+    },
+    "logbook": {
+      "pointsTo": [
+        "brenda"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry, in Walt's blocky hand: 'Told Brenda I'm cancelling the insurance Monday, and her job. She said, \"You'll be sorry you ever married me, Walt.\" I already am. Shot at quarter to eleven as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "policy",
+      "title": "The Insurance Policy",
+      "text": "In Walt's open safe: a life insurance policy for $100,000. Beneficiary: Brenda Harlan, his ex-wife. Pinned to it, a letter from the insurer: 'Cancellation will take effect on receipt of your signature.' The signature line is blank.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "brenda"
+      ]
+    },
+    {
+      "id": "vials",
+      "title": "The Sharps Bin",
+      "text": "In the infirmary sharps bin: three empty insulin vials, labelled 'W. Harlan', snapped at the neck. They're all from tonight's box.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "brenda"
+      ]
+    },
+    {
+      "id": "nurse-log",
+      "title": "The Infirmary Log",
+      "text": "The infirmary log, in Brenda's neat handwriting: '10:45. W. Harlan. 20 units.' But the box of vials in the infirmary fridge is three short of the count on the page before.",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "brenda"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "A sheriff's car bumping up a muddy road at dawn, headlights in the mist.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "toast",
+      "text": "One last toast: to the detectives of Camp Blackwater!",
+      "alternative": "Root beers up for the detectives!"
+    },
+    {
+      "type": "narration",
+      "text": "The sheriff's car came up the road at seven. Nurse Brenda was waiting in the infirmary with her bag packed and her cap on straight. 'Fifteen summers of bandages,' she said. 'Nobody ever looks at the nurse.'"
+    },
+    {
+      "type": "narration",
+      "text": "The mask went into an evidence box, sealed and signed, and the box went into the trunk of the sheriff's car. When they opened it at the station that afternoon, the box was empty. There was lake water on the bottom. And the smell of pine. Goodnight, detectives. Stay out of the water."
+    }
+  ]
+}

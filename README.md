@@ -17,9 +17,11 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - **Death at the Gin Joint** (Adults): a 1927 Chicago speakeasy, a torch singer, a crooked cop and a nervous bookkeeper, and a club owner who meant to settle every account before leaving town.
 - **Last Stop: Murder** (Adults): a 1930s sleeper train snowbound on the way to Istanbul, a stolen emerald, and a millionaire found dead in a compartment chained from the inside.
 - **Murder on the Red Carpet** (Adults): a 1950s Hollywood premiere, and a leading man who never makes his curtain call.
+- 🎃 **Last Night at Camp Blackwater** (Adults, Halloween): a 1980s summer camp, a storm on the lake, and the legend of the Lakeside Man in his burlap mask.
+- 🎃 **Who Spooked the Halloween Party?** (Family, Halloween): a village costume party at creaky Hollow Hill House, a pumpkin contest, and a missing Golden Pumpkin.
 
 All of them play with 3–8 guests in about two hours, and **each comes in three or four versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
-- generate new mysteries for any of the nine themes, family-friendly or mature
+- generate new mysteries for any of the eleven themes, family-friendly or mature
 - let guests question characters nobody is playing
 - get private hints from the Inspector
 - hear a personalised verdict at the reveal

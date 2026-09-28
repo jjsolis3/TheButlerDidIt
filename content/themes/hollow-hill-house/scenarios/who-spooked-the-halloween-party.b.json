@@ -1,0 +1,188 @@
+{
+  "variantOf": "who-spooked-the-halloween-party",
+  "variant": "B",
+  "solution": {
+    "murdererId": "hodge",
+    "motiveId": "patch",
+    "methodId": "soup",
+    "explanation": [
+      "The caramel apple was just an apple, and the punch was just punch. The Sleepy Syrup was in the pumpkin soup, carried in by Mr. Hodge, the gardener.",
+      "Tonight Mr. Bramble told Mr. Hodge he was selling the pumpkin patch to make a car park, and would announce it at the parade. 'You'll sleep through that parade, Barnaby, you mark my words,' said Mr. Hodge. Mr. Bramble wrote it in his diary.",
+      "At a quarter past eight Mr. Hodge crept into the kitchen, stood on the step stool and took the Sleepy Syrup from the high cupboard. Milo saw him, and he left a muddy boot print on the stool. He stirred the syrup into the bowl of soup he poured from his own flask, and at twenty to nine he carried it in.",
+      "By ten to nine Mr. Bramble was nodding off, and at nine he told Milo the soup 'tasted of cinnamon'. His old heart couldn't take so much. Mr. Hodge only meant him to snooze through the parade, so the patch would be saved, but it was a very dangerous thing to do.",
+      "Jax took the Golden Pumpkin for a prank, and Betty cheated at pumpkins, but the apple and the punch were perfectly innocent. You reap what you sow, and Mr. Hodge sowed cinnamon."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "Mr. Bramble judges the pumpkin contest."
+      },
+      {
+        "time": "8:10",
+        "event": "He tells Mr. Hodge about the car park. 'You'll sleep through that parade, Barnaby.'"
+      },
+      {
+        "time": "8:15",
+        "event": "Mr. Hodge takes the Sleepy Syrup from the high cupboard. Milo sees him."
+      },
+      {
+        "time": "8:30",
+        "event": "Betty gives Mr. Bramble his caramel apple. He's wide awake."
+      },
+      {
+        "time": "8:40",
+        "event": "Mr. Hodge brings a bowl of soup from his own flask, with the syrup in it."
+      },
+      {
+        "time": "8:50",
+        "event": "Zandini brings the witch's-brew punch. Mr. Bramble is nodding off."
+      },
+      {
+        "time": "9:00",
+        "event": "Milo says goodnight. Great-Uncle: 'That soup tasted of cinnamon tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Madame Moonbeam tries to read his palm. He's nodding off."
+      },
+      {
+        "time": "9:20",
+        "event": "Jax hides the Golden Pumpkin for a prank."
+      },
+      {
+        "time": "9:30",
+        "event": "Reverend Pumphrey finds Mr. Bramble asleep forever."
+      }
+    ]
+  },
+  "characters": {
+    "hodge": {
+      "private": {
+        "backstory": "YOU DID IT. Tonight Mr. Bramble told you he's selling your pumpkin patch for a car park, and he'd announce it at the ten o'clock parade. You said, 'You'll sleep through that parade, Barnaby, you mark my words.' At a quarter past eight you crept into the kitchen, stood on the step stool and took his Sleepy Syrup from the high cupboard. You stirred it into the bowl of soup you poured from your own flask, and at twenty to nine you carried it in. You only meant him to snooze through the parade. You didn't know how weak his heart was. Now nobody must find out.",
+        "objectives": [
+          "Don't get found out. Point everyone at the caramel apple (Betty cheated!) or the punch.",
+          "Wash out your soup flask, and your muddy boots.",
+          "Save the pumpkin patch, somehow."
+        ],
+        "knows": [
+          "Mr. Bramble's Sleepy Syrup is pink, and it tastes of cinnamon. Pumpkin soup has plenty of spice to hide it.",
+          "Betty cheated at the pumpkin contest this year: Mr. Bramble found a shop sticker."
+        ],
+        "lines": {
+          "act3": [
+            "My soup's the same as it's been for forty years. Look at Betty. She's the one who cheats."
+          ]
+        }
+      }
+    },
+    "betty": {
+      "private": {
+        "backstory": "This year your pumpkin didn't carve properly, so you secretly bought a ready-carved one from Mrs. Stitch's shop and entered it as your own. Mr. Bramble found the price sticker underneath and told you he'd announce it at the parade. You were mortified. You still took him his caramel apple at half past eight, plain vanilla caramel as always. You did not hurt him. But you've got a secret, and people are bound to wonder.",
+        "objectives": [
+          "Clear your name. Cheating at pumpkins isn't the same as spooking Mr. Bramble.",
+          "Keep the shop-bought pumpkin quiet, if you can.",
+          "Find out who really did it."
+        ],
+        "knows": [
+          "Mr. Bramble had three treats tonight: your caramel apple, Mr. Hodge's pumpkin soup and Zandini's witch's-brew punch.",
+          "At half past eight Mr. Bramble was wide awake. He crunched your apple and said, 'Vanilla! Perfect as always, Betty.'"
+        ],
+        "lines": {
+          "act3": [
+            "My caramel is vanilla. Always vanilla. Whatever tasted of cinnamon, it wasn't my apple."
+          ]
+        }
+      }
+    },
+    "milo": {
+      "private": {
+        "knows": [
+          "At nine you said goodnight to Great-Uncle in the library. He was yawning like a hippo. 'That soup tasted of cinnamon tonight, Milo,' he said.",
+          "At a quarter past eight you saw Mr. Hodge in the kitchen, standing on the stool by the high cupboard, in his muddy boots."
+        ]
+      }
+    },
+    "moonbeam": {
+      "private": {
+        "knows": [
+          "At a quarter past nine you tried to read Mr. Bramble's palm, but he was nodding off. 'Cinnamon,' he mumbled. 'Why did Hodge put cinnamon in the soup?'",
+          "At twenty past nine, leaving the library, you saw DJ Jax tiptoe past with something round and golden under their jacket."
+        ]
+      }
+    },
+    "jax": {
+      "private": {
+        "knows": [
+          "At twenty past nine Mr. Bramble was fast asleep in his chair in the library. You walked right past.",
+          "There was an empty soup bowl on his table, and the library smelled of cinnamon."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "apple-stick": {
+      "text": "On Mr. Bramble's plate: a bare caramel-apple stick with a few sticky crumbs. The caramel smells of vanilla, just like Betty always makes it. Betty was very flustered at the contest table tonight.",
+      "redHerring": true
+    },
+    "sticker": {
+      "redHerring": true
+    },
+    "gloves": null,
+    "spoon": null,
+    "soup-bowl": {
+      "text": "An empty soup bowl on the library table. At the bottom there's a ring of pink, sticky syrup that smells of cinnamon. The big soup pot in the kitchen is perfectly plain: this bowl was poured from Mr. Hodge's own flask.",
+      "redHerring": false
+    },
+    "milo-saw": {
+      "text": "Your own memory: at a quarter past eight, you peeked into the kitchen. Mr. Hodge was standing on the step stool in his muddy boots, reaching into the high cupboard where Great-Uncle keeps his Sleepy Syrup.",
+      "pointsTo": [
+        "hodge"
+      ]
+    },
+    "diary": {
+      "pointsTo": [
+        "hodge"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Told Hodge the pumpkin patch is going for the car park. He went red as a tomato and said, \"You'll sleep through that parade, Barnaby, you mark my words.\" Grumpy old thing. Soup at twenty to nine as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "flask",
+      "title": "The Soup Flask",
+      "text": "In Mr. Hodge's wheelbarrow by the back door: his tartan soup flask. Inside, streaks of pink syrup, and a strong smell of cinnamon.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "hodge"
+      ]
+    },
+    {
+      "id": "boot-print",
+      "title": "A Muddy Boot Print",
+      "text": "On the kitchen step stool, right under the high cupboard: a big muddy boot print, with a pumpkin seed stuck in the mud. Only one person at the party came straight from the pumpkin patch.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "hodge"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning sunshine on Hollow Hill House, and a policeman wheeling his bicycle up the drying lane.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The village policeman arrived on his bicycle at breakfast time. Mr. Hodge met him at the gate with his straw hat in his hands. 'I only wanted to save my pumpkins,' he said, and a big tear rolled into his beard."
+    },
+    {
+      "type": "narration",
+      "text": "Jax put the Golden Pumpkin back on its shelf, and Milo read out Great-Uncle Barnaby's last surprise from his card, the one nobody had noticed: 'The house goes to Milo, and the party goes on forever.' As everyone went home, the last jack-o'-lantern on the porch, the one that had blown out hours ago, flickered back to life all by itself. And winked. Happy Halloween, detectives."
+    }
+  ]
+}

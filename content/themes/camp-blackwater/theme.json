@@ -1,0 +1,27 @@
+{
+  "slug": "camp-blackwater",
+  "name": "Camp Blackwater",
+  "tagline": "A Halloween campfire tale: the last night of summer, a storm on the lake, and a legend in a burlap mask.",
+  "era": "1980s summer camp",
+  "description": "A Halloween slasher-movie night, without the gore. The campers have gone home, the counselors are having one last bonfire, and the phone line is down. Everyone knows the story of the Lakeside Man. Tonight, somebody used it.",
+  "palette": {
+    "background": "#07100d",
+    "surface": "#122019",
+    "accent": "#e8732a",
+    "ink": "#e9eee4"
+  },
+  "artStyle": "1980s horror VHS cover art, pine forest at night, lake mist, a campfire's orange glow, grainy film",
+  "sortOrder": 10,
+  "cocktails": [
+    {
+      "name": "The Lakeside Man",
+      "recipe": "Dark rum, ginger beer and lime over ice, with a blackberry sunk to the bottom.",
+      "mocktail": "Ginger beer, lime and blackberries over ice."
+    },
+    {
+      "name": "Campfire S'mores Shake",
+      "recipe": "Vanilla ice cream, chocolate liqueur and toasted marshmallow, blended.",
+      "mocktail": "Vanilla ice cream, chocolate syrup and a toasted marshmallow on top."
+    }
+  ]
+}

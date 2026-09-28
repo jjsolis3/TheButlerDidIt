@@ -1,0 +1,211 @@
+{
+  "variantOf": "who-spooked-the-halloween-party",
+  "variant": "C",
+  "solution": {
+    "murdererId": "zandini",
+    "motiveId": "house",
+    "methodId": "punch",
+    "explanation": [
+      "The caramel apple was just an apple, and the soup was just soup. The Sleepy Syrup was in the bubbling witch's-brew punch, poured with a puff of smoke by the Great Zandini.",
+      "Zandini has wanted Hollow Hill House for his Museum of Magic for years. Tonight Mr. Bramble told him, 'Not while I'm alive, Zandini,' and said he'd announce it at the parade. 'Then you'll sleep through your parade, Barnaby,' said Zandini. Mr. Bramble wrote it in his diary.",
+      "At a quarter past eight Zandini slipped into the kitchen to 'borrow some ice', and took the Sleepy Syrup from the high cupboard. Milo saw him. He hid it in his hollow magic wand, and at ten to nine, with a big 'Abracadabra!' and a puff of mist, he squirted it into Mr. Bramble's cup of punch.",
+      "By nine Mr. Bramble was yawning, and told Milo the punch 'tasted of cinnamon'. His old heart couldn't take so much. Zandini only meant him to snooze through the parade, but it was a very dangerous trick, and he left a trail: pink syrup in the cup, in his wand and in his top hat, and plans for his museum in his cape pocket.",
+      "Jax took the Golden Pumpkin for a prank, and Betty cheated at pumpkins, but the apple and the soup were perfectly innocent. Every magic trick has a secret, and this one was hidden in a wand."
+    ],
+    "timeline": [
+      {
+        "time": "8:00",
+        "event": "Mr. Bramble judges the pumpkin contest."
+      },
+      {
+        "time": "8:10",
+        "event": "He tells Zandini the house is not for sale. 'Then you'll sleep through your parade, Barnaby.'"
+      },
+      {
+        "time": "8:15",
+        "event": "Zandini 'borrows some ice' and takes the Sleepy Syrup from the high cupboard. Milo sees him."
+      },
+      {
+        "time": "8:30",
+        "event": "Betty gives Mr. Bramble his caramel apple. He's wide awake."
+      },
+      {
+        "time": "8:40",
+        "event": "Mr. Hodge brings the pumpkin soup. Mr. Bramble is telling jokes."
+      },
+      {
+        "time": "8:50",
+        "event": "Zandini brings the witch's-brew punch, with the syrup squirted in from his wand."
+      },
+      {
+        "time": "9:00",
+        "event": "Milo says goodnight. Great-Uncle: 'That punch tasted of cinnamon tonight.'"
+      },
+      {
+        "time": "9:15",
+        "event": "Madame Moonbeam tries to read his palm. He's nodding off."
+      },
+      {
+        "time": "9:20",
+        "event": "Jax hides the Golden Pumpkin for a prank."
+      },
+      {
+        "time": "9:30",
+        "event": "Reverend Pumphrey finds Mr. Bramble asleep forever."
+      }
+    ]
+  },
+  "characters": {
+    "zandini": {
+      "private": {
+        "backstory": "YOU DID IT. You've wanted Hollow Hill House for your Museum of Magic for years. Tonight Mr. Bramble told you, 'Not while I'm alive, Zandini,' and said he'd announce it at the parade. You said, 'Then you'll sleep through your parade, Barnaby.' At a quarter past eight you slipped into the kitchen to 'borrow some ice' and took his Sleepy Syrup from the high cupboard. You hid it in your hollow magic wand, and at ten to nine, with a big 'Abracadabra!', you squirted it into his punch. You only meant him to snooze through the parade. You didn't know how weak his heart was. Now nobody must find out.",
+        "objectives": [
+          "Don't get found out. Point everyone at the caramel apple (Betty cheated!) or the soup.",
+          "Clean out your magic wand, and your top hat.",
+          "Get Hollow Hill House, one way or another."
+        ],
+        "knows": [
+          "Mr. Bramble's Sleepy Syrup is pink, and it tastes of cinnamon. Green witch's-brew punch hides the colour.",
+          "Betty cheated at the pumpkin contest this year, and Mr. Hodge is losing his pumpkin patch."
+        ],
+        "lines": {
+          "act3": [
+            "A magician never reveals his secrets! But this one is simple: I didn't do it. Look at the apple. Look at the soup."
+          ]
+        }
+      }
+    },
+    "betty": {
+      "private": {
+        "backstory": "This year your pumpkin didn't carve properly, so you secretly bought a ready-carved one from Mrs. Stitch's shop and entered it as your own. Mr. Bramble found the price sticker underneath and told you he'd announce it at the parade. You were mortified. You still took him his caramel apple at half past eight, plain vanilla caramel as always. You did not hurt him. But you've got a secret, and people are bound to wonder.",
+        "objectives": [
+          "Clear your name. Cheating at pumpkins isn't the same as spooking Mr. Bramble.",
+          "Keep the shop-bought pumpkin quiet, if you can.",
+          "Find out who really did it."
+        ],
+        "knows": [
+          "Mr. Bramble had three treats tonight: your caramel apple, Mr. Hodge's pumpkin soup and Zandini's witch's-brew punch.",
+          "At half past eight Mr. Bramble was wide awake. He crunched your apple and said, 'Vanilla! Perfect as always, Betty.'"
+        ],
+        "lines": {
+          "act3": [
+            "My caramel is vanilla. Always vanilla. Whatever tasted of cinnamon, it wasn't my apple."
+          ]
+        }
+      }
+    },
+    "hodge": {
+      "private": {
+        "knows": [
+          "You took Mr. Bramble his pumpkin soup at twenty to nine. He was wide awake, telling you a joke about a scarecrow.",
+          "At a quarter past eight you saw the Great Zandini coming out of the kitchen, tucking his wand into his sleeve."
+        ],
+        "lines": {
+          "act3": [
+            "When I took the soup in, he was wide awake. Laughing at his own jokes, as usual."
+          ]
+        }
+      }
+    },
+    "milo": {
+      "private": {
+        "knows": [
+          "At nine you said goodnight to Great-Uncle in the library. He was yawning like a hippo. 'That punch tasted of cinnamon tonight, Milo,' he said.",
+          "At a quarter past eight you saw the Great Zandini in the kitchen, reaching into the high cupboard with his long arms."
+        ]
+      }
+    },
+    "moonbeam": {
+      "private": {
+        "knows": [
+          "At a quarter past nine you tried to read Mr. Bramble's palm, but he was nodding off. 'Cinnamon,' he mumbled. 'Why did the punch taste of cinnamon?'",
+          "At twenty past nine, leaving the library, you saw DJ Jax tiptoe past with something round and golden under their jacket."
+        ]
+      }
+    },
+    "jax": {
+      "private": {
+        "knows": [
+          "At twenty past nine Mr. Bramble was fast asleep in his chair in the library. You walked right past.",
+          "There was an empty punch cup on his table, and the library smelled of cinnamon."
+        ]
+      }
+    }
+  },
+  "clues": {
+    "apple-stick": {
+      "text": "On Mr. Bramble's plate: a bare caramel-apple stick with a few sticky crumbs. The caramel smells of vanilla, just like Betty always makes it. Betty was very flustered at the contest table tonight.",
+      "redHerring": true
+    },
+    "sticker": {
+      "redHerring": true
+    },
+    "gloves": null,
+    "spoon": null,
+    "punch-cup": {
+      "text": "An empty cup of the Great Zandini's witch's-brew punch. At the bottom, under the green, there's a ring of pink, sticky syrup that smells of cinnamon. Nobody else's punch had any: this cup was poured from Zandini's own little cauldron.",
+      "redHerring": false
+    },
+    "milo-saw": {
+      "text": "Your own memory: at a quarter past eight, you peeked into the kitchen. The Great Zandini was reaching up into the high cupboard where Great-Uncle keeps his Sleepy Syrup, with his long magician's arms.",
+      "pointsTo": [
+        "zandini"
+      ]
+    },
+    "diary": {
+      "pointsTo": [
+        "zandini"
+      ],
+      "puzzle": {
+        "solvedText": "Tonight's entry: 'Told Zandini, not while I'm alive. He twirled his moustache and said, \"Then you'll sleep through your parade, Barnaby.\" Silly old showman. Punch at ten to nine as usual.'"
+      }
+    }
+  },
+  "addClues": [
+    {
+      "id": "wand",
+      "title": "The Magic Wand",
+      "text": "The Great Zandini's magic wand, left on the ballroom piano. Unscrew the white tip, and it's hollow inside: a little tube, sticky with pink syrup that smells of cinnamon.",
+      "act": 2,
+      "wave": "midway",
+      "pointsTo": [
+        "zandini"
+      ]
+    },
+    {
+      "id": "top-hat",
+      "title": "The Top Hat",
+      "text": "Inside the Great Zandini's top hat there's a secret pocket, for rabbits. Tonight it holds no rabbit: just the little red cap from Mr. Bramble's bottle of Sleepy Syrup.",
+      "act": 3,
+      "wave": "start",
+      "pointsTo": [
+        "zandini"
+      ]
+    },
+    {
+      "id": "plans",
+      "title": "Museum Plans",
+      "text": "In the pocket of Zandini's cape: a drawing of Hollow Hill House, with a big sign over the door. 'ZANDINI'S MUSEUM OF MAGIC. Grand opening: next Halloween!'",
+      "act": 3,
+      "wave": "midway",
+      "pointsTo": [
+        "zandini"
+      ]
+    }
+  ],
+  "finale": [
+    {
+      "type": "image",
+      "text": "Morning sunshine on Hollow Hill House, and a policeman wheeling his bicycle up the drying lane.",
+      "effect": "kenburns"
+    },
+    {
+      "type": "narration",
+      "text": "The village policeman arrived on his bicycle at breakfast time. The Great Zandini met him on the front step, took off his top hat and bowed very low. 'For my final trick,' he said sadly, 'I shall need a very good lawyer.'"
+    },
+    {
+      "type": "narration",
+      "text": "Jax put the Golden Pumpkin back on its shelf, and Milo read out Great-Uncle Barnaby's last surprise from his card, the one nobody had noticed: 'The house goes to Milo, and the party goes on forever.' As everyone went home, the last jack-o'-lantern on the porch, the one that had blown out hours ago, flickered back to life all by itself. And winked. Happy Halloween, detectives."
+    }
+  ]
+}
