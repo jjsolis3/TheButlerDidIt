@@ -22,7 +22,7 @@ public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, DateT
     bool UseAi = true, bool DrinkingPrompts = false, string? Version = null, Tone Tone = Tone.Standard, bool TailorWithAi = false);
 /// <summary>Create an escape-room party: which room, and how people will play.</summary>
 public sealed record CreateEscapePartyRequest(string RoomId, PartyMode Mode, DateTimeOffset? ScheduledFor = null,
-    ButlerDidIt.Api.Escape.PuzzleChoice Puzzles = ButlerDidIt.Api.Escape.PuzzleChoice.Fresh, long? PuzzleSet = null);
+    ButlerDidIt.Api.Escape.PuzzleChoice Puzzles = ButlerDidIt.Api.Escape.PuzzleChoice.Fresh, long? PuzzleSet = null, bool UseAi = true);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -131,7 +131,7 @@ public static class PartyEndpoints
 
         // ---- Host: start an escape-room party. The room is checked, the clock doesn't start until the host says so.
         group.MapPost("/escape", async (CreateEscapePartyRequest req, ClaimsPrincipal user, AppDbContext db, GameModules modules,
-            ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, CancellationToken ct) =>
+            ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, CancellationToken ct) =>
         {
             if (rooms.Find(req.RoomId) is not { } room) return Results.Problem("Pick an escape room to play.", statusCode: 400);
             var (seed, daily) = ButlerDidIt.Api.Escape.PuzzleSets.For(req.Puzzles, req.PuzzleSet, parties.Now);
@@ -148,7 +148,7 @@ public static class PartyEndpoints
                 CreatedAt = parties.Now,
                 UpdatedAt = parties.Now,
                 ScheduledFor = req.ScheduledFor,
-                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame(seed, daily)),
+                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame(seed, daily, await EscapeAiFor(req.UseAi, ai, media, ct))),
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);
@@ -214,6 +214,19 @@ public static class PartyEndpoints
             Hints = inspector, HintsPerAct = Math.Clamp(options.HintsPerAct, 1, 10),
             Verdicts = inspector,
             Voices = actor && await media.VoicesConfiguredAsync(ct),
+        };
+    }
+
+    /// <summary>The escape room's game master: it speaks with the Actor role and writes hints with the Inspector, whichever are set up.</summary>
+    private static async Task<ButlerDidIt.Escape.Engine.EscapeAiFeatures> EscapeAiFor(bool useAi, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, CancellationToken ct)
+    {
+        if (!useAi) return new();
+        var actor = await ai.IsConfiguredAsync(AiRole.Actor, ct);
+        return new()
+        {
+            GameMaster = actor,
+            Hints = await ai.IsConfiguredAsync(AiRole.Inspector, ct),
+            Voice = actor && await media.VoicesConfiguredAsync(ct),
         };
     }
 

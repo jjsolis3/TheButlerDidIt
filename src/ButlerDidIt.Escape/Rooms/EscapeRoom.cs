@@ -35,12 +35,34 @@ public sealed class EscapeRoom
     public required string EscapedText { get; init; }
     public required string FailedText { get; init; }
 
+    /// <summary>Who speaks for the room when the AI game master is on. Rooms without one get <see cref="GameMaster.Default"/>.</summary>
+    public GameMaster? GameMaster { get; init; }
+
     public List<EscapeStage> Stages { get; init; } = [];
     public List<EscapePuzzle> Puzzles { get; init; } = [];
     public List<EscapeItem> Items { get; init; } = [];
 
+    public GameMaster Host => GameMaster ?? Rooms.GameMaster.Default;
+
     public EscapePuzzle? FindPuzzle(string id) => Puzzles.FirstOrDefault(p => p.Id == id);
     public EscapeItem? FindItem(string id) => Items.FirstOrDefault(i => i.Id == id);
+}
+
+/// <summary>
+/// The character the AI plays while the group is in the room: reacting out loud on the TV and giving
+/// hints. Only its voice is written here; its lines are written by the AI during the game.
+/// </summary>
+public sealed class GameMaster
+{
+    public static readonly GameMaster Default = new() { Name = "The Game Master", Persona = "A calm, slightly amused host who watches the group through a hidden camera." };
+
+    public required string Name { get; init; }
+
+    /// <summary>How it talks, for the AI: a sentence or two.</summary>
+    public string Persona { get; init; } = "";
+
+    /// <summary>How it sounds: picks the AI voice (see VoiceCasting) and tunes the browser's voice when there is none.</summary>
+    public VoiceProfile Voice { get; init; } = new();
 }
 
 public sealed class EscapeStage

@@ -16,6 +16,11 @@ An escape room is one JSON file in `content/escape/`. The app checks every room 
   "intro": "The villain's welcome, shown on the TV as the clock starts.",
   "escapedText": "Shown when the group gets out.",
   "failedText": "Shown when time runs out.",
+  "gameMaster": {                    // optional: who the AI plays (default "The Game Master")
+    "name": "The Tinkerer",
+    "persona": "How it talks, in a sentence or two (under 400 characters).",
+    "voice": { "accent": "en-US", "pitch": 0.7, "rate": 0.85, "style": "low, slow, measured" }
+  },
   "stages":  [ { "id": "chains", "title": "The Chains", "description": "…", "puzzles": ["tape", "shackles"] } ],
   "puzzles": [ … ],
   "items":   [ { "id": "rusty-key", "name": "Rusty key", "description": "…" } ]
@@ -69,6 +74,14 @@ There are two ways to make a puzzle vary:
 ```
 
 The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more.
+
+## The AI game master
+
+When the host keeps **Use the AI game master** on (and an admin has set up the AI), the room's `gameMaster` comes alive:
+- It **reacts out loud on the TV** to the start, solves, new rooms, a run of wrong answers, the last five minutes, and the ending. It speaks in its own voice if a Voice model is set up; otherwise the TV's browser reads the line.
+- It **writes the hints**. It sees the puzzle, the clue pieces and the group's wrong tries, plus your written hint for that step as the direction to nudge in. It never sees the answer. The app also checks every AI hint, and shows your written hint instead if the AI's one gives the answer away or doesn't arrive. So keep writing a good hint ladder: it is both the AI's guide and the fallback.
+
+The AI only writes words. It never changes a puzzle, an answer or the clock.
 
 ## Leaderboards
 

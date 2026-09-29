@@ -56,6 +56,8 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByRole('textbox', { name: 'Puzzle set number' })).toBeVisible()
   await tv.getByText('🎲 Fresh puzzles').click()
   await expect(tv.getByRole('radio', { name: /Fresh puzzles/ })).toBeChecked()
+  // The (fake) AI is set up, so the room's villain is offered as the game master.
+  await expect(tv.getByRole('checkbox', { name: /Use the AI game master \(The Tinkerer\)/ })).toBeChecked()
   await tv.screenshot({ path: `${SHOTS}/90-escape-shelf.png`, fullPage: true })
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
@@ -72,6 +74,9 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
   await expect(tv.getByLabel('Time left')).toContainText(/4[45]:\d\d/)
   for (const p of phones) await expect(p.getByText('Only you can see these')).toBeVisible()
+  // The game master greets the group on the TV.
+  await expect(tv.getByTestId('game-master')).toContainText('The Tinkerer')
+  await expect(tv.getByTestId('game-master')).toContainText('Fake game master line for Start')
   await tv.screenshot({ path: `${SHOTS}/91-escape-room-tv.png` })
 
   // ---- A wrong answer shows on the TV, and locks that puzzle for a moment.
@@ -81,9 +86,10 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tape.getByRole('status')).toHaveText('✗ Nothing happened.')
   await expect(tv.getByText(/tried “kettle” on The Tape Recorder/)).toBeVisible()
 
-  // ---- A hint costs time, and shows on every screen.
+  // ---- A hint costs time, and shows on every screen. The game master writes it for where the group is stuck.
   await phones[1].getByTestId('phone-puzzle-tape').getByRole('button', { name: /Need a hint/ }).click()
-  await expect(tv.getByTestId('puzzle-tape')).toContainText("What's ticking?")
+  await expect(tv.getByTestId('puzzle-tape')).toContainText('The game master whispers')
+  await expect(phones[2].getByTestId('phone-puzzle-tape')).toContainText('The game master whispers')
   await expect(tv.getByText(/solved · 1 hint$/)).toBeVisible()
   await expect(tv.getByText(/an hour is worth/)).toBeVisible() // the villain's welcome
   await phones[0].waitForTimeout(3200) // the lock resets after a wrong answer

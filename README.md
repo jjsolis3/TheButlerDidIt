@@ -26,6 +26,8 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - **The Workshop** (Adults): you wake up chained in a basement workshop, and the Tinkerer wants to play a game.
 - **The Funhouse After Dark** (Family): the carnival has closed, and Mister Giggles the robot clown has locked every door.
 
+With the optional AI, each room's villain becomes a live **game master**. It taunts and cheers the group out loud on the TV as they play, and writes hints for exactly where they're stuck. The app checks those hints, and they never give the answer away.
+
 A **🎃 Halloween** filter on each shelf shows just the spooky stories. It glows all through October. A theme joins a season by listing it in `"seasons"` in its `theme.json`.
 
 All of them play with 3–8 guests in about two hours, and **each comes in three or four versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:

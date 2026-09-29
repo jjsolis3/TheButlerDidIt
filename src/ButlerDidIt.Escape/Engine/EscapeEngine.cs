@@ -15,17 +15,37 @@ public static class EscapeEngine
     /// <summary>A wrong answer locks that puzzle for this long.</summary>
     public static readonly TimeSpan WrongAnswerCooldown = TimeSpan.FromSeconds(3);
     private const int FeedLength = 12;
+    private const int CueLength = 10;
+    private const int RecentWrongLength = 5;
+    private const int WrongStreakCue = 3;
 
-    public static EscapeState NewGame(long seed = 0, bool daily = false) => new() { Seed = seed, Daily = daily };
+    /// <summary>The game master warns the group this long before the clock runs out.</summary>
+    public static readonly TimeSpan LowTimeWarning = TimeSpan.FromMinutes(5);
+
+    /// <summary>Longest AI hint or line kept. Longer ones are cut (lines) or refused (hints).</summary>
+    public const int MaxAiText = 400;
+
+    /// <summary>How long an AI hint may take before the written one is shown instead.</summary>
+    public static readonly TimeSpan AiHintTimeout = TimeSpan.FromSeconds(60);
+
+    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null) =>
+        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures() };
 
     /// <summary>The room as this attempt plays it: its variants and generated codes picked from the state's seed.</summary>
     public static EscapeRoom RoomFor(EscapeState s, EscapeRoom room) => RoomVariants.Build(room, s.Seed);
 
-    public static DateTimeOffset? NextDueAt(EscapeState s) => s.Phase == EscapePhase.Playing ? s.Deadline : null;
+    /// <summary>When the ticker should look again: the deadline, or the "five minutes left" warning before it.</summary>
+    public static DateTimeOffset? NextDueAt(EscapeState s)
+    {
+        if (s.Phase != EscapePhase.Playing || s.Deadline is not { } deadline) return null;
+        return s.LowTimeCued || !s.Ai.GameMaster ? deadline : deadline - LowTimeWarning;
+    }
 
     public static EscapeState Apply(EscapeState state, EscapeRoom template, EscapeCommand command)
     {
         if (command is EscapeTick tick) return Tick(state, tick.Now);
+        // AI results that arrive after their hint or moment is gone (cancelled, or scrolled out) change nothing.
+        if (IsStale(state, command)) return state;
         var room = RoomFor(state, template);
 
         var s = Clone(state);
@@ -37,7 +57,13 @@ public static class EscapeEngine
             case StartEscape c: Start(s, room, c.Now); break;
             case SubmitAnswer c: Answer(s, room, c); break;
             case UseItems c: Use(s, room, c); break;
-            case RequestEscapeHint c: Hint(s, room, c); break;
+            case RequestEscapeHint c: Hint(s, room, c.Now, c.SeatId, c.PuzzleId); break;
+            case BeginEscapeHint c: BeginAiHint(s, room, c); break;
+            case CompleteEscapeHint c: CompleteAiHint(s, room, c); break;
+            case CancelEscapeHint c: s.AiHints.RemoveAll(h => h.Id == c.HintId); break;
+            case SetCueNarration c: FindCue(s, c.CueId)!.Text = Cut(c.Text); break;
+            case SetCueAudio c: FindCue(s, c.CueId)!.AudioUrl = c.Url; break;
+            case SkipCues c: foreach (var cue in s.Cues.Where(x => x.Id < c.BeforeCueId && x.Text is null)) cue.Skipped = true; break;
             default: throw new GameRuleException($"Unknown command {command.GetType().Name}.");
         }
         s.Version++;
@@ -46,12 +72,31 @@ public static class EscapeEngine
 
     private static EscapeState Tick(EscapeState state, DateTimeOffset now)
     {
-        if (state.Phase != EscapePhase.Playing || state.Deadline is not { } deadline || now < deadline) return state;
+        if (state.Phase != EscapePhase.Playing || state.Deadline is not { } deadline) return state;
+        if (now >= deadline)
+        {
+            var ended = Clone(state);
+            End(ended, EscapePhase.Failed, deadline, "⏰ Time's up.");
+            ended.Version++;
+            return ended;
+        }
+        if (state.LowTimeCued || !state.Ai.GameMaster || now < deadline - LowTimeWarning) return state;
         var s = Clone(state);
-        End(s, EscapePhase.Failed, deadline, "⏰ Time's up.");
+        s.LowTimeCued = true;
+        Cue(s, CueKind.LowTime, now);
         s.Version++;
         return s;
     }
+
+    private static bool IsStale(EscapeState s, EscapeCommand command) => command switch
+    {
+        CompleteEscapeHint c => !s.AiHints.Any(h => h.Id == c.HintId && h.Text is null),
+        CancelEscapeHint c => !s.AiHints.Any(h => h.Id == c.HintId && h.Text is null),
+        SetCueNarration c => FindCue(s, c.CueId) is not { Text: null },
+        SetCueAudio c => FindCue(s, c.CueId) is not { Text: not null, AudioUrl: null },
+        SkipCues c => !s.Cues.Any(x => x.Id < c.BeforeCueId && x.Text is null && !x.Skipped),
+        _ => false,
+    };
 
     private static void AddPlayer(EscapeState s, EscapeRoom room, AddEscapePlayer c)
     {
@@ -89,7 +134,10 @@ public static class EscapeEngine
         s.StartedAt = now;
         s.Deadline = now.AddMinutes(room.TimeLimitMinutes);
         s.StageIndex = 0;
+        // A warning only makes sense when there's real time before it.
+        s.LowTimeCued = !s.Ai.GameMaster || room.TimeLimitMinutes < 2 * LowTimeWarning.TotalMinutes;
         Log(s, now, $"🔒 The clock is running: {room.TimeLimitMinutes} minutes.");
+        Cue(s, CueKind.Start, now, stage: room.Stages[0].Title);
     }
 
     private static void Answer(EscapeState s, EscapeRoom room, SubmitAnswer c)
@@ -107,6 +155,15 @@ public static class EscapeEngine
         s.WrongAttempts++;
         s.LockedUntil[puzzle.Id] = c.Now + WrongAnswerCooldown;
         Log(s, c.Now, $"✗ {player.Name} tried “{Trim(c.Answer)}” on {puzzle.Title}. Nothing.");
+
+        var tries = s.RecentWrong.TryGetValue(puzzle.Id, out var list) ? list : s.RecentWrong[puzzle.Id] = [];
+        tries.Add(Trim(c.Answer));
+        if (tries.Count > RecentWrongLength) tries.RemoveRange(0, tries.Count - RecentWrongLength);
+        if (++s.WrongStreak >= WrongStreakCue)
+        {
+            s.WrongStreak = 0;
+            Cue(s, CueKind.WrongStreak, c.Now, puzzle.Title, player.Name);
+        }
     }
 
     private static void Use(EscapeState s, EscapeRoom room, UseItems c)
@@ -116,18 +173,40 @@ public static class EscapeEngine
         Solve(s, room, puzzle, player.Name, c.Now);
     }
 
-    private static void Hint(EscapeState s, EscapeRoom room, RequestEscapeHint c)
+    /// <summary>Pays for the puzzle's next hint step and returns its index. The written hint for it is the fallback for an AI one.</summary>
+    private static int Hint(EscapeState s, EscapeRoom room, DateTimeOffset now, Guid? seatId, string puzzleId)
     {
         if (s.Phase != EscapePhase.Playing) throw new GameRuleException("Hints are only for while the clock runs.");
-        if (c.SeatId is { } seat) RequirePlayer(s, seat);
-        var puzzle = OpenPuzzle(s, room, c.PuzzleId);
+        if (seatId is { } seat) RequirePlayer(s, seat);
+        var puzzle = OpenPuzzle(s, room, puzzleId);
         var shown = s.HintsShown.GetValueOrDefault(puzzle.Id);
         if (shown >= puzzle.Hints.Count) throw new GameRuleException("There are no more hints for this one.");
+        if (s.AiHints.Any(h => h.PuzzleId == puzzle.Id && h.IsPending(now))) throw new GameRuleException("A hint for this one is on its way.");
 
         s.HintsShown[puzzle.Id] = shown + 1;
         s.Deadline = s.Deadline!.Value.AddSeconds(-room.HintPenaltySeconds);
-        Log(s, c.Now, $"💡 A hint for {puzzle.Title} (−{FormatPenalty(room.HintPenaltySeconds)}).");
-        if (s.Deadline <= c.Now) End(s, EscapePhase.Failed, c.Now, "⏰ That hint cost the last of your time.");
+        Log(s, now, $"💡 A hint for {puzzle.Title} (−{FormatPenalty(room.HintPenaltySeconds)}).");
+        if (s.Deadline <= now) End(s, EscapePhase.Failed, now, "⏰ That hint cost the last of your time.");
+        return shown;
+    }
+
+    private static void BeginAiHint(EscapeState s, EscapeRoom room, BeginEscapeHint c)
+    {
+        if (!s.Ai.Hints) throw new GameRuleException("This party doesn't use AI hints.");
+        var index = Hint(s, room, c.Now, c.SeatId, c.PuzzleId);
+        if (s.Phase == EscapePhase.Playing) s.AiHints.Add(new AiHint { Id = c.HintId, PuzzleId = c.PuzzleId, Index = index, At = c.Now });
+    }
+
+    /// <summary>
+    /// The engine checks the AI's hint itself, against the answers of the puzzle set being played:
+    /// a hint that gives the answer away is dropped, and the room's written hint shows instead.
+    /// </summary>
+    private static void CompleteAiHint(EscapeState s, EscapeRoom room, CompleteEscapeHint c)
+    {
+        var hint = s.AiHints.First(h => h.Id == c.HintId);
+        var puzzle = room.FindPuzzle(hint.PuzzleId)!;
+        if (EscapeHintGuard.Rejects(c.Text, puzzle)) s.AiHints.Remove(hint);
+        else hint.Text = c.Text.Trim();
     }
 
     /// <summary>The checks every attempt shares: the game is on, the person is playing, the puzzle is open and its items are in hand.</summary>
@@ -157,27 +236,53 @@ public static class EscapeEngine
         s.Inventory.RemoveAll(puzzle.Requires.Contains); // used up: the key stays in its lock
         s.Inventory.AddRange(puzzle.Rewards.Where(r => !s.Inventory.Contains(r)));
         s.LockedUntil.Remove(puzzle.Id);
+        s.WrongStreak = 0;
         Log(s, now, $"✓ {by} solved {puzzle.Title}.");
 
+        // One cue per moment: opening a stage or escaping says more than the solve that caused it.
         var stage = room.Stages[s.StageIndex];
-        if (!stage.Puzzles.All(s.IsSolved)) return;
+        if (!stage.Puzzles.All(s.IsSolved))
+        {
+            Cue(s, CueKind.Solved, now, puzzle.Title, by);
+            return;
+        }
         if (s.StageIndex + 1 < room.Stages.Count)
         {
             s.StageIndex++;
             Log(s, now, $"🚪 {room.Stages[s.StageIndex].Title}");
+            Cue(s, CueKind.StageOpened, now, puzzle.Title, by, room.Stages[s.StageIndex].Title);
         }
         else
         {
-            End(s, EscapePhase.Escaped, now, "🏁 You escaped!");
+            End(s, EscapePhase.Escaped, now, "🏁 You escaped!", puzzle.Title, by);
         }
     }
 
-    private static void End(EscapeState s, EscapePhase phase, DateTimeOffset at, string message)
+    private static void End(EscapeState s, EscapePhase phase, DateTimeOffset at, string message, string? puzzle = null, string? by = null)
     {
         s.Phase = phase;
         s.EndedAt = at;
         s.LockedUntil.Clear();
+        // Hints still being written can't be shown any more: drop them rather than leave them "on their way".
+        s.AiHints.RemoveAll(h => h.Text is null);
         Log(s, at, message);
+        Cue(s, phase == EscapePhase.Escaped ? CueKind.Escaped : CueKind.Failed, at, puzzle, by);
+    }
+
+    /// <summary>Records a moment for the game master, when it's on. The engine only notes it; the AI writes the line later.</summary>
+    private static void Cue(EscapeState s, CueKind kind, DateTimeOffset at, string? puzzle = null, string? by = null, string? stage = null)
+    {
+        if (!s.Ai.GameMaster) return;
+        s.Cues.Add(new EscapeCue { Id = s.NextCueId++, Kind = kind, At = at, PuzzleTitle = puzzle, PlayerName = by, StageTitle = stage });
+        if (s.Cues.Count > CueLength) s.Cues.RemoveRange(0, s.Cues.Count - CueLength);
+    }
+
+    private static EscapeCue? FindCue(EscapeState s, int id) => s.Cues.FirstOrDefault(c => c.Id == id);
+
+    private static string Cut(string text)
+    {
+        var t = text.Trim();
+        return t.Length <= MaxAiText ? t : t[..MaxAiText].TrimEnd() + "…";
     }
 
     private static EscapePlayer RequirePlayer(EscapeState s, Guid seatId) =>

@@ -12,6 +12,11 @@
   "intro": "Hello. You don't know me, but I know all of you. You have wasted every hour you were given, so tonight I will teach you what an hour is worth. You are chained in my workshop. Everything you need to leave is in this room: keys, tools, and each other. Nobody escapes alone. You have forty-five minutes. Let the game begin.",
   "escapedText": "The steel door groans open and cold night air floods the stairwell. Behind you, the cassette clicks one last time: 'Congratulations. Remember what your time is worth.' You're out. Together.",
   "failedText": "The clock on the wall stops. The lights go out, one by one, and the tape recorder starts to laugh. You'll have to try again.",
+  "gameMaster": {
+    "name": "The Tinkerer",
+    "persona": "Speaks through a crackling cassette recorder: calm, precise, coldly polite, never shouts. Sees wasted time as the real crime and treats the room as a lesson. Dry, unsettling approval when the group does well; quiet disappointment when they flounder.",
+    "voice": { "accent": "en-US", "pitch": 0.7, "rate": 0.85, "style": "low, slow, measured" }
+  },
   "stages": [
     {
       "id": "chains",

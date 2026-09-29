@@ -585,6 +585,8 @@ export interface EscapeRoomSummary {
   hintPenaltySeconds: number
   /** The best escape so far: seconds taken plus the time its hints cost. Null until someone escapes. */
   bestScore: number | null
+  /** Who plays the AI game master in this room. */
+  gameMaster: string
 }
 
 /** Which puzzles a new escape party plays. */
@@ -631,6 +633,8 @@ export interface EscapePuzzleView {
   /** Only the hints already paid for */
   hints: string[]
   hintsLeft: number
+  /** The game master is writing the hint just paid for */
+  hintPending: boolean
   /** A wrong answer locks the puzzle for a few seconds */
   lockedUntil: string | null
   /** How many phones hold a piece of this puzzle */
@@ -682,6 +686,28 @@ export interface EscapeStageView {
   daily: boolean
   /** Which puzzle set was played, only once the game is over */
   puzzleSet: number | null
+  /** The AI game master, or null when this party plays without one */
+  gameMaster: EscapeGameMasterView | null
+  /** The game master's latest lines, newest last */
+  narration: EscapeNarrationView[]
+}
+
+export interface EscapeGameMasterView {
+  name: string
+  voice: VoiceProfile
+  /** It reacts out loud to what the group does */
+  narrates: boolean
+  /** Its hints are written for where the group is stuck */
+  writesHints: boolean
+  /** Lines come with a recording (otherwise the browser reads them) */
+  voiced: boolean
+}
+
+export interface EscapeNarrationView {
+  id: number
+  text: string
+  audioUrl: string | null
+  at: string
 }
 
 export interface EscapePieceView {

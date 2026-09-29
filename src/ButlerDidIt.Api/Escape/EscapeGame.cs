@@ -33,10 +33,10 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
 /// <summary>What the create-party page shows for each room, with the best escape so far (score in seconds, or null).</summary>
 public sealed record EscapeRoomSummary(
     string Id, string Title, string Synopsis, ButlerDidIt.Game.Scenarios.ContentRating ContentRating, string Theme,
-    int MinPlayers, int MaxPlayers, int TimeLimitMinutes, int StageCount, int PuzzleCount, int HintPenaltySeconds, int? BestScore)
+    int MinPlayers, int MaxPlayers, int TimeLimitMinutes, int StageCount, int PuzzleCount, int HintPenaltySeconds, int? BestScore, string GameMaster)
 {
     public static EscapeRoomSummary For(EscapeRoom r, int? bestScore) =>
-        new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, r.Stages.Count, r.Puzzles.Count, r.HintPenaltySeconds, bestScore);
+        new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, r.Stages.Count, r.Puzzles.Count, r.HintPenaltySeconds, bestScore, r.Host.Name);
 }
 
 /// <summary>Escape rooms as a game module: the escape engine behind the platform's interface.</summary>
@@ -143,13 +143,23 @@ public static class PuzzleSets
 /// <summary>Runs escape commands through the platform's <see cref="PartyRuntime"/>, refusing parties of another kind.</summary>
 public sealed class EscapeService(PartyRuntime runtime)
 {
-    public async Task<EscapeSession> ExecuteAsync(Guid partyId, Func<EscapeSession, DateTimeOffset, EscapeCommand> command, CancellationToken ct = default)
+    public DateTimeOffset Now => runtime.Now;
+
+    public async Task<EscapeSession> ExecuteAsync(Guid partyId, Func<EscapeSession, DateTimeOffset, EscapeCommand> command, CancellationToken ct = default) =>
+        (await RunAsync(partyId, command, ct)).Session;
+
+    /// <summary>Like <see cref="ExecuteAsync"/>, also returning the party row (for its host, when an AI call is billed).</summary>
+    public async Task<(Party Party, EscapeSession Session)> RunAsync(Guid partyId, Func<EscapeSession, DateTimeOffset, EscapeCommand> command, CancellationToken ct = default)
     {
-        var (_, session) = await runtime.ExecuteAsync(partyId, (s, now) =>
-        {
-            var escape = s as EscapeSession ?? throw new GameRuleException("That isn't part of this party's game.");
-            return escape.Apply(command(escape, now));
-        }, ct: ct);
-        return (EscapeSession)session;
+        var (party, session) = await runtime.ExecuteAsync(partyId, (s, now) => Escape(s).Apply(command(Escape(s), now)), ct: ct);
+        return (party, (EscapeSession)session);
     }
+
+    public async Task<(Party Party, EscapeSession Session)> LoadAsync(Guid partyId, CancellationToken ct = default)
+    {
+        var (party, session) = await runtime.LoadAsync(partyId, ct);
+        return (party, Escape(session));
+    }
+
+    private static EscapeSession Escape(GameSession s) => s as EscapeSession ?? throw new GameRuleException("That isn't part of this party's game.");
 }
