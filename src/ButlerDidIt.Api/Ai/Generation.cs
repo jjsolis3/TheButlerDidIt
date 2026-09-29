@@ -4,6 +4,7 @@ using ButlerDidIt.Ai.Generation;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
@@ -61,10 +62,10 @@ public static class GenerationEndpoints
 
 /// <summary>
 /// Writes queued mysteries in the background. Generation can take a minute or
-/// more, far longer than a web request should stay open, so the browser polls
-/// the job for progress instead.
+/// more, far longer than a web request should stay open, so the page follows the
+/// job instead: each change sends a "jobs" signal (see <see cref="JobEvents"/>).
 /// </summary>
-public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider clock, ILogger<GenerationWorker> log) : BackgroundService
+public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider clock, JobEvents events, ILogger<GenerationWorker> log) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -131,6 +132,7 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         job.Progress = "Starting…";
         job.UpdatedAt = clock.GetUtcNow();
         await db.SaveChangesAsync(ct);
+        await events.ChangedAsync(job.HostUserId);
 
         if (job.Kind == GenerationKind.Remix)
         {
@@ -144,7 +146,7 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
             var themeRow = await db.Themes.AsNoTracking().FirstAsync(t => t.Slug == job.ThemeSlug, ct);
             var theme = GameJson.Deserialize<ThemeDefinition>(themeRow.Document);
             var generator = scope.ServiceProvider.GetRequiredService<MysteryGenerator>();
-            var progress = new JobProgress(scopes, job.Id, clock);
+            var progress = new JobProgress(scopes, job, clock, events);
 
             var result = await generator.GenerateAsync(
                 new GenerationRequest(theme, req.Players, req.ContentRating, req.Length, req.Twist),
@@ -179,6 +181,7 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         // EF only writes the columns we changed, so progress updates made meanwhile
         // (via ExecuteUpdate) don't conflict; the final message simply replaces them.
         await db.SaveChangesAsync(ct);
+        await events.ChangedAsync(job.HostUserId);
     }
 
     /// <summary>
@@ -195,7 +198,7 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
             var original = await catalog.GetBaseScenarioAsync(db, job.SourceScenarioId!, ct);
             var variant = "ai" + Guid.NewGuid().ToString("N")[..6];
             var result = await sp.GetRequiredService<VersionRemixer>().RemixAsync(original, job.TargetCharacterId!, variant,
-                new AiCallContext(job.HostUserId, job.PartyId, JobId: job.Id), new JobProgress(scopes, job.Id, clock), ct);
+                new AiCallContext(job.HostUserId, job.PartyId, JobId: job.Id), new JobProgress(scopes, job, clock, events), ct);
 
             var s = result.Scenario;
             db.Scenarios.Add(new ScenarioEntity
@@ -220,6 +223,7 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         }
         job.UpdatedAt = clock.GetUtcNow();
         await db.SaveChangesAsync(ct);
+        await events.ChangedAsync(job.HostUserId);
 
         if (job.PartyId is not { } partyId) return;
         if (versionId is null)
@@ -238,8 +242,11 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         }
     }
 
-    private sealed class JobProgress(IServiceScopeFactory scopes, Guid jobId, TimeProvider clock) : IProgress<string>
+    private sealed class JobProgress(IServiceScopeFactory scopes, GenerationJobEntity job, TimeProvider clock, JobEvents events) : IProgress<string>
     {
+        private readonly Guid _jobId = job.Id;
+        private readonly string _hostUserId = job.HostUserId;
+
         public void Report(string value)
         {
             // Fire-and-forget: progress text is cosmetic and must never slow down generation.
@@ -247,8 +254,9 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
             {
                 using var scope = scopes.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                await db.GenerationJobs.Where(j => j.Id == jobId && j.Status == GenerationStatus.Running)
+                await db.GenerationJobs.Where(j => j.Id == _jobId && j.Status == GenerationStatus.Running)
                     .ExecuteUpdateAsync(u => u.SetProperty(j => j.Progress, value).SetProperty(j => j.UpdatedAt, clock.GetUtcNow()));
+                await events.ChangedAsync(_hostUserId);
             });
         }
     }

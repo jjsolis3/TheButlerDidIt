@@ -4,6 +4,7 @@ using ButlerDidIt.Ai;
 using ButlerDidIt.Ai.Media;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
@@ -135,7 +136,7 @@ public sealed record MediaJobView(Guid Id, MediaJobStatus Status, int Total, int
 /// narration, every NPC line, every portrait and scene. Results are shared by
 /// every party that plays the same scenario.
 /// </summary>
-public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock, ILogger<MediaWorker> log) : BackgroundService
+public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock, JobEvents events, ILogger<MediaWorker> log) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -191,6 +192,7 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         job.Failed = 0;
         job.UpdatedAt = clock.GetUtcNow();
         await db.SaveChangesAsync(ct);
+        await events.ChangedAsync(job.HostUserId);
 
         var context = new AiCallContext(job.HostUserId, JobId: job.Id, Purpose: "media");
         foreach (var item in plan)
@@ -217,11 +219,13 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
             }
             job.UpdatedAt = clock.GetUtcNow();
             await db.SaveChangesAsync(ct);
+            await events.ChangedAsync(job.HostUserId);
         }
 
         job.Status = job.Done == 0 && job.Total > 0 ? MediaJobStatus.Failed : MediaJobStatus.Succeeded;
         job.UpdatedAt = clock.GetUtcNow();
         await db.SaveChangesAsync(ct);
+        await events.ChangedAsync(job.HostUserId);
 
         // New art and voices: refresh every screen of every party using this scenario.
         catalog.Invalidate(job.ScenarioId);

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using ButlerDidIt.Game;
 using Microsoft.Extensions.AI;
@@ -25,7 +26,11 @@ public sealed class AiGateway(
     public async Task<bool> IsConfiguredAsync(AiRole role, CancellationToken ct = default) =>
         await settings.GetRoleAsync(role, ct) is not null;
 
-    /// <summary>Asks the model and returns its reply as text.</summary>
+    /// <summary>
+    /// Asks the model and returns its reply as text. <paramref name="onText"/>, when given,
+    /// is called with the reply so far each time more of it arrives, so a screen can show
+    /// the answer being "typed". A failing callback never breaks the call.
+    /// </summary>
     public async Task<string> CompleteAsync(
         AiRole role,
         string systemPrompt,
@@ -33,7 +38,8 @@ public sealed class AiGateway(
         AiCallContext context,
         int maxOutputTokens = 1024,
         bool jsonOutput = false,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        Func<string, Task>? onText = null)
     {
         var config = await settings.GetRoleAsync(role, ct)
             ?? throw new AiUnavailableException($"No AI is set up for the {role} role yet. An admin can configure it under Admin → AI.");
@@ -46,7 +52,9 @@ public sealed class AiGateway(
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            var response = await client.GetStreamingResponseAsync(messages, options, ct).ToChatResponseAsync(ct);
+            var response = onText is null
+                ? await client.GetStreamingResponseAsync(messages, options, ct).ToChatResponseAsync(ct)
+                : await StreamAsync(client, messages, options, onText, ct);
             await RecordAsync(config, context, response.Usage, stopwatch, success: true, error: null, ct);
 
             var text = response.Text.Trim();
@@ -72,6 +80,29 @@ public sealed class AiGateway(
     {
         var text = await CompleteAsync(role, systemPrompt, conversation, context, maxOutputTokens, jsonOutput: true, ct);
         return JsonExtraction.Parse<T>(text);
+    }
+
+    /// <summary>Collects the streamed updates into one response, reporting the text so far after each piece.</summary>
+    private async Task<ChatResponse> StreamAsync(IChatClient client, List<ChatMessage> messages, ChatOptions options, Func<string, Task> onText, CancellationToken ct)
+    {
+        List<ChatResponseUpdate> updates = [];
+        var text = new StringBuilder();
+        await foreach (var update in client.GetStreamingResponseAsync(messages, options, ct))
+        {
+            updates.Add(update);
+            if (string.IsNullOrEmpty(update.Text)) continue;
+            text.Append(update.Text);
+            try
+            {
+                await onText(text.ToString());
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // Showing progress is cosmetic: the full answer still arrives at the end.
+                log.LogDebug(ex, "Progress callback failed");
+            }
+        }
+        return updates.ToChatResponse();
     }
 
     private static ChatOptions BuildOptions(AiRoleSettings config, int maxOutputTokens, bool jsonOutput)

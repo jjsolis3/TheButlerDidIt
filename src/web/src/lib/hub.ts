@@ -1,6 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr'
-import type { PlayerView, StageView } from './types'
+import type { NpcTypingEvent, PlayerView, StageView } from './types'
+
+/** NPC answers still being written, from `useParty().typing`. Screens provide it once at the top. */
+export const NpcTypingContext = createContext<Record<string, string>>({})
+
+/** What to show for an interrogation: the answer, or the part the AI has written so far. */
+export function useNpcAnswer(i: { id: string; answer: string | null }): { text: string | null; typing: boolean } {
+  const partial = useContext(NpcTypingContext)[i.id]
+  if (i.answer) return { text: i.answer, typing: false }
+  return { text: partial ?? null, typing: partial !== undefined }
+}
 
 export type ConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'offline'
 
@@ -14,6 +24,29 @@ interface Options {
   joinSeat?: boolean
   /** Called when the host removes this seat. */
   onRemoved?: () => void
+}
+
+/**
+ * For a host page following a background job (a mystery being written, voices and pictures
+ * being made): returns a number that goes up whenever the server says one of the host's jobs
+ * changed, so the page can re-fetch at once. It connects only while `enabled`.
+ * The signal carries no data; the page still fetches the job through the normal endpoint.
+ */
+export function useJobUpdates(enabled: boolean): number {
+  const [tick, setTick] = useState(0)
+  useEffect(() => {
+    if (!enabled) return
+    const conn = new HubConnectionBuilder().withUrl('/hubs/party').withAutomaticReconnect().configureLogging(LogLevel.Warning).build()
+    const bump = () => setTick((t) => t + 1)
+    // Subscribing counts as a change too: anything that happened before we were listening is caught up.
+    const watch = () => conn.invoke('WatchMyJobs').then(bump, () => {})
+    conn.on('jobs', bump)
+    conn.onreconnected(() => void watch())
+    // If the connection fails, the page's slow fallback poll still gets there.
+    conn.start().then(watch, () => {})
+    return () => void conn.stop()
+  }, [enabled])
+  return tick
 }
 
 /** Strips SignalR's "An unexpected error occurred invoking… HubException:" prefix. */
@@ -37,6 +70,9 @@ export function useParty({ code, token, watchStage = false, joinSeat = false, on
   const [player, setPlayer] = useState<PlayerView | null>(null)
   const [status, setStatus] = useState<ConnectionStatus>('connecting')
   const [fatal, setFatal] = useState<string | null>(null)
+  // NPC answers the AI is still writing, by interrogation id. Screens show `answer ?? typing[id]`,
+  // so a finished answer always wins and a piece arriving after it is simply ignored.
+  const [typing, setTyping] = useState<Record<string, string>>({})
   const connRef = useRef<HubConnection | null>(null)
   const onRemovedRef = useRef(onRemoved)
   useEffect(() => {
@@ -61,6 +97,10 @@ export function useParty({ code, token, watchStage = false, joinSeat = false, on
     conn.on('stage', acceptStage)
     conn.on('player', acceptPlayer)
     conn.on('removed', () => onRemovedRef.current?.())
+    // Pieces can arrive out of order; the text only ever grows, so keep the longer one.
+    conn.on('npcTyping', (e: NpcTypingEvent) =>
+      setTyping((prev) => ((prev[e.interrogationId]?.length ?? 0) >= e.text.length ? prev : { ...prev, [e.interrogationId]: e.text })),
+    )
 
     const subscribe = async () => {
       try {
@@ -117,5 +157,5 @@ export function useParty({ code, token, watchStage = false, joinSeat = false, on
     }
   }, [])
 
-  return { stage, player, status, fatal, invoke }
+  return { stage, player, status, fatal, invoke, typing }
 }

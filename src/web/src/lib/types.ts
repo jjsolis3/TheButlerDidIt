@@ -204,6 +204,13 @@ export interface AiFeatures {
   voices: boolean
 }
 
+/** Pushed while an NPC's answer is still being written (the "npcTyping" hub event). */
+export interface NpcTypingEvent {
+  interrogationId: string
+  /** The answer so far */
+  text: string
+}
+
 export interface InterrogationView {
   id: string
   act: number

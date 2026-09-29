@@ -25,6 +25,25 @@ public class GatewayTests
     }
 
     [Fact]
+    public async Task Streamed_text_is_reported_as_it_grows_and_a_failing_callback_does_not_break_the_call()
+    {
+        var ai = new TestAi();
+        var seen = new List<string>();
+        var reply = await ai.Gateway().CompleteAsync(AiRole.Inspector, $"TASK: {InspectorPrompts.HintTask}", [new ChatMessage(ChatRole.User, "hint?")], TestAi.Context,
+            onText: text =>
+            {
+                seen.Add(text);
+                if (seen.Count == 2) throw new InvalidOperationException("the screen went away");
+                return Task.CompletedTask;
+            });
+
+        Assert.True(seen.Count > 2, "one report per streamed piece");
+        Assert.All(seen.Zip(seen.Skip(1)), pair => Assert.StartsWith(pair.First, pair.Second));
+        Assert.Equal(reply, seen[^1].Trim());
+        Assert.Equal(1000, Assert.Single(ai.Usage).InputTokens); // usage survives streaming
+    }
+
+    [Fact]
     public async Task Budget_is_checked_before_calling()
     {
         var ai = new TestAi { OverBudget = true };
