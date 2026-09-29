@@ -1,0 +1,230 @@
+{
+  "id": "the-bunker",
+  "title": "The Bunker",
+  "synopsis": "The siren woke you. Now the hatch above is sealed, the air smells of rust and dust, and a clipped voice on the intercom calls this a survival exercise. The Overseer is watching every camera, and he grades on the clock.",
+  "contentRating": "mature",
+  "theme": "bunker",
+  "artStyle": "Cold War fallout shelter, raw concrete walls, flickering emergency lights, green-grey tones, film grain",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45, 60],
+  "hintPenaltySeconds": 120,
+  "soundscape": "drone",
+  "intro": "Attention. This is the Overseer. You have been selected for a survival exercise. The surface hatch is sealed. The only way out is the blast door at the far end of this bunker, and it opens only for a team that works like one. Every camera is on you. Every mistake is logged. The exercise begins now.",
+  "escapedText": "The blast door groans open and grey dawn floods the stairwell. The intercom crackles one last time: 'Exercise complete. You survived. Barely.' You climb into the cold air, together.",
+  "failedText": "A klaxon sounds and the lights drop to emergency red. 'Exercise failed,' says the Overseer. 'Resetting the bunker. Again, recruits.'",
+  "gameMaster": {
+    "name": "The Overseer",
+    "persona": "A clipped, emotionless military voice on the bunker's intercom. Treats everything as a drill: logs every mistake, grades every solve, and calls the group 'recruits'. Never threatens directly; the cold politeness does the work.",
+    "voice": { "accent": "en-US", "pitch": 0.75, "rate": 0.95, "style": "clipped, flat, military" }
+  },
+  "stages": [
+    {
+      "id": "decon",
+      "title": "The Decontamination Room",
+      "description": "Tiled walls, a row of shower heads and a drain in the floor. Gas masks hang on hooks, a steel locker stands by the door, and a panel beside the showers blinks, waiting for a password.",
+      "puzzles": ["shower-panel", "mask-locker", "decon-door"]
+    },
+    {
+      "id": "bunks",
+      "soundscape": "workshop",
+      "title": "The Bunks and the Mess",
+      "description": "Narrow bunks line the walls, each with a footlocker at its foot. In the mess, a stopped clock hangs over a long table, a ration crate sits padlocked in the corner, and a hatch leads deeper in.",
+      "puzzles": ["ration-crate", "footlocker", "mess-hatch"]
+    },
+    {
+      "id": "command",
+      "soundscape": "space",
+      "title": "The Command Room",
+      "description": "Banks of switches and dead screens. A radio hisses with static, and at the far end the great blast door waits, with a keyhole and a three-digit keypad.",
+      "puzzles": ["radio", "blast-door"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "shower-panel",
+      "title": "The Shower Panel",
+      "kind": "text",
+      "prompt": "The panel wants a password. The intercom clicks: 'I speak without a mouth and hear without ears. Down here, I am the only one who answers you. Identify me, recruits.'",
+      "answers": ["echo", "an echo", "echoes"],
+      "rewards": ["locker-key"],
+      "hints": [
+        "Shout down the corridor and listen.",
+        "It's your own voice, coming back off the concrete."
+      ],
+      "solvedText": "The panel beeps and the showers sputter on for a second. When they stop, a small key is lying in the drain grate.",
+      "variants": [
+        {},
+        {
+          "prompt": "The panel wants a password. The intercom clicks: 'I can be broken without ever being held, and I was made to you the moment you arrived. Identify me, recruits.'",
+          "answers": ["promise", "a promise"],
+          "hints": [
+            "The Overseer said he'd let you out if you worked together. What was that?",
+            "You make one, you keep one, you break one."
+          ]
+        },
+        {
+          "prompt": "The panel wants a password. The intercom clicks: 'I have a bed but never sleep, and a mouth but never eat. I run far above your heads. Identify me, recruits.'",
+          "answers": ["river", "a river"],
+          "hints": [
+            "Think about the water flowing outside, far above the bunker.",
+            "It runs down to the sea."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mask-locker",
+      "minMinutes": 45,
+      "title": "The Steel Locker",
+      "kind": "code",
+      "prompt": "The steel locker by the door has a 3-digit dial. Each of you took a gas mask from the hooks, and something is stencilled inside each one.",
+      "hints": [
+        "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The locker swings open. Inside: a clipboard with your names on it, each one already ticked off. 'Punctual,' says the intercom. 'Good.'",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Stencilled inside your gas mask: the {ordinal} digit is {fact}."
+      }
+    },
+    {
+      "id": "decon-door",
+      "title": "The Decontamination Door",
+      "kind": "use",
+      "prompt": "A heavy door with a small, old-fashioned keyhole leads out of decontamination. A sign above it: DO NOT PROCEED UNTIL CLEAN.",
+      "requires": ["locker-key"],
+      "hints": [
+        "Something turned up in the drain.",
+        "Use the small key on the decontamination door."
+      ],
+      "solvedText": "The door unseals with a hiss of stale air. Beyond it: rows of bunks, and the smell of old canned food."
+    },
+    {
+      "id": "ration-crate",
+      "title": "The Ration Crate",
+      "kind": "code",
+      "prompt": "The ration crate has a 3-digit padlock. Stamped on the lid: '{order}. All rations are counted.'",
+      "rewards": ["access-badge"],
+      "hints": [
+        "Each phone saw one colour of ration tin, and how many of them there were.",
+        "Read them in the order stamped on the lid: {order}."
+      ],
+      "solvedText": "The padlock snaps open. Under the tins, in a plastic sleeve: an access badge with a faded photo and the word COMMAND.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": ["green", "grey", "brown", "black", "white", "red"],
+        "pieceTemplate": "You counted the {color} ration tins on your shelf: there were {digit}."
+      }
+    },
+    {
+      "id": "footlocker",
+      "minMinutes": 60,
+      "title": "The Footlocker",
+      "kind": "text",
+      "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I have a neck but no head, and two arms but no hands.'",
+      "answers": ["shirt", "a shirt", "jacket", "a jacket"],
+      "hints": [
+        "Look at the uniforms hanging off the bunks.",
+        "You wear it on the top half of your body."
+      ],
+      "solvedText": "Inside, folded neatly: a recruit's uniform, and a photo of your group arriving last night, taken from a camera you never saw.",
+      "variants": [
+        {},
+        {
+          "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I can travel all around the world while staying in one corner.'",
+          "answers": ["stamp", "a stamp", "postage stamp"],
+          "hints": [
+            "Look at the old letters pinned above the bunks.",
+            "It goes in the corner of an envelope."
+          ]
+        },
+        {
+          "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I am full of words, but I have never said one.'",
+          "answers": ["book", "a book", "books"],
+          "hints": [
+            "Check the shelf above the bunks.",
+            "You read it, page by page."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mess-hatch",
+      "title": "The Mess Hatch",
+      "kind": "use",
+      "prompt": "The hatch leading deeper into the bunker has a badge reader, blinking red. Stencilled beside it: COMMAND STAFF ONLY.",
+      "requires": ["access-badge"],
+      "rewards": ["launch-key"],
+      "hints": [
+        "You found something with the word COMMAND on it.",
+        "Use the access badge on the hatch's reader."
+      ],
+      "solvedText": "The reader turns green and the hatch swings down. Hanging just inside, on a chain: a heavy steel key labelled BLAST DOOR."
+    },
+    {
+      "id": "radio",
+      "minMinutes": 45,
+      "title": "The Command Radio",
+      "kind": "text",
+      "prompt": "The radio is wired to the blast door's second lock. A card is taped to it: 'Read back the Overseer's three code words, first to last.'",
+      "hints": [
+        "Three phones each caught one code word in the radio static.",
+        "Say them in order, first to last, like: word word word."
+      ],
+      "solvedText": "The static clears. '{answer},' the Overseer repeats. 'Confirmed. You were listening, recruits.' One lock on the blast door releases.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": ["falcon", "harbour", "anvil", "glacier", "beacon", "thunder", "meridian", "citadel", "orbit", "granite", "sentinel", "tundra"],
+        "pieceTemplate": "You caught it through the radio static: the {ordinal} code word was '{word}'."
+      }
+    },
+    {
+      "id": "blast-door",
+      "title": "The Blast Door",
+      "kind": "code",
+      "prompt": "The blast door takes the steel key AND a 3-digit code. On the only working screen: 'Your bunk number, then the hour the mess clock stopped, then how many gas masks hung by the showers.'",
+      "answers": ["628"],
+      "requires": ["launch-key"],
+      "pieces": [
+        "You remember the number painted on your bunk: 6.",
+        "You remember the mess clock: it stopped at 2 o'clock.",
+        "You remember the hooks by the showers: 8 gas masks."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on the screen.",
+        "The bunk, then the clock, then the gas masks."
+      ],
+      "solvedText": "The key turns, the keypad flashes green, and somewhere above you, machinery starts to grind.",
+      "variants": [
+        {},
+        {
+          "answers": ["413"],
+          "pieces": [
+            "You remember the number painted on your bunk: 4.",
+            "You remember the mess clock: it stopped at 1 o'clock.",
+            "You remember the hooks by the showers: 3 gas masks."
+          ]
+        },
+        {
+          "answers": ["957"],
+          "pieces": [
+            "You remember the number painted on your bunk: 9.",
+            "You remember the mess clock: it stopped at 5 o'clock.",
+            "You remember the hooks by the showers: 7 gas masks."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    { "id": "locker-key", "name": "Small key", "description": "Wet from the drain. Too small for any door you've seen." },
+    { "id": "access-badge", "name": "Access badge", "description": "A faded photo and one word: COMMAND." },
+    { "id": "launch-key", "name": "Steel key", "description": "Heavy, on a chain. The tag reads BLAST DOOR." }
+  ]
+}

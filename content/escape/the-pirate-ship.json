@@ -1,0 +1,229 @@
+{
+  "id": "the-pirate-ship",
+  "title": "The Pirate Ship",
+  "synopsis": "You sneaked aboard the Jolly Sardine for a peek at the treasure, and now the ship has set sail! Captain Salty Sal has hidden the gangplank key, and she'll only let stowaways go ashore if they can solve her puzzles before the tide turns.",
+  "contentRating": "family",
+  "theme": "pirate",
+  "artStyle": "friendly pirate ship on a sunny sea, colourful flags, treasure chests and cheerful seagulls, storybook cartoon style",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45, 60],
+  "hintPenaltySeconds": 90,
+  "soundscape": "sea",
+  "intro": "Ahoy, stowaways! Captain Salty Sal here, and this is MY ship. You want to go ashore? Then earn it, me hearties! Every hatch is locked, every chest is sealed, and the gangplank key is hidden. Work together like a proper crew, and be quick about it before the tide turns. Yo ho!",
+  "escapedText": "The gangplank thumps down onto the sandy beach. Captain Sal tips her hat: 'Best crew I ever had! Come back any time, landlubbers!' You're ashore!",
+  "failedText": "The tide turns and the Jolly Sardine sails back out to sea. Captain Sal laughs: 'Looks like you're swabbing the decks till morning! Try again, crew!'",
+  "gameMaster": {
+    "name": "Captain Salty Sal",
+    "persona": "A jolly, booming pirate captain who loves riddles, treasure and terrible sea puns. Teases the crew when they're stuck and roars with delight when they solve something. Never scary: all bark and no bite.",
+    "voice": { "accent": "en-GB", "pitch": 1.05, "rate": 1.0, "style": "booming, jolly, piratey" }
+  },
+  "stages": [
+    {
+      "id": "galley",
+      "soundscape": "workshop",
+      "title": "The Galley",
+      "description": "Pots and pans swing from hooks, barrels of apples are stacked by the stove, and hammocks sway in the corner. The hatch up to the captain's cabin is padlocked, and the cook's spice chest has a lock of its own.",
+      "puzzles": ["apple-barrel", "spice-chest", "galley-hatch"]
+    },
+    {
+      "id": "cabin",
+      "title": "The Captain's Cabin",
+      "description": "Charts and letters cover the walls, a treasure chest sits under the round portholes, the captain's desk is piled with odds and ends, and a big wooden ship's wheel stands by the window, locked in place.",
+      "puzzles": ["treasure-chest", "captains-desk", "ships-wheel"]
+    },
+    {
+      "id": "deck",
+      "title": "The Deck",
+      "description": "Sea spray and sunshine! Flags flap from the mast, seagulls squawk overhead, and the gangplank is pulled up tight, with a lock and a three-digit keypad.",
+      "puzzles": ["flag-locker", "gangplank"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "apple-barrel",
+      "title": "The Riddle Barrel",
+      "kind": "text",
+      "prompt": "One barrel has a word lock, and the cook has carved a riddle into the lid: 'I have lots of eyes but I can't see a thing. What am I?'",
+      "answers": ["potato", "a potato", "potatoes"],
+      "rewards": ["galley-key"],
+      "hints": [
+        "Look in the cook's vegetable sack.",
+        "You can mash it, roast it, or make chips from it."
+      ],
+      "solvedText": "The lid pops open. Under the apples: a big iron key with a little anchor on it!",
+      "variants": [
+        {},
+        {
+          "prompt": "One barrel has a word lock, and the cook has carved a riddle into the lid: 'I have a head and a foot, but no body at all, and you climb into me when night starts to fall.'",
+          "answers": ["bed", "a bed", "hammock", "a hammock"],
+          "hints": [
+            "Where do pirates sleep?",
+            "You sleep in it every night."
+          ]
+        },
+        {
+          "prompt": "One barrel has a word lock, and the cook has carved a riddle into the lid: 'I'm full of teeth but I never bite, I keep your hair looking just right.'",
+          "answers": ["comb", "a comb", "brush", "hairbrush"],
+          "hints": [
+            "Think about what the captain uses before she puts her hat on.",
+            "You pull it through your hair."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spice-chest",
+      "minMinutes": 45,
+      "title": "The Spice Chest",
+      "kind": "code",
+      "prompt": "The cook's spice chest has a 3-digit lock. Each of you grabbed a different recipe card from the wall.",
+      "hints": [
+        "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The chest opens with a sneeze of pepper. Aaa-CHOO! Inside is the cook's secret recipe for sea biscuits. Yum!",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Scrawled on your recipe card: the {ordinal} digit is {fact}."
+      }
+    },
+    {
+      "id": "galley-hatch",
+      "title": "The Galley Hatch",
+      "kind": "use",
+      "prompt": "The hatch up to the captain's cabin has a big padlock with an anchor carved on it.",
+      "requires": ["galley-key"],
+      "hints": [
+        "Something with an anchor on it came out of a barrel.",
+        "Use the iron key on the galley hatch."
+      ],
+      "solvedText": "Clunk! The padlock falls off and you climb up the ladder into the captain's cabin."
+    },
+    {
+      "id": "treasure-chest",
+      "title": "The Treasure Chest",
+      "kind": "code",
+      "prompt": "The captain's treasure chest has a 3-digit lock. Carved on it: '{order}, or no treasure for you!'",
+      "rewards": ["compass"],
+      "hints": [
+        "Each phone found one colour of gem, and how many there were.",
+        "Read them in the order carved on the chest: {order}."
+      ],
+      "solvedText": "The chest creaks open and gold coins spill everywhere! On top of the pile sits a shiny brass compass.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": ["red", "blue", "green", "purple", "yellow", "white"],
+        "pieceTemplate": "You counted the {color} gems in your pouch: there were {digit} of them."
+      }
+    },
+    {
+      "id": "captains-desk",
+      "minMinutes": 60,
+      "title": "The Captain's Desk",
+      "kind": "text",
+      "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I start with T, I end with T, and I'm full of T.'",
+      "answers": ["teapot", "a teapot"],
+      "hints": [
+        "Look at the captain's breakfast tray.",
+        "You pour tea out of it."
+      ],
+      "solvedText": "The drawer slides open. Inside: a drawing of the whole crew, and you're in it! Captain Sal must have drawn you when you came aboard.",
+      "variants": [
+        {},
+        {
+          "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I'm full of holes, but I still hold water.'",
+          "answers": ["sponge", "a sponge"],
+          "hints": [
+            "Think about scrubbing the deck.",
+            "It soaks up water when you squeeze it."
+          ]
+        },
+        {
+          "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I begin with E, I end with E, and I usually hold just one letter.'",
+          "answers": ["envelope", "an envelope"],
+          "hints": [
+            "Look at the captain's post.",
+            "You put a letter inside it before you send it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ships-wheel",
+      "title": "The Ship's Wheel",
+      "kind": "use",
+      "prompt": "The ship's wheel is locked in place. A brass plate on it says: 'Only a true navigator may steer. Show me which way is north!'",
+      "requires": ["compass"],
+      "rewards": ["gangplank-key"],
+      "hints": [
+        "You found something that always points north.",
+        "Use the compass on the ship's wheel."
+      ],
+      "solvedText": "The compass needle spins and the wheel unlocks! You turn it, and a secret drawer in the wheel pops out with the gangplank key inside."
+    },
+    {
+      "id": "flag-locker",
+      "minMinutes": 45,
+      "title": "The Flag Locker",
+      "kind": "text",
+      "prompt": "The flag locker is sealed with a word lock. Captain Sal's note: 'Hoist the three flag words, first to last!'",
+      "hints": [
+        "Three phones each remember one flag word the lookout shouted.",
+        "Say them in order, first to last, like: word word word."
+      ],
+      "solvedText": "Up go the flags: '{answer}!' The whole crew cheers, and the seagulls join in.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": ["anchor", "cannon", "parrot", "jewel", "lagoon", "seagull", "lantern", "barrel", "island", "mermaid", "starfish", "dolphin"],
+        "pieceTemplate": "The lookout shouted it from the crow's nest: the {ordinal} flag word was '{word}'."
+      }
+    },
+    {
+      "id": "gangplank",
+      "title": "The Gangplank",
+      "kind": "code",
+      "prompt": "The gangplank needs its key AND a 3-digit code. Captain Sal's note: 'Hammocks in the galley, then portholes in my cabin, then seagulls on the mast!'",
+      "answers": ["685"],
+      "requires": ["gangplank-key"],
+      "pieces": [
+        "You counted the hammocks in the galley: 6.",
+        "You counted the portholes in the captain's cabin: 8.",
+        "You counted the seagulls on the mast: 5."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on Captain Sal's note.",
+        "Hammocks, then portholes, then seagulls."
+      ],
+      "solvedText": "The key turns, the keypad plays a sea shanty, and the gangplank starts to swing down towards the beach.",
+      "variants": [
+        {},
+        {
+          "answers": ["342"],
+          "pieces": [
+            "You counted the hammocks in the galley: 3.",
+            "You counted the portholes in the captain's cabin: 4.",
+            "You counted the seagulls on the mast: 2."
+          ]
+        },
+        {
+          "answers": ["974"],
+          "pieces": [
+            "You counted the hammocks in the galley: 9.",
+            "You counted the portholes in the captain's cabin: 7.",
+            "You counted the seagulls on the mast: 4."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    { "id": "galley-key", "name": "Iron anchor key", "description": "Big and heavy, with a little anchor on the handle." },
+    { "id": "compass", "name": "Brass compass", "description": "Shiny and new. The needle always points north." },
+    { "id": "gangplank-key", "name": "Gangplank key", "description": "Salty and a bit sandy. The tag says: GO ASHORE." }
+  ]
+}

@@ -247,6 +247,9 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Contains("halloween", asylum.Seasons);
         Assert.Equal(asylum.Lengths.Single(l => l.Minutes == 45).PuzzleCount, asylum.PuzzleCount); // the card shows the standard game
         Assert.Contains(rooms, r => r.Id == "the-toy-factory" && r.ContentRating == ButlerDidIt.Game.Scenarios.ContentRating.Family);
+        Assert.Contains(rooms, r => r.Id == "the-bunker" && r.ContentRating == ButlerDidIt.Game.Scenarios.ContentRating.Mature);
+        Assert.Contains(rooms, r => r.Id == "the-wizards-tower" && r.Seasons.Contains("halloween"));
+        Assert.Contains(rooms, r => r.Id == "the-pirate-ship" && r.ContentRating == ButlerDidIt.Game.Scenarios.ContentRating.Family);
     }
 
     [Fact]
