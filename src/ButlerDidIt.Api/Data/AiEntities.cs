@@ -123,6 +123,7 @@ public sealed class GenerationJobEntity
     [MaxLength(300)]
     public string Progress { get; set; } = "";
 
+    /// <summary>The id of what was written: a mystery (or version), or for an escape-room job, the room.</summary>
     [MaxLength(120)]
     public string? ScenarioId { get; set; }
 
@@ -153,5 +154,8 @@ public enum GenerationKind
 {
     Mystery,
     Remix,
+
+    /// <summary>A new escape room from a theme (see EscapeRoomGenerator).</summary>
+    EscapeRoom,
 }
 

@@ -335,3 +335,27 @@ public sealed class EscapeResult
     public DateTimeOffset FinishedAt { get; set; }
 }
 
+
+/// <summary>
+/// An escape room written by AI for one host (see EscapeRoomGenerator). Only that host sees it on
+/// their shelf and can start a party with it; guests of those parties load it like any other room.
+/// Saved only after it passed EscapeRoomValidator, and never changed afterwards.
+/// </summary>
+public sealed class EscapeRoomEntity
+{
+    [Key, MaxLength(120)]
+    public required string Id { get; set; }
+
+    [MaxLength(450)]
+    public required string OwnerUserId { get; set; }
+
+    [MaxLength(200)]
+    public required string Title { get; set; }
+
+    public ButlerDidIt.Game.Scenarios.ContentRating ContentRating { get; set; }
+
+    /// <summary>The room as jsonb, in the same format as content/escape/*.json.</summary>
+    public required string Document { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+}

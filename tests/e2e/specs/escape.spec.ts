@@ -125,3 +125,31 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByRole('region', { name: 'Leaderboard' })).toContainText('Ada, Ben, Cy')
   await tv.screenshot({ path: `${SHOTS}/94-escape-escaped.png` })
 })
+
+test('an escape room written by AI from a theme lands on the host shelf, ready to play', async ({ browser }) => {
+  test.setTimeout(60_000)
+  const tv = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage()
+  await tv.goto('/login')
+  await tv.getByRole('button', { name: 'Create an account' }).click()
+  await tv.getByLabel('Your name').fill('Room Writer')
+  await tv.getByLabel('Email').fill(`writer-${Date.now()}@example.com`)
+  await tv.getByLabel('Password').fill('password123')
+  await tv.getByRole('button', { name: 'Create account' }).click()
+  await tv.waitForURL('**/host/new')
+  await tv.getByRole('tab', { name: /Escape room/ }).click()
+
+  // The (fake) Storyteller writes the room; it's checked and saved before it appears.
+  await tv.getByRole('button', { name: /Write a new escape room with AI/ }).click()
+  await tv.getByLabel('Theme').fill('a haunted lighthouse')
+  await tv.getByRole('button', { name: 'Write my escape room' }).click()
+  await expect(tv.getByText('"The Fake Lighthouse" is ready.')).toBeVisible({ timeout: 30_000 })
+  const card = tv.getByRole('button', { name: /The Fake Lighthouse/ })
+  await expect(card).toContainText('Written by AI for you')
+  await expect(card).toHaveAttribute('aria-pressed', 'true')
+  await expect(tv.getByRole('button', { name: 'Delete this room' })).toBeVisible()
+  await tv.screenshot({ path: `${SHOTS}/95-escape-written-by-ai.png`, fullPage: true })
+
+  await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
+  await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
+  await expect(tv.getByRole('heading', { name: 'The Fake Lighthouse' })).toBeVisible()
+})

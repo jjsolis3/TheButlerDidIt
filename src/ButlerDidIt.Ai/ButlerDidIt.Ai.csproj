@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Fake\FakeScenario.json" LogicalName="ButlerDidIt.Ai.Fake.FakeScenario.json" />
+    <EmbeddedResource Include="Fake\FakeEscapeRoom.json" LogicalName="ButlerDidIt.Ai.Fake.FakeEscapeRoom.json" />
   </ItemGroup>
 
   <ItemGroup>

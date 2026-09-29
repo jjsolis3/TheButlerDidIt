@@ -587,6 +587,8 @@ export interface EscapeRoomSummary {
   bestScore: number | null
   /** Who plays the AI game master in this room. */
   gameMaster: string
+  /** Written by AI for this host: only they see it, and they can delete it. */
+  generated: boolean
 }
 
 /** Which puzzles a new escape party plays. */

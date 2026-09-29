@@ -89,6 +89,9 @@ export const api = {
 
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
   escapeRooms: () => request<EscapeRoomSummary[]>('GET', '/api/escape-rooms'),
+  generateEscapeRoom: (theme: string, contentRating: ContentRating, minutes: number) =>
+    request<GenerationJob>('POST', '/api/escape-rooms/generate', { theme, contentRating, minutes }),
+  deleteEscapeRoom: (id: string) => request<void>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}`),
   createEscapeParty: (roomId: string, mode: PartyMode, puzzles: PuzzleChoice, puzzleSet: number | null, useAi: boolean) =>
     request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi }),
   leaderboard: (roomId: string, daily: boolean, party?: string) =>

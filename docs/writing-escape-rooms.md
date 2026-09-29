@@ -83,6 +83,10 @@ When the host keeps **Use the AI game master** on (and an admin has set up the A
 
 The AI only writes words. It never changes a puzzle, an answer or the clock.
 
+## Rooms written by AI
+
+With a Storyteller model set up, a host can type a theme on the escape shelf ("a haunted lighthouse") and get a new room in this same format, on their own shelf only. The AI writes the story, the riddles and the villain, and it picks which generators fill the codes and passwords. So every code comes from the same proven templates as yours, and nothing it writes is saved unless the validator passes. A tester AI also has to crack each riddle from its prompt and pieces alone. A good hand-written room is still the best model: the AI is shown this format and follows the same rules.
+
 ## Leaderboards
 
 When a game ends, its result is saved in the same step that ends the game. The **score** is the time taken plus the time each hint cost, and lower is better. The ending screen shows where the group ranked, all time or on today's challenge. Times are public. Team names only ever appear on the host's own escapes.

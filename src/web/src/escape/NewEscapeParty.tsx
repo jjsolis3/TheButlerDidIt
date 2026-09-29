@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, ErrorText, inputClass } from '../components/ui'
 import { api } from '../lib/api'
-import type { AiStatus, EscapeRoomSummary, PartyMode, PuzzleChoice } from '../lib/types'
+import type { AiStatus, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
+import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { formatDuration } from './time'
 
 /** The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby. */
@@ -25,6 +26,24 @@ export function NewEscapeParty() {
     api.escapeRooms().then(setRooms, (e: Error) => setError(e.message))
     api.aiStatus().then(setAi, () => setAi(null))
   }, [])
+
+  // A room written by AI goes to the top of the shelf, selected, ready to play.
+  const onWritten = async (job: GenerationJob) => {
+    setRooms(await api.escapeRooms())
+    if (job.scenarioId) setChosen(job.scenarioId)
+  }
+
+  const remove = async (room: EscapeRoomSummary) => {
+    if (!window.confirm(`Delete “${room.title}”? Its best times stay on the leaderboards.`)) return
+    setError(null)
+    try {
+      await api.deleteEscapeRoom(room.id)
+      setRooms((all) => all?.filter((r) => r.id !== room.id) ?? null)
+      if (chosen === room.id) setChosen(undefined)
+    } catch (e) {
+      setError((e as Error).message)
+    }
+  }
 
   const roomId = chosen ?? rooms?.[0]?.id
   const room = rooms?.find((r) => r.id === roomId)
@@ -51,22 +70,31 @@ export function NewEscapeParty() {
           Work together against the clock: every phone holds different clues, so talk! Hints help, but each one costs time.
         </p>
         {!rooms && !error && <p className="text-muted">Loading rooms…</p>}
+        {ai?.storyteller && <GenerateEscapeRoom onReady={onWritten} />}
         <div className="grid gap-3 sm:grid-cols-2">
           {rooms?.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => setChosen(r.id)}
-              aria-pressed={roomId === r.id}
-              className={`rounded-xl border p-4 text-left transition ${roomId === r.id ? 'border-accent bg-accent/10' : 'border-line bg-surface hover:border-accent/60'}`}
-            >
-              <p className="font-display text-lg">{r.title}</p>
-              <p className="mt-1 text-xs text-muted">
-                {r.contentRating === 'mature' ? '🍷 Adults' : '🧸 Family'} · {r.timeLimitMinutes} min · {r.minPlayers}–{r.maxPlayers} players · {r.stageCount} rooms,{' '}
-                {r.puzzleCount} puzzles
-              </p>
-              <p className="mt-2 text-sm text-ink/90">{r.synopsis}</p>
-              {r.bestScore !== null && <p className="mt-2 text-xs text-accent">🏆 Best escape: {formatDuration(r.bestScore)}</p>}
-            </button>
+            <div key={r.id} className="flex flex-col">
+              <button
+                onClick={() => setChosen(r.id)}
+                aria-pressed={roomId === r.id}
+                className={`flex-1 rounded-xl border p-4 text-left transition ${roomId === r.id ? 'border-accent bg-accent/10' : 'border-line bg-surface hover:border-accent/60'}`}
+              >
+                {r.generated && <p className="text-xs font-semibold tracking-widest text-accent uppercase">✨ Written by AI for you</p>}
+                <p className="font-display text-lg">{r.title}</p>
+                <p className="mt-1 text-xs text-muted">
+                  {r.contentRating === 'mature' ? '🍷 Adults' : '🧸 Family'} · {r.timeLimitMinutes} min · {r.minPlayers}–{r.maxPlayers} players · {r.stageCount} rooms,{' '}
+                  {r.puzzleCount} puzzles
+                </p>
+                <p className="mt-2 text-sm text-ink/90">{r.synopsis}</p>
+                {r.bestScore !== null && <p className="mt-2 text-xs text-accent">🏆 Best escape: {formatDuration(r.bestScore)}</p>}
+              </button>
+              {/* Outside the card: a button can't sit inside another button. */}
+              {r.generated && (
+                <button onClick={() => remove(r)} className="mt-1 self-end text-xs text-muted underline hover:text-ink">
+                  Delete this room
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </section>

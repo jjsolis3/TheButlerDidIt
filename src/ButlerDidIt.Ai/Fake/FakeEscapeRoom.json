@@ -1,0 +1,88 @@
+{
+  "id": "draft",
+  "title": "The Fake Lighthouse",
+  "synopsis": "A test escape room written by the fake AI. The keeper has locked you in the lighthouse until the lamp is lit.",
+  "contentRating": "family",
+  "artStyle": "stormy seaside at night, warm lamplight",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "intro": "Ahoy! Keeper Barnacle here. The door is locked and the lamp is dark. Light it before the tide turns, or you'll be counting waves all night!",
+  "escapedText": "The great lamp blazes over the sea and the door swings open. Keeper Barnacle tips his cap: 'Well sailed, crew!'",
+  "failedText": "The tide rolls in and the lamp stays dark. Keeper Barnacle chuckles: 'Another night in the lighthouse, then!'",
+  "gameMaster": {
+    "name": "Keeper Barnacle",
+    "persona": "A cheerful old lighthouse keeper who speaks in sea shanty rhymes and loves a riddle.",
+    "voice": { "accent": "en-GB", "pitch": 0.9, "rate": 0.95, "style": "gruff, jolly, salty" }
+  },
+  "stages": [
+    { "id": "stairs", "title": "The Spiral Stairs", "description": "Round and round the stairs go. A chest sits on the first landing.", "puzzles": ["echo-riddle", "stair-chest"] },
+    { "id": "study", "title": "The Keeper's Study", "description": "Old sea papers cover the walls and a lockbox sits on the desk.", "puzzles": ["lockbox", "map-riddle"] },
+    { "id": "lamp", "title": "The Lamp Room", "description": "The great lamp waits under a glass dome, and a password panel blinks beside it.", "puzzles": ["buoys", "lamp-panel"] }
+  ],
+  "puzzles": [
+    {
+      "id": "echo-riddle",
+      "title": "The Whispering Wall",
+      "kind": "text",
+      "prompt": "Painted on the wall: 'I speak without a mouth and hear without ears. What am I?'",
+      "answers": ["echo", "an echo"],
+      "hints": ["Shout up the stairs and listen.", "It repeats whatever you say."],
+      "rewards": ["chest-key"],
+      "solvedText": "The wall answers back: 'Echo… echo…' A little key drops from a crack."
+    },
+    {
+      "id": "stair-chest",
+      "title": "The Landing Chest",
+      "kind": "use",
+      "prompt": "A sea chest with a small keyhole.",
+      "requires": ["chest-key"],
+      "hints": ["You found a small key.", "Use the small key on the chest."],
+      "rewards": ["oil-can"],
+      "solvedText": "Inside the chest: a can of lamp oil."
+    },
+    {
+      "id": "lockbox",
+      "title": "The Keeper's Lockbox",
+      "kind": "code",
+      "prompt": "A lockbox with a 3-digit dial. Each of you remembers one fact from the keeper's logbook.",
+      "hints": ["Each phone holds one digit as a fact.", "Put the digits in order: first, second, third."],
+      "rewards": ["lamp-lens"],
+      "solvedText": "The lockbox opens. Inside: a polished lamp lens.",
+      "generator": { "type": "digitFacts", "count": 3, "pieceTemplate": "The logbook says the {ordinal} digit is {fact}." }
+    },
+    {
+      "id": "map-riddle",
+      "title": "The Captain's Table",
+      "kind": "text",
+      "prompt": "Carved on the captain's table: 'I have cities but no houses, forests but no trees, and water but no fish. What am I?'",
+      "answers": ["map", "a map", "chart"],
+      "hints": ["Look at what covers the walls.", "Sailors unroll it to find their way."],
+      "solvedText": "The table drawer slides open with a click."
+    },
+    {
+      "id": "buoys",
+      "title": "The Buoy Lights",
+      "kind": "code",
+      "prompt": "Through the window, buoys bob in the dark. The sign reads: '{order}!'",
+      "hints": ["Each phone sees one buoy's colour and number.", "Read them in this order: {order}."],
+      "solvedText": "The buoys flash in answer, and the glass dome over the lamp lifts.",
+      "generator": { "type": "colorDigits", "count": 3, "colors": ["red", "green", "yellow", "blue", "white"], "pieceTemplate": "You spotted the {color} buoy. It flashes {digit} times." }
+    },
+    {
+      "id": "lamp-panel",
+      "title": "The Lamp Password",
+      "kind": "text",
+      "prompt": "The panel beside the lamp asks for the keeper's three favourite sea words, first to last. You also need oil and the lens.",
+      "requires": ["oil-can", "lamp-lens"],
+      "hints": ["Three phones each remember one sea word.", "Say them in order, first to last."],
+      "solvedText": "You fill the oil, fit the lens and say the words: {answer}! The lamp blazes into life.",
+      "generator": { "type": "wordSequence", "count": 3, "words": ["anchor", "wave", "gull", "tide", "sail", "shell", "harbour", "compass", "rope", "starfish"], "pieceTemplate": "The keeper hummed a shanty: the {ordinal} word was {word}." }
+    }
+  ],
+  "items": [
+    { "id": "chest-key", "name": "Small key", "description": "It fell from a crack in the whispering wall." },
+    { "id": "oil-can", "name": "Lamp oil", "description": "A heavy can, sloshing and full." },
+    { "id": "lamp-lens", "name": "Lamp lens", "description": "Polished glass for the great lamp." }
+  ]
+}
