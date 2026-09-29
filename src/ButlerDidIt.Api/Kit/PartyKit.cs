@@ -54,7 +54,7 @@ public static class PartyKit
                 "invitations" => await Invitations(snapshot, joinUrl, party.ScheduledFor, images, ct),
                 "booklets" => Booklets(snapshot),
                 "nametags" => NameTags(snapshot),
-                _ => Clues(snapshot),
+                _ => await Clues(snapshot, images, ct),
             };
             var file = $"{Slug(snapshot.Scenario.Title)}-{kind}.pdf";
             return Results.File(pdf, "application/pdf", file);
@@ -196,9 +196,11 @@ public static class PartyKit
         })).GeneratePdf();
     }
 
-    public static byte[] Clues(PartySnapshot s)
+    public static async Task<byte[]> Clues(PartySnapshot s, ImageLoader images, CancellationToken ct)
     {
         var scenario = s.Scenario;
+        var pictures = new Dictionary<string, byte[]?>();
+        foreach (var clue in scenario.Clues) pictures[clue.Id] = await images.LoadAsync(clue.Image, ct);
         return Document.Create(doc =>
         {
             foreach (var act in scenario.Acts.Select((a, i) => (Act: a, Number: i + 1)))
@@ -218,6 +220,7 @@ public static class PartyKit
                                 card.Item().Text(who is null ? (clue.Wave == ClueWave.Midway ? "Reveal halfway through the act" : "Reveal at the start of the act")
                                     : $"Give privately to {who}").FontSize(8).FontColor(Accent);
                                 card.Item().Text(clue.Title).FontSize(14).Bold();
+                                if (pictures[clue.Id] is { } picture) card.Item().PaddingTop(4).Height(90).Image(picture).FitArea();
                                 card.Item().PaddingTop(4).Text(clue.Text);
                                 if (clue.Puzzle is not null) card.Item().PaddingTop(6).Text(clue.Puzzle.Prompt).Italic();
                             });

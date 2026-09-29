@@ -10,7 +10,7 @@ AI is optional. Without it the game plays exactly like Phase 1. With it you get:
 | **Hints**: one private nudge per player per act | Inspector | Phone: **Clues** tab → *Ask the Inspector* |
 | **Verdicts**: a witty comment on each guest's accusation | Inspector | Stage, when the killer is unmasked |
 | **Voices**: narration, NPC lines and NPC answers read by a real voice | Voice | Stage, during scenes and in the interrogation room |
-| **Pictures**: character portraits, the victim and the setting | Illustrator | Stage, phones and the printable kit |
+| **Pictures**: character portraits, the victim, the setting and each clue card | Illustrator | Stage, phones and the printable kit |
 
 Voices and pictures are made **once per mystery** in the background when a host creates a party, then reused by every party that plays the same mystery. The host sees the progress in the lobby (*Preparing… 12 of 40 done*), and the party is playable straight away: until a clip or picture is ready, the browser's own speech and the candlelit placeholders fill in.
 
@@ -69,7 +69,7 @@ Environment settings are applied at every start-up and overwrite the same-named 
 - Every AI call is logged with its tokens, estimated cost, duration and which host it was for. See **Usage and cost** on the admin page.
 - Each host has a **monthly budget** (`AI_MONTHLY_BUDGET_USD`, default $25; `0` means unlimited). Once it's used up, AI features politely switch off until next month and the game carries on without them.
 - Costs are estimates from the price list. A model with no price shows as $0 and is flagged on the admin page.
-- Voices and pictures are cached by their exact text and model, so a mystery's media is paid for once, however many parties play it. A mystery like Blackwood Manor needs about 50 voice clips and pictures in total.
+- Voices and pictures are cached by their exact text and model, so a mystery's media is paid for once, however many parties play it. A mystery like Blackwood Manor needs about 65 voice clips and pictures in total, including one picture per clue card.
 - Rough guide with Claude: generating a mystery costs well under a couple of dollars; each NPC answer or hint costs a fraction of a cent to a few cents, depending on the model.
 - **Remixes** ("let the AI write one" on the new-party page) run only when no unplayed version of the story has a guest as the killer. One costs less than a new mystery, because the Storyteller writes a patch (the new solution, the changed character sheets and clues), not a whole story. It takes about a minute while the lobby waits. The host can press **Start without it** at any time, and if it fails, the evening starts with a hand-written version instead.
 

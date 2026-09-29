@@ -88,4 +88,24 @@ public class MediaTests
         var line = Assert.Single(ViewProjector.Stage(s, scenario, T0).Cues, c => c.Type == CueType.Line);
         Assert.Equal("/media/assets/line", line.Src);
     }
+
+    [Fact]
+    public void Clue_pictures_follow_the_clue_title_and_never_replace_a_hand_placed_one()
+    {
+        var scenario = Create();
+        var c1 = scenario.FindClue("c1")!;
+        var media = new Dictionary<string, string>
+        {
+            [MediaOverlay.ClueImage("c1", c1.Title)] = "/media/assets/boots",
+            [MediaOverlay.ClueImage("c2", "An old title")] = "/media/assets/stale",
+        };
+
+        var result = MediaOverlay.Apply(scenario, media);
+        Assert.Equal("/media/assets/boots", result.FindClue("c1")!.Image);
+        Assert.Null(result.FindClue("c2")!.Image); // made for a different title, so it isn't used
+
+        var handPlaced = Create();
+        handPlaced.Clues[0] = new Clue { Id = "c1", Title = c1.Title, Text = c1.Text, Act = 1, PointsTo = c1.PointsTo, Image = "/original.jpg" };
+        Assert.Equal("/original.jpg", MediaOverlay.Apply(handPlaced, media).FindClue("c1")!.Image);
+    }
 }
