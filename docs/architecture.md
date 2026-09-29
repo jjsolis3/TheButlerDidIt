@@ -226,11 +226,11 @@ Everything here is off by default: one server behaves exactly as described above
 
 ## 14. Game kinds: one platform, several games
 
-A party has a `GameKind`: `Mystery` today, with `EscapeRoom` on its way (#67). Everything around the game is shared, and only the rules and screens differ per kind:
+A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the game is shared, and only the rules and screens differ per kind:
 
 | Shared by every game (the platform) | Per game |
 |---|---|
-| Host accounts, join codes, seats and seat tokens, the hub and its groups, reconnects | The pure rules engine (`ButlerDidIt.Game` for mysteries) |
+| Host accounts, join codes, seats and seat tokens, the hub and its groups, reconnects | The pure rules engine (`ButlerDidIt.Game` for mysteries, `ButlerDidIt.Escape` for escape rooms) |
 | `PartyRuntime`: the party lock, load, save (state, status, next wake-up), broadcast | Its views and their privacy rules (`ViewProjector` for mysteries) |
 | Joining, removing a seat, costume selfies, the ticker, retention | Its hub actions and pages (the mystery's `PartyService`, dealer, AI game master, kit, recap) |
 | AI gateway, media pipeline, scaling, backups | Its content (scenarios, and later escape rooms) |
@@ -247,4 +247,28 @@ A party has a `GameKind`: `Mystery` today, with `EscapeRoom` on its way (#67). E
   - `useParty` is generic over its view types, so a new game reuses the connection, reconnects and version checks.
 
 **Why the seam is shaped this way:** the platform already did the hard, shared work (locks, reconnects, privacy, scaling). A new game should only have to bring its rules and screens. Tests use a stand-in escape module (`GameKindTests`) to prove joining, seats, live views and the ticker work for a game that isn't a mystery.
+
+### Escape rooms
+
+`ButlerDidIt.Escape` follows the mystery's rules for rules: pure functions, a state saved as JSON, commands that return a new state, and views copied field by field.
+
+- **A room** (`content/escape/*.json`) is a list of stages. A stage's puzzles must all be solved to open the next one. A puzzle can be:
+  - a **code** (digits),
+  - a **text** answer,
+  - a **use** puzzle, which needs items such as a key or a fuse.
+
+  Puzzles can require items and give items as rewards.
+- **Split clues:** a puzzle's `pieces` are dealt round the table when the clock starts. Each phone sees only its own pieces, so the group has to talk. If a player leaves, their pieces pass to someone still playing.
+- **The clock:**
+  - it's a `Deadline`, and each hint moves it earlier;
+  - `EscapeEngine.NextDueAt` hands the deadline to the platform's ticker, which ends the game when time runs out;
+  - a wrong answer locks that puzzle for 3 seconds, so a code can't be brute-forced from a script.
+- **Answers are checked on the server**, and forgivingly: case, spacing, punctuation and a leading "a", "an" or "the" don't matter. They never reach a browser. `PrivacyTests` walk every room through every stage and search the serialized views for answers, unpaid hints, other players' clue pieces and later stages' puzzles.
+- **`EscapeRoomValidator`** checks references and answer formats, keeps Family rooms free of gruesome words, and **proves each room can be escaped**: it plays the room greedily, solving any puzzle whose items are in hand, and reports the first stage that gets stuck. The app refuses to start with a broken room.
+- **In the API:**
+  - `EscapeModule`/`EscapeSession` plug the engine into `PartyRuntime`;
+  - `EscapeService` runs escape commands (and refuses other kinds of party);
+  - the hub's escape actions are in `PartyHub.Escape.cs`;
+  - rooms are listed at `/api/escape-rooms`, and a party is created with `POST /api/parties/escape`.
+- **Front end:** `src/web/src/escape/` holds the shelf, the TV (`EscapeStage`) and the phone (`EscapePhone`). The game routes pick them by `PartyInfo.kind`.
 

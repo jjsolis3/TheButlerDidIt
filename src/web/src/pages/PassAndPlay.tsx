@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { PlayerScreen } from '../components/PlayerScreen'
 import { UnsupportedGame } from '../components/UnsupportedGame'
+import { EscapePhone } from '../escape/EscapePhone'
 import { Button, ErrorText, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import { seats, type StoredSeat } from '../lib/seats'
@@ -47,7 +48,8 @@ export default function PassAndPlay() {
     }
   }
 
-  if (kind && kind !== 'mystery') return <UnsupportedGame kind={kind} />
+  if (kind && kind !== 'mystery' && kind !== 'escapeRoom') return <UnsupportedGame kind={kind} />
+  if (!kind) return <p className="p-8 text-center text-muted">Setting the table…</p>
 
   if (open) {
     return (
@@ -58,15 +60,27 @@ export default function PassAndPlay() {
             Hide & pass on
           </Button>
         </div>
-        <PlayerScreen
-          code={code}
-          token={open.token}
-          onLeave={() => {
-            seats.forget(code, open.seatId)
-            setLocal(seats.local(code))
-            setOpen(null)
-          }}
-        />
+        {kind === 'escapeRoom' ? (
+          <EscapePhone
+            code={code}
+            token={open.token}
+            onLeave={() => {
+              seats.forget(code, open.seatId)
+              setLocal(seats.local(code))
+              setOpen(null)
+            }}
+          />
+        ) : (
+          <PlayerScreen
+            code={code}
+            token={open.token}
+            onLeave={() => {
+              seats.forget(code, open.seatId)
+              setLocal(seats.local(code))
+              setOpen(null)
+            }}
+          />
+        )}
       </div>
     )
   }

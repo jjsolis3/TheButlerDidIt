@@ -19,10 +19,12 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api
 WORKDIR /src
 COPY global.json Directory.Build.targets ./
 COPY src/ButlerDidIt.Game/ButlerDidIt.Game.csproj src/ButlerDidIt.Game/
+COPY src/ButlerDidIt.Escape/ButlerDidIt.Escape.csproj src/ButlerDidIt.Escape/
 COPY src/ButlerDidIt.Ai/ButlerDidIt.Ai.csproj src/ButlerDidIt.Ai/
 COPY src/ButlerDidIt.Api/ButlerDidIt.Api.csproj src/ButlerDidIt.Api/
 RUN dotnet restore src/ButlerDidIt.Api/ButlerDidIt.Api.csproj
 COPY src/ButlerDidIt.Game/ src/ButlerDidIt.Game/
+COPY src/ButlerDidIt.Escape/ src/ButlerDidIt.Escape/
 COPY src/ButlerDidIt.Ai/ src/ButlerDidIt.Ai/
 COPY src/ButlerDidIt.Api/ src/ButlerDidIt.Api/
 COPY --from=web /src/src/ButlerDidIt.Api/wwwroot src/ButlerDidIt.Api/wwwroot

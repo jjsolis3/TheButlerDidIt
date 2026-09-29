@@ -7,6 +7,7 @@ using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
+using ButlerDidIt.Api.Escape;
 using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Kit;
@@ -148,6 +149,9 @@ builder.Services.AddSingleton<ContentCatalog>();
 builder.Services.AddSingleton<PartyLocks>();
 // Each kind of game plugs in as a module; the platform finds it by the party's GameKind.
 builder.Services.AddSingleton<IGameModule, MysteryModule>();
+builder.Services.AddSingleton<EscapeCatalog>();
+builder.Services.AddSingleton<IGameModule, EscapeModule>();
+builder.Services.AddScoped<EscapeService>();
 builder.Services.AddSingleton<GameModules>();
 builder.Services.AddScoped<PartyRuntime>();
 builder.Services.AddScoped<PartyService>();
@@ -227,6 +231,7 @@ if (migrateOnly || !app.Configuration.GetValue<bool>("SkipStartupTasks"))
         await DataProtectionKeyImport.RunAsync(app.Configuration, db, app.Logger);
         var contentRoot = Path.Combine(app.Environment.ContentRootPath, app.Services.GetRequiredService<IOptions<ContentOptions>>().Value.Root);
         await app.Services.GetRequiredService<ContentCatalog>().SeedAsync(contentRoot);
+        app.Logger.LogInformation("Loaded {Count} escape rooms", app.Services.GetRequiredService<EscapeCatalog>().Rooms.Count); // fails fast if one is broken
         await AiConfigSeeder.SeedAsync(app.Services);
     }
     if (migrateOnly)

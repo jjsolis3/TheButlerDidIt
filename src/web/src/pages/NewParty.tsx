@@ -5,7 +5,8 @@ import { api } from '../lib/api'
 import { useJobUpdates } from '../lib/hub'
 import { ConfirmEmailBanner } from './Account'
 import { useThemes } from '../lib/theme'
-import type { AiStatus, AuthOptions, ContentRating, GenerationJob, MysteryLength, PartyMode, ThemeCard, Tone } from '../lib/types'
+import type { AiStatus, AuthOptions, ContentRating, GameKind, GenerationJob, MysteryLength, PartyMode, ThemeCard, Tone } from '../lib/types'
+import { NewEscapeParty } from '../escape/NewEscapeParty'
 import { useMe } from '../lib/useMe'
 
 const MODES: { id: PartyMode; title: string; body: string }[] = [
@@ -72,6 +73,8 @@ export default function NewParty() {
   const [when, setWhen] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // Which kind of game night. Mysteries first: the original game.
+  const [game, setGame] = useState<GameKind>('mystery')
 
   useEffect(() => {
     if (me === null) navigate('/login')
@@ -117,11 +120,44 @@ export default function NewParty() {
     }
   }
 
-  return (
-    <Shell>
+  const header = (
+    <>
       <Eyebrow>New party</Eyebrow>
       <Heading className="mt-2 mb-6">Set the scene</Heading>
       <ConfirmEmailBanner required={!!authOptions?.requireConfirmedEmail && me?.emailConfirmed === false} />
+      <div className="mb-8 grid grid-cols-2 gap-2 rounded-xl border border-line bg-surface p-1" role="tablist" aria-label="Kind of game">
+        {(
+          [
+            ['mystery', '🔎 Murder mystery'],
+            ['escapeRoom', '🔐 Escape room'],
+          ] as const
+        ).map(([kind, label]) => (
+          <button
+            key={kind}
+            role="tab"
+            aria-selected={game === kind}
+            onClick={() => setGame(kind)}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${game === kind ? 'bg-accent text-bg' : 'text-muted hover:text-ink'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </>
+  )
+
+  if (game === 'escapeRoom') {
+    return (
+      <Shell>
+        {header}
+        <NewEscapeParty />
+      </Shell>
+    )
+  }
+
+  return (
+    <Shell>
+      {header}
 
       <section className="space-y-3">
         <h2 className="font-display text-xl">1. Choose a mystery</h2>

@@ -17,4 +17,4 @@ Murder-mystery party game: ASP.NET Core 10 + SignalR + EF Core/PostgreSQL back e
 - Track bugs, tech debt and follow-ups as GitHub issues (labels: `bug`, `enhancement`, `documentation`, `phase-N`, `ai`, `media`) and reference them in PRs.
 - Never send scenario data to browsers directly: add fields to `Views.cs` and copy them explicitly in `ViewProjector`. Extend `ViewProjectorTests` for anything private.
 - C# view records and `src/web/src/lib/types.ts` must stay in sync (camelCase, enums as camelCase strings).
-- Scenario JSON in `content/` is validated at startup and in tests by `ScenarioValidator`.
+- Scenario JSON in `content/themes/` is validated at startup and in tests by `ScenarioValidator`; escape rooms in `content/escape/` by `EscapeRoomValidator` (which also proves each room can be escaped). Escape views live in `ButlerDidIt.Escape/Engine/EscapeViews.cs` and are mirrored in `types.ts`; extend `PrivacyTests` for anything private.

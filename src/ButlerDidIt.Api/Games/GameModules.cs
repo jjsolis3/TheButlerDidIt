@@ -61,7 +61,8 @@ public interface IGameModule
 /// <summary>Finds the module for a party's kind. Every module is registered as an IGameModule.</summary>
 public sealed class GameModules(IEnumerable<IGameModule> modules)
 {
-    private readonly Dictionary<GameKind, IGameModule> _byKind = modules.ToDictionary(m => m.Kind);
+    // If two modules claim a kind, the one registered last wins (the usual .NET rule), so tests can swap one in.
+    private readonly Dictionary<GameKind, IGameModule> _byKind = modules.GroupBy(m => m.Kind).ToDictionary(g => g.Key, g => g.Last());
 
     /// <summary>The module for <paramref name="kind"/>. A kind this server can't play (yet) is a normal game message, not a crash.</summary>
     public IGameModule For(GameKind kind) =>

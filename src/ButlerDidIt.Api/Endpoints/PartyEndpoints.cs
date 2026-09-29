@@ -20,6 +20,8 @@ namespace ButlerDidIt.Api.Endpoints;
 /// <param name="TailorWithAi">With "surprise": if no version's killer is a guest, let the AI write one.</param>
 public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, DateTimeOffset? ScheduledFor,
     bool UseAi = true, bool DrinkingPrompts = false, string? Version = null, Tone Tone = Tone.Standard, bool TailorWithAi = false);
+/// <summary>Create an escape-room party: which room, and how people will play.</summary>
+public sealed record CreateEscapePartyRequest(string RoomId, PartyMode Mode, DateTimeOffset? ScheduledFor = null);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -123,6 +125,31 @@ public static class PartyEndpoints
             // ready by the time guests arrive. Already-made files are reused.
             if (req.UseAi && (await media.VoicesConfiguredAsync(ct) || await media.ImagesConfiguredAsync(ct)))
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, scenario.Id, userId, clock, ct);
+            return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
+        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
+
+        // ---- Host: start an escape-room party. The room is checked, the clock doesn't start until the host says so.
+        group.MapPost("/escape", async (CreateEscapePartyRequest req, ClaimsPrincipal user, AppDbContext db, GameModules modules,
+            ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, CancellationToken ct) =>
+        {
+            if (rooms.Find(req.RoomId) is not { } room) return Results.Problem("Pick an escape room to play.", statusCode: 400);
+            var party = new Party
+            {
+                Id = Guid.NewGuid(),
+                Code = await UniqueCodeAsync(db, ct),
+                HostUserId = user.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                Kind = GameKind.EscapeRoom,
+                ScenarioId = room.Id,
+                Mode = req.Mode,
+                ContentLevel = room.ContentRating,
+                Status = PartyStatus.Lobby,
+                CreatedAt = parties.Now,
+                UpdatedAt = parties.Now,
+                ScheduledFor = req.ScheduledFor,
+                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame()),
+            };
+            db.Parties.Add(party);
+            await db.SaveChangesAsync(ct);
             return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
         }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
 

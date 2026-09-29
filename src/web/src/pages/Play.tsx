@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { PlayerScreen } from '../components/PlayerScreen'
 import { UnsupportedGame } from '../components/UnsupportedGame'
+import { EscapePhone } from '../escape/EscapePhone'
 import { api } from '../lib/api'
 import { seats } from '../lib/seats'
 import { useThemePalette } from '../lib/theme'
@@ -29,15 +30,13 @@ export default function Play() {
   }, [seat, code, navigate])
 
   if (!seat) return null
-  if (kind && kind !== 'mystery') return <UnsupportedGame kind={kind} />
-  return (
-    <PlayerScreen
-      code={code}
-      token={seat.token}
-      onLeave={() => {
-        seats.forget(code, seat.seatId)
-        navigate(`/join/${code}`)
-      }}
-    />
-  )
+  const leave = () => {
+    seats.forget(code, seat.seatId)
+    navigate(`/join/${code}`)
+  }
+  // Each kind of game has its own phone screen, so wait until we know which this is.
+  if (!kind) return <p className="p-8 text-center text-muted">Finding your seat…</p>
+  if (kind === 'escapeRoom') return <EscapePhone code={code} token={seat.token} onLeave={leave} />
+  if (kind !== 'mystery') return <UnsupportedGame kind={kind} />
+  return <PlayerScreen code={code} token={seat.token} onLeave={leave} />
 }

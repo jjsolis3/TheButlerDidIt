@@ -22,6 +22,10 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - 🎃 **Death in Room 13** (Adults, Halloween): a 1926 séance at a gothic grand hotel where no guest ever checks out, and thirteen minutes of total darkness.
 - 🎃 **The Witching Hour** (Adults, Halloween): a New England harvest festival, a reenactment of a 1692 witch trial, and a curse three hundred years old.
 
+**🔐 Escape rooms** are the second kind of game night. The group joins on their phones and races the clock through a series of rooms: codes, riddles, keys and tools, with clues split across everyone's phones so nobody can solve them alone. Hints help, but each one costs time. Two rooms so far:
+- **The Workshop** (Adults): you wake up chained in a basement workshop, and the Tinkerer wants to play a game.
+- **The Funhouse After Dark** (Family): the carnival has closed, and Mister Giggles the robot clown has locked every door.
+
 A **🎃 Halloween** filter on each shelf shows just the spooky stories. It glows all through October. A theme joins a season by listing it in `"seasons"` in its `theme.json`.
 
 All of them play with 3–8 guests in about two hours, and **each comes in three or four versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
@@ -82,11 +86,13 @@ cd tests/e2e && npm install && npx playwright test # two complete parties in rea
 ## Project layout
 
 ```
-src/ButlerDidIt.Game/   rules engine, scenario model, validator (no dependencies)
+src/ButlerDidIt.Game/   murder-mystery rules engine, scenario model, validator (no dependencies)
+src/ButlerDidIt.Escape/ escape-room rules engine, room model, solvability validator
 src/ButlerDidIt.Ai/     AI providers, prompts, mystery generator (no web or database code)
 src/ButlerDidIt.Api/    ASP.NET Core host: REST endpoints, SignalR hub, database, auth
 src/web/                React front end (builds into the API's wwwroot)
 content/themes/         themes, mysteries (JSON) and media
+content/escape/         escape rooms (JSON)
 tests/                  xUnit tests and Playwright end-to-end tests
 docs/                   architecture, deployment and scenario-writing guides
 ```
@@ -96,6 +102,7 @@ docs/                   architecture, deployment and scenario-writing guides
 - [Architecture: how it works and why](docs/architecture.md)
 - [Deploying on Coolify](docs/deploy-coolify.md)
 - [Writing a mystery](docs/writing-scenarios.md)
+- [Writing an escape room](docs/writing-escape-rooms.md)
 - [Setting up the AI game master](docs/ai-setup.md)
 
 ## Roadmap

@@ -565,3 +565,105 @@ export interface VersionOption {
   playedByMe: boolean
 }
 
+// ---------------------------------------------------------------- escape rooms (mirror ButlerDidIt.Escape/Engine/EscapeViews.cs)
+
+export type EscapePhase = 'lobby' | 'playing' | 'escaped' | 'failed'
+export type PuzzleKind = 'code' | 'text' | 'use'
+
+/** A room on the create-party shelf. */
+export interface EscapeRoomSummary {
+  id: string
+  title: string
+  synopsis: string
+  contentRating: ContentRating
+  theme: string
+  minPlayers: number
+  maxPlayers: number
+  timeLimitMinutes: number
+  stageCount: number
+  puzzleCount: number
+}
+
+export interface EscapeFeedEntry {
+  at: string
+  text: string
+}
+
+export interface EscapePuzzleView {
+  id: string
+  title: string
+  kind: PuzzleKind
+  prompt: string
+  solved: boolean
+  solvedBy: string | null
+  solvedText: string | null
+  /** Names of the items still needed before it can be tried */
+  needs: string[]
+  /** Only the hints already paid for */
+  hints: string[]
+  hintsLeft: number
+  /** A wrong answer locks the puzzle for a few seconds */
+  lockedUntil: string | null
+  /** How many phones hold a piece of this puzzle */
+  pieceCount: number
+}
+
+export interface EscapeItemView {
+  id: string
+  name: string
+  description: string
+}
+
+export interface EscapePlayerSummary {
+  seatId: string
+  name: string
+  isHost: boolean
+  photoUrl: string | null
+}
+
+/** The TV: public to everyone in the room. */
+export interface EscapeStageView {
+  version: number
+  phase: EscapePhase
+  roomId: string
+  roomTitle: string
+  synopsis: string
+  theme: string
+  intro: string
+  timeLimitMinutes: number
+  hintPenaltySeconds: number
+  stageNumber: number
+  stageCount: number
+  stage: { id: string; title: string; description: string } | null
+  puzzles: EscapePuzzleView[]
+  inventory: EscapeItemView[]
+  players: EscapePlayerSummary[]
+  startedAt: string | null
+  deadline: string | null
+  endedAt: string | null
+  serverNow: string
+  feed: EscapeFeedEntry[]
+  solvedCount: number
+  puzzleCount: number
+  hintsUsed: number
+  wrongAttempts: number
+  /** The escape or failure text, once the game is over */
+  endText: string | null
+}
+
+export interface EscapePieceView {
+  puzzleId: string
+  puzzleTitle: string
+  text: string
+}
+
+/** One phone: the TV's view plus this player's own clue pieces. */
+export interface EscapePlayerView {
+  version: number
+  stage: EscapeStageView
+  seatId: string
+  name: string
+  isHost: boolean
+  pieces: EscapePieceView[]
+}
+

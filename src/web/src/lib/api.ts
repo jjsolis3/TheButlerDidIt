@@ -3,6 +3,7 @@ import type {
   AiRole,
   AiStatus,
   ContentRating,
+  EscapeRoomSummary,
   GenerationJob,
   MediaJob,
   Me,
@@ -85,6 +86,8 @@ export const api = {
   resendConfirmation: () => request<void>('POST', '/api/auth/resend-confirmation'),
 
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
+  escapeRooms: () => request<EscapeRoomSummary[]>('GET', '/api/escape-rooms'),
+  createEscapeParty: (roomId: string, mode: PartyMode) => request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode }),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
   // The content level isn't sent: the server uses the mystery's own rating.
