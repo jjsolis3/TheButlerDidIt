@@ -39,6 +39,8 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("ConnectionStrings:Default", ConnectionString);
         builder.UseSetting("Auth:AllowRegistration", AllowRegistration.ToString());
         builder.UseSetting("Media:Root", MediaRoot);
+        // Tests register many hosts from the same in-memory "address"; SignUpRateLimitFactory tests the real limit.
+        builder.UseSetting("RateLimits:RegisterPerHour", "10000");
         foreach (var (key, value) in ExtraSettings) builder.UseSetting(key, value);
     }
 
@@ -99,6 +101,12 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 public sealed class ClosedRegistrationFactory : ApiFactory
 {
     protected override bool AllowRegistration => false;
+}
+
+/// <summary>The real sign-up limit, turned down to 3 an hour so a test can reach it quickly.</summary>
+public sealed class SignUpRateLimitFactory : ApiFactory
+{
+    protected override IEnumerable<(string Key, string Value)> ExtraSettings => [("RateLimits:RegisterPerHour", "3")];
 }
 
 /// <summary>The app with every AI role pointed at the Fake provider (canned answers, no network).</summary>

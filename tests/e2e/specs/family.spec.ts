@@ -265,3 +265,45 @@ test('Halloween: the Hollow Hill House party deals a version whose culprit is at
   await host.getByRole('button', { name: 'Start mingling' }).click()
   await expect(host.getByText("Mr. Bramble's Three Treats")).toBeVisible()
 })
+
+test('the 🎃 Halloween filter narrows each shelf to its spooky stories, and glows in October', async ({ browser }) => {
+  const host = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage()
+  // Pretend it's mid-October: the filter chip should say so, but still leave the whole shelf showing.
+  await host.clock.setFixedTime(new Date('2026-10-15T19:00:00'))
+  await host.goto('/login')
+  await host.getByRole('button', { name: 'Create an account' }).click()
+  await host.getByLabel('Your name').fill('Spooky Sam')
+  await host.getByLabel('Email').fill(`spooky-${Date.now()}@example.com`)
+  await host.getByLabel('Password').fill('password123')
+  await host.getByRole('button', { name: 'Create account' }).click()
+  await host.waitForURL('**/host/new')
+
+  const filters = host.getByRole('group', { name: 'Filter stories' })
+  const halloween = filters.getByRole('button', { name: /Halloween/ })
+  await expect(halloween).toContainText("It's spooky season!")
+  await expect(halloween).toHaveAttribute('aria-pressed', 'false') // highlighted, never switched on for the host
+  await expect(host.getByRole('button', { name: /Death at Blackwood Manor/ })).toBeVisible()
+  await expect(host.getByRole('button', { name: /Death in Room 13/ })).toContainText('🎃 Halloween')
+
+  // Adults: the three Halloween stories, and nothing else.
+  await expect(halloween).toContainText('(3)')
+  await halloween.click()
+  await expect(halloween).toHaveAttribute('aria-pressed', 'true')
+  await expect(host.getByRole('button', { name: /Last Night at Camp Blackwater/ })).toBeVisible()
+  await expect(host.getByRole('button', { name: /Death in Room 13/ })).toBeVisible()
+  await expect(host.getByRole('button', { name: /The Witching Hour/ })).toBeVisible()
+  await expect(host.getByRole('button', { name: /Death at Blackwood Manor/ })).toHaveCount(0)
+  // The selection follows the filter, so the Version box belongs to a Halloween story.
+  await expect(host.getByRole('button', { name: /Last Night at Camp Blackwater/ })).toHaveClass(/border-accent/)
+  await host.screenshot({ path: `${SHOTS}/89-halloween-filter.png`, fullPage: true })
+
+  // Family: the filter stays on, and shows the one Family Halloween story.
+  await host.getByRole('tab', { name: /Family/ }).click()
+  await expect(filters.getByRole('button', { name: /Halloween/ })).toContainText('(1)')
+  await expect(host.getByRole('button', { name: /Who Spooked the Halloween Party\?/ })).toBeVisible()
+  await expect(host.getByRole('button', { name: /The Captain's Last Cocoa/ })).toHaveCount(0)
+
+  // "All stories" brings the whole shelf back.
+  await filters.getByRole('button', { name: 'All stories' }).click()
+  await expect(host.getByRole('button', { name: /The Captain's Last Cocoa/ })).toBeVisible()
+})

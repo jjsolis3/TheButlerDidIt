@@ -37,6 +37,9 @@ public static class AuthEndpoints
     /// <summary>Rate-limit policy for endpoints that send email, so the site can't be used to flood an inbox.</summary>
     public const string EmailRateLimit = "email";
 
+    /// <summary>Rate-limit policy for sign-ups, which can also send email (the confirmation link).</summary>
+    public const string RegisterRateLimit = "register";
+
     /// <summary>The same answer whether or not the account exists, so nobody can use the form to find out who has one.</summary>
     private const string ForgotReply = "If that email has a host account, a reset link is on its way. Check your inbox (and spam folder).";
 
@@ -76,7 +79,7 @@ public static class AuthEndpoints
             await SendConfirmationAsync(user, users, email, app, log, ct);
             await signIn.SignInAsync(user, isPersistent: true);
             return Results.Ok(ToMe(user));
-        });
+        }).RequireRateLimiting(RegisterRateLimit);
 
         group.MapPost("/login", async (LoginRequest req, SignInManager<AppUser> signIn, UserManager<AppUser> users) =>
         {

@@ -12,6 +12,9 @@
   },
   "artStyle": "New England folk horror, bare autumn trees, a white clapboard church, an old mill by a black pond, lantern light and falling leaves",
   "sortOrder": 13,
+  "seasons": [
+    "halloween"
+  ],
   "cocktails": [
     {
       "name": "The Witch's Cup",

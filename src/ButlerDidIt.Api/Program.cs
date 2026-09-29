@@ -102,6 +102,9 @@ else
 // Configurable (RateLimits:JoinPerMinute) so the end-to-end tests, which seat dozens of guests from
 // one machine within a minute, can raise it. Real servers keep the default.
 var joinsPerMinute = builder.Configuration.GetValue("RateLimits:JoinPerMinute", 20);
+// Sign-ups per hour per address. Registering can send a confirmation email, so without a limit an
+// open server could be used to spam inboxes. Ten an hour is plenty for a household of hosts.
+var registrationsPerHour = builder.Configuration.GetValue("RateLimits:RegisterPerHour", 10);
 builder.Services.AddRateLimiter(o =>
 {
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -111,6 +114,9 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy(AuthEndpoints.EmailRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15) }));
+    o.AddPolicy(AuthEndpoints.RegisterRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
+        http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = registrationsPerHour, Window = TimeSpan.FromHours(1) }));
 });
 
 // ---------------------------------------------------------------- JSON

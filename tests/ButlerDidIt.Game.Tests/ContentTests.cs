@@ -22,6 +22,16 @@ public class ContentTests
         Assert.Equal(themes.Count, themes.Select(t => t.Theme.Slug).Distinct().Count());
     }
 
+    [Fact]
+    public void The_Halloween_filter_finds_the_four_Halloween_themes_and_nothing_else()
+    {
+        var halloween = ContentLibrary.Load(ContentRoot())
+            .Where(t => t.Theme.Seasons.Contains("halloween"))
+            .Select(t => t.Theme.Slug)
+            .Order();
+        Assert.Equal(["camp-blackwater", "hollow-hill-house", "hollowmere", "hotel-mortimer"], halloween);
+    }
+
     /// <summary>Every hand-written mystery, by id, for the theory below. New files are picked up automatically.</summary>
     public static TheoryData<string> ScenarioIds()
     {

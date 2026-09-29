@@ -76,21 +76,48 @@ Optionally, in the app service's health check settings, use path `/healthz` on p
 
 ## Data and backups
 
-The compose file declares three named volumes, which Coolify keeps across redeploys:
+The compose file declares four named volumes, which Coolify keeps across redeploys:
 
 | Volume | Holds |
 |---|---|
 | `pgdata` | the PostgreSQL database |
 | `keys` | ASP.NET Data Protection keys. Without these, every redeploy would sign every host out. |
 | `media` | generated pictures and voice clips, and guests' costume selfies. Back it up along with the database: the database only stores where each file is. |
+| `backups` | nightly database dumps from the `backup` service (see below) |
 
-To back up the database, add a **Scheduled Task** in Coolify on the `db` service, for example nightly:
+### Database backups
 
-```bash
-pg_dump -U butler butlerdidit | gzip > /var/lib/postgresql/data/backup-$(date +%F).sql.gz
+The compose file includes a `backup` service that dumps the database every night into a fourth volume, `backups`. It keeps 7 daily, 4 weekly and 6 monthly copies, and deletes older ones. To change the time, set `BACKUP_SCHEDULE` to a cron expression, e.g. `0 4 * * *` for 4 a.m. The default is `@daily`, at midnight.
+
+```
+backups/
+  last/     butlerdidit-latest.sql.gz   ← the most recent dump
+  daily/    butlerdidit-20261031.sql.gz …
+  weekly/   …
+  monthly/  …
 ```
 
-Copy backups off the server regularly.
+**Copy them off the server.** A backup on the same disk won't survive the disk. Either:
+- in Coolify, add an S3-compatible destination (Cloudflare R2, Backblaze B2, AWS S3) and a nightly **Scheduled Task** that uploads `backups/last/`, or
+- run `rclone copy` from the server's cron to any storage rclone supports.
+
+Back up the `media` volume too: the database only records where each picture and voice clip is.
+
+**To take a backup right now:** open a terminal on the `backup` service in Coolify and run `/backup.sh`.
+
+### Restoring from a backup
+
+1. Stop the `app` service so nothing writes while you restore.
+2. Copy the dump you want onto the server, then replace the database with it:
+
+   ```bash
+   docker compose exec -T db psql -U butler -d postgres -c "DROP DATABASE butlerdidit WITH (FORCE)" -c "CREATE DATABASE butlerdidit"
+   gunzip -c butlerdidit-latest.sql.gz | docker compose exec -T db psql -U butler -d butlerdidit -v ON_ERROR_STOP=1
+   ```
+
+3. Start `app` again. It applies any newer migrations on startup, so an older backup works with a newer version of the app.
+
+These steps were tested by restoring a dump from the `backup` image into a fresh database. The row counts matched, and the app started healthy on the restored copy.
 
 ### Automatic clean-up
 
