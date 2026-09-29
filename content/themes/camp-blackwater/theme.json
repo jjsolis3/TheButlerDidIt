@@ -12,6 +12,9 @@
   },
   "artStyle": "1980s horror VHS cover art, pine forest at night, lake mist, a campfire's orange glow, grainy film",
   "sortOrder": 10,
+  "seasons": [
+    "halloween"
+  ],
   "cocktails": [
     {
       "name": "The Lakeside Man",

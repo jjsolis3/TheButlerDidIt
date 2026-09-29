@@ -28,6 +28,24 @@ const TONES: Record<ContentRating, { id: Tone; title: string; body: string }[]> 
   ],
 }
 
+/** Seasons come from the theme, so every story in a Halloween theme (AI-written ones too) is found by the filter. */
+const isHalloween = (theme: ThemeCard['theme']) => (theme.seasons ?? []).includes('halloween')
+
+function FilterChip({ on, glow = false, onClick, children }: { on: boolean; glow?: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={`rounded-full border px-3 py-1 text-sm font-semibold transition ${
+        on ? 'border-accent bg-accent text-bg' : 'border-line text-muted hover:text-ink'
+      } ${glow ? 'animate-pulse ring-2 ring-accent/70' : ''}`}
+    >
+      {children}
+    </button>
+  )
+}
+
 export default function NewParty() {
   const { me } = useMe()
   const { themes, reload: reloadThemes } = useThemes()
@@ -45,6 +63,10 @@ export default function NewParty() {
   // Two catalogs: Adults (Mature) and Family. Adults first, so Blackwood Manor stays the default.
   // The shelf is also the party's content level: the server takes it from the mystery itself.
   const [shelf, setShelf] = useState<ContentRating>('mature')
+  // A seasonal filter within the shelf. Never switched on automatically: in October the chip
+  // just glows, so the host still sees the whole shelf unless they ask for the spooky ones.
+  const [halloweenOnly, setHalloweenOnly] = useState(false)
+  const [spookySeason] = useState(() => new Date().getMonth() === 9) // October; read once, not on every render
   const [chosenTone, setTone] = useState<Tone>('standard')
   const [when, setWhen] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -57,7 +79,11 @@ export default function NewParty() {
   }, [me, navigate])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
-  const onShelf = playable.filter((p) => p.scenario.contentRating === shelf)
+  const byRating = playable.filter((p) => p.scenario.contentRating === shelf)
+  const halloweenCount = byRating.filter((p) => isHalloween(p.theme)).length
+  // The filter only applies while this shelf has Halloween stories, so switching to a shelf
+  // without any can never leave the host looking at an empty list.
+  const onShelf = halloweenOnly && halloweenCount > 0 ? byRating.filter((p) => isHalloween(p.theme)) : byRating
   // The host's pick if it's on this shelf, otherwise the shelf's first mystery. Worked out
   // during render, so switching shelves can never leave a mystery from the other shelf selected.
   const scenarioId = onShelf.some((p) => p.scenario.id === chosenId) ? chosenId : onShelf[0]?.scenario.id
@@ -119,6 +145,17 @@ export default function NewParty() {
             ? 'For grown-ups: affairs, scandal, dark humour and drinking-game toasts. Nothing explicit.'
             : 'For all ages: no gore, no alcohol, no swearing. Great with kids and teens.'}
         </p>
+        {halloweenCount > 0 && (
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter stories">
+            <FilterChip on={!halloweenOnly} onClick={() => setHalloweenOnly(false)}>
+              All stories
+            </FilterChip>
+            <FilterChip on={halloweenOnly} glow={spookySeason && !halloweenOnly} onClick={() => setHalloweenOnly(true)}>
+              🎃 Halloween <span className="font-normal opacity-80">({halloweenCount})</span>
+              {spookySeason && <span className="font-normal"> · It's spooky season!</span>}
+            </FilterChip>
+          </div>
+        )}
         {themes && onShelf.length === 0 && (
           <p className="text-sm text-muted">
             No {shelf === 'family' ? 'Family' : 'Adult'} mysteries yet.{ai?.storyteller ? ' Write one with AI below.' : ''}
@@ -137,6 +174,7 @@ export default function NewParty() {
               {scenario.minPlayers}–{scenario.maxPlayers} players · about{' '}
               {scenario.estimatedMinutes < 90 ? `${scenario.estimatedMinutes} minutes` : `${Math.round(scenario.estimatedMinutes / 60)} hours`} ·{' '}
               {scenario.contentRating === 'mature' ? 'Mature themes' : 'Family friendly'}
+              {isHalloween(theme) && ' · 🎃 Halloween'}
               {scenario.aiGenerated && ' · ✨ written by AI for you'}
               {scenario.custom && ' · ✏️ your edited copy'}
               {scenario.versions.length > 1 && ` · 🎲 ${scenario.versions.length} versions, a different killer each`}

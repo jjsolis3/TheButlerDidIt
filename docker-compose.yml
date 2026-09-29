@@ -69,7 +69,29 @@ services:
       timeout: 5s
       retries: 10
 
+  # Nightly database backups into the `backups` volume: 7 daily, 4 weekly and 6 monthly are kept,
+  # older ones are deleted. These stay on the same server, so also copy them somewhere else
+  # (see "Data and backups" in docs/deploy-coolify.md, which also has the restore steps).
+  backup:
+    image: prodrigestivill/postgres-backup-local:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: butlerdidit
+      POSTGRES_USER: butler
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+      SCHEDULE: "${BACKUP_SCHEDULE:-@daily}"
+      BACKUP_KEEP_DAYS: "7"
+      BACKUP_KEEP_WEEKS: "4"
+      BACKUP_KEEP_MONTHS: "6"
+    volumes:
+      - backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
   keys:
   media:
+  backups:

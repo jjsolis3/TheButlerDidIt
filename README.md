@@ -22,6 +22,8 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - 🎃 **Death in Room 13** (Adults, Halloween): a 1926 séance at a gothic grand hotel where no guest ever checks out, and thirteen minutes of total darkness.
 - 🎃 **The Witching Hour** (Adults, Halloween): a New England harvest festival, a reenactment of a 1692 witch trial, and a curse three hundred years old.
 
+A **🎃 Halloween** filter on each shelf shows just the spooky stories. It glows all through October. A theme joins a season by listing it in `"seasons"` in its `theme.json`.
+
 All of them play with 3–8 guests in about two hours, and **each comes in three or four versions**: the same place and suspects, but a different killer, motive and clues, like dealing a new game of Clue. With "Surprise me" the version is dealt when the evening begins: one the host hasn't played, whose killer is one of the guests whenever possible (or, if none fits, one the AI writes for tonight's cast), so even the host can play along. With the optional **AI game master**, which works with Claude, ChatGPT, Gemini or local Ollama models, hosts can:
 - generate new mysteries for any of the thirteen themes, family-friendly or mature
 - let guests question characters nobody is playing

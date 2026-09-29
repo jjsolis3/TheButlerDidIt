@@ -12,6 +12,9 @@
   },
   "artStyle": "Storybook Halloween illustration, a crooked old mansion on a hill, glowing jack-o'-lanterns, friendly bats, purple night sky",
   "sortOrder": 11,
+  "seasons": [
+    "halloween"
+  ],
   "cocktails": [
     {
       "name": "Witch's Brew Punch",

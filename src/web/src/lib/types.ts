@@ -324,6 +324,8 @@ export interface ThemeDefinition {
   palette: ThemePalette
   artStyle: string
   cover: string | null
+  /** Holidays the theme suits, e.g. "halloween". Drives the seasonal filter on the host's shelf. */
+  seasons: string[]
   cocktails: { name: string; recipe: string; mocktail: string }[]
 }
 

@@ -19,6 +19,12 @@ public sealed class ThemeDefinition
     public string? Cover { get; init; }
     public int SortOrder { get; init; } = 100;
 
+    /// <summary>
+    /// Holidays this theme suits, e.g. "halloween". The host's shelf offers a filter for each
+    /// season in use, so seasonal stories are easy to find without a separate catalog.
+    /// </summary>
+    public List<string> Seasons { get; init; } = [];
+
     /// <summary>Themed drinks, shown when the host switches on drinking prompts. Each has a non-alcoholic version.</summary>
     public List<Cocktail> Cocktails { get; init; } = [];
 }

@@ -12,6 +12,9 @@
   },
   "artStyle": "Gothic 1920s art deco horror, a grand hotel lobby lit by guttering candles, gilt mirrors, green gaslight, sepia photographs",
   "sortOrder": 12,
+  "seasons": [
+    "halloween"
+  ],
   "cocktails": [
     {
       "name": "The Vanishing Bride",
