@@ -36,7 +36,23 @@ public sealed record EscapeStageView(
     /// <summary>Today's challenge: the same puzzles for every group today.</summary>
     bool Daily,
     /// <summary>Which puzzle set was played, only once the game is over.</summary>
-    long? PuzzleSet);
+    long? PuzzleSet,
+    /// <summary>The AI game master, or null when this party plays without one.</summary>
+    EscapeGameMasterView? GameMaster,
+    /// <summary>The game master's latest lines, newest last.</summary>
+    IReadOnlyList<EscapeNarrationView> Narration);
+
+public sealed record EscapeGameMasterView(
+    string Name,
+    ButlerDidIt.Game.Scenarios.VoiceProfile Voice,
+    /// <summary>It reacts out loud to what the group does.</summary>
+    bool Narrates,
+    /// <summary>Its hints are written for where the group is stuck.</summary>
+    bool WritesHints,
+    /// <summary>Lines come with a recording (otherwise the TV's browser reads them).</summary>
+    bool Voiced);
+
+public sealed record EscapeNarrationView(int Id, string Text, string? AudioUrl, DateTimeOffset At);
 
 public sealed record EscapeStageInfo(string Id, string Title, string Description);
 
@@ -53,6 +69,8 @@ public sealed record EscapePuzzleView(
     /// <summary>Only the hints already paid for.</summary>
     IReadOnlyList<string> Hints,
     int HintsLeft,
+    /// <summary>The game master is writing the hint just paid for.</summary>
+    bool HintPending,
     DateTimeOffset? LockedUntil,
     /// <summary>How many phones hold a piece of this puzzle.</summary>
     int PieceCount);

@@ -4,6 +4,7 @@ import { Button, ErrorText, StatusPill } from '../components/ui'
 import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
+import { GameMasterPanel } from './GameMasterPanel'
 import { LeaderboardPanel } from './LeaderboardPanel'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 
@@ -110,6 +111,7 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
         <blockquote className="max-w-3xl border-l-2 border-accent pl-4 text-lg text-ink/80 italic">{stage.intro}</blockquote>
       )}
       <p className="max-w-3xl text-lg text-ink/90">{stage.stage?.description}</p>
+      <GameMasterPanel gameMaster={stage.gameMaster} narration={stage.narration} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {stage.puzzles.map((p) => (
@@ -138,7 +140,8 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
                     💡 {h}
                   </p>
                 ))}
-                {info.isHost && p.hintsLeft > 0 && (
+                {p.hintPending && <p className="mt-2 animate-pulse text-sm text-muted">💭 {stage.gameMaster?.name ?? 'The game master'} is thinking of a hint…</p>}
+                {info.isHost && p.hintsLeft > 0 && !p.hintPending && (
                   <button className="mt-3 text-xs text-muted underline hover:text-ink" onClick={() => hint(p)}>
                     Hint (−{penaltyLabel(stage.hintPenaltySeconds)})
                   </button>
@@ -187,6 +190,10 @@ function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
       </p>
       <h1 className="font-display mt-4 text-5xl">{escaped ? 'You escaped!' : 'Trapped!'}</h1>
       <p className="mt-6 text-lg text-ink/90">{stage.endText}</p>
+      {/* The game master's last word arrives a moment after the ending. */}
+      <div className="mt-6 text-left">
+        <GameMasterPanel gameMaster={stage.gameMaster} narration={stage.narration} />
+      </div>
       <dl className="mt-8 grid grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-4">
         <div>
           <dt className="text-xs text-muted">Time</dt>

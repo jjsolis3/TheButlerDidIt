@@ -73,7 +73,7 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
           <section className="space-y-3">
             <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">In front of you</h2>
             {stage.puzzles.map((p) => (
-              <PuzzleCard key={p.id} puzzle={p} penalty={stage.hintPenaltySeconds} invoke={invoke} />
+              <PuzzleCard key={p.id} puzzle={p} penalty={stage.hintPenaltySeconds} gameMaster={stage.gameMaster?.name ?? null} invoke={invoke} />
             ))}
           </section>
 
@@ -109,7 +109,7 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
   )
 }
 
-function PuzzleCard({ puzzle: p, penalty, invoke }: { puzzle: EscapePuzzleView; penalty: number; invoke: Invoke }) {
+function PuzzleCard({ puzzle: p, penalty, gameMaster, invoke }: { puzzle: EscapePuzzleView; penalty: number; gameMaster: string | null; invoke: Invoke }) {
   const [answer, setAnswer] = useState('')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<string | null>(null)
@@ -191,7 +191,8 @@ function PuzzleCard({ puzzle: p, penalty, invoke }: { puzzle: EscapePuzzleView; 
             💡 {h}
           </p>
         ))}
-      {!p.solved && p.hintsLeft > 0 && (
+      {!p.solved && p.hintPending && <p className="mt-2 animate-pulse text-sm text-muted">💭 {gameMaster ?? 'The game master'} is thinking of a hint…</p>}
+      {!p.solved && p.hintsLeft > 0 && !p.hintPending && (
         <button className="mt-2 text-xs text-muted underline" onClick={hint} disabled={busy}>
           Need a hint? (−{penaltyLabel(penalty)})
         </button>

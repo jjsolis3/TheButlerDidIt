@@ -63,6 +63,11 @@ public static class EscapeRoomValidator
         if (room.HintPenaltySeconds < 0) errors.Add("The hint penalty can't be negative.");
         if (room.MinPlayers < 1 || room.MinPlayers > room.MaxPlayers) errors.Add("Player counts must satisfy 1 ≤ min ≤ max.");
         if (room.Stages.Count == 0) errors.Add("The room needs at least one stage.");
+        if (room.GameMaster is { } gm)
+        {
+            if (gm.Name.Trim().Length is 0 or > 40) errors.Add("The game master's name must be 1–40 characters.");
+            if (gm.Persona.Length > 400) errors.Add("Keep the game master's persona under 400 characters.");
+        }
 
         Duplicates(room.Stages.Select(s => s.Id), "stage", errors);
         Duplicates(room.Puzzles.Select(p => p.Id), "puzzle", errors);
@@ -129,6 +134,7 @@ public static class EscapeRoomValidator
         texts.AddRange(room.Stages.SelectMany(s => new[] { s.Title, s.Description }));
         texts.AddRange(room.Puzzles.SelectMany(p => new[] { p.Title, p.Prompt, p.SolvedText }.Concat(p.Pieces).Concat(p.Hints)));
         texts.AddRange(room.Items.SelectMany(i => new[] { i.Name, i.Description }));
+        if (room.GameMaster is { } gm) texts.AddRange([gm.Name, gm.Persona]);
         foreach (var word in FamilyUnsafeWords)
         {
             if (texts.Any(t => System.Text.RegularExpressions.Regex.IsMatch(t, $@"\b{word}", System.Text.RegularExpressions.RegexOptions.IgnoreCase)))

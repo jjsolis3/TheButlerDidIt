@@ -34,17 +34,17 @@ public sealed partial class PartyHub
         await escape.ExecuteAsync(partyId, (_, now) => new UseItems(now, seatId, puzzleId));
     }
 
-    /// <summary>A hint from a player's phone.</summary>
+    /// <summary>A hint from a player's phone: written by the AI game master when the party has one.</summary>
     public async Task EscapeHint(string puzzleId)
     {
         var (seatId, partyId) = RequireSeat();
-        await escape.ExecuteAsync(partyId, (_, now) => new RequestEscapeHint(now, seatId, puzzleId));
+        await gameMaster.RequestHintAsync(partyId, seatId, puzzleId);
     }
 
     /// <summary>A hint the host asks for from the TV.</summary>
     public async Task EscapeHostHint(string code, string puzzleId)
     {
         var party = await RequireHostParty(code);
-        await escape.ExecuteAsync(party.Id, (_, now) => new RequestEscapeHint(now, null, puzzleId));
+        await gameMaster.RequestHintAsync(party.Id, null, puzzleId);
     }
 }

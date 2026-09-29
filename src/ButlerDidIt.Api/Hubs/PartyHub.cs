@@ -23,7 +23,7 @@ namespace ButlerDidIt.Api.Hubs;
 ///   * Host controls take the party code and check the signed-in user owns the party.
 /// </summary>
 [Authorize(Policy = AuthPolicies.PartyMember)]
-public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime, PartyDealer dealer, AppDbContext db, AiGameService aiGame, ButlerDidIt.Api.Escape.EscapeService escape) : Hub
+public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime, PartyDealer dealer, AppDbContext db, AiGameService aiGame, ButlerDidIt.Api.Escape.EscapeService escape, ButlerDidIt.Api.Escape.EscapeGameMaster gameMaster) : Hub
 {
     public static string StageGroup(Guid partyId) => $"stage:{partyId}";
     public static string SeatGroup(Guid seatId) => $"seat:{seatId}";

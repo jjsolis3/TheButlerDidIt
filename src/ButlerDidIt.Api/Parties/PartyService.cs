@@ -61,6 +61,16 @@ public sealed class PartyLocks(ClusterLock cluster)
     }
 }
 
+/// <summary>
+/// Told about every change to a party once it's committed and broadcast, whatever made it
+/// (a player, the host, the ticker). For work that follows a change, such as the escape room's
+/// game master reacting to it. It must return at once: queue anything slow.
+/// </summary>
+public interface IPartySavedHandler
+{
+    void OnSaved(Party party, GameSession previous, GameSession next);
+}
+
 /// <summary>Part of an NPC's answer, pushed while the AI writes it.</summary>
 public sealed record NpcTypingEvent(Guid InterrogationId, string Text);
 
@@ -80,7 +90,8 @@ public sealed class PartyRuntime(
     GameModules modules,
     PartyLocks locks,
     IHubContext<PartyHub> hub,
-    TimeProvider clock)
+    TimeProvider clock,
+    IEnumerable<IPartySavedHandler> savedHandlers)
 {
     public DateTimeOffset Now => clock.GetUtcNow();
 
@@ -134,6 +145,7 @@ public sealed class PartyRuntime(
             await db.SaveChangesAsync(ct);
 
             await BroadcastAsync(party.Id, next, now);
+            foreach (var handler in savedHandlers) handler.OnSaved(party, session, next);
             return (party, next);
         }
     }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, ErrorText, inputClass } from '../components/ui'
 import { api } from '../lib/api'
-import type { EscapeRoomSummary, PartyMode, PuzzleChoice } from '../lib/types'
+import type { AiStatus, EscapeRoomSummary, PartyMode, PuzzleChoice } from '../lib/types'
 import { formatDuration } from './time'
 
 /** The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby. */
@@ -17,19 +17,25 @@ export function NewEscapeParty() {
   const [puzzleSet, setPuzzleSet] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // The AI game master is offered only when an admin has set up the models it uses.
+  const [ai, setAi] = useState<AiStatus | null>(null)
+  const [useAi, setUseAi] = useState(true)
 
   useEffect(() => {
     api.escapeRooms().then(setRooms, (e: Error) => setError(e.message))
+    api.aiStatus().then(setAi, () => setAi(null))
   }, [])
 
   const roomId = chosen ?? rooms?.[0]?.id
+  const room = rooms?.find((r) => r.id === roomId)
+  const aiAvailable = !!ai && (ai.actor || ai.inspector)
 
   const create = async () => {
     if (!roomId) return
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null)
+      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi)
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -114,6 +120,25 @@ export function NewEscapeParty() {
           ))}
         </div>
       </section>
+
+      {aiAvailable && ai && (
+        <section>
+          <label className="flex items-start gap-3 rounded-xl border border-line bg-surface p-4">
+            <input type="checkbox" className="mt-1 accent-[var(--theme-accent)]" checked={useAi} onChange={(e) => setUseAi(e.target.checked)} />
+            <span>
+              <span className="font-semibold">Use the AI game master{room ? ` (${room.gameMaster})` : ''}</span>
+              <span className="block text-xs text-muted">
+                {[ai.actor && `reacts out loud on the TV${ai.voice ? ' in its own voice' : ''}`, ai.inspector && 'writes hints for exactly where you are stuck (never the answer)']
+                  .filter(Boolean)
+                  .join('; ')
+                  .replace(/^./, (c) => c.toUpperCase())}
+                . This month's AI spend: ${ai.spentThisMonthUsd.toFixed(2)}
+                {ai.budgetUsd > 0 ? ` of $${ai.budgetUsd.toFixed(2)}` : ''}.
+              </span>
+            </span>
+          </label>
+        </section>
+      )}
 
       <div>
         <Button onClick={create} disabled={busy || !roomId || (puzzles === 'replay' && puzzleSet === '')}>

@@ -58,6 +58,8 @@ public sealed partial class FakeChatClient : IChatClient
             NpcPrompt.Task => NpcAnswer(system, messages),
             InspectorPrompts.HintTask => "Inspector Graves murmurs: \"Look again at who was seen near the library at nine.\"",
             InspectorPrompts.VerdictTask => Verdicts(system),
+            EscapePrompts.NarrationTask => $"Fake game master line for {Moment().Match(system).Groups[1].Value}: tick tock, my little guests.",
+            EscapePrompts.HintTask => "The game master whispers: look again at what the phones in your hands are telling you.",
             _ => "OK",
         };
     }
@@ -141,6 +143,9 @@ public sealed partial class FakeChatClient : IChatClient
 
     [GeneratedRegex(@"You are (.+?) \(")]
     private static partial Regex YouAre();
+
+    [GeneratedRegex(@"^MOMENT:\s*(\w+)", RegexOptions.Multiline)]
+    private static partial Regex Moment();
 
     [GeneratedRegex(@"^\d+\. ", RegexOptions.Multiline)]
     private static partial Regex PlayerLine();

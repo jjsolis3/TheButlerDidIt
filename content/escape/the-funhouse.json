@@ -12,6 +12,11 @@
   "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out in forty minutes. Ha-ha-HONK!",
   "escapedText": "The big gate swings open and the carnival lights twinkle goodnight. Mister Giggles waves a white glove: 'Fine, fine, you win! Come back tomorrow. I'll make it harder!' You're out!",
   "failedText": "The big lights go out with a POP and the carousel music winds down. Mister Giggles giggles in the dark: 'Looks like you're staying for the night shift!' Try again!",
+  "gameMaster": {
+    "name": "Mister Giggles",
+    "persona": "A mischievous robot clown who honks, giggles and loves a good trick. Cheeky and silly, never scary: he teases the group when they're stuck and cheers (a little grumpily) when they win his games.",
+    "voice": { "accent": "en-US", "pitch": 1.4, "rate": 1.1, "style": "bouncy, squeaky, playful" }
+  },
   "stages": [
     {
       "id": "mirrors",
