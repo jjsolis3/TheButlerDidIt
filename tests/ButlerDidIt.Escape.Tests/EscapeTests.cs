@@ -22,10 +22,28 @@ public static class Rooms
 public class ContentTests
 {
     [Fact]
-    public void The_library_has_a_mature_workshop_and_a_family_funhouse()
+    public void The_library_has_adult_and_family_rooms()
     {
         Assert.Equal(ContentRating.Mature, Rooms.Get("the-workshop").ContentRating);
+        Assert.Equal(ContentRating.Mature, Rooms.Get("the-asylum").ContentRating);
         Assert.Equal(ContentRating.Family, Rooms.Get("the-funhouse").ContentRating);
+        Assert.Equal(ContentRating.Family, Rooms.Get("the-toy-factory").ContentRating);
+        Assert.Contains("halloween", Rooms.Get("the-asylum").Seasons);
+        Assert.DoesNotContain("halloween", Rooms.Get("the-toy-factory").Seasons);
+    }
+
+    [Theory]
+    [MemberData(nameof(RoomIds))]
+    public void Every_room_has_a_look_a_sound_a_villain_and_more_than_one_length(string id)
+    {
+        var room = Rooms.Get(id);
+        Assert.False(string.IsNullOrWhiteSpace(room.ArtStyle));
+        Assert.NotNull(room.GameMaster);
+        Assert.True(room.PlayableLengths.Count > 1, "a host can pick a shorter or longer game");
+        // A longer game really is longer: more puzzles at every step up.
+        var counts = room.PlayableLengths.Select(m => RoomLengths.Cut(room, m).Puzzles.Count).ToList();
+        Assert.Equal(counts.Order(), counts);
+        Assert.True(counts[0] < counts[^1]);
     }
 
     public static TheoryData<string> RoomIds() => new(Rooms.Library.Select(r => r.Id));
@@ -98,9 +116,11 @@ public class EngineTests
 
     private static EscapeState Started(EscapeRoom room, params Guid[] seats) => Started(room, 0, seats);
 
-    private static EscapeState Started(EscapeRoom room, long seed, params Guid[] seats)
+    private static EscapeState Started(EscapeRoom room, long seed, params Guid[] seats) => Started(room, seed, null, seats);
+
+    private static EscapeState Started(EscapeRoom room, long seed, int? minutes, params Guid[] seats)
     {
-        var s = EscapeEngine.NewGame(seed);
+        var s = EscapeEngine.NewGame(seed, minutes: minutes);
         var names = new[] { "Ada", "Ben", "Cy", "Dee" };
         for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, room, new AddEscapePlayer(T0, seats[i], names[i], i == 0, false));
         return EscapeEngine.Apply(s, room, new StartEscape(T0));
@@ -117,19 +137,29 @@ public class EngineTests
             : new SubmitAnswer(at, seat, puzzle.Id, puzzle.Answers[0]));
     }
 
+    /// <summary>Every room at every length it offers, with two puzzle sets each.</summary>
+    public static TheoryData<string, long, int> RoomsAndLengths()
+    {
+        var data = new TheoryData<string, long, int>();
+        foreach (var room in Rooms.Library)
+            foreach (var minutes in room.PlayableLengths)
+                foreach (var seed in new long[] { 0, 20261031 })
+                    data.Add(room.Id, seed, minutes);
+        return data;
+    }
+
     [Theory]
-    [InlineData("the-workshop", 0)]
-    [InlineData("the-workshop", 20261031)]
-    [InlineData("the-funhouse", 0)]
-    [InlineData("the-funhouse", 424242)]
-    public void A_group_that_solves_everything_escapes(string id, long seed)
+    [MemberData(nameof(RoomsAndLengths))]
+    public void A_group_that_solves_everything_escapes(string id, long seed, int minutes)
     {
         var room = Rooms.Get(id);
-        var s = Started(room, seed, Ada, Ben, Cy);
+        var s = Started(room, seed, minutes, Ada, Ben, Cy);
+        Assert.Equal(minutes, (s.Deadline!.Value - T0).TotalMinutes); // the clock follows the length
         for (var i = 0; s.Phase == EscapePhase.Playing; i++) s = SolveNext(s, room, T0.AddMinutes(i + 1), Ben);
 
         Assert.Equal(EscapePhase.Escaped, s.Phase);
-        Assert.Equal(room.Puzzles.Count, s.Solved.Count);
+        // Every puzzle of the game as played: a shorter game leaves some of the room's puzzles out.
+        Assert.Equal(EscapeEngine.RoomFor(s, room).Puzzles.Count, s.Solved.Count);
         Assert.Equal(room.EscapedText, EscapeProjector.Stage(s, room, T0).EndText);
         Assert.Null(EscapeEngine.NextDueAt(s)); // the ticker can stop watching
     }
@@ -225,16 +255,25 @@ public class PrivacyTests
 {
     private static readonly DateTimeOffset T0 = new(2026, 10, 31, 20, 0, 0, TimeSpan.Zero);
 
+    public static TheoryData<string, int> RoomsAndLengths()
+    {
+        var data = new TheoryData<string, int>();
+        foreach (var room in Rooms.Library)
+            foreach (var minutes in room.PlayableLengths) data.Add(room.Id, minutes);
+        return data;
+    }
+
     [Theory]
-    [InlineData("the-workshop")]
-    [InlineData("the-funhouse")]
-    public void Screens_never_see_answers_unpaid_hints_later_stages_or_other_players_clues(string id)
+    [MemberData(nameof(RoomsAndLengths))]
+    public void Screens_never_see_answers_unpaid_hints_later_stages_or_other_players_clues(string id, int minutes)
     {
         var template = Rooms.Get(id);
         const long seed = 987654321; // a number that appears nowhere else, so the test can check it never leaks
-        var room = RoomVariants.Build(template, seed);
         var seats = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
-        var s = EscapeEngine.NewGame(seed);
+        var s = EscapeEngine.NewGame(seed, minutes: minutes);
+        // Every puzzle of the room, including ones this length leaves out: those must never show either.
+        var room = RoomVariants.Build(template, seed);
+        var played = EscapeEngine.RoomFor(s, template);
         for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, seats[i], $"P{i}", i == 0, false));
         s = EscapeEngine.Apply(s, template, new StartEscape(T0));
 
@@ -242,7 +281,7 @@ public class PrivacyTests
         {
             var stageJson = GameJson.Serialize(EscapeProjector.Stage(s, template, T0));
             Assert.DoesNotContain(seed.ToString(), stageJson); // the puzzle set would let someone work out the answers
-            var current = room.Stages[s.StageIndex];
+            var current = played.Stages[s.StageIndex];
             foreach (var p in room.Puzzles)
             {
                 foreach (var answer in p.Answers.Where(a => a.Length >= 3))

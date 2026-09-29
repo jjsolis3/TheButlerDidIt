@@ -289,6 +289,12 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **Hints:** with `Hints` on, a hint is `BeginEscapeHint`, which pays the time and reserves the step exactly like a written hint. `EscapeGameMaster.RequestHintAsync` then asks the AI outside the lock (Inspector role, `TASK: escape-hint`) and returns `CompleteEscapeHint`, or `CancelEscapeHint` on failure. The **engine** checks the text with `EscapeHintGuard` against the answers of the puzzle set being played. A hint that spells out an answer (digits in any form, words in any case, with or without accents or a plural) is dropped, and the written hint for that step shows instead. So does a hint still missing after `AiHintTimeout`, so a server restart mid-call never leaves a puzzle stuck "thinking".
 - **Privacy:** the narration prompt is built from the TV's public view. The hint prompt holds the puzzle, its clue pieces with who holds them, the items, the recent wrong tries, the hints already shown and the author's written hint for the step, but never the answers. `EscapePromptTests` play every room over 200 puzzle sets and check that no prompt holds an answer the group can't already see.
 
+**Lengths:**
+- A room offers `lengths` (30, 45 or 60 minutes), and a puzzle can have `minMinutes`. The host picks a length, and it's kept on the state (`EscapeState.Minutes`).
+- `EscapeEngine.RoomFor` is `RoomLengths.Cut(RoomVariants.Build(room, seed), minutes)`: the chosen puzzle set, minus the puzzles kept for longer games (and any stage left empty), with the clock at the chosen length. Both steps are cached. Everything downstream (rules, projector, prompts, art) sees the cut room, so a shorter game needs no special cases.
+- The validator checks every length over 200 puzzle sets. Results record their length, and the leaderboard ranks each length apart. Results from before lengths existed count as the room's standard length.
+- `EscapeRoom`, `EscapeStage` and `EscapePuzzle` are records, so a built or cut room is made with `with { … }` and every setting carries over. Hand-copying had already dropped a setting once.
+
 **Atmosphere** (the TV only; phones stay quiet):
 - **Sound is synthesised in the browser** (`src/web/src/escape/sound.ts`, Web Audio), so rooms ship no audio files and there's nothing to license.
   - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted or silence. The view carries the current one.

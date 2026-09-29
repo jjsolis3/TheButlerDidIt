@@ -589,6 +589,15 @@ export interface EscapeRoomSummary {
   gameMaster: string
   /** Written by AI for this host: only they see it, and they can delete it. */
   generated: boolean
+  /** The lengths a host can pick, shortest first, with how many puzzles each plays */
+  lengths: EscapeLength[]
+  /** Seasonal shelves the room is on ("halloween") */
+  seasons: string[]
+}
+
+export interface EscapeLength {
+  minutes: number
+  puzzleCount: number
 }
 
 /** Which puzzles a new escape party plays. */
@@ -612,6 +621,8 @@ export interface LeaderboardEntry {
 export interface Leaderboard {
   roomId: string
   daily: boolean
+  /** Each game length has its own board */
+  minutes: number
   top: LeaderboardEntry[]
   thisParty: LeaderboardEntry | null
   myBest: LeaderboardEntry[]

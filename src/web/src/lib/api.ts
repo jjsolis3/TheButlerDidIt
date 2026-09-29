@@ -92,12 +92,12 @@ export const api = {
   generateEscapeRoom: (theme: string, contentRating: ContentRating, minutes: number) =>
     request<GenerationJob>('POST', '/api/escape-rooms/generate', { theme, contentRating, minutes }),
   deleteEscapeRoom: (id: string) => request<void>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}`),
-  createEscapeParty: (roomId: string, mode: PartyMode, puzzles: PuzzleChoice, puzzleSet: number | null, useAi: boolean) =>
-    request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi }),
-  leaderboard: (roomId: string, daily: boolean, party?: string) =>
+  createEscapeParty: (roomId: string, mode: PartyMode, puzzles: PuzzleChoice, puzzleSet: number | null, useAi: boolean, minutes: number | null) =>
+    request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi, minutes }),
+  leaderboard: (roomId: string, daily: boolean, minutes: number, party?: string) =>
     request<Leaderboard>(
       'GET',
-      `/api/escape-rooms/${encodeURIComponent(roomId)}/leaderboard?daily=${daily}${party ? `&party=${encodeURIComponent(party)}` : ''}`,
+      `/api/escape-rooms/${encodeURIComponent(roomId)}/leaderboard?daily=${daily}&minutes=${minutes}${party ? `&party=${encodeURIComponent(party)}` : ''}`,
     ),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),

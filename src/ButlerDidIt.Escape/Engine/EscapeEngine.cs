@@ -28,11 +28,15 @@ public static class EscapeEngine
     /// <summary>How long an AI hint may take before the written one is shown instead.</summary>
     public static readonly TimeSpan AiHintTimeout = TimeSpan.FromSeconds(60);
 
-    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null) =>
-        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures() };
+    /// <param name="minutes">The game's length, one of the room's lengths; null plays the room's own time limit.</param>
+    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null, int? minutes = null) =>
+        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures(), Minutes = minutes };
 
-    /// <summary>The room as this attempt plays it: its variants and generated codes picked from the state's seed.</summary>
-    public static EscapeRoom RoomFor(EscapeState s, EscapeRoom room) => RoomVariants.Build(room, s.Seed);
+    /// <summary>
+    /// The room as this attempt plays it: its variants and generated codes picked from the state's seed,
+    /// then cut to the game's length.
+    /// </summary>
+    public static EscapeRoom RoomFor(EscapeState s, EscapeRoom room) => RoomLengths.Cut(RoomVariants.Build(room, s.Seed), s.Minutes);
 
     /// <summary>When the ticker should look again: the deadline, or the "five minutes left" warning before it.</summary>
     public static DateTimeOffset? NextDueAt(EscapeState s)

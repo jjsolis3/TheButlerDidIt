@@ -318,6 +318,12 @@ public sealed class EscapeResult
     /// <summary>Today's challenge: ranked against every group that played the same set that day.</summary>
     public bool Daily { get; set; }
 
+    /// <summary>
+    /// The game's length. Games of different lengths play different numbers of puzzles, so they're ranked
+    /// apart. Null (every result from before lengths existed) means the room's own time limit.
+    /// </summary>
+    public int? Minutes { get; set; }
+
     public bool Escaped { get; set; }
     public int ElapsedSeconds { get; set; }
     public int HintsUsed { get; set; }

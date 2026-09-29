@@ -27,6 +27,9 @@ public sealed class EscapeState
 
     /// <summary>Today's challenge: every group plays the same puzzle set today and shares a leaderboard.</summary>
     public bool Daily { get; set; }
+
+    /// <summary>The game's length in minutes, chosen when the party was made. Null (and in parties from before lengths) is the room's own time limit.</summary>
+    public int? Minutes { get; set; }
     public List<EscapePlayer> Players { get; set; } = [];
 
     public DateTimeOffset? StartedAt { get; set; }

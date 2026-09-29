@@ -7,10 +7,12 @@
   "artStyle": "bright retro carnival at night, glowing bulbs, candy stripes, playful cartoon style",
   "minPlayers": 2,
   "maxPlayers": 8,
-  "timeLimitMinutes": 40,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45],
+  "seasons": ["halloween"],
   "hintPenaltySeconds": 90,
   "soundscape": "carnival",
-  "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out in forty minutes. Ha-ha-HONK!",
+  "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out. Ha-ha-HONK!",
   "escapedText": "The big gate swings open and the carnival lights twinkle goodnight. Mister Giggles waves a white glove: 'Fine, fine, you win! Come back tomorrow. I'll make it harder!' You're out!",
   "failedText": "The big lights go out with a POP and the carousel music winds down. Mister Giggles giggles in the dark: 'Looks like you're staying for the night shift!' Try again!",
   "gameMaster": {
@@ -109,6 +111,7 @@
     },
     {
       "id": "duck-pond",
+      "minMinutes": 45,
       "title": "The Duck Pond Prize Box",
       "kind": "code",
       "prompt": "The prize box has a 3-digit lock. The sign says: '{order}!' Each of you fished out one rubber duck.",
@@ -195,6 +198,7 @@
     },
     {
       "id": "ticket-machine",
+      "minMinutes": 45,
       "title": "The Ticket Machine",
       "kind": "use",
       "prompt": "The gate's ticket machine blinks: 'One golden prize ticket to leave, please!'",

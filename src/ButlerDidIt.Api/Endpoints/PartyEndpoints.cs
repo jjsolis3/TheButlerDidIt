@@ -22,7 +22,9 @@ public sealed record CreatePartyRequest(string ScenarioId, PartyMode Mode, DateT
     bool UseAi = true, bool DrinkingPrompts = false, string? Version = null, Tone Tone = Tone.Standard, bool TailorWithAi = false);
 /// <summary>Create an escape-room party: which room, and how people will play.</summary>
 public sealed record CreateEscapePartyRequest(string RoomId, PartyMode Mode, DateTimeOffset? ScheduledFor = null,
-    ButlerDidIt.Api.Escape.PuzzleChoice Puzzles = ButlerDidIt.Api.Escape.PuzzleChoice.Fresh, long? PuzzleSet = null, bool UseAi = true);
+    ButlerDidIt.Api.Escape.PuzzleChoice Puzzles = ButlerDidIt.Api.Escape.PuzzleChoice.Fresh, long? PuzzleSet = null, bool UseAi = true,
+    /// <summary>The game's length, one of the room's lengths; null plays the room's own time limit.</summary>
+    int? Minutes = null);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -136,6 +138,8 @@ public static class PartyEndpoints
             // A hand-written room, or one written for this host: nobody else can start a party with another host's room.
             if (await rooms.FindForHostAsync(db, req.RoomId, user.FindFirstValue(ClaimTypes.NameIdentifier)!, ct) is not { } room)
                 return Results.Problem("Pick an escape room to play.", statusCode: 400);
+            if (req.Minutes is { } minutes && !room.PlayableLengths.Contains(minutes))
+                return Results.Problem($"This room can be played in {string.Join(", ", room.PlayableLengths)} minutes.", statusCode: 400);
             var (seed, daily) = ButlerDidIt.Api.Escape.PuzzleSets.For(req.Puzzles, req.PuzzleSet, parties.Now);
             var party = new Party
             {
@@ -150,7 +154,7 @@ public static class PartyEndpoints
                 CreatedAt = parties.Now,
                 UpdatedAt = parties.Now,
                 ScheduledFor = req.ScheduledFor,
-                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame(seed, daily, await EscapeAiFor(req.UseAi, ai, media, ct))),
+                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame(seed, daily, await EscapeAiFor(req.UseAi, ai, media, ct), req.Minutes)),
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);

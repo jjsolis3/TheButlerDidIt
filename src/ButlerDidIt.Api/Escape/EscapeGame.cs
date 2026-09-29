@@ -100,10 +100,30 @@ public sealed record EscapeRoomSummary(
     string Id, string Title, string Synopsis, ButlerDidIt.Game.Scenarios.ContentRating ContentRating, string Theme,
     int MinPlayers, int MaxPlayers, int TimeLimitMinutes, int StageCount, int PuzzleCount, int HintPenaltySeconds, int? BestScore, string GameMaster,
     /// <summary>Written by AI for this host: only they see it, and they can delete it.</summary>
-    bool Generated)
+    bool Generated,
+    /// <summary>The lengths a host can pick, shortest first, with how many puzzles each plays.</summary>
+    IReadOnlyList<EscapeLength> Lengths,
+    /// <summary>Seasonal shelves the room is on ("halloween").</summary>
+    IReadOnlyList<string> Seasons)
 {
-    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool generated = false) =>
-        new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, r.Stages.Count, r.Puzzles.Count, r.HintPenaltySeconds, bestScore, r.Host.Name, generated);
+    /// <param name="bestScore">The best escape at the room's own length.</param>
+    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool generated = false)
+    {
+        // Counted on the room as played at its own length, so the card matches the game the host gets by default.
+        var standard = RoomLengths.Cut(r, null);
+        return new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, standard.Stages.Count, standard.Puzzles.Count,
+            r.HintPenaltySeconds, bestScore, r.Host.Name, generated,
+            r.PlayableLengths.Select(m => new EscapeLength(m, r.Puzzles.Count(p => RoomLengths.Plays(p, m)))).ToList(), r.Seasons);
+    }
+}
+
+public sealed record EscapeLength(int Minutes, int PuzzleCount);
+
+public static class EscapeResults
+{
+    /// <summary>A room's results at one length. Results from before lengths existed count as the room's own length.</summary>
+    public static IQueryable<EscapeResult> AtLength(this IQueryable<EscapeResult> results, EscapeRoom room, int minutes) =>
+        minutes == room.TimeLimitMinutes ? results.Where(r => r.Minutes == minutes || r.Minutes == null) : results.Where(r => r.Minutes == minutes);
 }
 
 /// <summary>Escape rooms as a game module: the escape engine behind the platform's interface.</summary>
@@ -182,6 +202,7 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
             HostUserId = party.HostUserId,
             Seed = State.Seed,
             Daily = State.Daily,
+            Minutes = State.Minutes ?? Room.TimeLimitMinutes,
             Escaped = State.Phase == EscapePhase.Escaped,
             ElapsedSeconds = elapsed,
             HintsUsed = State.HintsUsed,

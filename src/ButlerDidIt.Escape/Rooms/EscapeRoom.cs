@@ -9,8 +9,11 @@ namespace ButlerDidIt.Escape.Rooms;
 /// next stage opens, and solving the last stage means the group escaped. Puzzles can need items
 /// (keys, tools) that other puzzles give out, and can split their clues across the players'
 /// phones so nobody can solve them alone.
+///
+/// A record, so a built puzzle set or a shorter length is a copy made with <c>room with { … }</c>:
+/// every setting carries over, including ones added later.
 /// </summary>
-public sealed class EscapeRoom
+public sealed record EscapeRoom
 {
     public required string Id { get; init; }
     public required string Title { get; init; }
@@ -37,6 +40,18 @@ public sealed class EscapeRoom
 
     /// <summary>The background sound on the TV, made in the browser (no audio files). A stage can change it.</summary>
     public Soundscape Soundscape { get; init; } = Soundscape.Drone;
+
+    /// <summary>
+    /// The game lengths a host can pick, in minutes (30, 45 or 60). A shorter game plays fewer
+    /// puzzles (see <see cref="EscapePuzzle.MinMinutes"/>). Left out, the room has one length: its time limit.
+    /// </summary>
+    public List<int> Lengths { get; init; } = [];
+
+    /// <summary>Seasonal shelves the room is on, like a mystery theme's: "halloween".</summary>
+    public List<string> Seasons { get; init; } = [];
+
+    /// <summary>The lengths on offer, shortest first.</summary>
+    public IReadOnlyList<int> PlayableLengths => Lengths.Count == 0 ? [TimeLimitMinutes] : Lengths.Distinct().Order().ToList();
 
     /// <summary>Who speaks for the room when the AI game master is on. Rooms without one get <see cref="GameMaster.Default"/>.</summary>
     public GameMaster? GameMaster { get; init; }
@@ -68,7 +83,7 @@ public sealed class GameMaster
     public VoiceProfile Voice { get; init; } = new();
 }
 
-public sealed class EscapeStage
+public sealed record EscapeStage
 {
     public required string Id { get; init; }
     public required string Title { get; init; }
@@ -123,7 +138,7 @@ public enum PuzzleKind
     Use,
 }
 
-public sealed class EscapePuzzle
+public sealed record EscapePuzzle
 {
     public required string Id { get; init; }
     public required string Title { get; init; }
@@ -167,6 +182,9 @@ public sealed class EscapePuzzle
     /// Prompt, hints and solved text may use {order}, {facts} and {answer}.
     /// </summary>
     public PuzzleGenerator? Generator { get; init; }
+
+    /// <summary>Only played in games at least this long (e.g. 45: left out of a 30-minute game). Null: always played.</summary>
+    public int? MinMinutes { get; init; }
 }
 
 public sealed class PuzzleVariant
