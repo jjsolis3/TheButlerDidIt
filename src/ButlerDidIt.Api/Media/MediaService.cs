@@ -147,12 +147,23 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         var gateway = sp.GetRequiredService<MediaGateway>();
         var media = sp.GetRequiredService<MediaService>();
 
-        var scenario = await catalog.GetBaseScenarioAsync(db, job.ScenarioId, ct);
-        var themeRow = await db.Themes.AsNoTracking().FirstAsync(t => t.Slug == scenario.ThemeSlug, ct);
-        var theme = GameJson.Deserialize<ThemeDefinition>(themeRow.Document);
+        // A job is for a mystery, or (with an "escape:" id) for an escape room's pictures.
+        var roomId = ButlerDidIt.Api.Escape.EscapeMedia.RoomId(job.ScenarioId);
+        IReadOnlyList<MediaItem> wanted;
+        if (roomId is not null)
+        {
+            var room = await sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().FindAsync(db, roomId, ct);
+            wanted = room is not null && await gateway.ImagesConfiguredAsync(ct) ? EscapeMediaPlan.For(room) : [];
+        }
+        else
+        {
+            var scenario = await catalog.GetBaseScenarioAsync(db, job.ScenarioId, ct);
+            var themeRow = await db.Themes.AsNoTracking().FirstAsync(t => t.Slug == scenario.ThemeSlug, ct);
+            var theme = GameJson.Deserialize<ThemeDefinition>(themeRow.Document);
+            wanted = MediaPlan.For(scenario, theme, await gateway.VoicesConfiguredAsync(ct), await gateway.ImagesConfiguredAsync(ct));
+        }
         var done = await db.ScenarioMedia.Where(m => m.ScenarioId == job.ScenarioId).Select(m => m.Key).ToHashSetAsync(ct);
-        var plan = MediaPlan.For(scenario, theme, await gateway.VoicesConfiguredAsync(ct), await gateway.ImagesConfiguredAsync(ct))
-            .Where(i => !done.Contains(i.Key)).ToList();
+        var plan = wanted.Where(i => !done.Contains(i.Key)).ToList();
 
         job.Status = MediaJobStatus.Running;
         job.Total = plan.Count;
@@ -195,11 +206,13 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         await db.SaveChangesAsync(ct);
         await events.ChangedAsync(job.HostUserId);
 
-        // New art and voices: refresh every screen of every party using this scenario.
-        catalog.Invalidate(job.ScenarioId);
+        // New art and voices: refresh every screen of every party using this scenario (or room).
+        if (roomId is null) catalog.Invalidate(job.ScenarioId);
+        else sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().ForgetArt(roomId);
         var runtime = sp.GetRequiredService<PartyRuntime>();
+        var contentId = roomId ?? job.ScenarioId;
         var partyIds = await db.Parties.AsNoTracking()
-            .Where(p => p.ScenarioId == job.ScenarioId && p.Status != PartyStatus.Finished).Select(p => p.Id).ToListAsync(ct);
+            .Where(p => p.ScenarioId == contentId && p.Status != PartyStatus.Finished).Select(p => p.Id).ToListAsync(ct);
         foreach (var id in partyIds)
         {
             var (_, session) = await runtime.LoadAsync(id, ct);

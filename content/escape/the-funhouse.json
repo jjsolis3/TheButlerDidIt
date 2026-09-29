@@ -9,6 +9,7 @@
   "maxPlayers": 8,
   "timeLimitMinutes": 40,
   "hintPenaltySeconds": 90,
+  "soundscape": "carnival",
   "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out in forty minutes. Ha-ha-HONK!",
   "escapedText": "The big gate swings open and the carnival lights twinkle goodnight. Mister Giggles waves a white glove: 'Fine, fine, you win! Come back tomorrow. I'll make it harder!' You're out!",
   "failedText": "The big lights go out with a POP and the carousel music winds down. Mister Giggles giggles in the dark: 'Looks like you're staying for the night shift!' Try again!",
@@ -20,6 +21,7 @@
   "stages": [
     {
       "id": "mirrors",
+      "soundscape": "haunted",
       "title": "The Hall of Mirrors",
       "description": "A thousand of you stare back from the wobbly mirrors. Somewhere in here is the way out, and something is written backwards on the glass.",
       "puzzles": [

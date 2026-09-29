@@ -102,3 +102,49 @@ body {
     break-inside: avoid;
   }
 }
+
+/* ---- Escape-room finale on the TV. Slow movement only (no flashing), and none with reduced motion. */
+.finale-doors,
+.finale-bars {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  pointer-events: none;
+}
+/* Two heavy doors swing apart and the light comes through. */
+.finale-doors span {
+  flex: 1;
+  background: linear-gradient(90deg, #120d08, #2a2016 50%, #120d08);
+  border: 1px solid #3a2c1c;
+  animation: finale-door-left 1.8s cubic-bezier(0.7, 0, 0.3, 1) 0.2s both;
+}
+.finale-doors span + span {
+  animation-name: finale-door-right;
+}
+@keyframes finale-door-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+@keyframes finale-door-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+/* Iron bars drop one after another, then fade back so the results stay readable. */
+.finale-bars {
+  justify-content: space-evenly;
+}
+.finale-bars span {
+  width: 14px;
+  background: linear-gradient(90deg, #2b2b2b, #6b6b6b 50%, #2b2b2b);
+  animation: finale-bar 3.2s ease-in both;
+}
+@keyframes finale-bar {
+  0% { transform: translateY(-100%); opacity: 0.9; }
+  30% { transform: translateY(0); opacity: 0.9; }
+  100% { transform: translateY(0); opacity: 0.12; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .finale-doors,
+  .finale-bars { display: none; }
+}

@@ -75,6 +75,11 @@ There are two ways to make a puzzle vary:
 
 The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more.
 
+## Sound and pictures
+
+- **`soundscape`** (on the room, and optionally on a stage) sets the background sound on the TV: `drone` (the default), `workshop`, `carnival`, `sea`, `space`, `haunted` or `silence`. The sound is made live in the browser, so there are no audio files to add. The TV also plays short sounds when a lock opens, a new room opens, a code is wrong or a hint is bought, then a gong and a heartbeat in the final minute.
+- **`artStyle`** describes the look. With an image model set up, the room's cover and each stage are painted once, from the title, synopsis and stage descriptions only. So write stage descriptions that paint a picture, and never put an answer in them unless you mean it to be hidden in plain sight.
+
 ## The AI game master
 
 When the host keeps **Use the AI game master** on (and an admin has set up the AI), the room's `gameMaster` comes alive:

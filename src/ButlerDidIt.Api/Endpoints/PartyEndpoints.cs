@@ -131,7 +131,7 @@ public static class PartyEndpoints
 
         // ---- Host: start an escape-room party. The room is checked, the clock doesn't start until the host says so.
         group.MapPost("/escape", async (CreateEscapePartyRequest req, ClaimsPrincipal user, AppDbContext db, GameModules modules,
-            ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, CancellationToken ct) =>
+            ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, TimeProvider clock, CancellationToken ct) =>
         {
             // A hand-written room, or one written for this host: nobody else can start a party with another host's room.
             if (await rooms.FindForHostAsync(db, req.RoomId, user.FindFirstValue(ClaimTypes.NameIdentifier)!, ct) is not { } room)
@@ -154,6 +154,9 @@ public static class PartyEndpoints
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);
+            // Paint the room's cover and stages now, so they're ready by the time the clock starts. Made once per room.
+            if (req.UseAi && await media.ImagesConfiguredAsync(ct))
+                await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, ButlerDidIt.Api.Escape.EscapeMedia.JobId(room.Id), party.HostUserId, clock, ct);
             return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
         }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
 

@@ -65,6 +65,11 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
 
   // ---- Lobby: three phones join.
   await expect(tv.getByRole('heading', { name: 'The Workshop' })).toBeVisible()
+  // Atmosphere: the room's cover (painted by the fake Illustrator) and a sound switch that remembers its setting.
+  await expect(tv.getByTestId('room-art')).toBeVisible({ timeout: 20_000 })
+  await tv.getByRole('button', { name: /Sound on|Click anywhere for sound/ }).click()
+  await tv.getByRole('button', { name: '🔇 Sound off' }).click()
+  await expect(tv.getByRole('button', { name: /Sound on|Click anywhere for sound/ })).toBeVisible()
   const phones = [await joinAs(browser, code, 'Ada'), await joinAs(browser, code, 'Ben'), await joinAs(browser, code, 'Cy')]
   await expect(tv.getByText("Who's trapped (3)")).toBeVisible()
 
@@ -117,6 +122,9 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
 
   // ---- Out!
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
+  // The doors swing open, then get out of the way.
+  await expect(tv.getByTestId('finale-escaped')).toBeAttached()
+  await expect(tv.getByTestId('finale-escaped')).toHaveCount(0)
   await expect(tv.getByText('Congratulations. Remember what your time is worth.', { exact: false })).toBeVisible()
   for (const p of phones) await expect(p.getByText('You escaped!')).toBeVisible()
   // The puzzle set to replay or share, and where this group ranked.

@@ -9,6 +9,7 @@
   "maxPlayers": 6,
   "timeLimitMinutes": 45,
   "hintPenaltySeconds": 120,
+  "soundscape": "workshop",
   "intro": "Hello. You don't know me, but I know all of you. You have wasted every hour you were given, so tonight I will teach you what an hour is worth. You are chained in my workshop. Everything you need to leave is in this room: keys, tools, and each other. Nobody escapes alone. You have forty-five minutes. Let the game begin.",
   "escapedText": "The steel door groans open and cold night air floods the stairwell. Behind you, the cassette clicks one last time: 'Congratulations. Remember what your time is worth.' You're out. Together.",
   "failedText": "The clock on the wall stops. The lights go out, one by one, and the tape recorder starts to laugh. You'll have to try again.",
@@ -38,6 +39,7 @@
     },
     {
       "id": "door",
+      "soundscape": "drone",
       "title": "The Door",
       "description": "Past the workbench: a steel door with a keypad, a dead fuse box, and a wire cage bolted to the wall. A doll with painted cheeks watches from a shelf.",
       "puzzles": [

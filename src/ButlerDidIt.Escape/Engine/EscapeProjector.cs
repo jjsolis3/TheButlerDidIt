@@ -8,7 +8,8 @@ namespace ButlerDidIt.Escape.Engine;
 /// </summary>
 public static class EscapeProjector
 {
-    public static EscapeStageView Stage(EscapeState s, EscapeRoom template, DateTimeOffset now)
+    /// <param name="art">The room's generated pictures by <see cref="EscapeArt"/> key, if any have been made.</param>
+    public static EscapeStageView Stage(EscapeState s, EscapeRoom template, DateTimeOffset now, IReadOnlyDictionary<string, string>? art = null)
     {
         var room = EscapeEngine.RoomFor(s, template);
         var playing = s.Phase != EscapePhase.Lobby;
@@ -40,14 +41,17 @@ public static class EscapeProjector
             GameMaster: s.Ai is { GameMaster: false, Hints: false } ? null
                 : new EscapeGameMasterView(room.Host.Name, room.Host.Voice, s.Ai.GameMaster, s.Ai.Hints, s.Ai.Voice),
             // Only the lines themselves: what the moment was, and who it was about, stays in the state.
-            Narration: s.Cues.Where(c => c.Text is not null).TakeLast(3).Select(c => new EscapeNarrationView(c.Id, c.Text!, c.AudioUrl, c.At)).ToList());
+            Narration: s.Cues.Where(c => c.Text is not null).TakeLast(3).Select(c => new EscapeNarrationView(c.Id, c.Text!, c.AudioUrl, c.At)).ToList(),
+            Soundscape: stage?.Soundscape ?? room.Soundscape,
+            // The stage's own picture while playing, falling back to the cover; the cover before and after.
+            ArtUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.Stage(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Cover));
     }
 
-    public static EscapePlayerView Player(EscapeState s, EscapeRoom template, Guid seatId, DateTimeOffset now)
+    public static EscapePlayerView Player(EscapeState s, EscapeRoom template, Guid seatId, DateTimeOffset now, IReadOnlyDictionary<string, string>? art = null)
     {
         var room = EscapeEngine.RoomFor(s, template);
         var me = s.FindPlayer(seatId) ?? throw new ButlerDidIt.Game.Engine.GameRuleException("You're not in this game.");
-        var stage = Stage(s, template, now);
+        var stage = Stage(s, template, now, art);
         // Only pieces for the stage in front of them: earlier ones are done, later ones would give the room away.
         var open = stage.Puzzles.Where(p => !p.Solved).Select(p => p.Id).ToHashSet();
         var pieces = s.Pieces

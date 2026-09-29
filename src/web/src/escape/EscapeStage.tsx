@@ -7,6 +7,7 @@ import { EscapeClock } from './EscapeClock'
 import { GameMasterPanel } from './GameMasterPanel'
 import { LeaderboardPanel } from './LeaderboardPanel'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
+import { useAtmosphere } from './useAtmosphere'
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
@@ -24,13 +25,33 @@ export function EscapeStage({ info, token }: { info: PartyInfo; token?: string }
   return (
     <div className="grain min-h-dvh">
       <StatusPill status={status} />
-      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
-        {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} />}
-        {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} />}
-        {(stage.phase === 'escaped' || stage.phase === 'failed') && <Ending stage={stage} code={info.code} />}
-      </main>
+      <Tv stage={stage} info={info} invoke={invoke} />
     </div>
   )
+}
+
+/** Split out so the sound hook only runs once there is a room to play. */
+function Tv({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke }) {
+  const sound = useAtmosphere(stage)
+  const over = stage.phase === 'escaped' || stage.phase === 'failed'
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
+      <div className="mb-2 flex justify-end">
+        <button onClick={sound.toggle} className="rounded-full border border-line bg-surface/80 px-3 py-1 text-sm text-muted hover:text-ink" aria-pressed={sound.on}>
+          {sound.on ? (sound.playing ? '🔊 Sound on' : '🔈 Click anywhere for sound') : '🔇 Sound off'}
+        </button>
+      </div>
+      {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} />}
+      {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} />}
+      {over && <Ending stage={stage} code={info.code} />}
+    </main>
+  )
+}
+
+/** A generated picture of the room or stage, if one has been made. Decorative: everything it shows is also in the text. */
+function Art({ url, className = '' }: { url: string | null; className?: string }) {
+  if (!url) return null
+  return <img src={url} alt="" data-testid="room-art" className={`fade-in w-full rounded-xl object-cover ${className}`} />
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
@@ -47,6 +68,7 @@ function Lobby({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInf
           🔐 Escape room · {stage.timeLimitMinutes} minutes · {stage.daily ? "📅 Today's challenge" : '🎲 Shuffled puzzles'}
         </p>
         <h1 className="font-display mt-2 text-5xl">{stage.roomTitle}</h1>
+        <Art url={stage.artUrl} className="mt-4 aspect-[21/9] max-w-3xl" />
         <p className="mt-4 max-w-2xl text-lg text-ink/90">{stage.synopsis}</p>
         <h2 className="font-display mt-8 text-2xl">Who's trapped ({stage.players.length})</h2>
         {stage.players.length === 0 ? (
@@ -106,6 +128,8 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
           </p>
         </div>
       </header>
+      {/* Keyed on the stage, so the new room's picture fades in as the door opens. */}
+      <Art key={stage.stage?.id} url={stage.artUrl} className="aspect-[21/7] max-h-72" />
       {stage.stageNumber === 1 && (
         // The villain's welcome, read out as the clock starts.
         <blockquote className="max-w-3xl border-l-2 border-accent pl-4 text-lg text-ink/80 italic">{stage.intro}</blockquote>
@@ -183,8 +207,24 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
 
 function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
   const escaped = stage.phase === 'escaped'
+  // The doors are taken away once they've swung open; the bars stay, faded, as part of the "trapped" look.
+  const [doorsOpen, setDoorsOpen] = useState(false)
   return (
-    <div className="mx-auto max-w-2xl py-12 text-center">
+    <div className="relative mx-auto max-w-2xl py-12 text-center">
+      {/* The finale: doors swing open on an escape, bars come down when time runs out. Movement only, no flashing, and none at all with reduced motion. */}
+      {!(escaped && doorsOpen) && (
+        <div className={escaped ? 'finale-doors' : 'finale-bars'} aria-hidden data-testid={escaped ? 'finale-escaped' : 'finale-trapped'}>
+          {escaped ? (
+            <>
+              <span />
+              <span onAnimationEnd={() => setDoorsOpen(true)} />
+            </>
+          ) : (
+            Array.from({ length: 9 }, (_, i) => <span key={i} style={{ animationDelay: `${i * 70}ms` }} />)
+          )}
+        </div>
+      )}
+      <Art url={stage.artUrl} className={`mb-6 aspect-[21/9] ${escaped ? '' : 'grayscale'}`} />
       <p className="text-6xl" aria-hidden>
         {escaped ? '🏁' : '⏰'}
       </p>

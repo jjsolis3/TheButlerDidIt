@@ -4,6 +4,7 @@
   "synopsis": "A test escape room written by the fake AI. The keeper has locked you in the lighthouse until the lamp is lit.",
   "contentRating": "family",
   "artStyle": "stormy seaside at night, warm lamplight",
+  "soundscape": "sea",
   "minPlayers": 2,
   "maxPlayers": 8,
   "timeLimitMinutes": 45,

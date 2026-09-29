@@ -40,7 +40,11 @@ public sealed record EscapeStageView(
     /// <summary>The AI game master, or null when this party plays without one.</summary>
     EscapeGameMasterView? GameMaster,
     /// <summary>The game master's latest lines, newest last.</summary>
-    IReadOnlyList<EscapeNarrationView> Narration);
+    IReadOnlyList<EscapeNarrationView> Narration,
+    /// <summary>The background sound to play now: the current stage's, or the room's.</summary>
+    Soundscape Soundscape,
+    /// <summary>A generated picture of the stage in front of the group (the room's cover in the lobby and at the end), or null.</summary>
+    string? ArtUrl);
 
 public sealed record EscapeGameMasterView(
     string Name,
