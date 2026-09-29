@@ -27,7 +27,7 @@ public static class RoomVariants
             Theme = room.Theme, ArtStyle = room.ArtStyle, MinPlayers = room.MinPlayers, MaxPlayers = room.MaxPlayers,
             TimeLimitMinutes = room.TimeLimitMinutes, HintPenaltySeconds = room.HintPenaltySeconds,
             Intro = room.Intro, EscapedText = room.EscapedText, FailedText = room.FailedText,
-            GameMaster = room.GameMaster, Stages = room.Stages, Items = room.Items,
+            GameMaster = room.GameMaster, Soundscape = room.Soundscape, Stages = room.Stages, Items = room.Items,
             Puzzles = room.Puzzles.Select(p => Concrete(p, new Rng(s ^ StableHash(p.Id)))).ToList(),
         });
     }

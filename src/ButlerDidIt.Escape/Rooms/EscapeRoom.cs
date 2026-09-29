@@ -35,6 +35,9 @@ public sealed class EscapeRoom
     public required string EscapedText { get; init; }
     public required string FailedText { get; init; }
 
+    /// <summary>The background sound on the TV, made in the browser (no audio files). A stage can change it.</summary>
+    public Soundscape Soundscape { get; init; } = Soundscape.Drone;
+
     /// <summary>Who speaks for the room when the AI game master is on. Rooms without one get <see cref="GameMaster.Default"/>.</summary>
     public GameMaster? GameMaster { get; init; }
 
@@ -75,6 +78,37 @@ public sealed class EscapeStage
 
     /// <summary>Puzzle ids, in the order the TV lists them.</summary>
     public List<string> Puzzles { get; init; } = [];
+
+    /// <summary>A different background sound for this stage; the room's when left out.</summary>
+    public Soundscape? Soundscape { get; init; }
+}
+
+/// <summary>
+/// Background sound presets, synthesised live on the TV (src/web/src/escape/sound.ts), so rooms
+/// need no audio files and nothing to license. New presets need a matching one there.
+/// </summary>
+public enum Soundscape
+{
+    /// <summary>No background sound.</summary>
+    Silence,
+
+    /// <summary>A low, uneasy hum: fits anywhere.</summary>
+    Drone,
+
+    /// <summary>Machinery hum, a ticking clock and the odd drip.</summary>
+    Workshop,
+
+    /// <summary>A slightly out-of-tune music box over a crowd murmur.</summary>
+    Carnival,
+
+    /// <summary>Waves and wind.</summary>
+    Sea,
+
+    /// <summary>A slow, pulsing synth pad and faint beeps.</summary>
+    Space,
+
+    /// <summary>Wind and distant, low bells.</summary>
+    Haunted,
 }
 
 public enum PuzzleKind

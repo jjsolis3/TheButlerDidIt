@@ -73,6 +73,25 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
     /// <summary>Drops a deleted room from this server's cache.</summary>
     public void Forget(string id) => _generated.TryRemove(id, out _);
 
+    // Pictures appear while parties play (the media job runs in the background), possibly on another
+    // server, so they're cached only briefly: a party's commands would otherwise each ask the database.
+    private static readonly TimeSpan ArtFreshFor = TimeSpan.FromSeconds(30);
+    private readonly ConcurrentDictionary<string, (DateTimeOffset At, IReadOnlyDictionary<string, string> Art)> _art = new();
+
+    /// <summary>A room's generated pictures (URLs by <see cref="EscapeArt"/> key). Empty until some are made.</summary>
+    public async Task<IReadOnlyDictionary<string, string>> ArtAsync(AppDbContext db, string roomId, DateTimeOffset now, CancellationToken ct)
+    {
+        if (_art.TryGetValue(roomId, out var cached) && now - cached.At < ArtFreshFor) return cached.Art;
+        var jobId = EscapeMedia.JobId(roomId);
+        var art = await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == jobId)
+            .ToDictionaryAsync(m => m.Key, m => ButlerDidIt.Api.Media.MediaStore.Url(m.AssetId), ct);
+        _art[roomId] = (now, art);
+        return art;
+    }
+
+    /// <summary>New pictures were made for this room: read them again on the next load.</summary>
+    public void ForgetArt(string roomId) => _art.TryRemove(roomId, out _);
+
     private EscapeRoom Parse(string id, string document) => _generated.GetOrAdd(id, _ => GameJson.Deserialize<EscapeRoom>(document));
 }
 
@@ -88,27 +107,41 @@ public sealed record EscapeRoomSummary(
 }
 
 /// <summary>Escape rooms as a game module: the escape engine behind the platform's interface.</summary>
-public sealed class EscapeModule(EscapeCatalog catalog) : IGameModule
+/// <summary>
+/// An escape room's pictures go through the mystery media pipeline (MediaWorker, MediaService's cache).
+/// Its jobs and stored pictures use "escape:{room id}" where a mystery uses its scenario id, so the two never mix.
+/// </summary>
+public static class EscapeMedia
+{
+    private const string Prefix = "escape:";
+    public static string JobId(string roomId) => Prefix + roomId;
+    public static string? RoomId(string jobId) => jobId.StartsWith(Prefix, StringComparison.Ordinal) ? jobId[Prefix.Length..] : null;
+}
+
+public sealed class EscapeModule(EscapeCatalog catalog, TimeProvider clock) : IGameModule
 {
     public GameKind Kind => GameKind.EscapeRoom;
 
     public async Task<GameSession> LoadAsync(AppDbContext db, Party party, CancellationToken ct)
     {
         var room = await catalog.FindAsync(db, party.ScenarioId, ct) ?? throw new GameRuleException("This escape room is no longer available.");
-        return new EscapeSession(GameJson.Deserialize<EscapeState>(party.State), room);
+        var art = await catalog.ArtAsync(db, room.Id, clock.GetUtcNow(), ct);
+        return new EscapeSession(GameJson.Deserialize<EscapeState>(party.State), room, art);
     }
 }
 
-public sealed class EscapeSession(EscapeState state, EscapeRoom room) : GameSession
+/// <param name="art">The room's generated pictures, by <see cref="EscapeArt"/> key.</param>
+public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyDictionary<string, string>? art = null) : GameSession
 {
     public EscapeState State { get; } = state;
     public EscapeRoom Room { get; } = room;
+    public IReadOnlyDictionary<string, string>? Art { get; } = art;
 
     /// <summary>The session after a command. The same instance when the engine changed nothing (an idle tick).</summary>
     public EscapeSession Apply(EscapeCommand command)
     {
         var next = EscapeEngine.Apply(State, Room, command);
-        return ReferenceEquals(next, State) ? this : new EscapeSession(next, Room);
+        return ReferenceEquals(next, State) ? this : new EscapeSession(next, Room, Art);
     }
 
     public override IReadOnlyList<Guid> SeatIds => State.Players.Select(p => p.SeatId).ToList();
@@ -123,8 +156,8 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room) : GameSess
     public override DateTimeOffset? NextDueAt => EscapeEngine.NextDueAt(State);
     public override string ContentId => Room.Id;
     public override string Serialize() => GameJson.Serialize(State);
-    public override object StageView(DateTimeOffset now) => EscapeProjector.Stage(State, Room, now);
-    public override object PlayerView(Guid seatId, DateTimeOffset now) => EscapeProjector.Player(State, Room, seatId, now);
+    public override object StageView(DateTimeOffset now) => EscapeProjector.Stage(State, Room, now, Art);
+    public override object PlayerView(Guid seatId, DateTimeOffset now) => EscapeProjector.Player(State, Room, seatId, now, Art);
     public override GameSummary Describe(bool isHost) => new(Room.Id, Room.Title, Room.Theme, State.Players.Count, Room.MaxPlayers);
     public override string? PhotoUrl(Guid seatId) => State.FindPlayer(seatId)?.PhotoUrl;
 

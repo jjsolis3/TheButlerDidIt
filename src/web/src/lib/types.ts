@@ -692,7 +692,14 @@ export interface EscapeStageView {
   gameMaster: EscapeGameMasterView | null
   /** The game master's latest lines, newest last */
   narration: EscapeNarrationView[]
+  /** The background sound to play now: the current stage's, or the room's */
+  soundscape: Soundscape
+  /** A generated picture of the stage in front of the group (the room's cover in the lobby and at the end), or null */
+  artUrl: string | null
 }
+
+/** Background sound presets, synthesised in the browser by escape/sound.ts. */
+export type Soundscape = 'silence' | 'drone' | 'workshop' | 'carnival' | 'sea' | 'space' | 'haunted'
 
 export interface EscapeGameMasterView {
   name: string

@@ -3,6 +3,7 @@ using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
 using ButlerDidIt.Api.Escape;
 using ButlerDidIt.Escape.Engine;
+using ButlerDidIt.Escape.Rooms;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
@@ -105,5 +106,44 @@ public class EscapeGameMasterTests(FakeAiFactory app) : IClassFixture<FakeAiFact
         using var scope = app.Services.CreateScope();
         var row = scope.ServiceProvider.GetRequiredService<AppDbContext>().Parties.AsNoTracking().Single(p => p.Code == code);
         return GameJson.Deserialize<EscapeState>(row.State);
+    }
+
+    [Fact]
+    public async Task The_room_is_painted_once_and_the_tv_shows_each_stage_picture()
+    {
+        var (cookie, party, _) = await StartedPartyAsync(useAi: true);
+        await using var tv = await app.ConnectAsync(cookie: cookie);
+
+        // The cover shows in the lobby once the (fake) Illustrator has painted it.
+        var lobby = await WaitForAsync(tv, party.Code, s => s.ArtUrl is not null, "the room's cover");
+        Assert.StartsWith("/media/assets/", lobby.ArtUrl);
+        Assert.Equal(Soundscape.Workshop, lobby.Soundscape);
+
+        await tv.InvokeAsync("EscapeStart", party.Code);
+        var playing = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
+        Assert.NotEqual(lobby.ArtUrl, playing.ArtUrl); // the first stage's own picture
+
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var room = scope.ServiceProvider.GetRequiredService<EscapeCatalog>().Find("the-workshop")!;
+        Assert.Equal(room.Stages.Count + 1, await db.ScenarioMedia.CountAsync(m => m.ScenarioId == EscapeMedia.JobId("the-workshop")));
+
+        // A second party of the same room reuses the pictures: nothing new is painted.
+        var images = await db.MediaAssets.CountAsync(a => a.Kind == MediaKind.Image);
+        var (secondCookie, second, _) = await StartedPartyAsync(useAi: true); // another host
+        await using var tv2 = await app.ConnectAsync(cookie: secondCookie);
+        await WaitForAsync(tv2, second.Code, s => s.ArtUrl is not null, "the second party's cover");
+        Assert.Equal(images, await db.MediaAssets.CountAsync(a => a.Kind == MediaKind.Image));
+    }
+
+    [Fact]
+    public async Task Without_the_ai_nothing_is_painted()
+    {
+        var (host, _) = await app.RegisterHostAsync($"noart{Guid.NewGuid():N}@example.com");
+        await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties/escape",
+            new CreateEscapePartyRequest("the-funhouse", PartyMode.SharedScreen, UseAi: false), GameJson.Options));
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.False(await db.MediaJobs.AnyAsync(j => j.ScenarioId == EscapeMedia.JobId("the-funhouse")));
     }
 }
