@@ -256,7 +256,7 @@ function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
           {stage.daily ? '' : ': share it to challenge friends with the same puzzles.'}
         </p>
       )}
-      <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} />
+      <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} minutes={stage.timeLimitMinutes} />
     </div>
   )
 }

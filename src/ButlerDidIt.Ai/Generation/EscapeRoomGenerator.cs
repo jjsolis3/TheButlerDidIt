@@ -134,7 +134,13 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         node["minPlayers"] = Math.Clamp(room.MinPlayers, 2, 8);
         node["maxPlayers"] = 8;
         // One fixed version: the generators already make every play different.
-        foreach (var puzzle in node["puzzles"]!.AsArray()) puzzle!.AsObject().Remove("variants");
+        // …and one length, the clock the host asked for: the model doesn't pick which puzzles a shorter game skips.
+        node.Remove("lengths");
+        foreach (var puzzle in node["puzzles"]!.AsArray())
+        {
+            puzzle!.AsObject().Remove("variants");
+            puzzle.AsObject().Remove("minMinutes");
+        }
         return node.Deserialize<EscapeRoom>(GameJson.Options)!;
     }
 

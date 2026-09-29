@@ -1,16 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Button, ErrorText, inputClass } from '../components/ui'
+import { Button, ErrorText, FilterChip, inputClass } from '../components/ui'
 import { api } from '../lib/api'
-import type { AiStatus, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
+import type { AiStatus, ContentRating, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
 import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { formatDuration } from './time'
+
+const isHalloween = (room: EscapeRoomSummary) => room.seasons.includes('halloween')
 
 /** The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby. */
 export function NewEscapeParty() {
   const navigate = useNavigate()
   const [rooms, setRooms] = useState<EscapeRoomSummary[] | null>(null)
   const [chosen, setChosen] = useState<string>()
+  // Adults and Family shelves, and a Halloween filter within them, like the mystery shelf.
+  const [shelf, setShelf] = useState<ContentRating>('mature')
+  const [halloweenOnly, setHalloweenOnly] = useState(false)
+  const [spookySeason] = useState(() => new Date().getMonth() === 9) // October; read once, not on every render
+  // The game's length. Only kept while the chosen room offers it (worked out during render below).
+  const [chosenMinutes, setChosenMinutes] = useState<number>()
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   // Fresh puzzles every time by default; today's challenge races every other group; a puzzle set
   // number (shown at the end of every game) replays exactly the same puzzles.
@@ -29,8 +37,13 @@ export function NewEscapeParty() {
 
   // A room written by AI goes to the top of the shelf, selected, ready to play.
   const onWritten = async (job: GenerationJob) => {
-    setRooms(await api.escapeRooms())
-    if (job.scenarioId) setChosen(job.scenarioId)
+    const all = await api.escapeRooms()
+    setRooms(all)
+    const written = all.find((r) => r.id === job.scenarioId)
+    if (!written) return
+    setShelf(written.contentRating) // show it on its own shelf
+    setHalloweenOnly(false)
+    setChosen(written.id)
   }
 
   const remove = async (room: EscapeRoomSummary) => {
@@ -45,8 +58,15 @@ export function NewEscapeParty() {
     }
   }
 
-  const roomId = chosen ?? rooms?.[0]?.id
-  const room = rooms?.find((r) => r.id === roomId)
+  const byRating = rooms?.filter((r) => r.contentRating === shelf) ?? []
+  const halloweenCount = byRating.filter(isHalloween).length
+  // The filter only applies while this shelf has Halloween rooms, so switching shelves never leaves it empty.
+  const onShelf = halloweenOnly && halloweenCount > 0 ? byRating.filter(isHalloween) : byRating
+  // The host's pick if it's on this shelf, otherwise the shelf's first room: worked out during render,
+  // so switching shelves can never leave a room from the other shelf selected.
+  const room = onShelf.find((r) => r.id === chosen) ?? onShelf[0]
+  const roomId = room?.id
+  const minutes = room && room.lengths.some((l) => l.minutes === chosenMinutes) ? chosenMinutes! : room?.timeLimitMinutes
   const aiAvailable = !!ai && (ai.actor || ai.inspector)
 
   const create = async () => {
@@ -54,7 +74,7 @@ export function NewEscapeParty() {
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi)
+      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi, minutes ?? null)
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -69,10 +89,40 @@ export function NewEscapeParty() {
         <p className="text-xs text-muted">
           Work together against the clock: every phone holds different clues, so talk! Hints help, but each one costs time.
         </p>
+        <div className="grid grid-cols-2 gap-2 rounded-xl border border-line bg-surface p-1" role="tablist" aria-label="Escape room catalog">
+          {(['mature', 'family'] as const).map((s) => (
+            <button
+              key={s}
+              role="tab"
+              aria-selected={shelf === s}
+              onClick={() => setShelf(s)}
+              className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${shelf === s ? 'bg-accent text-bg' : 'text-muted hover:text-ink'}`}
+            >
+              {s === 'mature' ? '🍷 Adults' : '🧸 Family'} <span className="font-normal opacity-80">({rooms?.filter((r) => r.contentRating === s).length ?? 0})</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted">
+          {shelf === 'mature' ? 'For grown-ups: horror in the style of the Saw films. Tense and creepy, never graphic.' : 'For all ages: spooky or silly, never scary. Great with kids.'}
+        </p>
+        {halloweenCount > 0 && (
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter rooms">
+            <FilterChip on={!halloweenOnly} onClick={() => setHalloweenOnly(false)}>
+              All rooms
+            </FilterChip>
+            <FilterChip on={halloweenOnly} glow={spookySeason && !halloweenOnly} onClick={() => setHalloweenOnly(true)}>
+              🎃 Halloween <span className="font-normal opacity-80">({halloweenCount})</span>
+              {spookySeason && <span className="font-normal"> · It's spooky season!</span>}
+            </FilterChip>
+          </div>
+        )}
         {!rooms && !error && <p className="text-muted">Loading rooms…</p>}
+        {rooms && onShelf.length === 0 && (
+          <p className="text-sm text-muted">No {shelf === 'family' ? 'Family' : 'Adult'} rooms yet.{ai?.storyteller ? ' Write one with AI below.' : ''}</p>
+        )}
         {ai?.storyteller && <GenerateEscapeRoom onReady={onWritten} />}
         <div className="grid gap-3 sm:grid-cols-2">
-          {rooms?.map((r) => (
+          {onShelf.map((r) => (
             <div key={r.id} className="flex flex-col">
               <button
                 onClick={() => setChosen(r.id)}
@@ -82,8 +132,8 @@ export function NewEscapeParty() {
                 {r.generated && <p className="text-xs font-semibold tracking-widest text-accent uppercase">✨ Written by AI for you</p>}
                 <p className="font-display text-lg">{r.title}</p>
                 <p className="mt-1 text-xs text-muted">
-                  {r.contentRating === 'mature' ? '🍷 Adults' : '🧸 Family'} · {r.timeLimitMinutes} min · {r.minPlayers}–{r.maxPlayers} players · {r.stageCount} rooms,{' '}
-                  {r.puzzleCount} puzzles
+                  {r.contentRating === 'mature' ? '🍷 Adults' : '🧸 Family'} · {r.lengths.map((l) => l.minutes).join('/')} min · {r.minPlayers}–{r.maxPlayers} players ·{' '}
+                  {r.stageCount} rooms, {r.puzzleCount} puzzles{isHalloween(r) && ' · 🎃 Halloween'}
                 </p>
                 <p className="mt-2 text-sm text-ink/90">{r.synopsis}</p>
                 {r.bestScore !== null && <p className="mt-2 text-xs text-accent">🏆 Best escape: {formatDuration(r.bestScore)}</p>}
@@ -97,6 +147,23 @@ export function NewEscapeParty() {
             </div>
           ))}
         </div>
+        {room && room.lengths.length > 1 && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">How long?</h3>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {room.lengths.map((l) => (
+                <label key={l.minutes} className={`cursor-pointer rounded-xl border p-3 ${minutes === l.minutes ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}>
+                  <input type="radio" name="escape-length" className="sr-only" checked={minutes === l.minutes} onChange={() => setChosenMinutes(l.minutes)} />
+                  <span className="font-semibold">⏱️ {l.minutes} minutes</span>
+                  <span className="mt-1 block text-xs text-muted">
+                    {l.puzzleCount} puzzles{l.minutes === room.timeLimitMinutes ? ' · the standard game' : l.minutes < room.timeLimitMinutes ? ' · a quicker game' : ' · the extended cut'}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-muted">Each length has its own leaderboard.</p>
+          </div>
+        )}
       </section>
 
       <section className="space-y-3">

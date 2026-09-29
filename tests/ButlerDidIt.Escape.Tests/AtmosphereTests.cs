@@ -71,7 +71,7 @@ public class AtmosphereTests
         {
             var built = RoomVariants.Build(template, 42);
             foreach (var property in typeof(EscapeRoom).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                         .Where(p => p.Name != nameof(EscapeRoom.Puzzles) && p.GetIndexParameters().Length == 0))
+                         .Where(p => p.Name != nameof(EscapeRoom.Puzzles) && p.SetMethod is not null)) // settings, not computed ones
             {
                 Assert.True(Equals(property.GetValue(template), property.GetValue(built)), $"{template.Id}: {property.Name} was lost building a puzzle set.");
             }

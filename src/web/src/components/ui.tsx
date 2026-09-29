@@ -78,3 +78,19 @@ export function StatusPill({ status }: { status: string }) {
     </div>
   )
 }
+
+/** A round on/off chip for filtering a shelf (e.g. 🎃 Halloween). With `glow`, it pulses gently to be noticed. */
+export function FilterChip({ on, glow = false, onClick, children }: { on: boolean; glow?: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={`rounded-full border px-3 py-1 text-sm font-semibold transition ${
+        on ? 'border-accent bg-accent text-bg' : 'border-line text-muted hover:text-ink'
+      } ${glow ? 'animate-pulse ring-2 ring-accent/70' : ''}`}
+    >
+      {children}
+    </button>
+  )
+}

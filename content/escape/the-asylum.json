@@ -1,0 +1,230 @@
+{
+  "id": "the-asylum",
+  "title": "The Asylum",
+  "synopsis": "You wake on an iron bed in Cell Block C of an asylum that closed fifty years ago. The PA system hums to life. The Night Warden has been expecting you, and he doesn't like patients who wander.",
+  "contentRating": "mature",
+  "theme": "asylum",
+  "artStyle": "abandoned Victorian asylum, peeling paint, cold blue moonlight, flickering caged bulbs, film grain",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45, 60],
+  "seasons": ["halloween"],
+  "hintPenaltySeconds": 120,
+  "soundscape": "haunted",
+  "intro": "Good evening, my patients. Lights out was hours ago, and yet here you are, awake. How restless. The doors of my ward are locked, as they have always been. If you want to leave, you will have to earn it, together. I'll be listening on the PA. I am always listening. Your treatment begins now.",
+  "escapedText": "The gate grinds open onto wet grass and moonlight. Behind you, the PA gives one last crackle: 'Discharged. For now.' You run, and you don't look back.",
+  "failedText": "Every door in the ward slams at once. The bulbs go out one by one, and the PA hums a lullaby. 'Back to bed, my patients. We'll try again tomorrow.'",
+  "gameMaster": {
+    "name": "The Night Warden",
+    "persona": "Speaks over the asylum's crackling PA system in a soft, sing-song voice, like a nurse doing rounds at three in the morning. Calls the group 'my patients'. Never raises his voice: the calmer he sounds, the worse it is. Treats every solved lock as a worrying symptom.",
+    "voice": { "accent": "en-GB", "pitch": 0.8, "rate": 0.9, "style": "soft, sing-song, clinical" }
+  },
+  "stages": [
+    {
+      "id": "cells",
+      "title": "Cell Block C",
+      "description": "Three iron beds, bolted to the floor. The paint on the walls hangs in long strips, and a bulb flickers behind a wire cage. The cell door has a small observation slot, locked from the outside, and a patient chart hangs from the end of your bed.",
+      "puzzles": ["observation-slot", "chart", "cell-door"]
+    },
+    {
+      "id": "treatment",
+      "title": "The Treatment Wing",
+      "description": "A long corridor of white tiles. Wheelchairs stand in a row, as if waiting for someone. At the far end, a glass medicine cabinet glows under a single lamp, beside a staff locker and a security door with a card reader.",
+      "puzzles": ["medicine-cabinet", "staff-locker", "security-door"]
+    },
+    {
+      "id": "records",
+      "soundscape": "drone",
+      "title": "The Records Room",
+      "description": "Filing cabinets tower to the ceiling, their drawers hanging open. An old reel-to-reel tape player is wired into the exit gate, which has a heavy keyhole and a three-digit keypad.",
+      "puzzles": ["tape-player", "exit-gate"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "observation-slot",
+      "title": "The Observation Slot",
+      "kind": "text",
+      "prompt": "A word lock holds the slot in your cell door shut. The PA crackles: 'I can fill your whole cell, yet I take up no space at all. Tell me what I am, and I'll let you look.'",
+      "answers": ["light", "the light", "lamplight"],
+      "rewards": ["cell-key"],
+      "hints": [
+        "Look up at that flickering bulb.",
+        "Flick a switch and the cell is full of it."
+      ],
+      "solvedText": "The slot scrapes open. Something small drops through it and rings on the floor: a key on a loop of hospital string.",
+      "variants": [
+        {},
+        {
+          "prompt": "A word lock holds the slot in your cell door shut. The PA crackles: 'Speak my name and I am gone. Tell me what I am, and I'll let you look.'",
+          "answers": ["silence"],
+          "hints": [
+            "The PA has just gone very quiet. What's left?",
+            "It's broken the moment anybody talks."
+          ]
+        },
+        {
+          "prompt": "A word lock holds the slot in your cell door shut. The PA crackles: 'I follow you everywhere in the light, and I vanish when it's gone. Tell me what I am, and I'll let you look.'",
+          "answers": ["shadow", "your shadow", "shadows"],
+          "hints": [
+            "Look at the wall behind you under the flickering bulb.",
+            "It copies every move you make, and it's always right behind you."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chart",
+      "minMinutes": 45,
+      "title": "The Patient Chart",
+      "kind": "code",
+      "prompt": "Clipped to the chart is a little lockbox marked MEDICATION, with a 3-digit dial. Someone has scribbled the code across the chart's pages. Each of you read a different page.",
+      "hints": [
+        "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The lockbox opens. There's no medicine inside, only a note in shaky handwriting: 'Don't believe the Warden's clock.'",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Scrawled across your page of the chart in red pen: the {ordinal} digit is {fact}."
+      }
+    },
+    {
+      "id": "cell-door",
+      "title": "The Cell Door",
+      "kind": "use",
+      "prompt": "The cell door is solid steel, with a keyhole on the inside. A cell should never lock from the inside.",
+      "requires": ["cell-key"],
+      "hints": [
+        "Something that came through the slot fits a keyhole.",
+        "Use the key on the string on the cell door."
+      ],
+      "solvedText": "The key turns with a clunk. The door swings out into a long, tiled corridor. The PA sighs: 'Oh dear. Wandering again.'"
+    },
+    {
+      "id": "medicine-cabinet",
+      "title": "The Medicine Cabinet",
+      "kind": "code",
+      "prompt": "The glass medicine cabinet has a 3-digit lock. A typed label on the glass reads: '{order}. Take as directed.'",
+      "rewards": ["keycard"],
+      "hints": [
+        "Each phone saw one colour of pill bottle, and how many of them there were.",
+        "Read them in the label's order: {order}."
+      ],
+      "solvedText": "The cabinet clicks open. Behind the bottles, taped to the back panel: a staff keycard with the photo scratched out.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": ["white", "blue", "pink", "yellow", "green", "orange"],
+        "pieceTemplate": "You counted the {color} pill bottles on the cabinet's shelves: there were {digit}."
+      }
+    },
+    {
+      "id": "staff-locker",
+      "minMinutes": 60,
+      "title": "The Staff Locker",
+      "kind": "text",
+      "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'I have keys but open no locks. I have space but no room. You can enter, but you can never go inside.'",
+      "answers": ["keyboard", "a keyboard", "computer keyboard"],
+      "hints": [
+        "Think about the computer at the nurses' station.",
+        "You type on it."
+      ],
+      "solvedText": "Inside the locker hangs a staff rota. Every name on it has been crossed out but one, written in fresh ink: yours.",
+      "variants": [
+        {},
+        {
+          "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'I have a head and a tail, but no body. Flip me to decide your fate.'",
+          "answers": ["coin", "a coin"],
+          "hints": [
+            "Check your pockets.",
+            "Heads or tails?"
+          ]
+        },
+        {
+          "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'The more I dry, the wetter I get.'",
+          "answers": ["towel", "a towel"],
+          "hints": [
+            "Think about the washrooms down the hall.",
+            "You use one after a bath."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security-door",
+      "title": "The Security Door",
+      "kind": "use",
+      "prompt": "The security door at the end of the wing has a card reader, blinking red. A sign beneath it: STAFF ONLY.",
+      "requires": ["keycard"],
+      "rewards": ["master-key"],
+      "hints": [
+        "You found something that belongs to the staff.",
+        "Use the keycard on the card reader."
+      ],
+      "solvedText": "The reader beeps green and the door hisses open. Just inside, on the floor, as if someone left it for you: a heavy iron master key."
+    },
+    {
+      "id": "tape-player",
+      "minMinutes": 45,
+      "title": "The Tape Player",
+      "kind": "text",
+      "prompt": "The reel-to-reel tape player is wired to the gate's second lock. A label on it reads: 'Repeat the Warden's three words, first to last.'",
+      "hints": [
+        "Three phones each remember one word the Warden whispered over the PA.",
+        "Say them in order, first to last, like: word word word."
+      ],
+      "solvedText": "The reels stop turning. '{answer},' the Warden repeats softly. 'Good. You were listening.' One lock on the gate falls open.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": ["lullaby", "cradle", "mother", "winter", "candle", "orchard", "violin", "sparrow", "chapel", "lantern", "ribbon", "willow"],
+        "pieceTemplate": "You heard it on the PA as you ran down the corridor: the {ordinal} word the Warden whispered was '{word}'."
+      }
+    },
+    {
+      "id": "exit-gate",
+      "title": "The Exit Gate",
+      "kind": "code",
+      "prompt": "The gate takes the master key AND a 3-digit code. Painted on the wall beside it: 'Your cell's number, then the floor you woke on, then how many beds you shared.'",
+      "answers": ["713"],
+      "requires": ["master-key"],
+      "pieces": [
+        "You remember the number stencilled on your cell door: 7.",
+        "You remember the sign in the stairwell: FLOOR 1.",
+        "You remember your cell: 3 iron beds, bolted down."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order painted on the wall.",
+        "The cell number, then the floor, then the beds."
+      ],
+      "solvedText": "The master key turns and the keypad glows green. With a groan of old iron, the gate begins to open.",
+      "variants": [
+        {},
+        {
+          "answers": ["425"],
+          "pieces": [
+            "You remember the number stencilled on your cell door: 4.",
+            "You remember the sign in the stairwell: FLOOR 2.",
+            "You remember your cell: 5 iron beds, bolted down."
+          ]
+        },
+        {
+          "answers": ["936"],
+          "pieces": [
+            "You remember the number stencilled on your cell door: 9.",
+            "You remember the sign in the stairwell: FLOOR 3.",
+            "You remember your cell: 6 iron beds, bolted down."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    { "id": "cell-key", "name": "Key on a string", "description": "Small and cold, on a loop of hospital string. It came through the slot." },
+    { "id": "keycard", "name": "Staff keycard", "description": "The photo has been scratched out with something sharp." },
+    { "id": "master-key", "name": "Iron master key", "description": "Heavy and old. Stamped on the bow: WARD C." }
+  ]
+}

@@ -236,4 +236,54 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Null(board.ThisParty);
         Assert.DoesNotContain(board.Top, e => e.ThisParty);
     }
+
+    [Fact]
+    public async Task The_shelf_offers_each_rooms_lengths_and_seasons()
+    {
+        var rooms = GameJson.Deserialize<List<EscapeRoomSummary>>(await app.CreateClient().GetStringAsync("/api/escape-rooms"));
+        var asylum = rooms.Single(r => r.Id == "the-asylum");
+        Assert.Equal([30, 45, 60], asylum.Lengths.Select(l => l.Minutes));
+        Assert.True(asylum.Lengths[0].PuzzleCount < asylum.Lengths[^1].PuzzleCount);
+        Assert.Contains("halloween", asylum.Seasons);
+        Assert.Equal(asylum.Lengths.Single(l => l.Minutes == 45).PuzzleCount, asylum.PuzzleCount); // the card shows the standard game
+        Assert.Contains(rooms, r => r.Id == "the-toy-factory" && r.ContentRating == ButlerDidIt.Game.Scenarios.ContentRating.Family);
+    }
+
+    [Fact]
+    public async Task A_shorter_game_plays_fewer_puzzles_on_a_shorter_clock_and_has_its_own_leaderboard()
+    {
+        var (host, cookie) = await app.RegisterHostAsync($"short{Guid.NewGuid():N}@example.com");
+        // A length the room doesn't offer is refused.
+        var bad = await host.PostAsJsonAsync("/api/parties/escape", new CreateEscapePartyRequest("the-funhouse", PartyMode.SharedScreen, Minutes: 60), GameJson.Options);
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, bad.StatusCode);
+
+        var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties/escape",
+            new CreateEscapePartyRequest("the-workshop", PartyMode.SharedScreen, Minutes: 30), GameJson.Options));
+        await EscapeAsync(party, cookie, "the-workshop");
+
+        await using var tv = await app.ConnectAsync(cookie: cookie);
+        var end = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
+        Assert.Equal(EscapePhase.Escaped, end.Phase);
+        Assert.Equal(30, end.TimeLimitMinutes);
+        Assert.True(end.PuzzleCount < app.Services.GetRequiredService<EscapeCatalog>().Find("the-workshop")!.Puzzles.Count);
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var result = scope.ServiceProvider.GetRequiredService<AppDbContext>().EscapeResults.AsNoTracking().Single(r => r.PartyId == StateParty(party.Code));
+            Assert.Equal(30, result.Minutes);
+        }
+        // On the 30-minute board, not on the standard one.
+        var thirty = await Read<Leaderboard>(await host.GetAsync($"/api/escape-rooms/the-workshop/leaderboard?minutes=30&party={party.Code}"));
+        Assert.Equal(30, thirty.Minutes);
+        Assert.NotNull(thirty.ThisParty);
+        var standard = await Read<Leaderboard>(await host.GetAsync($"/api/escape-rooms/the-workshop/leaderboard?party={party.Code}"));
+        Assert.Equal(45, standard.Minutes);
+        Assert.Null(standard.ThisParty);
+    }
+
+    private Guid StateParty(string code)
+    {
+        using var scope = app.Services.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<AppDbContext>().Parties.AsNoTracking().Single(p => p.Code == code).Id;
+    }
 }

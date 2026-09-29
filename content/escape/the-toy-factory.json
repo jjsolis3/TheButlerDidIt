@@ -1,0 +1,229 @@
+{
+  "id": "the-toy-factory",
+  "title": "The Tick-Tock Toy Factory",
+  "synopsis": "You snuck into the toy factory to see where the magic happens, and the doors locked behind you. Sprocket, the grumpy wind-up foreman, won't let anyone leave until his factory is fixed. Solve his puzzles before the morning whistle!",
+  "contentRating": "family",
+  "theme": "toy-factory",
+  "artStyle": "whimsical toy factory at night, conveyor belts of teddy bears and tin robots, warm lamp light, bright storybook illustration",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45, 60],
+  "hintPenaltySeconds": 90,
+  "soundscape": "workshop",
+  "intro": "Beep. Boop. INTRUDERS! The Tick-Tock Toy Factory is CLOSED, and I, Sprocket, Foreman of the Night Shift, have locked every door. Want to go home? Then fix my factory! Work together, share what you find, and get out before the morning whistle. Clank!",
+  "escapedText": "The big loading door rolls up and morning sunshine pours in. Sprocket's gears whir sulkily: 'Hmph. Fine. Best night shift I've ever had. Don't tell anyone.' You made it out!",
+  "failedText": "The morning whistle blows and every machine grinds to a halt. Sprocket clanks with glee: 'Overtime for everyone!' Try again!",
+  "gameMaster": {
+    "name": "Sprocket",
+    "persona": "A grumpy wind-up robot foreman who clanks, whirs and grumbles about 'unauthorised fun'. Secretly delighted whenever the group solves one of his puzzles, though he'd never admit it. Never scary: more cross old uncle than villain.",
+    "voice": { "accent": "en-GB", "pitch": 1.2, "rate": 1.05, "style": "clanky, grumpy, robotic" }
+  },
+  "stages": [
+    {
+      "id": "assembly",
+      "title": "The Assembly Line",
+      "description": "Conveyor belts snake across the room, piled with half-built teddy bears and tin soldiers. A giant toy robot stands frozen in front of the exit, and a control panel blinks beside the belt.",
+      "puzzles": ["control-panel", "teddy-tester", "giant-robot"]
+    },
+    {
+      "id": "paint",
+      "soundscape": "carnival",
+      "title": "The Paint Shop",
+      "description": "Everything is splattered in colour: the walls, the floor, the ceiling. Shelves of paint pots line one wall, a coat rack of painters' smocks stands in the corner, and a huge paint mixer rumbles next to a gearbox with a missing piece.",
+      "puzzles": ["paint-mixer", "coat-rack", "gearbox"]
+    },
+    {
+      "id": "dock",
+      "title": "The Shipping Dock",
+      "description": "Crates of toys are stacked high, ready for the delivery trucks. A toy parrot squawks from inside one crate, and the big loading door has a slot for a shipping label and a three-digit keypad.",
+      "puzzles": ["parrot-crate", "loading-door"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "control-panel",
+      "title": "The Control Panel",
+      "kind": "text",
+      "prompt": "The conveyor's control panel has a word lock. Sprocket has stuck a note on it: 'What has lots of keys but can't open a single door? Answer me, and I'll give you MY key.'",
+      "answers": ["piano", "a piano", "keyboard"],
+      "rewards": ["wind-up-key"],
+      "hints": [
+        "Listen: somewhere in the factory, a toy is playing a tune.",
+        "You play it with your fingers. It has black and white keys."
+      ],
+      "solvedText": "The panel pops open with a TING! Inside: a big brass wind-up key.",
+      "variants": [
+        {},
+        {
+          "prompt": "The conveyor's control panel has a word lock. Sprocket has stuck a note on it: 'What has one eye but can't see a thing? Answer me, and I'll give you MY key.'",
+          "answers": ["needle", "a needle", "sewing needle"],
+          "hints": [
+            "Think about how teddy bears are stitched together.",
+            "You push thread through its eye."
+          ]
+        },
+        {
+          "prompt": "The conveyor's control panel has a word lock. Sprocket has stuck a note on it: 'What goes up and down but never moves? Answer me, and I'll give you MY key.'",
+          "answers": ["stairs", "staircase", "steps", "a staircase"],
+          "hints": [
+            "Think about how you got up to the factory floor.",
+            "You climb them one at a time."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "teddy-tester",
+      "minMinutes": 45,
+      "title": "The Teddy Bear Tester",
+      "kind": "code",
+      "prompt": "A machine that squeezes teddy bears to test their squeak has jammed. Its reset box has a 3-digit lock. Each of you checked the tag on a different bear.",
+      "hints": [
+        "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The machine hums back to life. Squeak! Squeak! Squeak! Every teddy on the belt passes the test.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "The tag on your teddy bear says: the {ordinal} digit is {fact}."
+      }
+    },
+    {
+      "id": "giant-robot",
+      "title": "The Giant Robot",
+      "kind": "use",
+      "prompt": "A toy robot as big as a fridge blocks the way out, frozen mid-step. There's a keyhole in its back.",
+      "requires": ["wind-up-key"],
+      "hints": [
+        "Wind-up toys need winding.",
+        "Use the wind-up key on the giant robot."
+      ],
+      "solvedText": "Crank, crank, crank! The robot beeps a happy tune and marches out of the way, straight into the paint shop."
+    },
+    {
+      "id": "paint-mixer",
+      "title": "The Paint Mixer",
+      "kind": "code",
+      "prompt": "The paint mixer has a 3-digit lock. Sprocket's sign on it says: '{order}!'",
+      "rewards": ["gear"],
+      "hints": [
+        "Each phone saw one colour of paint pot, and how many of them there were.",
+        "Read them in the sign's order: {order}."
+      ],
+      "solvedText": "The mixer swirls every colour together into a rainbow, then spits out a shiny golden gear. Plink!",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": ["red", "blue", "yellow", "green", "purple", "orange"],
+        "pieceTemplate": "You counted the {color} paint pots on your shelf: there were {digit} of them."
+      }
+    },
+    {
+      "id": "coat-rack",
+      "minMinutes": 60,
+      "title": "The Painters' Coat Rack",
+      "kind": "text",
+      "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'I have a thumb and four fingers, but I'm not alive.'",
+      "answers": ["glove", "a glove", "gloves"],
+      "hints": [
+        "Look at what the painters wear to keep their hands clean.",
+        "You wear it on your hand."
+      ],
+      "solvedText": "The cupboard opens. Inside is a painted sign: 'Employee of the Month: SPROCKET'. He painted it himself.",
+      "variants": [
+        {},
+        {
+          "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'What can you catch but never throw?'",
+          "answers": ["cold", "a cold"],
+          "hints": [
+            "Achoo!",
+            "You might catch one in winter."
+          ]
+        },
+        {
+          "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'What has four legs but can't walk?'",
+          "answers": ["table", "a table", "chair", "a chair"],
+          "hints": [
+            "Look at the furniture in the paint shop.",
+            "You eat your dinner at one."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gearbox",
+      "title": "The Gearbox",
+      "kind": "use",
+      "prompt": "The gearbox that runs the shipping dock is missing one golden gear. Without it, nothing moves.",
+      "requires": ["gear"],
+      "rewards": ["shipping-label"],
+      "hints": [
+        "Something shiny came out of the paint mixer.",
+        "Use the golden gear on the gearbox."
+      ],
+      "solvedText": "The gear clicks into place and the whole factory whirs. A printer beside the gearbox prints out a shipping label with your names on it!"
+    },
+    {
+      "id": "parrot-crate",
+      "minMinutes": 45,
+      "title": "The Parrot Crate",
+      "kind": "text",
+      "prompt": "A toy parrot is stuck inside a crate with a word lock. It squawks: 'Sprocket's three favourite toys, first to last! Squawk!'",
+      "hints": [
+        "Three phones each remember one toy from Sprocket's list.",
+        "Say them in order, first to last, like: toy toy toy."
+      ],
+      "solvedText": "The crate pops open and the parrot flaps out: '{answer}! {answer}!' It lands on your shoulder and won't let go.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": ["kite", "drum", "train", "ball", "blocks", "rocket", "marble", "puppet", "whistle", "teddy", "yoyo", "spinner"],
+        "pieceTemplate": "You read it on a crate label: the {ordinal} toy on Sprocket's favourites list is the {word}."
+      }
+    },
+    {
+      "id": "loading-door",
+      "title": "The Loading Door",
+      "kind": "code",
+      "prompt": "The loading door needs the shipping label AND a 3-digit code. Sprocket's note: 'Robots on my assembly line, then mixers in my paint shop, then trucks at my dock!'",
+      "answers": ["524"],
+      "requires": ["shipping-label"],
+      "pieces": [
+        "You counted the robots on the assembly line: 5.",
+        "You remember the paint shop: it had 2 mixers.",
+        "You counted the trucks waiting at the dock: 4."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on Sprocket's note.",
+        "Robots, then mixers, then trucks."
+      ],
+      "solvedText": "The label slides into the slot and the keypad plays a jolly jingle. With a clatter, the big door starts to roll up.",
+      "variants": [
+        {},
+        {
+          "answers": ["613"],
+          "pieces": [
+            "You counted the robots on the assembly line: 6.",
+            "You remember the paint shop: it had 1 mixer.",
+            "You counted the trucks waiting at the dock: 3."
+          ]
+        },
+        {
+          "answers": ["835"],
+          "pieces": [
+            "You counted the robots on the assembly line: 8.",
+            "You remember the paint shop: it had 3 mixers.",
+            "You counted the trucks waiting at the dock: 5."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    { "id": "wind-up-key", "name": "Brass wind-up key", "description": "Big and shiny, with a curly handle. It came from Sprocket's control panel." },
+    { "id": "gear", "name": "Golden gear", "description": "Warm from the paint mixer, and still a bit sticky." },
+    { "id": "shipping-label", "name": "Shipping label", "description": "It has all your names on it, and says: DELIVER TO HOME." }
+  ]
+}

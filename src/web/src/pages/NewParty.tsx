@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } from '../components/ui'
+import { Button, Card, ErrorText, Eyebrow, Field, FilterChip, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import { useJobUpdates } from '../lib/hub'
 import { ConfirmEmailBanner } from './Account'
@@ -32,21 +32,6 @@ const TONES: Record<ContentRating, { id: Tone; title: string; body: string }[]> 
 
 /** Seasons come from the theme, so every story in a Halloween theme (AI-written ones too) is found by the filter. */
 const isHalloween = (theme: ThemeCard['theme']) => (theme.seasons ?? []).includes('halloween')
-
-function FilterChip({ on, glow = false, onClick, children }: { on: boolean; glow?: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-sm font-semibold transition ${
-        on ? 'border-accent bg-accent text-bg' : 'border-line text-muted hover:text-ink'
-      } ${glow ? 'animate-pulse ring-2 ring-accent/70' : ''}`}
-    >
-      {children}
-    </button>
-  )
-}
 
 export default function NewParty() {
   const { me } = useMe()

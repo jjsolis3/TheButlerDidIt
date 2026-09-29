@@ -21,13 +21,8 @@ public static class RoomVariants
     public static EscapeRoom Build(EscapeRoom room, long seed)
     {
         if (!IsTemplated(room)) return room;
-        return Cache.GetOrCreateValue(room).GetOrAdd(seed, s => new EscapeRoom
+        return Cache.GetOrCreateValue(room).GetOrAdd(seed, s => room with
         {
-            Id = room.Id, Title = room.Title, Synopsis = room.Synopsis, ContentRating = room.ContentRating,
-            Theme = room.Theme, ArtStyle = room.ArtStyle, MinPlayers = room.MinPlayers, MaxPlayers = room.MaxPlayers,
-            TimeLimitMinutes = room.TimeLimitMinutes, HintPenaltySeconds = room.HintPenaltySeconds,
-            Intro = room.Intro, EscapedText = room.EscapedText, FailedText = room.FailedText,
-            GameMaster = room.GameMaster, Soundscape = room.Soundscape, Stages = room.Stages, Items = room.Items,
             Puzzles = room.Puzzles.Select(p => Concrete(p, new Rng(s ^ StableHash(p.Id)))).ToList(),
         });
     }
@@ -50,11 +45,8 @@ public static class RoomVariants
             hints = hints.Select(h => Fill(h, made)).ToList();
         }
 
-        return new EscapePuzzle
-        {
-            Id = p.Id, Title = p.Title, Kind = p.Kind, Prompt = prompt, Answers = answers, Requires = p.Requires,
-            Rewards = p.Rewards, Pieces = pieces, Hints = hints, SolvedText = solved,
-        };
+        // The concrete puzzle is fixed: no variants or generator left to pick from.
+        return p with { Prompt = prompt, Answers = answers, Pieces = pieces, Hints = hints, SolvedText = solved, Variants = [], Generator = null };
     }
 
     private sealed record Made(string Answer, List<string> Pieces, string Order, string Facts);

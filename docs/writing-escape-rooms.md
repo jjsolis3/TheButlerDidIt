@@ -75,6 +75,15 @@ There are two ways to make a puzzle vary:
 
 The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more.
 
+## Lengths and seasons
+
+- **`lengths`** lists the game lengths a host can pick: `[30, 45, 60]`, or any of those that include the room's `timeLimitMinutes` (its standard game). Leave it out and the room has one length.
+- **`minMinutes`** on a puzzle keeps it only for games at least that long. For example, `45` leaves it out of a 30-minute game, and `60` makes it an extra for the extended cut. A shorter game is a shorter room, with the clock set to its length. A stage left with no puzzles is skipped.
+- **The validator plays every length through**, 200 puzzle sets each. So a quicker game can never need a key that only a left-out puzzle gives. Cut puzzles in pairs, with the puzzle that gives an item and the one that uses it. The shortest game must keep at least 4 puzzles.
+- Each length has its own leaderboard, because a 30-minute game plays fewer puzzles.
+- **`seasons`**: `["halloween"]` puts the room under the 🎃 Halloween filter on its shelf (Adults or Family, from `contentRating`), just like a mystery theme's `seasons`.
+- Don't mention the clock in the room's texts ("you have forty-five minutes"): the length is the host's choice.
+
 ## Sound and pictures
 
 - **`soundscape`** (on the room, and optionally on a stage) sets the background sound on the TV: `drone` (the default), `workshop`, `carnival`, `sea`, `space`, `haunted` or `silence`. The sound is made live in the browser, so there are no audio files to add. The TV also plays short sounds when a lock opens, a new room opens, a code is wrong or a hint is bought, then a gong and a heartbeat in the final minute.

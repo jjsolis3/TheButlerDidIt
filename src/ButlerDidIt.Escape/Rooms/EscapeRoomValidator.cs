@@ -23,14 +23,53 @@ public static class EscapeRoomValidator
     public static List<string> Validate(EscapeRoom room)
     {
         var template = TemplateErrors(room);
+        template.AddRange(LengthErrors(room));
         if (template.Count > 0) return template;
-        if (!RoomVariants.IsTemplated(room)) return ValidateConcrete(room);
-        for (var seed = 0; seed < SeedsChecked; seed++)
+
+        // Every length is its own room to escape: a shorter game must never need a key from a puzzle it leaves out.
+        var lengths = room.PlayableLengths;
+        foreach (var minutes in lengths)
         {
-            var errors = ValidateConcrete(RoomVariants.Build(room, seed));
-            if (errors.Count > 0) return errors.Select(e => $"With puzzle set {seed}: {e}").ToList();
+            var at = lengths.Count > 1 ? $"At {minutes} minutes: " : "";
+            if (!RoomVariants.IsTemplated(room))
+            {
+                var errors = ValidateConcrete(RoomLengths.Cut(room, minutes));
+                if (errors.Count > 0) return errors.Select(e => at + e).ToList();
+                continue;
+            }
+            for (var seed = 0; seed < SeedsChecked; seed++)
+            {
+                var errors = ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed), minutes));
+                if (errors.Count > 0) return errors.Select(e => $"{at}With puzzle set {seed}: {e}").ToList();
+            }
         }
         return [];
+    }
+
+    /// <summary>The lengths a host can pick, and the shortest one still being a real game.</summary>
+    public const int MinPuzzlesInShortestGame = 4;
+    private static readonly int[] AllowedLengths = [30, 45, 60];
+
+    private static List<string> LengthErrors(EscapeRoom room)
+    {
+        var errors = new List<string>();
+        if (room.Lengths.Count > 0)
+        {
+            foreach (var bad in room.Lengths.Where(l => !AllowedLengths.Contains(l)).Distinct())
+                errors.Add($"A room's lengths are 30, 45 or 60 minutes, not {bad}.");
+            if (!room.Lengths.Contains(room.TimeLimitMinutes))
+                errors.Add($"The lengths must include the room's time limit ({room.TimeLimitMinutes} minutes).");
+        }
+        foreach (var p in room.Puzzles.Where(p => p.MinMinutes is { } m && !room.PlayableLengths.Contains(m)))
+            errors.Add($"Puzzle '{p.Id}' is kept for {p.MinMinutes}-minute games, which isn't one of the room's lengths.");
+        if (errors.Count == 0 && room.PlayableLengths.Count > 1)
+        {
+            var shortest = room.PlayableLengths[0];
+            var kept = room.Puzzles.Count(p => RoomLengths.Plays(p, shortest));
+            if (kept < MinPuzzlesInShortestGame)
+                errors.Add($"A {shortest}-minute game keeps only {kept} puzzles; keep at least {MinPuzzlesInShortestGame}.");
+        }
+        return errors;
     }
 
     private static List<string> TemplateErrors(EscapeRoom room)
