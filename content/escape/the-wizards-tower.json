@@ -1,0 +1,231 @@
+{
+  "id": "the-wizards-tower",
+  "title": "The Wizard's Tower",
+  "synopsis": "You were only meant to dust the wizard's library, but you read a spell out loud and now every door in the tower has locked itself. Professor Quill, the wizard's enchanted feather pen, will help you out, if you can solve his rhyming puzzles before the spell sets at midnight!",
+  "contentRating": "family",
+  "theme": "wizard",
+  "artStyle": "cosy wizard's tower at night, floating books, bubbling potions, starry skies, warm candlelight, storybook illustration",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45, 60],
+  "seasons": ["halloween"],
+  "hintPenaltySeconds": 90,
+  "soundscape": "haunted",
+  "intro": "Oh my, oh dear, what have you done? You read the spell, and now it's begun! Every door is locked up tight, until you solve my puzzles right. Share your clues and work as one, and you'll be home when the magic's done!",
+  "escapedText": "The last door swings open and the spell fizzles away in a shower of sparkles. Professor Quill does a happy loop in the air: 'Hooray, hooray, you've saved the day!' You're free!",
+  "failedText": "The clock strikes midnight and the spell sets with a soft POP. Professor Quill sighs: 'Stuck till dawn, but never mind. Try again, and you will find!'",
+  "gameMaster": {
+    "name": "Professor Quill",
+    "persona": "The wizard's enchanted feather pen: flustered, kind and very talkative. Speaks in little rhyming couplets whenever he can, fusses when the group is stuck, and cheers wildly when they solve something. Never scary.",
+    "voice": { "accent": "en-GB", "pitch": 1.3, "rate": 1.1, "style": "fluttery, cheerful, rhyming" }
+  },
+  "stages": [
+    {
+      "id": "library",
+      "title": "The Floating Library",
+      "description": "Books float in slow circles below the ceiling, and candles hover beside them. A huge spellbook lies open on a stand, a bookshelf drifts past with a golden clasp on it, and the library door is locked tight.",
+      "puzzles": ["spellbook", "floating-shelf", "library-door"]
+    },
+    {
+      "id": "lab",
+      "soundscape": "carnival",
+      "title": "The Potion Lab",
+      "description": "Bubbling cauldrons, jars of glowing ingredients and a shelf of potion bottles in every colour. A tall magic mirror stands in the corner, and its glass ripples when you walk past.",
+      "puzzles": ["ingredient-cabinet", "cauldron", "magic-mirror"]
+    },
+    {
+      "id": "observatory",
+      "soundscape": "space",
+      "title": "The Observatory",
+      "description": "Up the spiral stairs, the roof opens onto the night sky. A great brass telescope points at the stars, owls blink from the rafters, and the tower's last door waits beside a glowing keypad.",
+      "puzzles": ["telescope", "tower-door"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "spellbook",
+      "title": "The Spellbook",
+      "kind": "text",
+      "prompt": "The spellbook's pages are locked with a word charm. Professor Quill reads the riddle: 'I have a golden face and rise every day, I chase the night far, far away. What am I?'",
+      "answers": ["sun", "the sun"],
+      "rewards": ["silver-key"],
+      "hints": [
+        "Look out of the tower window when morning comes.",
+        "It lights up the whole sky in the daytime."
+      ],
+      "solvedText": "The spellbook flutters its pages and coughs up a little silver key. Professor Quill claps: 'Oh, well done, clever one!'",
+      "variants": [
+        {},
+        {
+          "prompt": "The spellbook's pages are locked with a word charm. Professor Quill reads the riddle: 'I fall from the sky but never get hurt, I fill up the puddles and wash off the dirt. What am I?'",
+          "answers": ["rain", "the rain", "raindrops"],
+          "hints": [
+            "Look at the clouds outside the window.",
+            "You need an umbrella when it comes."
+          ]
+        },
+        {
+          "prompt": "The spellbook's pages are locked with a word charm. Professor Quill reads the riddle: 'I have a bark but I never bite, I stand up tall all day and night. What am I?'",
+          "answers": ["tree", "a tree", "trees"],
+          "hints": [
+            "Look out of the window at the forest around the tower.",
+            "Leaves grow on it, and birds build nests in it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "floating-shelf",
+      "minMinutes": 45,
+      "title": "The Floating Bookshelf",
+      "kind": "code",
+      "prompt": "The floating bookshelf is locked with a 3-digit golden clasp. Each of you caught a different book as it drifted past.",
+      "hints": [
+        "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The clasp springs open and the books fly out like a flock of birds, flapping happily around the ceiling.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Written in glowing ink inside your book: the {ordinal} digit is {fact}."
+      }
+    },
+    {
+      "id": "library-door",
+      "title": "The Library Door",
+      "kind": "use",
+      "prompt": "The library door has a tiny keyhole that glitters silver. A note pinned to it: 'The key you need is not far away, the spellbook will give it, if you say.'",
+      "requires": ["silver-key"],
+      "hints": [
+        "Something shiny came out of the spellbook.",
+        "Use the silver key on the library door."
+      ],
+      "solvedText": "Click! The door creaks open, and the smell of bubbling potions drifts up the stairs."
+    },
+    {
+      "id": "ingredient-cabinet",
+      "title": "The Ingredient Cabinet",
+      "kind": "code",
+      "prompt": "The ingredient cabinet has a 3-digit lock. A spell card on it reads: '{order}! Mix them in that order!'",
+      "rewards": ["wand"],
+      "hints": [
+        "Each phone saw one colour of potion bottle, and how many of them there were.",
+        "Read them in the spell card's order: {order}."
+      ],
+      "solvedText": "The cabinet doors swing open with a puff of glitter. Resting on the top shelf: the wizard's spare wand.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": ["red", "blue", "green", "purple", "gold", "silver"],
+        "pieceTemplate": "You counted the {color} potion bottles on the shelf: there were {digit}."
+      }
+    },
+    {
+      "id": "cauldron",
+      "minMinutes": 60,
+      "title": "The Grumbling Cauldron",
+      "kind": "text",
+      "prompt": "The biggest cauldron has a lid locked with a word charm. It burbles a riddle: 'What kind of room has no doors and no windows at all?'",
+      "answers": ["mushroom", "a mushroom", "mushrooms"],
+      "hints": [
+        "Look at the ingredients in the jars.",
+        "It grows in damp forests and wears a little cap."
+      ],
+      "solvedText": "The lid pops off and the cauldron burps a big pink bubble that floats up and bursts into confetti.",
+      "variants": [
+        {},
+        {
+          "prompt": "The biggest cauldron has a lid locked with a word charm. It burbles a riddle: 'I'm taller than trees and my top touches the sky, but I have no legs and I never say hi.'",
+          "answers": ["mountain", "a mountain", "mountains"],
+          "hints": [
+            "Look out of the lab window at the far horizon.",
+            "It's very, very tall and rocky, and people climb it."
+          ]
+        },
+        {
+          "prompt": "The biggest cauldron has a lid locked with a word charm. It burbles a riddle: 'I run but never walk, I have a mouth but never talk.'",
+          "answers": ["river", "a river"],
+          "hints": [
+            "Think about the water flowing far below the tower.",
+            "It runs all the way to the sea."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "magic-mirror",
+      "title": "The Magic Mirror",
+      "kind": "use",
+      "prompt": "The magic mirror's glass ripples, but it won't let anyone through. Written in the steam on it: 'Wave a wand, and I'll show you the way.'",
+      "requires": ["wand"],
+      "rewards": ["star-map"],
+      "hints": [
+        "Mirrors like this need a little magic.",
+        "Use the wand on the magic mirror."
+      ],
+      "solvedText": "You wave the wand. The mirror glows, and a rolled-up star map slides out of the glass into your hands. Stairs appear behind it!"
+    },
+    {
+      "id": "telescope",
+      "minMinutes": 45,
+      "title": "The Great Telescope",
+      "kind": "text",
+      "prompt": "The great telescope is locked with a word dial. A note in curly handwriting: 'The three star-words, first to last!'",
+      "hints": [
+        "Three phones each remember one star-word Professor Quill whispered.",
+        "Say them in order, first to last, like: word word word."
+      ],
+      "solvedText": "The telescope swings round by itself, and the stars spell out '{answer}' across the sky. Professor Quill sniffles: 'How beautiful!'",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": ["dragon", "unicorn", "phoenix", "griffin", "owl", "comet", "lantern", "crown", "castle", "fox", "swan", "harp"],
+        "pieceTemplate": "Professor Quill whispered it in your ear: the {ordinal} star-word is '{word}'."
+      }
+    },
+    {
+      "id": "tower-door",
+      "title": "The Tower Door",
+      "kind": "code",
+      "prompt": "The tower's last door needs the star map AND a 3-digit code. Professor Quill's note: 'Floating books in the library, then bubbling cauldrons in the lab, then owls up here in the rafters!'",
+      "answers": ["735"],
+      "requires": ["star-map"],
+      "pieces": [
+        "You counted the floating books in the library: 7.",
+        "You remember the potion lab: 3 cauldrons were bubbling.",
+        "You counted the owls in the rafters: 5."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on the note.",
+        "Books, then cauldrons, then owls."
+      ],
+      "solvedText": "The star map glows, the keypad twinkles, and the door starts to swing open.",
+      "variants": [
+        {},
+        {
+          "answers": ["482"],
+          "pieces": [
+            "You counted the floating books in the library: 4.",
+            "You remember the potion lab: 8 cauldrons were bubbling.",
+            "You counted the owls in the rafters: 2."
+          ]
+        },
+        {
+          "answers": ["916"],
+          "pieces": [
+            "You counted the floating books in the library: 9.",
+            "You remember the potion lab: 1 cauldron was bubbling.",
+            "You counted the owls in the rafters: 6."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    { "id": "silver-key", "name": "Little silver key", "description": "It came out of the spellbook, and it tickles your hand." },
+    { "id": "wand", "name": "Spare wand", "description": "A bit bent, but it still sparkles when you wave it." },
+    { "id": "star-map", "name": "Star map", "description": "A rolled-up map of the night sky. The stars on it twinkle." }
+  ]
+}

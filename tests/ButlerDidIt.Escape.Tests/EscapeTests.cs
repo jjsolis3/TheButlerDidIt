@@ -28,8 +28,13 @@ public class ContentTests
         Assert.Equal(ContentRating.Mature, Rooms.Get("the-asylum").ContentRating);
         Assert.Equal(ContentRating.Family, Rooms.Get("the-funhouse").ContentRating);
         Assert.Equal(ContentRating.Family, Rooms.Get("the-toy-factory").ContentRating);
+        Assert.Equal(ContentRating.Mature, Rooms.Get("the-bunker").ContentRating);
+        Assert.Equal(ContentRating.Family, Rooms.Get("the-wizards-tower").ContentRating);
+        Assert.Equal(ContentRating.Family, Rooms.Get("the-pirate-ship").ContentRating);
         Assert.Contains("halloween", Rooms.Get("the-asylum").Seasons);
+        Assert.Contains("halloween", Rooms.Get("the-wizards-tower").Seasons);
         Assert.DoesNotContain("halloween", Rooms.Get("the-toy-factory").Seasons);
+        Assert.DoesNotContain("halloween", Rooms.Get("the-bunker").Seasons);
     }
 
     [Theory]
