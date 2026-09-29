@@ -65,9 +65,14 @@ export function hubErrorMessage(err: unknown): string {
  *    groups, so we must subscribe again (WatchParty / JoinSeat). Those calls
  *    also return a fresh snapshot, so anything missed while offline is caught up.
  */
-export function useParty({ code, token, watchStage = false, joinSeat = false, onRemoved }: Options) {
-  const [stage, setStage] = useState<StageView | null>(null)
-  const [player, setPlayer] = useState<PlayerView | null>(null)
+export function useParty<
+  TStage extends { version: number } = StageView,
+  TPlayer extends { version: number; stage: { version: number } } = PlayerView,
+>({ code, token, watchStage = false, joinSeat = false, onRemoved }: Options) {
+  // The view types default to the murder mystery's. Another kind of game passes its own,
+  // since every game's views carry a version number (and a player view includes the stage).
+  const [stage, setStage] = useState<TStage | null>(null)
+  const [player, setPlayer] = useState<TPlayer | null>(null)
   const [status, setStatus] = useState<ConnectionStatus>('connecting')
   const [fatal, setFatal] = useState<string | null>(null)
   // NPC answers the AI is still writing, by interrogation id. Screens show `answer ?? typing[id]`,
@@ -89,10 +94,10 @@ export function useParty({ code, token, watchStage = false, joinSeat = false, on
     connRef.current = conn
 
     // Ignore out-of-order messages: every view carries the game's version number.
-    const acceptStage = (v: StageView) => setStage((prev) => (!prev || v.version >= prev.version ? v : prev))
-    const acceptPlayer = (v: PlayerView) => {
+    const acceptStage = (v: TStage) => setStage((prev) => (!prev || v.version >= prev.version ? v : prev))
+    const acceptPlayer = (v: TPlayer) => {
       setPlayer((prev) => (!prev || v.version >= prev.version ? v : prev))
-      acceptStage(v.stage)
+      acceptStage(v.stage as TStage) // a player view carries its own game's stage view
     }
     conn.on('stage', acceptStage)
     conn.on('player', acceptPlayer)
@@ -104,8 +109,8 @@ export function useParty({ code, token, watchStage = false, joinSeat = false, on
 
     const subscribe = async () => {
       try {
-        if (watchStage) acceptStage(await conn.invoke<StageView>('WatchParty', code))
-        if (joinSeat) acceptPlayer(await conn.invoke<PlayerView>('JoinSeat'))
+        if (watchStage) acceptStage(await conn.invoke<TStage>('WatchParty', code))
+        if (joinSeat) acceptPlayer(await conn.invoke<TPlayer>('JoinSeat'))
         setFatal(null)
       } catch (err) {
         setFatal(hubErrorMessage(err))

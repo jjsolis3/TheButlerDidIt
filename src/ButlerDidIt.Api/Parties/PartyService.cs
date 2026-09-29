@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Game;
@@ -63,23 +64,27 @@ public sealed class PartyLocks(ClusterLock cluster)
 /// <summary>Part of an NPC's answer, pushed while the AI writes it.</summary>
 public sealed record NpcTypingEvent(Guid InterrogationId, string Text);
 
+/// <summary>A mystery party as the mystery code sees it: the row, the engine's state and the scenario.</summary>
 public sealed record PartySnapshot(Party Party, GameState State, Scenario Scenario);
 
 /// <summary>
-/// The only place game state changes: load, apply a command with the pure
-/// engine, save, then push fresh views to every connected screen.
+/// The only place game state changes, for every kind of game: take the party's lock,
+/// load its session, apply a change, save, then push fresh views to every screen.
+///
+/// It knows nothing about any game's rules; the party's game module (see GameModules)
+/// does. Platform features (joining, seats, selfies, the ticker) use it directly with
+/// the commands every game supports. Mystery features go through <see cref="PartyService"/>.
 /// </summary>
-public sealed class PartyService(
+public sealed class PartyRuntime(
     AppDbContext db,
-    ContentCatalog catalog,
+    GameModules modules,
     PartyLocks locks,
     IHubContext<PartyHub> hub,
     TimeProvider clock)
 {
     public DateTimeOffset Now => clock.GetUtcNow();
-    public TimeProvider Clock => clock;
 
-    public async Task<PartySnapshot> LoadAsync(Guid partyId, CancellationToken ct = default)
+    public async Task<(Party Party, GameSession Session)> LoadAsync(Guid partyId, CancellationToken ct = default)
     {
         // If this DbContext already loaded the party earlier in the same request
         // (e.g. an AI question: Begin, then Complete seconds later), EF would hand
@@ -92,7 +97,91 @@ public sealed class PartyService(
 
         var party = await db.Parties.FirstOrDefaultAsync(p => p.Id == partyId, ct)
             ?? throw new KeyNotFoundException("Party not found.");
-        return new PartySnapshot(party, GameJson.Deserialize<GameState>(party.State), await catalog.GetScenarioAsync(db, party.ScenarioId, ct));
+        return (party, await modules.For(party.Kind).LoadAsync(db, party, ct));
+    }
+
+    /// <param name="command">One of the commands every game supports, e.g. <c>(s, now) => s.Tick(now)</c>.</param>
+    /// <param name="beforeSave">Extra database changes that must commit together with the new state (e.g. adding a Seat row).</param>
+    public Task<(Party Party, GameSession Session)> ExecuteAsync(
+        Guid partyId,
+        Func<GameSession, DateTimeOffset, GameSession> command,
+        Action<Party, GameSession>? beforeSave = null,
+        CancellationToken ct = default) =>
+        ChangeAsync(partyId, (_, s, now) => Task.FromResult(command(s, now)), beforeSave, ct);
+
+    /// <summary>Runs <paramref name="change"/> under the party's lock and saves the session it returns.</summary>
+    public async Task<(Party Party, GameSession Session)> ChangeAsync(
+        Guid partyId,
+        Func<Party, GameSession, DateTimeOffset, Task<GameSession>> change,
+        Action<Party, GameSession>? beforeSave = null,
+        CancellationToken ct = default)
+    {
+        await using (await locks.AcquireAsync(partyId, ct))
+        {
+            var (party, session) = await LoadAsync(partyId, ct);
+            var now = Now;
+            var next = await change(party, session, now);
+            if (ReferenceEquals(next, session)) return (party, session); // nothing changed (e.g. an idle tick)
+
+            party.ScenarioId = next.ContentId;
+            party.State = next.Serialize();
+            party.Status = next.Status;
+            party.NextDueAt = next.NextDueAt;
+            party.UpdatedAt = now;
+
+            beforeSave?.Invoke(party, next);
+            await db.SaveChangesAsync(ct);
+
+            await BroadcastAsync(party.Id, next, now);
+            return (party, next);
+        }
+    }
+
+    /// <summary>
+    /// Sends a complete snapshot to each screen rather than a diff: the stage gets
+    /// the public view, and every seat gets its own private view. Full snapshots
+    /// are only a few KB, and a phone that missed a message (asleep, bad Wi-Fi)
+    /// fixes itself with the next one.
+    /// </summary>
+    public async Task BroadcastAsync(Guid partyId, GameSession session, DateTimeOffset now)
+    {
+        var tasks = new List<Task>
+        {
+            hub.Clients.Group(PartyHub.StageGroup(partyId)).SendAsync("stage", session.StageView(now)),
+        };
+        foreach (var seatId in session.SeatIds)
+        {
+            tasks.Add(hub.Clients.Group(PartyHub.SeatGroup(seatId)).SendAsync("player", session.PlayerView(seatId, now)));
+        }
+        await Task.WhenAll(tasks);
+    }
+
+    /// <summary>A message for the stage and every seat at once, such as an NPC's answer being typed.</summary>
+    public Task SendToEveryoneAsync(Guid partyId, IEnumerable<Guid> seatIds, string method, object payload) =>
+        hub.Clients.Groups([PartyHub.StageGroup(partyId), .. seatIds.Select(PartyHub.SeatGroup)]).SendAsync(method, payload);
+
+    public Task NotifySeatRemovedAsync(Guid seatId) =>
+        hub.Clients.Group(PartyHub.SeatGroup(seatId)).SendAsync("removed");
+}
+
+/// <summary>
+/// The murder mystery's way into <see cref="PartyRuntime"/>: the same load / change / save cycle,
+/// typed with the mystery engine's state, commands and scenario. The dealer, the AI game master,
+/// the hub's player and host actions, the kit and the recap all use it.
+///
+/// A party of another kind is refused with a friendly message (a GameRuleException), so a mystery
+/// action can never run against, say, an escape room.
+/// </summary>
+public sealed class PartyService(AppDbContext db, PartyRuntime runtime, TimeProvider clock)
+{
+    public DateTimeOffset Now => clock.GetUtcNow();
+    public TimeProvider Clock => clock;
+
+    public async Task<PartySnapshot> LoadAsync(Guid partyId, CancellationToken ct = default)
+    {
+        var (party, session) = await runtime.LoadAsync(partyId, ct);
+        var mystery = AsMystery(party, session);
+        return new PartySnapshot(party, mystery.State, mystery.Scenario);
     }
 
     public async Task<Party?> FindByCodeAsync(string code, CancellationToken ct = default)
@@ -121,52 +210,18 @@ public sealed class PartyService(
         Action<PartySnapshot>? beforeSave = null,
         CancellationToken ct = default)
     {
-        await using (await locks.AcquireAsync(partyId, ct))
+        var (party, session) = await runtime.ChangeAsync(partyId, async (party, session, now) =>
         {
-            var snapshot = await LoadAsync(partyId, ct);
-            var now = Now;
-            var (next, scenario) = await change(snapshot, now);
-            if (ReferenceEquals(next, snapshot.State)) return snapshot; // nothing changed (e.g. an idle tick)
-
-            var party = snapshot.Party;
-            party.ScenarioId = scenario.Id;
-            party.State = GameJson.Serialize(next);
-            party.Status = next.Phase switch
-            {
-                Phase.Lobby => PartyStatus.Lobby,
-                Phase.Finished => PartyStatus.Finished,
-                _ => PartyStatus.InProgress,
-            };
-            party.NextDueAt = GameEngine.NextDueAt(next);
-            party.UpdatedAt = now;
-
-            var updated = snapshot with { State = next, Scenario = scenario };
-            beforeSave?.Invoke(updated);
-            await db.SaveChangesAsync(ct);
-
-            await BroadcastAsync(updated, now);
-            return updated;
-        }
-    }
-
-    /// <summary>
-    /// Sends a complete snapshot to each screen rather than a diff: the stage gets
-    /// the public view, and every seat gets its own private view. Full snapshots
-    /// are only a few KB, and a phone that missed a message (asleep, bad Wi-Fi)
-    /// fixes itself with the next one.
-    /// </summary>
-    public async Task BroadcastAsync(PartySnapshot s, DateTimeOffset now)
-    {
-        var tasks = new List<Task>
+            var mystery = AsMystery(party, session);
+            var (state, scenario) = await change(new PartySnapshot(party, mystery.State, mystery.Scenario), now);
+            return mystery.With(state, scenario);
+        }, beforeSave is null ? null : (party, next) =>
         {
-            hub.Clients.Group(PartyHub.StageGroup(s.Party.Id)).SendAsync("stage", ViewProjector.Stage(s.State, s.Scenario, now)),
-        };
-        foreach (var player in s.State.Players)
-        {
-            tasks.Add(hub.Clients.Group(PartyHub.SeatGroup(player.SeatId))
-                .SendAsync("player", ViewProjector.Player(s.State, s.Scenario, player.SeatId, now)));
-        }
-        await Task.WhenAll(tasks);
+            var mystery = (MysterySession)next;
+            beforeSave(new PartySnapshot(party, mystery.State, mystery.Scenario));
+        }, ct);
+        var result = (MysterySession)session;
+        return new PartySnapshot(party, result.State, result.Scenario);
     }
 
     /// <summary>
@@ -175,9 +230,10 @@ public sealed class PartyService(
     /// It isn't saved: the finished answer arrives in the next normal update.
     /// </summary>
     public Task SendNpcTypingAsync(PartySnapshot s, Guid interrogationId, string text) =>
-        hub.Clients.Groups([PartyHub.StageGroup(s.Party.Id), .. s.State.Players.Select(p => PartyHub.SeatGroup(p.SeatId))])
-            .SendAsync("npcTyping", new NpcTypingEvent(interrogationId, text));
+        runtime.SendToEveryoneAsync(s.Party.Id, s.State.Players.Select(p => p.SeatId), "npcTyping", new NpcTypingEvent(interrogationId, text));
 
-    public Task NotifySeatRemovedAsync(Guid seatId) =>
-        hub.Clients.Group(PartyHub.SeatGroup(seatId)).SendAsync("removed");
+    public Task NotifySeatRemovedAsync(Guid seatId) => runtime.NotifySeatRemovedAsync(seatId);
+
+    private static MysterySession AsMystery(Party party, GameSession session) =>
+        session as MysterySession ?? throw new GameRuleException($"That isn't part of this {GameModules.Describe(party.Kind)} party.");
 }

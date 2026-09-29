@@ -10,6 +10,7 @@ import { api } from '../lib/api'
 import { stageGuide } from '../lib/guide'
 import { NpcTypingContext, useJobUpdates, useParty } from '../lib/hub'
 import { NpcAnswer } from '../components/NpcAnswer'
+import { UnsupportedGame } from '../components/UnsupportedGame'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
@@ -43,6 +44,7 @@ export default function Stage() {
       </Centered>
     )
   }
+  if (info.kind !== 'mystery') return <UnsupportedGame kind={info.kind} />
   return <StageScreen info={info} token={info.isHost ? undefined : guestSeat?.token} />
 }
 

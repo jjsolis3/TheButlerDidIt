@@ -4,6 +4,7 @@ using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
@@ -37,7 +38,9 @@ public sealed record PartyInfo(
     int MaxPlayers,
     bool IsHost,
     // "Surprise me": the version is dealt when the evening begins. Told to the host only.
-    bool DealAtStart);
+    bool DealAtStart,
+    // Which game the party plays, so the pages can show the right screens.
+    GameKind Kind);
 
 public static class PartyEndpoints
 {
@@ -48,7 +51,7 @@ public static class PartyEndpoints
         var group = app.MapGroup("/api/parties");
 
         // ---- Host: list and create parties
-        group.MapGet("/", async (ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, CancellationToken ct) =>
+        group.MapGet("/", async (ClaimsPrincipal user, AppDbContext db, GameModules modules, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var parties = await db.Parties.AsNoTracking()
@@ -57,11 +60,11 @@ public static class PartyEndpoints
                 .Take(50)
                 .ToListAsync(ct);
             var result = new List<PartyInfo>();
-            foreach (var p in parties) result.Add(await ToInfo(p, db, catalog, isHost: true, ct));
+            foreach (var p in parties) result.Add(await ToInfo(p, db, modules, isHost: true, ct));
             return result;
         }).RequireAuthorization(AuthPolicies.Host);
 
-        group.MapPost("/", async (CreatePartyRequest req, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties,
+        group.MapPost("/", async (CreatePartyRequest req, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, GameModules modules, PartyService parties,
             AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, IOptions<AiOptions> aiOptions, TimeProvider clock, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -91,6 +94,7 @@ public static class PartyEndpoints
                 Id = Guid.NewGuid(),
                 Code = await UniqueCodeAsync(db, ct),
                 HostUserId = userId,
+                Kind = GameKind.Mystery,
                 ScenarioId = scenario.Id,
                 Mode = req.Mode,
                 // The level is the mystery's own rating, so a party can never be played "above" or "below" its story.
@@ -119,7 +123,7 @@ public static class PartyEndpoints
             // ready by the time guests arrive. Already-made files are reused.
             if (req.UseAi && (await media.VoicesConfiguredAsync(ct) || await media.ImagesConfiguredAsync(ct)))
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, scenario.Id, userId, clock, ct);
-            return Results.Ok(await ToInfo(party, db, catalog, isHost: true, ct));
+            return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
         }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
 
         // ---- Host: remove a party from their list.
@@ -140,32 +144,32 @@ public static class PartyEndpoints
         }).RequireAuthorization(AuthPolicies.Host);
 
         // ---- Public: what a guest sees on the join page
-        group.MapGet("/{code}", async (string code, ClaimsPrincipal user, AppDbContext db, ContentCatalog catalog, PartyService parties, CancellationToken ct) =>
+        group.MapGet("/{code}", async (string code, ClaimsPrincipal user, AppDbContext db, GameModules modules, PartyService parties, CancellationToken ct) =>
         {
             var party = await parties.FindByCodeAsync(code, ct);
             if (party is null) return Results.NotFound();
             var isHost = user.FindFirstValue(ClaimTypes.NameIdentifier) == party.HostUserId;
-            return Results.Ok(await ToInfo(party, db, catalog, isHost, ct));
+            return Results.Ok(await ToInfo(party, db, modules, isHost, ct));
         });
 
         // ---- Guest: take a seat. Rate-limited so nobody can guess codes by brute force.
-        group.MapPost("/{code}/join", async (string code, JoinRequest req, PartyService parties, AppDbContext db, CancellationToken ct) =>
+        group.MapPost("/{code}/join", async (string code, JoinRequest req, PartyService parties, PartyRuntime runtime, AppDbContext db, CancellationToken ct) =>
         {
             var party = await parties.FindByCodeAsync(code, ct);
             if (party is null) return Results.Problem("No party with that code.", statusCode: 404);
             if (party.Status != PartyStatus.Lobby)
                 return Results.Problem("This party has already started. Ask the host to add you as a pass-and-play seat.", statusCode: 409);
-            return Results.Ok(await AddSeatAsync(party, req.Name, isHost: false, isLocal: false, parties, db, ct));
+            return Results.Ok(await AddSeatAsync(party, req.Name, isHost: false, isLocal: false, runtime, db, ct));
         }).RequireRateLimiting(JoinRateLimit);
 
         // ---- Host: add themselves as a player, or a pass-and-play seat that lives on this device
-        group.MapPost("/{code}/seats", async (string code, AddSeatRequest req, ClaimsPrincipal user, PartyService parties, AppDbContext db, CancellationToken ct) =>
+        group.MapPost("/{code}/seats", async (string code, AddSeatRequest req, ClaimsPrincipal user, PartyService parties, PartyRuntime runtime, AppDbContext db, CancellationToken ct) =>
         {
             var party = await parties.FindByCodeAsync(code, ct);
             if (party is null) return Results.NotFound();
             if (party.HostUserId != user.FindFirstValue(ClaimTypes.NameIdentifier)) return Results.Forbid();
             var isHostSeat = !req.IsLocal;
-            return Results.Ok(await AddSeatAsync(party, req.Name, isHostSeat, req.IsLocal, parties, db, ct));
+            return Results.Ok(await AddSeatAsync(party, req.Name, isHostSeat, req.IsLocal, runtime, db, ct));
         }).RequireAuthorization(AuthPolicies.Host);
     }
 
@@ -184,16 +188,16 @@ public static class PartyEndpoints
         };
     }
 
-    private static async Task<SeatResponse> AddSeatAsync(Party party, string name, bool isHost, bool isLocal, PartyService parties, AppDbContext db, CancellationToken ct)
+    private static async Task<SeatResponse> AddSeatAsync(Party party, string name, bool isHost, bool isLocal, PartyRuntime runtime, AppDbContext db, CancellationToken ct)
     {
         var token = SeatTokens.NewToken();
         var seatId = Guid.NewGuid();
 
         // The Seat row (authentication) and the engine's player entry (gameplay)
         // are saved in one SaveChanges, so they can never get out of step.
-        await parties.ExecuteAsync(party.Id,
-            (_, now) => new AddPlayer(now, seatId, name, isHost, isLocal),
-            beforeSave: s => db.Seats.Add(new Seat
+        await runtime.ExecuteAsync(party.Id,
+            (s, now) => s.AddPlayer(now, seatId, name, isHost, isLocal),
+            beforeSave: (_, _) => db.Seats.Add(new Seat
             {
                 Id = seatId,
                 PartyId = party.Id,
@@ -201,8 +205,8 @@ public static class PartyEndpoints
                 TokenHash = SeatTokens.Hash(token),
                 IsHost = isHost,
                 IsLocal = isLocal,
-                CreatedAt = parties.Now,
-                LastSeenAt = parties.Now,
+                CreatedAt = runtime.Now,
+                LastSeenAt = runtime.Now,
             }),
             ct: ct);
 
@@ -219,12 +223,10 @@ public static class PartyEndpoints
         throw new InvalidOperationException("Could not generate a unique party code.");
     }
 
-    private static async Task<PartyInfo> ToInfo(Party p, AppDbContext db, ContentCatalog catalog, bool isHost, CancellationToken ct)
+    private static async Task<PartyInfo> ToInfo(Party p, AppDbContext db, GameModules modules, bool isHost, CancellationToken ct)
     {
-        var scenario = await catalog.GetScenarioAsync(db, p.ScenarioId, ct);
-        var state = GameJson.Deserialize<GameState>(p.State);
-        // Guests see the shared story's id: a version's id would hint at which killer they're facing.
-        return new PartyInfo(p.Code, isHost ? scenario.Id : scenario.VariantOf ?? scenario.Id, scenario.Title, scenario.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
-            p.CreatedAt, p.ScheduledFor, state.Players.Count, scenario.MaxPlayers, isHost, isHost && p.DealAtStart);
+        var game = (await modules.For(p.Kind).LoadAsync(db, p, ct)).Describe(isHost);
+        return new PartyInfo(p.Code, game.ContentId, game.Title, game.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
+            p.CreatedAt, p.ScheduledFor, game.PlayerCount, game.MaxPlayers, isHost, isHost && p.DealAtStart, p.Kind);
     }
 }

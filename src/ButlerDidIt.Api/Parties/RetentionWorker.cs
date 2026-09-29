@@ -120,13 +120,13 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
             using var scope = scopes.CreateScope();
             var sp = scope.ServiceProvider;
             var db = sp.GetRequiredService<AppDbContext>();
-            var parties = sp.GetRequiredService<PartyService>();
+            var runtime = sp.GetRequiredService<PartyRuntime>();
 
             // Clear the photo URLs through the engine, like any other change to the game,
             // so the saved state never points at deleted files.
-            var snapshot = await parties.LoadAsync(id, ct);
-            foreach (var player in snapshot.State.Players.Where(p => p.PhotoUrl is not null))
-                await parties.ExecuteAsync(id, (_, t) => new SetPlayerPhoto(t, player.SeatId, null), ct: ct);
+            var (_, session) = await runtime.LoadAsync(id, ct);
+            foreach (var seatId in session.SeatIds.Where(seat => session.PhotoUrl(seat) is not null))
+                await runtime.ExecuteAsync(id, (s, t) => s.SetPlayerPhoto(t, seatId, null), ct: ct);
 
             await using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
             {

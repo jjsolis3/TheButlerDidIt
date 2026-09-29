@@ -46,7 +46,7 @@ public static class MediaApi
         }).RequireAuthorization(AuthPolicies.Host);
 
         // ---- Guest: costume selfie. Authenticated by the seat token (X-Seat-Token header).
-        app.MapPost("/api/seat/photo", async (HttpRequest request, ClaimsPrincipal user, PartyService parties, MediaService mediaService, CancellationToken ct) =>
+        app.MapPost("/api/seat/photo", async (HttpRequest request, ClaimsPrincipal user, PartyRuntime runtime, MediaService mediaService, CancellationToken ct) =>
         {
             if (user.SeatId() is not { } seatId || user.PartyId() is not { } partyId) return Results.Unauthorized();
             if (!request.HasFormContentType) return Results.Problem("Send the photo as a form upload.", statusCode: 400);
@@ -69,24 +69,24 @@ public static class MediaApi
             var assetId = await mediaService.SaveUploadAsync(MediaKind.Photo, jpeg, "image/jpeg", "jpg", partyId, ct);
             var url = MediaStore.Url(assetId);
             string? previous = null;
-            await parties.ExecuteAsync(partyId, (s, now) =>
+            await runtime.ExecuteAsync(partyId, (s, now) =>
             {
-                previous = s.State.Players.FirstOrDefault(p => p.SeatId == seatId)?.PhotoUrl;
-                return new SetPlayerPhoto(now, seatId, url);
+                previous = s.PhotoUrl(seatId);
+                return s.SetPlayerPhoto(now, seatId, url);
             }, ct: ct);
             // A retake replaces the old selfie; don't keep the old one around.
             if (MediaStore.AssetIdFromUrl(previous) is { } old) await mediaService.DeleteUploadsAsync([old], ct);
             return Results.Ok(new { PhotoUrl = url });
         }).RequireAuthorization(AuthPolicies.Seat).DisableAntiforgery();
 
-        app.MapDelete("/api/seat/photo", async (ClaimsPrincipal user, PartyService parties, MediaService mediaService, CancellationToken ct) =>
+        app.MapDelete("/api/seat/photo", async (ClaimsPrincipal user, PartyRuntime runtime, MediaService mediaService, CancellationToken ct) =>
         {
             if (user.SeatId() is not { } seatId || user.PartyId() is not { } partyId) return Results.Unauthorized();
             string? previous = null;
-            await parties.ExecuteAsync(partyId, (s, now) =>
+            await runtime.ExecuteAsync(partyId, (s, now) =>
             {
-                previous = s.State.Players.FirstOrDefault(p => p.SeatId == seatId)?.PhotoUrl;
-                return new SetPlayerPhoto(now, seatId, null);
+                previous = s.PhotoUrl(seatId);
+                return s.SetPlayerPhoto(now, seatId, null);
             }, ct: ct);
             // "Remove" means gone from the server too, not just hidden.
             if (MediaStore.AssetIdFromUrl(previous) is { } old) await mediaService.DeleteUploadsAsync([old], ct);

@@ -52,7 +52,7 @@ public static class RecapEndpoints
         // ---- Public: anyone with the link. No sign-in, no seat token.
         app.MapGet("/api/recap/{slug}", async (string slug, AppDbContext db, ContentCatalog catalog, PartyService parties, HttpContext http, CancellationToken ct) =>
         {
-            var party = await db.Parties.AsNoTracking().FirstOrDefaultAsync(p => p.RecapSlug == slug && p.Status == PartyStatus.Finished, ct);
+            var party = await db.Parties.AsNoTracking().FirstOrDefaultAsync(p => p.RecapSlug == slug && p.Status == PartyStatus.Finished && p.Kind == GameKind.Mystery, ct);
             if (party is null) return Results.NotFound();
             // Keep shared recaps out of search engines, even if a link gets posted somewhere public.
             http.Response.Headers["X-Robots-Tag"] = "noindex";
@@ -63,7 +63,8 @@ public static class RecapEndpoints
     private static async Task<Party?> HostsPartyAsync(string code, ClaimsPrincipal user, PartyService parties, CancellationToken ct)
     {
         var party = await parties.FindByCodeAsync(code, ct);
-        return party is not null && party.HostUserId == user.FindFirstValue(ClaimTypes.NameIdentifier) ? party : null;
+        // The recap tells a mystery's story; other kinds of game have no recap (yet).
+        return party is not null && party.Kind == GameKind.Mystery && party.HostUserId == user.FindFirstValue(ClaimTypes.NameIdentifier) ? party : null;
     }
 
     private static async Task<RecapPage> PageAsync(Party party, AppDbContext db, ContentCatalog catalog, PartyService parties, CancellationToken ct)
