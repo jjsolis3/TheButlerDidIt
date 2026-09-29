@@ -175,6 +175,7 @@ builder.Services.AddSingleton<IAiUsageSink, DbAiUsageSink>();
 builder.Services.AddScoped<IAiBudget, DbAiBudget>();
 builder.Services.AddScoped<AiGateway>();
 builder.Services.AddScoped<MysteryGenerator>();
+builder.Services.AddScoped<EscapeRoomGenerator>();
 builder.Services.AddScoped<VersionRemixer>();
 builder.Services.AddScoped<AiGameService>();
 builder.Services.AddSingleton<VerdictQueue>();

@@ -52,13 +52,15 @@ public sealed partial class FakeChatClient : IChatClient
         return task switch
         {
             MysteryGenerator.OutlineTask => """{"title":"The Fake Affair","synopsis":"A test mystery.","murderer":"Colonel Fake"}""",
-            MysteryGenerator.ScenarioTask => LoadScenario(),
+            MysteryGenerator.ScenarioTask => Load("FakeScenario.json"),
             MysteryGenerator.SolveTask => """{"suspectId":"colonel","reasoning":"The fake clues say so."}""",
             VersionRemixer.Task => Remix(messages),
             NpcPrompt.Task => NpcAnswer(system, messages),
             InspectorPrompts.HintTask => "Inspector Graves murmurs: \"Look again at who was seen near the library at nine.\"",
             InspectorPrompts.VerdictTask => Verdicts(system),
             EscapePrompts.NarrationTask => $"Fake game master line for {Moment().Match(system).Groups[1].Value}: tick tock, my little guests.",
+            EscapeRoomGenerator.WriteTask => Load("FakeEscapeRoom.json"),
+            EscapeRoomGenerator.SolveTask => """{"answers":{"1":"an echo","2":"map"}}""",
             EscapePrompts.HintTask => "The game master whispers: look again at what the phones in your hands are telling you.",
             _ => "OK",
         };
@@ -124,10 +126,10 @@ public sealed partial class FakeChatClient : IChatClient
         }.ToJsonString();
     }
 
-    private static string LoadScenario()
+    private static string Load(string file)
     {
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ButlerDidIt.Ai.Fake.FakeScenario.json")
-            ?? throw new InvalidOperationException("FakeScenario.json is not embedded.");
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"ButlerDidIt.Ai.Fake.{file}")
+            ?? throw new InvalidOperationException($"{file} is not embedded.");
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }

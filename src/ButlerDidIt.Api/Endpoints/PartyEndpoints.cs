@@ -133,7 +133,9 @@ public static class PartyEndpoints
         group.MapPost("/escape", async (CreateEscapePartyRequest req, ClaimsPrincipal user, AppDbContext db, GameModules modules,
             ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, CancellationToken ct) =>
         {
-            if (rooms.Find(req.RoomId) is not { } room) return Results.Problem("Pick an escape room to play.", statusCode: 400);
+            // A hand-written room, or one written for this host: nobody else can start a party with another host's room.
+            if (await rooms.FindForHostAsync(db, req.RoomId, user.FindFirstValue(ClaimTypes.NameIdentifier)!, ct) is not { } room)
+                return Results.Problem("Pick an escape room to play.", statusCode: 400);
             var (seed, daily) = ButlerDidIt.Api.Escape.PuzzleSets.For(req.Puzzles, req.PuzzleSet, parties.Now);
             var party = new Party
             {

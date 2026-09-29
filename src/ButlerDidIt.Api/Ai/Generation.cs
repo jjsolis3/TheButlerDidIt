@@ -106,7 +106,7 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         await interrupted
             .ExecuteUpdateAsync(u => u
                 .SetProperty(j => j.Status, GenerationStatus.Failed)
-                .SetProperty(j => j.Error, "The server restarted while this mystery was being written. Please try again."), ct);
+                .SetProperty(j => j.Error, "The server restarted while this was being written. Please try again."), ct);
         foreach (var partyId in waiting) await StartWithoutRemixAsync(partyId, ct);
     }
 
@@ -146,6 +146,11 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
         if (job.Kind == GenerationKind.Remix)
         {
             await RunRemixAsync(scope.ServiceProvider, db, job, ct);
+            return;
+        }
+        if (job.Kind == GenerationKind.EscapeRoom)
+        {
+            await RunEscapeRoomAsync(scope.ServiceProvider, db, job, ct);
             return;
         }
 
@@ -249,6 +254,39 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
             log.LogWarning(ex, "Could not start party {PartyId} with its remix", partyId);
             await StartWithoutRemixAsync(partyId, ct);
         }
+    }
+
+    /// <summary>Writes an escape room from the host's theme and puts it on their shelf. Nothing is saved unless it passed the validator.</summary>
+    private async Task RunEscapeRoomAsync(IServiceProvider sp, AppDbContext db, GenerationJobEntity job, CancellationToken ct)
+    {
+        try
+        {
+            var req = GameJson.Deserialize<EscapeRoomRequest>(job.Request);
+            var result = await sp.GetRequiredService<EscapeRoomGenerator>().GenerateAsync(req,
+                new AiCallContext(job.HostUserId, JobId: job.Id), new JobProgress(scopes, job, clock, events), ct);
+
+            var room = result.Room;
+            db.EscapeRooms.Add(new EscapeRoomEntity
+            {
+                Id = room.Id, OwnerUserId = job.HostUserId, Title = room.Title, ContentRating = room.ContentRating,
+                Document = GameJson.Serialize(room), CreatedAt = clock.GetUtcNow(),
+            });
+            job.Status = GenerationStatus.Succeeded;
+            job.ScenarioId = room.Id;
+            job.Progress = $"\"{room.Title}\" is ready.";
+            job.Warnings = GameJson.Serialize(result.Warnings);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            log.LogWarning(ex, "Escape-room job {JobId} failed", job.Id);
+            job.Status = GenerationStatus.Failed;
+            job.Error = ex is AiException ? ex.Message : "Something went wrong while building the escape room. Please try again.";
+            foreach (var added in db.ChangeTracker.Entries<EscapeRoomEntity>().Where(e => e.State == EntityState.Added).ToList())
+                added.State = EntityState.Detached;
+        }
+        job.UpdatedAt = clock.GetUtcNow();
+        await db.SaveChangesAsync(ct);
+        await events.ChangedAsync(job.HostUserId);
     }
 
     private sealed class JobProgress(IServiceScopeFactory scopes, GenerationJobEntity job, TimeProvider clock, JobEvents events) : IProgress<string>
