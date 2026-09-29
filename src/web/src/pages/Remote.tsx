@@ -7,6 +7,7 @@ import { api } from '../lib/api'
 import { stageGuide } from '../lib/guide'
 import { useParty } from '../lib/hub'
 import { UnsupportedGame } from '../components/UnsupportedGame'
+import { EscapeStage } from '../escape/EscapeStage'
 import { useThemePalette } from '../lib/theme'
 import type { PartyInfo, StageView } from '../lib/types'
 import { useMe } from '../lib/useMe'
@@ -36,6 +37,8 @@ export default function Remote() {
   if (error) return <Centered>{error}</Centered>
   if (!info) return <Centered>Finding your party…</Centered>
   if (!info.isHost) return <Centered>Only the host of party {code} can use its remote.</Centered>
+  // An escape room's host controls (start, hints) are on its room screen, which works on a phone too.
+  if (info.kind === 'escapeRoom') return <EscapeStage info={info} />
   if (info.kind !== 'mystery') return <UnsupportedGame kind={info.kind} />
   return <RemoteScreen info={info} />
 }

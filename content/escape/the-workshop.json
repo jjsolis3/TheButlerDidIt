@@ -1,0 +1,143 @@
+{
+  "id": "the-workshop",
+  "title": "The Workshop",
+  "synopsis": "You wake up chained in a filthy basement workshop. A cassette recorder clicks on. The Tinkerer wants to play a game, and the clock on the wall is already counting down.",
+  "contentRating": "mature",
+  "theme": "workshop",
+  "artStyle": "grimy industrial horror, flickering fluorescent light, green-grey tones, film grain",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "hintPenaltySeconds": 120,
+  "intro": "Hello. You don't know me, but I know all of you. You have wasted every hour you were given, so tonight I will teach you what an hour is worth. You are chained in my workshop. Everything you need to leave is in this room: keys, tools, and each other. Nobody escapes alone. You have forty-five minutes. Let the game begin.",
+  "escapedText": "The steel door groans open and cold night air floods the stairwell. Behind you, the cassette clicks one last time: 'Congratulations. Remember what your time is worth.' You're out. Together.",
+  "failedText": "The clock on the wall stops. The lights go out, one by one, and the tape recorder starts to laugh. You'll have to try again.",
+  "stages": [
+    {
+      "id": "chains",
+      "title": "The Chains",
+      "description": "Heavy chains run from your ankles to the pipes. A cassette recorder sits on the floor, and a wall clock ticks just out of reach.",
+      "puzzles": ["tape", "shackles"]
+    },
+    {
+      "id": "workbench",
+      "title": "The Workbench",
+      "description": "Free of the pipes, you stumble to a workbench covered in rusted tools. A steel toolbox and a tall cabinet are both locked. Someone has written on your hands.",
+      "puzzles": ["toolbox", "cabinet"]
+    },
+    {
+      "id": "door",
+      "title": "The Door",
+      "description": "Past the workbench: a steel door with a keypad, a dead fuse box, and a wire cage bolted to the wall. A doll with painted cheeks watches from a shelf.",
+      "puzzles": ["fusebox", "cage", "exit-door"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "tape",
+      "title": "The Tape Recorder",
+      "kind": "text",
+      "prompt": "The tape crackles: 'I have hands but cannot clap. I have a face but cannot see. And I am counting every second you have left. Say what I am.'",
+      "answers": ["clock", "wall clock", "the clock on the wall"],
+      "rewards": ["rusty-key"],
+      "hints": [
+        "Look around the room. What's ticking?",
+        "Its hands point at numbers. It's on the wall."
+      ],
+      "solvedText": "The wall clock's glass swings open. Taped behind the hands: a small rusty key."
+    },
+    {
+      "id": "shackles",
+      "title": "The Shackles",
+      "kind": "use",
+      "prompt": "Your ankles are chained to the pipes with a heavy padlock. The keyhole is caked with rust.",
+      "requires": ["rusty-key"],
+      "hints": [
+        "Something you found fits a padlock.",
+        "Use the rusty key on the shackles."
+      ],
+      "solvedText": "The key grinds, then turns. The chains rattle to the floor. You can reach the workbench."
+    },
+    {
+      "id": "toolbox",
+      "title": "The Steel Toolbox",
+      "kind": "code",
+      "prompt": "A 4-digit combination lock. Scratched into the lid: 'Each of you carries part of the code. Read your hands.'",
+      "answers": ["3728"],
+      "rewards": ["bolt-cutters"],
+      "pieces": [
+        "Written on your palm in marker: the FIRST digit is the number of sides on a triangle.",
+        "Written on your palm in marker: the SECOND digit is the number of days in a week.",
+        "Written on your palm in marker: the THIRD digit is the first digit minus one.",
+        "Written on your palm in marker: the FOURTH digit is how many legs a spider has."
+      ],
+      "hints": [
+        "Every phone holds one of the four digits. Read them out loud, in order.",
+        "Triangle sides, days in a week, the first digit minus one, spider legs."
+      ],
+      "solvedText": "The lid springs open. Inside, wrapped in oily cloth: a pair of bolt cutters."
+    },
+    {
+      "id": "cabinet",
+      "title": "The Tall Cabinet",
+      "kind": "text",
+      "prompt": "A letter lock on the cabinet. Painted above it: 'The more of me you take, the more you leave behind.'",
+      "answers": ["footsteps", "steps", "footprints"],
+      "rewards": ["fuse"],
+      "hints": [
+        "Think about walking.",
+        "Every one you take leaves one behind on the floor."
+      ],
+      "solvedText": "The cabinet door creaks open. On the top shelf, in a plastic bag: a spare fuse."
+    },
+    {
+      "id": "fusebox",
+      "title": "The Fuse Box",
+      "kind": "use",
+      "prompt": "The emergency lights are dead. The fuse box on the wall has one empty slot.",
+      "requires": ["fuse"],
+      "hints": [
+        "What goes in an empty slot in a fuse box?",
+        "Use the fuse from the cabinet."
+      ],
+      "solvedText": "The lights stutter on. A monitor above the door blinks awake: the Tinkerer's doll, grinning. 'Almost free. Count what saved you.'"
+    },
+    {
+      "id": "cage",
+      "title": "The Wire Cage",
+      "kind": "use",
+      "prompt": "A brass key hangs inside a wire cage bolted to the wall. The wire is too thick to bend.",
+      "requires": ["bolt-cutters"],
+      "hints": [
+        "Thick wire needs a strong tool.",
+        "Use the bolt cutters from the toolbox."
+      ],
+      "rewards": ["exit-key"],
+      "solvedText": "The cutters bite through the wire with a snap. The brass key drops into your hand."
+    },
+    {
+      "id": "exit-door",
+      "title": "The Steel Door",
+      "kind": "code",
+      "prompt": "The door takes the brass key AND a 3-digit code. On the monitor: 'Enter the hour my clock stopped, then how many tools were in the box, then how many chains held you.'",
+      "answers": ["942"],
+      "requires": ["exit-key"],
+      "pieces": [
+        "You remember the wall clock's hands: it stopped at 9 o'clock.",
+        "You remember the toolbox: besides the bolt cutters it held exactly 4 tools.",
+        "You remember the pipes: there were 2 chains, one on each ankle."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order the monitor asks for.",
+        "The hour, then the tools, then the chains."
+      ],
+      "solvedText": "The keypad flashes green. The key turns. Somewhere above you, a door unlocks."
+    }
+  ],
+  "items": [
+    { "id": "rusty-key", "name": "Rusty key", "description": "Small and flaking. It was taped behind the clock." },
+    { "id": "bolt-cutters", "name": "Bolt cutters", "description": "Heavy, with red handles. They could cut through almost anything." },
+    { "id": "fuse", "name": "Spare fuse", "description": "A glass fuse in a plastic bag." },
+    { "id": "exit-key", "name": "Brass key", "description": "Big, heavy and polished. It has a tag: EXIT." }
+  ]
+}

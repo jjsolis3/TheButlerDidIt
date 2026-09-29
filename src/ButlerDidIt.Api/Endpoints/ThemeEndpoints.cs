@@ -21,6 +21,10 @@ public static class ThemeEndpoints
 {
     public static void MapThemeEndpoints(this IEndpointRouteBuilder app)
     {
+        // The escape rooms for the create-party page. Only what the shelf shows: no puzzles, no answers.
+        app.MapGet("/api/escape-rooms", (ButlerDidIt.Api.Escape.EscapeCatalog rooms) =>
+            Results.Ok(rooms.Rooms.Select(ButlerDidIt.Api.Escape.EscapeRoomSummary.For)));
+
         // Public: the home page shows the themes to everyone. Only summary fields
         // are returned, never the scenario document itself (it contains the solution).
         app.MapGet("/api/themes", async (ClaimsPrincipal user, AppDbContext db, CancellationToken ct) =>

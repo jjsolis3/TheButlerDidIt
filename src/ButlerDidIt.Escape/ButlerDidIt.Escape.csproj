@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The escape-room rules: pure functions, no web or database code, like ButlerDidIt.Game.
+    It references the mystery project only for what every game shares: GameJson, GameRuleException
+    and ContentRating.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\ButlerDidIt.Game\ButlerDidIt.Game.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

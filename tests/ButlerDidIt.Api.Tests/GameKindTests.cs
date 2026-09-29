@@ -170,11 +170,11 @@ public class UnknownGameKindTests(ApiFactory app) : IClassFixture<ApiFactory>
         using (var scope = app.Services.CreateScope())
         {
             await scope.ServiceProvider.GetRequiredService<AppDbContext>().Parties.Where(p => p.Code == party.Code)
-                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Kind, GameKind.EscapeRoom));
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.Kind, (GameKind)99)); // a kind from a newer version of the app
         }
 
         var info = await app.CreateClient().GetAsync($"/api/parties/{party.Code}");
         Assert.Equal(HttpStatusCode.BadRequest, info.StatusCode);
-        Assert.Contains("can't run escape-room games yet", await info.Content.ReadAsStringAsync());
+        Assert.Contains("can't run 99 games yet", await info.Content.ReadAsStringAsync());
     }
 }

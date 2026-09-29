@@ -11,6 +11,7 @@ import { stageGuide } from '../lib/guide'
 import { NpcTypingContext, useJobUpdates, useParty } from '../lib/hub'
 import { NpcAnswer } from '../components/NpcAnswer'
 import { UnsupportedGame } from '../components/UnsupportedGame'
+import { EscapeStage } from '../escape/EscapeStage'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
@@ -44,8 +45,10 @@ export default function Stage() {
       </Centered>
     )
   }
+  const token = info.isHost ? undefined : guestSeat?.token
+  if (info.kind === 'escapeRoom') return <EscapeStage info={info} token={token} />
   if (info.kind !== 'mystery') return <UnsupportedGame kind={info.kind} />
-  return <StageScreen info={info} token={info.isHost ? undefined : guestSeat?.token} />
+  return <StageScreen info={info} token={token} />
 }
 
 function Centered({ children }: { children: React.ReactNode }) {

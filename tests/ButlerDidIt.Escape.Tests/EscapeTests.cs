@@ -1,0 +1,262 @@
+using ButlerDidIt.Escape.Engine;
+using ButlerDidIt.Escape.Rooms;
+using ButlerDidIt.Game;
+using ButlerDidIt.Game.Engine;
+using ButlerDidIt.Game.Scenarios;
+
+namespace ButlerDidIt.Escape.Tests;
+
+public static class Rooms
+{
+    private static readonly Lazy<List<EscapeRoom>> All = new(() =>
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "content"))) dir = dir.Parent;
+        return EscapeLibrary.Load(Path.Combine(dir!.FullName, "content", "escape"));
+    });
+
+    public static IReadOnlyList<EscapeRoom> Library => All.Value;
+    public static EscapeRoom Get(string id) => Library.Single(r => r.Id == id);
+}
+
+public class ContentTests
+{
+    [Fact]
+    public void The_library_has_a_mature_workshop_and_a_family_funhouse()
+    {
+        Assert.Equal(ContentRating.Mature, Rooms.Get("the-workshop").ContentRating);
+        Assert.Equal(ContentRating.Family, Rooms.Get("the-funhouse").ContentRating);
+    }
+
+    public static TheoryData<string> RoomIds() => new(Rooms.Library.Select(r => r.Id));
+
+    [Theory]
+    [MemberData(nameof(RoomIds))]
+    public void Every_room_is_valid_and_can_be_escaped(string id) =>
+        Assert.Empty(EscapeRoomValidator.Validate(Rooms.Get(id)));
+
+    [Theory]
+    [MemberData(nameof(RoomIds))]
+    public void Every_room_makes_the_group_share_clues(string id) =>
+        Assert.Contains(Rooms.Get(id).Puzzles, p => p.Pieces.Count >= 3);
+}
+
+public class ValidatorTests
+{
+    private static EscapeRoom Room(Action<List<EscapePuzzle>>? change = null, ContentRating rating = ContentRating.Mature, string intro = "Go.")
+    {
+        var puzzles = new List<EscapePuzzle>
+        {
+            new() { Id = "a", Title = "A", Kind = PuzzleKind.Text, Prompt = "?", Answers = ["yes"], Rewards = ["key"], Hints = ["h"], SolvedText = "ok" },
+            new() { Id = "b", Title = "B", Kind = PuzzleKind.Use, Prompt = "?", Requires = ["key"], Hints = ["h"], SolvedText = "ok" },
+        };
+        change?.Invoke(puzzles);
+        return new EscapeRoom
+        {
+            Id = "r", Title = "R", Synopsis = "S", Intro = intro, EscapedText = "E", FailedText = "F", ContentRating = rating,
+            Stages = [new EscapeStage { Id = "s", Title = "S", Description = "D", Puzzles = puzzles.Select(p => p.Id).ToList() }],
+            Puzzles = puzzles,
+            Items = [new EscapeItem { Id = "key", Name = "Key" }],
+        };
+    }
+
+    [Fact]
+    public void A_simple_room_is_valid() => Assert.Empty(EscapeRoomValidator.Validate(Room()));
+
+    [Fact]
+    public void A_room_that_needs_an_item_nobody_gives_out_cannot_be_escaped()
+    {
+        var errors = EscapeRoomValidator.Validate(Room(p => p[0] = new EscapePuzzle
+        {
+            Id = "a", Title = "A", Kind = PuzzleKind.Text, Prompt = "?", Answers = ["yes"], Hints = ["h"], SolvedText = "ok",
+        }));
+        Assert.Contains(errors, e => e.Contains("can't be finished") && e.Contains("'key'"));
+    }
+
+    [Fact]
+    public void Codes_must_be_digits_and_use_puzzles_need_items()
+    {
+        var errors = EscapeRoomValidator.Validate(Room(p =>
+        {
+            p[0] = new EscapePuzzle { Id = "a", Title = "A", Kind = PuzzleKind.Code, Prompt = "?", Answers = ["12a"], Rewards = ["key"], Hints = ["h"], SolvedText = "ok" };
+            p.Add(new EscapePuzzle { Id = "c", Title = "C", Kind = PuzzleKind.Use, Prompt = "?", Hints = ["h"], SolvedText = "ok" });
+        }));
+        Assert.Contains(errors, e => e.Contains("digits only"));
+        Assert.Contains(errors, e => e.Contains("must require at least one item"));
+    }
+
+    [Fact]
+    public void Family_rooms_stay_spooky_not_gruesome() =>
+        Assert.Contains(EscapeRoomValidator.Validate(Room(rating: ContentRating.Family, intro: "There's blood on the floor.")), e => e.Contains("'blood'"));
+}
+
+public class EngineTests
+{
+    private static readonly DateTimeOffset T0 = new(2026, 10, 31, 20, 0, 0, TimeSpan.Zero);
+    private static readonly Guid Ada = Guid.NewGuid(), Ben = Guid.NewGuid(), Cy = Guid.NewGuid();
+    private static EscapeRoom Workshop => Rooms.Get("the-workshop");
+
+    private static EscapeState Started(EscapeRoom room, params Guid[] seats)
+    {
+        var s = EscapeEngine.NewGame();
+        var names = new[] { "Ada", "Ben", "Cy", "Dee" };
+        for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, room, new AddEscapePlayer(T0, seats[i], names[i], i == 0, false));
+        return EscapeEngine.Apply(s, room, new StartEscape(T0));
+    }
+
+    /// <summary>Solves whatever is open, the way a group that knows the answers would.</summary>
+    private static EscapeState SolveNext(EscapeState s, EscapeRoom room, DateTimeOffset at, Guid seat)
+    {
+        var stage = room.Stages[s.StageIndex];
+        var puzzle = stage.Puzzles.Select(id => room.FindPuzzle(id)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
+        return EscapeEngine.Apply(s, room, puzzle.Kind == PuzzleKind.Use
+            ? new UseItems(at, seat, puzzle.Id)
+            : new SubmitAnswer(at, seat, puzzle.Id, puzzle.Answers[0]));
+    }
+
+    [Theory]
+    [InlineData("the-workshop")]
+    [InlineData("the-funhouse")]
+    public void A_group_that_solves_everything_escapes(string id)
+    {
+        var room = Rooms.Get(id);
+        var s = Started(room, Ada, Ben, Cy);
+        for (var i = 0; s.Phase == EscapePhase.Playing; i++) s = SolveNext(s, room, T0.AddMinutes(i + 1), Ben);
+
+        Assert.Equal(EscapePhase.Escaped, s.Phase);
+        Assert.Equal(room.Puzzles.Count, s.Solved.Count);
+        Assert.Equal(room.EscapedText, EscapeProjector.Stage(s, room, T0).EndText);
+        Assert.Null(EscapeEngine.NextDueAt(s)); // the ticker can stop watching
+    }
+
+    [Fact]
+    public void Clue_pieces_are_dealt_so_every_phone_holds_some_and_nobody_holds_a_whole_puzzle()
+    {
+        var s = Started(Workshop, Ada, Ben, Cy);
+        Assert.All(new[] { Ada, Ben, Cy }, seat => Assert.Contains(s.Pieces, p => p.SeatId == seat));
+        foreach (var puzzle in Workshop.Puzzles.Where(p => p.Pieces.Count >= 3))
+            Assert.True(s.Pieces.Where(p => p.PuzzleId == puzzle.Id).Select(p => p.SeatId).Distinct().Count() >= 3);
+    }
+
+    [Fact]
+    public void Answers_are_forgiving_about_case_spacing_and_articles()
+    {
+        var s = Started(Workshop, Ada, Ben);
+        s = EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0, Ada, "tape", "  The CLOCK!  "));
+        Assert.True(s.IsSolved("tape"));
+        Assert.Contains("rusty-key", s.Inventory);
+    }
+
+    [Fact]
+    public void A_wrong_answer_locks_the_puzzle_for_a_moment_so_codes_cannot_be_brute_forced()
+    {
+        var s = Started(Workshop, Ada, Ben);
+        s = EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0, Ada, "tape", "a kettle"));
+        Assert.False(s.IsSolved("tape"));
+        Assert.Equal(1, s.WrongAttempts);
+        Assert.Contains("kettle", s.Feed[^1].Text);
+
+        var ex = Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0.AddSeconds(1), Ben, "tape", "clock")));
+        Assert.Contains("resetting", ex.Message);
+        s = EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0.AddSeconds(4), Ben, "tape", "clock"));
+        Assert.True(s.IsSolved("tape"));
+    }
+
+    [Fact]
+    public void Locked_puzzles_say_what_they_need_and_later_stages_stay_closed()
+    {
+        var s = Started(Workshop, Ada, Ben);
+        var ex = Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new UseItems(T0, Ada, "shackles")));
+        Assert.Contains("Rusty key", ex.Message);
+        ex = Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0, Ada, "toolbox", "3728")));
+        Assert.Contains("isn't in this part", ex.Message);
+    }
+
+    [Fact]
+    public void Hints_are_revealed_one_at_a_time_and_cost_time()
+    {
+        var s = Started(Workshop, Ada, Ben);
+        var deadline = s.Deadline!.Value;
+        s = EscapeEngine.Apply(s, Workshop, new RequestEscapeHint(T0, Ada, "tape"));
+        Assert.Equal(deadline.AddSeconds(-Workshop.HintPenaltySeconds), s.Deadline);
+        var view = EscapeProjector.Stage(s, Workshop, T0).Puzzles.Single(p => p.Id == "tape");
+        Assert.Equal([Workshop.FindPuzzle("tape")!.Hints[0]], view.Hints);
+        Assert.Equal(1, view.HintsLeft);
+
+        s = EscapeEngine.Apply(s, Workshop, new RequestEscapeHint(T0, null, "tape")); // the host, from the TV
+        Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new RequestEscapeHint(T0, Ada, "tape")));
+        Assert.Equal(2, s.HintsUsed);
+    }
+
+    [Fact]
+    public void When_the_clock_runs_out_the_group_is_trapped()
+    {
+        var s = Started(Workshop, Ada, Ben);
+        Assert.Same(s, EscapeEngine.Apply(s, Workshop, new EscapeTick(T0.AddMinutes(44)))); // nothing yet: same state, nothing saved
+        Assert.Equal(s.Deadline, EscapeEngine.NextDueAt(s));
+
+        s = EscapeEngine.Apply(s, Workshop, new EscapeTick(T0.AddMinutes(45)));
+        Assert.Equal(EscapePhase.Failed, s.Phase);
+        Assert.Equal(Workshop.FailedText, EscapeProjector.Stage(s, Workshop, T0).EndText);
+        Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0.AddMinutes(46), Ada, "tape", "clock")));
+    }
+
+    [Fact]
+    public void Nobody_joins_once_the_clock_is_running_and_a_leaver_hands_on_their_clues()
+    {
+        var s = Started(Workshop, Ada, Ben, Cy);
+        Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new AddEscapePlayer(T0, Guid.NewGuid(), "Late", false, false)));
+
+        var cyPieces = s.Pieces.Count(p => p.SeatId == Cy);
+        s = EscapeEngine.Apply(s, Workshop, new RemoveEscapePlayer(T0, Cy));
+        Assert.DoesNotContain(s.Pieces, p => p.SeatId == Cy);
+        Assert.Equal(Workshop.Puzzles.Sum(p => p.Pieces.Count), s.Pieces.Count);
+        Assert.True(cyPieces > 0);
+    }
+}
+
+/// <summary>"No leak" tests: views are serialized exactly as a browser receives them and searched for what must never be there.</summary>
+public class PrivacyTests
+{
+    private static readonly DateTimeOffset T0 = new(2026, 10, 31, 20, 0, 0, TimeSpan.Zero);
+
+    [Theory]
+    [InlineData("the-workshop")]
+    [InlineData("the-funhouse")]
+    public void Screens_never_see_answers_unpaid_hints_later_stages_or_other_players_clues(string id)
+    {
+        var room = Rooms.Get(id);
+        var seats = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        var s = EscapeEngine.NewGame();
+        for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, room, new AddEscapePlayer(T0, seats[i], $"P{i}", i == 0, false));
+        s = EscapeEngine.Apply(s, room, new StartEscape(T0));
+
+        for (var step = 0; s.Phase == EscapePhase.Playing; step++)
+        {
+            var stageJson = GameJson.Serialize(EscapeProjector.Stage(s, room, T0));
+            var current = room.Stages[s.StageIndex];
+            foreach (var p in room.Puzzles)
+            {
+                foreach (var answer in p.Answers.Where(a => a.Length >= 3))
+                    Assert.False(stageJson.Contains($"\"{answer}\"", StringComparison.OrdinalIgnoreCase), $"answer of {p.Id} leaked");
+                foreach (var hint in p.Hints) Assert.DoesNotContain(hint, stageJson); // nobody paid for any
+                foreach (var piece in p.Pieces) Assert.DoesNotContain(piece, stageJson);
+                if (!current.Puzzles.Contains(p.Id)) Assert.DoesNotContain(p.Prompt, stageJson);
+            }
+
+            foreach (var seat in seats)
+            {
+                var mine = s.Pieces.Where(h => h.SeatId == seat).Select(h => room.FindPuzzle(h.PuzzleId)!.Pieces[h.Index]).ToHashSet();
+                var phoneJson = GameJson.Serialize(EscapeProjector.Player(s, room, seat, T0));
+                foreach (var piece in room.Puzzles.SelectMany(p => p.Pieces).Where(piece => !mine.Contains(piece)))
+                    Assert.DoesNotContain(piece, phoneJson);
+            }
+
+            // Solve the next open puzzle and look again.
+            var next = current.Puzzles.Select(pid => room.FindPuzzle(pid)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
+            s = EscapeEngine.Apply(s, room, next.Kind == PuzzleKind.Use
+                ? new UseItems(T0.AddMinutes(step), seats[0], next.Id)
+                : new SubmitAnswer(T0.AddMinutes(step), seats[0], next.Id, next.Answers[0]));
+        }
+    }
+}
