@@ -41,6 +41,12 @@ public abstract class GameSession
 
     public abstract string? PhotoUrl(Guid seatId);
 
+    /// <summary>
+    /// Called just before a change is saved, in the same transaction: a game can add rows that must
+    /// commit together with its new state (an escape room records its result when it ends).
+    /// </summary>
+    public virtual void OnSaving(AppDbContext db, Party party, GameSession previous) { }
+
     // ---- Commands every game supports, because the platform itself needs them.
     public abstract GameSession AddPlayer(DateTimeOffset now, Guid seatId, string name, bool isHost, bool isLocal);
     public abstract GameSession RemovePlayer(DateTimeOffset now, Guid seatId);

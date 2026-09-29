@@ -37,6 +37,43 @@ A stage opens when every puzzle in the stage before it is solved. Solving the la
 | `hints` | Revealed one at a time, each costing time. Every puzzle needs at least one. |
 | `solvedText` | Shown when it's solved. Good for pointing at what just appeared. |
 
+## Replays: variants and generators
+
+A room plays differently every time. When a party is created, the server picks a **puzzle set**, a number used as the seed. `RoomVariants.Build(room, seed)` then fixes every puzzle for that game:
+- The same room and seed always build exactly the same puzzles.
+- Every game ends by showing its puzzle-set number, so a group can replay it or challenge friends with it.
+- "Today's challenge" gives every group the same set that day.
+
+There are two ways to make a puzzle vary:
+
+**Variants** are hand-written alternatives. One is picked per game, and fields a variant leaves out keep the puzzle's own values. `{}` means "the puzzle as written".
+
+```jsonc
+"variants": [
+  {},
+  { "prompt": "…'The more you take away from me, the bigger I get.'", "answers": ["hole"], "hints": ["Think about digging.", "You dig one in the ground."] }
+]
+```
+
+**Generators** build the clue pieces and the answer from the seed. The prompt, the hints and the solved text can use `{order}`, `{facts}` and `{answer}`.
+
+| `type` | Makes | Piece template must use |
+|---|---|---|
+| `digitFacts` | A code whose digits are everyday facts ("the number of days in a week"), one fact per phone. The facts come from `FactBank`. | `{ordinal}`, `{fact}` |
+| `colorDigits` | A code read from coloured objects in the order a sign gives (`{order}`). | `{color}`, `{digit}` |
+| `wordSequence` | A password of words in order, one word per phone. It needs a `words` list. | `{ordinal}`, `{word}` |
+
+```jsonc
+"generator": { "type": "digitFacts", "count": 4, "pieceTemplate": "Written on your palm: the {ordinal} digit is {fact}." },
+"hints": ["Every phone holds one digit. Read them out in order.", "In order: {facts}."]
+```
+
+The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more.
+
+## Leaderboards
+
+When a game ends, its result is saved in the same step that ends the game. The **score** is the time taken plus the time each hint cost, and lower is better. The ending screen shows where the group ranked, all time or on today's challenge. Times are public. Team names only ever appear on the host's own escapes.
+
 ## Tips
 
 - **Make the phones matter.** Put at least one puzzle with 3–4 `pieces` in each room. Write every piece so it only makes sense together with the others, for example "the SECOND digit is…".

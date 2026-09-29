@@ -32,7 +32,11 @@ public sealed record EscapeStageView(
     int HintsUsed,
     int WrongAttempts,
     /// <summary>The escape or failure text, once the game is over.</summary>
-    string? EndText);
+    string? EndText,
+    /// <summary>Today's challenge: the same puzzles for every group today.</summary>
+    bool Daily,
+    /// <summary>Which puzzle set was played, only once the game is over.</summary>
+    long? PuzzleSet);
 
 public sealed record EscapeStageInfo(string Id, string Title, string Description);
 

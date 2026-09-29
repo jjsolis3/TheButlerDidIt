@@ -38,7 +38,7 @@ public class ContentTests
     [Theory]
     [MemberData(nameof(RoomIds))]
     public void Every_room_makes_the_group_share_clues(string id) =>
-        Assert.Contains(Rooms.Get(id).Puzzles, p => p.Pieces.Count >= 3);
+        Assert.Contains(RoomVariants.Build(Rooms.Get(id), 0).Puzzles, p => p.Pieces.Count >= 3);
 }
 
 public class ValidatorTests
@@ -96,31 +96,36 @@ public class EngineTests
     private static readonly Guid Ada = Guid.NewGuid(), Ben = Guid.NewGuid(), Cy = Guid.NewGuid();
     private static EscapeRoom Workshop => Rooms.Get("the-workshop");
 
-    private static EscapeState Started(EscapeRoom room, params Guid[] seats)
+    private static EscapeState Started(EscapeRoom room, params Guid[] seats) => Started(room, 0, seats);
+
+    private static EscapeState Started(EscapeRoom room, long seed, params Guid[] seats)
     {
-        var s = EscapeEngine.NewGame();
+        var s = EscapeEngine.NewGame(seed);
         var names = new[] { "Ada", "Ben", "Cy", "Dee" };
         for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, room, new AddEscapePlayer(T0, seats[i], names[i], i == 0, false));
         return EscapeEngine.Apply(s, room, new StartEscape(T0));
     }
 
     /// <summary>Solves whatever is open, the way a group that knows the answers would.</summary>
-    private static EscapeState SolveNext(EscapeState s, EscapeRoom room, DateTimeOffset at, Guid seat)
+    private static EscapeState SolveNext(EscapeState s, EscapeRoom template, DateTimeOffset at, Guid seat)
     {
+        var room = EscapeEngine.RoomFor(s, template); // the answers of this attempt's puzzle set
         var stage = room.Stages[s.StageIndex];
         var puzzle = stage.Puzzles.Select(id => room.FindPuzzle(id)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
-        return EscapeEngine.Apply(s, room, puzzle.Kind == PuzzleKind.Use
+        return EscapeEngine.Apply(s, template, puzzle.Kind == PuzzleKind.Use
             ? new UseItems(at, seat, puzzle.Id)
             : new SubmitAnswer(at, seat, puzzle.Id, puzzle.Answers[0]));
     }
 
     [Theory]
-    [InlineData("the-workshop")]
-    [InlineData("the-funhouse")]
-    public void A_group_that_solves_everything_escapes(string id)
+    [InlineData("the-workshop", 0)]
+    [InlineData("the-workshop", 20261031)]
+    [InlineData("the-funhouse", 0)]
+    [InlineData("the-funhouse", 424242)]
+    public void A_group_that_solves_everything_escapes(string id, long seed)
     {
         var room = Rooms.Get(id);
-        var s = Started(room, Ada, Ben, Cy);
+        var s = Started(room, seed, Ada, Ben, Cy);
         for (var i = 0; s.Phase == EscapePhase.Playing; i++) s = SolveNext(s, room, T0.AddMinutes(i + 1), Ben);
 
         Assert.Equal(EscapePhase.Escaped, s.Phase);
@@ -134,7 +139,7 @@ public class EngineTests
     {
         var s = Started(Workshop, Ada, Ben, Cy);
         Assert.All(new[] { Ada, Ben, Cy }, seat => Assert.Contains(s.Pieces, p => p.SeatId == seat));
-        foreach (var puzzle in Workshop.Puzzles.Where(p => p.Pieces.Count >= 3))
+        foreach (var puzzle in EscapeEngine.RoomFor(s, Workshop).Puzzles.Where(p => p.Pieces.Count >= 3))
             Assert.True(s.Pieces.Where(p => p.PuzzleId == puzzle.Id).Select(p => p.SeatId).Distinct().Count() >= 3);
     }
 
@@ -210,7 +215,7 @@ public class EngineTests
         var cyPieces = s.Pieces.Count(p => p.SeatId == Cy);
         s = EscapeEngine.Apply(s, Workshop, new RemoveEscapePlayer(T0, Cy));
         Assert.DoesNotContain(s.Pieces, p => p.SeatId == Cy);
-        Assert.Equal(Workshop.Puzzles.Sum(p => p.Pieces.Count), s.Pieces.Count);
+        Assert.Equal(EscapeEngine.RoomFor(s, Workshop).Puzzles.Sum(p => p.Pieces.Count), s.Pieces.Count);
         Assert.True(cyPieces > 0);
     }
 }
@@ -225,15 +230,18 @@ public class PrivacyTests
     [InlineData("the-funhouse")]
     public void Screens_never_see_answers_unpaid_hints_later_stages_or_other_players_clues(string id)
     {
-        var room = Rooms.Get(id);
+        var template = Rooms.Get(id);
+        const long seed = 987654321; // a number that appears nowhere else, so the test can check it never leaks
+        var room = RoomVariants.Build(template, seed);
         var seats = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
-        var s = EscapeEngine.NewGame();
-        for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, room, new AddEscapePlayer(T0, seats[i], $"P{i}", i == 0, false));
-        s = EscapeEngine.Apply(s, room, new StartEscape(T0));
+        var s = EscapeEngine.NewGame(seed);
+        for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, seats[i], $"P{i}", i == 0, false));
+        s = EscapeEngine.Apply(s, template, new StartEscape(T0));
 
         for (var step = 0; s.Phase == EscapePhase.Playing; step++)
         {
-            var stageJson = GameJson.Serialize(EscapeProjector.Stage(s, room, T0));
+            var stageJson = GameJson.Serialize(EscapeProjector.Stage(s, template, T0));
+            Assert.DoesNotContain(seed.ToString(), stageJson); // the puzzle set would let someone work out the answers
             var current = room.Stages[s.StageIndex];
             foreach (var p in room.Puzzles)
             {
@@ -247,16 +255,90 @@ public class PrivacyTests
             foreach (var seat in seats)
             {
                 var mine = s.Pieces.Where(h => h.SeatId == seat).Select(h => room.FindPuzzle(h.PuzzleId)!.Pieces[h.Index]).ToHashSet();
-                var phoneJson = GameJson.Serialize(EscapeProjector.Player(s, room, seat, T0));
+                var phoneJson = GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0));
+                Assert.DoesNotContain(seed.ToString(), phoneJson);
                 foreach (var piece in room.Puzzles.SelectMany(p => p.Pieces).Where(piece => !mine.Contains(piece)))
                     Assert.DoesNotContain(piece, phoneJson);
             }
 
             // Solve the next open puzzle and look again.
             var next = current.Puzzles.Select(pid => room.FindPuzzle(pid)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
-            s = EscapeEngine.Apply(s, room, next.Kind == PuzzleKind.Use
+            s = EscapeEngine.Apply(s, template, next.Kind == PuzzleKind.Use
                 ? new UseItems(T0.AddMinutes(step), seats[0], next.Id)
                 : new SubmitAnswer(T0.AddMinutes(step), seats[0], next.Id, next.Answers[0]));
         }
+        Assert.Equal(seed, EscapeProjector.Stage(s, template, T0).PuzzleSet); // shown once it's over, to replay or share
+    }
+}
+
+/// <summary>Replays: the same room plays differently with every puzzle set, and the same set always plays the same.</summary>
+public class ReplayTests
+{
+    public static TheoryData<string> RoomIds() => new(Rooms.Library.Select(r => r.Id));
+
+    [Theory]
+    [MemberData(nameof(RoomIds))]
+    public void A_thousand_puzzle_sets_per_room_are_all_valid_and_escapable(string id)
+    {
+        var room = Rooms.Get(id);
+        for (var seed = 1000; seed < 2000; seed++)
+            Assert.Empty(EscapeRoomValidator.Validate(RoomVariants.Build(room, seed)));
+    }
+
+    [Theory]
+    [MemberData(nameof(RoomIds))]
+    public void The_same_puzzle_set_always_builds_the_same_room(string id)
+    {
+        var room = Rooms.Get(id);
+        Assert.Equal(GameJson.Serialize(RoomVariants.Build(room, 31337)), GameJson.Serialize(RoomVariants.Build(room, 31337)));
+        // A fresh copy of the room (as after a server restart) builds the identical puzzles too.
+        var copy = GameJson.Deserialize<EscapeRoom>(GameJson.Serialize(room));
+        Assert.Equal(GameJson.Serialize(RoomVariants.Build(room, 31337)), GameJson.Serialize(RoomVariants.Build(copy, 31337)));
+    }
+
+    [Fact]
+    public void Different_puzzle_sets_give_different_codes_riddles_and_passwords()
+    {
+        string Answer(string room, string puzzle, long seed) => RoomVariants.Build(Rooms.Get(room), seed).FindPuzzle(puzzle)!.Answers[0];
+        var seeds = Enumerable.Range(0, 60).Select(i => (long)i).ToList();
+        Assert.True(seeds.Select(s => Answer("the-workshop", "toolbox", s)).Distinct().Count() > 40, "the toolbox code varies");
+        Assert.True(seeds.Select(s => Answer("the-funhouse", "duck-pond", s)).Distinct().Count() > 40, "the duck-pond code varies");
+        Assert.True(seeds.Select(s => Answer("the-funhouse", "exit-gate", s)).Distinct().Count() > 40, "the gate password varies");
+        Assert.Equal(3, seeds.Select(s => Answer("the-workshop", "cabinet", s)).Distinct().Count()); // every hand-written riddle comes up
+        Assert.Equal(3, seeds.Select(s => Answer("the-workshop", "exit-door", s)).Distinct().Count());
+    }
+
+    [Fact]
+    public void Generated_clues_add_up_to_the_answer()
+    {
+        for (var seed = 0; seed < 200; seed++)
+        {
+            var toolbox = RoomVariants.Build(Rooms.Get("the-workshop"), seed).FindPuzzle("toolbox")!;
+            var digits = toolbox.Pieces.Select(piece => FactBank.Facts.Single(f => piece.Contains(f.Text)).Value);
+            Assert.Equal(string.Concat(digits), toolbox.Answers[0]);
+            Assert.DoesNotContain("{", toolbox.Hints[1]);
+
+            var gate = RoomVariants.Build(Rooms.Get("the-funhouse"), seed).FindPuzzle("exit-gate")!;
+            Assert.Equal(gate.Answers[0].ToUpperInvariant(), gate.SolvedText[(gate.SolvedText.IndexOf(": ") + 2)..^1]);
+            var ducks = RoomVariants.Build(Rooms.Get("the-funhouse"), seed).FindPuzzle("duck-pond")!;
+            Assert.DoesNotContain("{order}", ducks.Prompt);
+            Assert.Equal(3, ducks.Pieces.Count);
+        }
+    }
+
+    [Fact]
+    public void Broken_generators_are_caught_before_anyone_plays()
+    {
+        var room = GameJson.Deserialize<EscapeRoom>(GameJson.Serialize(Rooms.Get("the-funhouse")));
+        var gate = room.Puzzles.Single(p => p.Id == "exit-gate");
+        room.Puzzles[room.Puzzles.IndexOf(gate)] = new EscapePuzzle
+        {
+            Id = gate.Id, Title = gate.Title, Kind = PuzzleKind.Code, Prompt = gate.Prompt, Requires = gate.Requires, Hints = gate.Hints, SolvedText = gate.SolvedText,
+            Generator = new PuzzleGenerator { Type = GeneratorType.WordSequence, Count = 5, Words = ["horse", "lion"], PieceTemplate = "An animal." },
+        };
+        var errors = EscapeRoomValidator.Validate(room);
+        Assert.Contains(errors, e => e.Contains("must be a Text puzzle"));
+        Assert.Contains(errors, e => e.Contains("has only 2"));
+        Assert.Contains(errors, e => e.Contains("{word}"));
     }
 }

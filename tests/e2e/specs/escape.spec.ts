@@ -12,9 +12,9 @@ interface Puzzle {
   id: string
   title: string
   kind: 'code' | 'text' | 'use'
-  answers?: string[]
 }
-// The test plays like a group that has already worked everything out: it reads the answers from the room file.
+// The room's layout comes from its file; the answers are shuffled for every game, so the test asks
+// the server for this game's (an endpoint that only exists when Escape__ExposeAnswersForTests is set).
 const room = JSON.parse(readFileSync('../../content/escape/the-workshop.json', 'utf8')) as {
   stages: { title: string; puzzles: string[] }[]
   puzzles: Puzzle[]
@@ -49,6 +49,13 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByRole('button', { name: /The Funhouse After Dark/ })).toContainText('Family')
   await tv.getByRole('button', { name: /The Workshop/ }).click()
   await expect(tv.getByRole('button', { name: /The Workshop/ })).toContainText('Adults')
+  // Fresh puzzles by default; today's challenge and replaying a puzzle set are the other choices.
+  await expect(tv.getByRole('radio', { name: /Fresh puzzles/ })).toBeChecked()
+  await expect(tv.getByRole('radio', { name: /Today's challenge/ })).toBeVisible()
+  await tv.getByText('🔁 Replay a puzzle set').click() // the labels are the buttons; the radios themselves are hidden
+  await expect(tv.getByRole('textbox', { name: 'Puzzle set number' })).toBeVisible()
+  await tv.getByText('🎲 Fresh puzzles').click()
+  await expect(tv.getByRole('radio', { name: /Fresh puzzles/ })).toBeChecked()
   await tv.screenshot({ path: `${SHOTS}/90-escape-shelf.png`, fullPage: true })
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
@@ -62,6 +69,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   // ---- The clock starts; every phone gets its own clues.
   await tv.getByRole('button', { name: /Start the clock/ }).click()
   await expect(tv.getByRole('heading', { name: 'The Chains' })).toBeVisible()
+  const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
   await expect(tv.getByLabel('Time left')).toContainText(/4[45]:\d\d/)
   for (const p of phones) await expect(p.getByText('Only you can see these')).toBeVisible()
   await tv.screenshot({ path: `${SHOTS}/91-escape-room-tv.png` })
@@ -91,7 +99,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
       if (p.kind === 'use') {
         await card.getByRole('button', { name: 'Use it' }).click()
       } else {
-        await card.getByLabel(`Answer for ${p.title}`).fill(p.answers![0])
+        await card.getByLabel(`Answer for ${p.title}`).fill(answers[id]!)
         await card.getByRole('button', { name: 'Try' }).click()
       }
       const last = stage === room.stages[room.stages.length - 1] && id === stage.puzzles[stage.puzzles.length - 1]
@@ -105,5 +113,9 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
   await expect(tv.getByText('Congratulations. Remember what your time is worth.', { exact: false })).toBeVisible()
   for (const p of phones) await expect(p.getByText('You escaped!')).toBeVisible()
+  // The puzzle set to replay or share, and where this group ranked.
+  await expect(tv.getByTestId('puzzle-set')).toContainText(/Puzzle set #\d+/)
+  await expect(tv.getByTestId('your-rank')).toContainText(/You ranked #\d+/)
+  await expect(tv.getByRole('region', { name: 'Leaderboard' })).toContainText('Ada, Ben, Cy')
   await tv.screenshot({ path: `${SHOTS}/94-escape-escaped.png` })
 })

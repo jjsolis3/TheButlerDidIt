@@ -17,19 +17,29 @@
       "id": "chains",
       "title": "The Chains",
       "description": "Heavy chains run from your ankles to the pipes. A cassette recorder sits on the floor, and a wall clock ticks just out of reach.",
-      "puzzles": ["tape", "shackles"]
+      "puzzles": [
+        "tape",
+        "shackles"
+      ]
     },
     {
       "id": "workbench",
       "title": "The Workbench",
       "description": "Free of the pipes, you stumble to a workbench covered in rusted tools. A steel toolbox and a tall cabinet are both locked. Someone has written on your hands.",
-      "puzzles": ["toolbox", "cabinet"]
+      "puzzles": [
+        "toolbox",
+        "cabinet"
+      ]
     },
     {
       "id": "door",
       "title": "The Door",
       "description": "Past the workbench: a steel door with a keypad, a dead fuse box, and a wire cage bolted to the wall. A doll with painted cheeks watches from a shelf.",
-      "puzzles": ["fusebox", "cage", "exit-door"]
+      "puzzles": [
+        "fusebox",
+        "cage",
+        "exit-door"
+      ]
     }
   ],
   "puzzles": [
@@ -38,20 +48,37 @@
       "title": "The Tape Recorder",
       "kind": "text",
       "prompt": "The tape crackles: 'I have hands but cannot clap. I have a face but cannot see. And I am counting every second you have left. Say what I am.'",
-      "answers": ["clock", "wall clock", "the clock on the wall"],
-      "rewards": ["rusty-key"],
+      "answers": [
+        "clock",
+        "wall clock",
+        "the clock on the wall"
+      ],
+      "rewards": [
+        "rusty-key"
+      ],
       "hints": [
         "Look around the room. What's ticking?",
         "Its hands point at numbers. It's on the wall."
       ],
-      "solvedText": "The wall clock's glass swings open. Taped behind the hands: a small rusty key."
+      "solvedText": "The wall clock's glass swings open. Taped behind the hands: a small rusty key.",
+      "variants": [
+        {},
+        {
+          "prompt": "The tape crackles: 'I have a face and two hands, but I never wash either. I never sleep, and I'm counting down for you right now. Say what I am.'"
+        },
+        {
+          "prompt": "The tape crackles: 'I tick but I'm no bug. I have hands but no arms. Look up, I'm right in front of you. Say what I am.'"
+        }
+      ]
     },
     {
       "id": "shackles",
       "title": "The Shackles",
       "kind": "use",
       "prompt": "Your ankles are chained to the pipes with a heavy padlock. The keyhole is caked with rust.",
-      "requires": ["rusty-key"],
+      "requires": [
+        "rusty-key"
+      ],
       "hints": [
         "Something you found fits a padlock.",
         "Use the rusty key on the shackles."
@@ -63,39 +90,70 @@
       "title": "The Steel Toolbox",
       "kind": "code",
       "prompt": "A 4-digit combination lock. Scratched into the lid: 'Each of you carries part of the code. Read your hands.'",
-      "answers": ["3728"],
-      "rewards": ["bolt-cutters"],
-      "pieces": [
-        "Written on your palm in marker: the FIRST digit is the number of sides on a triangle.",
-        "Written on your palm in marker: the SECOND digit is the number of days in a week.",
-        "Written on your palm in marker: the THIRD digit is the first digit minus one.",
-        "Written on your palm in marker: the FOURTH digit is how many legs a spider has."
+      "rewards": [
+        "bolt-cutters"
       ],
       "hints": [
         "Every phone holds one of the four digits. Read them out loud, in order.",
-        "Triangle sides, days in a week, the first digit minus one, spider legs."
+        "In order: {facts}."
       ],
-      "solvedText": "The lid springs open. Inside, wrapped in oily cloth: a pair of bolt cutters."
+      "solvedText": "The lid springs open. Inside, wrapped in oily cloth: a pair of bolt cutters.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 4,
+        "pieceTemplate": "Written on your palm in marker: the {ordinal} digit is {fact}."
+      }
     },
     {
       "id": "cabinet",
       "title": "The Tall Cabinet",
       "kind": "text",
       "prompt": "A letter lock on the cabinet. Painted above it: 'The more of me you take, the more you leave behind.'",
-      "answers": ["footsteps", "steps", "footprints"],
-      "rewards": ["fuse"],
+      "answers": [
+        "footsteps",
+        "steps",
+        "footprints"
+      ],
+      "rewards": [
+        "fuse"
+      ],
       "hints": [
         "Think about walking.",
         "Every one you take leaves one behind on the floor."
       ],
-      "solvedText": "The cabinet door creaks open. On the top shelf, in a plastic bag: a spare fuse."
+      "solvedText": "The cabinet door creaks open. On the top shelf, in a plastic bag: a spare fuse.",
+      "variants": [
+        {},
+        {
+          "prompt": "A letter lock on the cabinet. Painted above it: 'The more you take away from me, the bigger I get.'",
+          "answers": [
+            "hole"
+          ],
+          "hints": [
+            "Think about digging.",
+            "You dig one in the ground."
+          ]
+        },
+        {
+          "prompt": "A letter lock on the cabinet. Painted above it: 'I can be cracked, made, told and played.'",
+          "answers": [
+            "joke"
+          ],
+          "hints": [
+            "You might tell one at a party.",
+            "It makes people laugh."
+          ]
+        }
+      ]
     },
     {
       "id": "fusebox",
       "title": "The Fuse Box",
       "kind": "use",
       "prompt": "The emergency lights are dead. The fuse box on the wall has one empty slot.",
-      "requires": ["fuse"],
+      "requires": [
+        "fuse"
+      ],
       "hints": [
         "What goes in an empty slot in a fuse box?",
         "Use the fuse from the cabinet."
@@ -107,12 +165,16 @@
       "title": "The Wire Cage",
       "kind": "use",
       "prompt": "A brass key hangs inside a wire cage bolted to the wall. The wire is too thick to bend.",
-      "requires": ["bolt-cutters"],
+      "requires": [
+        "bolt-cutters"
+      ],
       "hints": [
         "Thick wire needs a strong tool.",
         "Use the bolt cutters from the toolbox."
       ],
-      "rewards": ["exit-key"],
+      "rewards": [
+        "exit-key"
+      ],
       "solvedText": "The cutters bite through the wire with a snap. The brass key drops into your hand."
     },
     {
@@ -120,8 +182,12 @@
       "title": "The Steel Door",
       "kind": "code",
       "prompt": "The door takes the brass key AND a 3-digit code. On the monitor: 'Enter the hour my clock stopped, then how many tools were in the box, then how many chains held you.'",
-      "answers": ["942"],
-      "requires": ["exit-key"],
+      "answers": [
+        "942"
+      ],
+      "requires": [
+        "exit-key"
+      ],
       "pieces": [
         "You remember the wall clock's hands: it stopped at 9 o'clock.",
         "You remember the toolbox: besides the bolt cutters it held exactly 4 tools.",
@@ -131,13 +197,52 @@
         "Three phones remember three numbers. Put them in the order the monitor asks for.",
         "The hour, then the tools, then the chains."
       ],
-      "solvedText": "The keypad flashes green. The key turns. Somewhere above you, a door unlocks."
+      "solvedText": "The keypad flashes green. The key turns. Somewhere above you, a door unlocks.",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "362"
+          ],
+          "pieces": [
+            "You remember the wall clock's hands: it stopped at 3 o'clock.",
+            "You remember the toolbox: besides the bolt cutters it held exactly 6 tools.",
+            "You remember the pipes: there were 2 chains, one on each ankle."
+          ]
+        },
+        {
+          "answers": [
+            "752"
+          ],
+          "pieces": [
+            "You remember the wall clock's hands: it stopped at 7 o'clock.",
+            "You remember the toolbox: besides the bolt cutters it held exactly 5 tools.",
+            "You remember the pipes: there were 2 chains, one on each ankle."
+          ]
+        }
+      ]
     }
   ],
   "items": [
-    { "id": "rusty-key", "name": "Rusty key", "description": "Small and flaking. It was taped behind the clock." },
-    { "id": "bolt-cutters", "name": "Bolt cutters", "description": "Heavy, with red handles. They could cut through almost anything." },
-    { "id": "fuse", "name": "Spare fuse", "description": "A glass fuse in a plastic bag." },
-    { "id": "exit-key", "name": "Brass key", "description": "Big, heavy and polished. It has a tag: EXIT." }
+    {
+      "id": "rusty-key",
+      "name": "Rusty key",
+      "description": "Small and flaking. It was taped behind the clock."
+    },
+    {
+      "id": "bolt-cutters",
+      "name": "Bolt cutters",
+      "description": "Heavy, with red handles. They could cut through almost anything."
+    },
+    {
+      "id": "fuse",
+      "name": "Spare fuse",
+      "description": "A glass fuse in a plastic bag."
+    },
+    {
+      "id": "exit-key",
+      "name": "Brass key",
+      "description": "Big, heavy and polished. It has a tag: EXIT."
+    }
   ]
 }

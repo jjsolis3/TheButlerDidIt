@@ -269,6 +269,7 @@ app.MapAdminHostEndpoints();
 app.MapRecapEndpoints();
 app.MapScenarioEditorEndpoints();
 app.MapThemeEndpoints();
+app.MapEscapeEndpoints(app.Configuration);
 app.MapPartyEndpoints();
 app.MapMediaEndpoints();
 app.MapAiEndpoints();

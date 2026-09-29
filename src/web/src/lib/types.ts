@@ -582,6 +582,35 @@ export interface EscapeRoomSummary {
   timeLimitMinutes: number
   stageCount: number
   puzzleCount: number
+  hintPenaltySeconds: number
+  /** The best escape so far: seconds taken plus the time its hints cost. Null until someone escapes. */
+  bestScore: number | null
+}
+
+/** Which puzzles a new escape party plays. */
+export type PuzzleChoice = 'fresh' | 'daily' | 'replay'
+
+export interface LeaderboardEntry {
+  rank: number
+  /** Seconds taken plus the time hints cost; lower is better */
+  score: number
+  elapsedSeconds: number
+  hintsUsed: number
+  playerCount: number
+  finishedAt: string
+  /** One of the signed-in host's own escapes */
+  mine: boolean
+  /** Players' names, only on the host's own escapes */
+  team: string | null
+  thisParty: boolean
+}
+
+export interface Leaderboard {
+  roomId: string
+  daily: boolean
+  top: LeaderboardEntry[]
+  thisParty: LeaderboardEntry | null
+  myBest: LeaderboardEntry[]
 }
 
 export interface EscapeFeedEntry {
@@ -649,6 +678,10 @@ export interface EscapeStageView {
   wrongAttempts: number
   /** The escape or failure text, once the game is over */
   endText: string | null
+  /** Today's challenge: the same puzzles for every group today */
+  daily: boolean
+  /** Which puzzle set was played, only once the game is over */
+  puzzleSet: number | null
 }
 
 export interface EscapePieceView {

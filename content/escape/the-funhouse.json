@@ -17,19 +17,29 @@
       "id": "mirrors",
       "title": "The Hall of Mirrors",
       "description": "A thousand of you stare back from the wobbly mirrors. Somewhere in here is the way out, and something is written backwards on the glass.",
-      "puzzles": ["mirror-riddle", "little-door"]
+      "puzzles": [
+        "mirror-riddle",
+        "little-door"
+      ]
     },
     {
       "id": "booths",
       "title": "The Game Booths",
       "description": "Past the mirrors, the midway game booths glow. The duck pond is still bubbling, and the strongman bell stands in the corner with a lock on its mallet.",
-      "puzzles": ["duck-pond", "strongman"]
+      "puzzles": [
+        "duck-pond",
+        "strongman"
+      ]
     },
     {
       "id": "gate",
       "title": "The Big Top Gate",
       "description": "The exit gate is right there, but a sleepy clown guard is snoring in front of it, and the ticket machine is blinking.",
-      "puzzles": ["bell", "ticket-machine", "exit-gate"]
+      "puzzles": [
+        "bell",
+        "ticket-machine",
+        "exit-gate"
+      ]
     }
   ],
   "puzzles": [
@@ -38,20 +48,52 @@
       "title": "The Backwards Riddle",
       "kind": "text",
       "prompt": "Written backwards on the biggest mirror: '?ti esu nac uoy erofeb nekorb eb ot sah tahW'",
-      "answers": ["egg", "an egg", "eggs"],
-      "rewards": ["mirror-key"],
+      "answers": [
+        "egg",
+        "an egg",
+        "eggs"
+      ],
+      "rewards": [
+        "mirror-key"
+      ],
       "hints": [
         "Read it from right to left: 'What has to be broken before you can use it?'",
         "You crack it for breakfast."
       ],
-      "solvedText": "The mirror slides aside with a giggle. On a hook behind it: a little silver key."
+      "solvedText": "The mirror slides aside with a giggle. On a hook behind it: a little silver key.",
+      "variants": [
+        {},
+        {
+          "prompt": "Written backwards on the biggest mirror: '?palc t'nac tub sdnah sah tahW'",
+          "answers": [
+            "clock"
+          ],
+          "hints": [
+            "Read it from right to left: 'What has hands but can't clap?'",
+            "It tells the time."
+          ]
+        },
+        {
+          "prompt": "Written backwards on the biggest mirror: '?nwod semoc reven tub pu seog tahW'",
+          "answers": [
+            "age",
+            "your age"
+          ],
+          "hints": [
+            "Read it from right to left: 'What goes up but never comes down?'",
+            "It gets bigger on every birthday."
+          ]
+        }
+      ]
     },
     {
       "id": "little-door",
       "title": "The Little Door",
       "kind": "use",
       "prompt": "Behind the mirrors, a door just big enough to crawl through. It has a tiny silver lock.",
-      "requires": ["mirror-key"],
+      "requires": [
+        "mirror-key"
+      ],
       "hints": [
         "You found a key that's just the right size.",
         "Use the silver key on the little door."
@@ -62,44 +104,86 @@
       "id": "duck-pond",
       "title": "The Duck Pond Prize Box",
       "kind": "code",
-      "prompt": "The prize box has a 3-digit lock. The sign says: 'Red duck, then Yellow duck, then Blue duck!' Each of you fished out one rubber duck.",
-      "answers": ["258"],
-      "rewards": ["prize-ticket"],
-      "pieces": [
-        "You fished out a YELLOW duck. Under it is the number 5.",
-        "You fished out a RED duck. Under it is the number 2.",
-        "You fished out a BLUE duck. Under it is the number 8."
+      "prompt": "The prize box has a 3-digit lock. The sign says: '{order}!' Each of you fished out one rubber duck.",
+      "rewards": [
+        "prize-ticket"
       ],
       "hints": [
         "Each phone has one duck. Say your duck's color and number out loud.",
-        "Put them in the sign's order: red, yellow, blue."
+        "Put them in the sign's order: {order}."
       ],
-      "solvedText": "Quack! The prize box pops open. Inside: one shiny golden prize ticket."
+      "solvedText": "Quack! The prize box pops open. Inside: one shiny golden prize ticket.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "yellow",
+          "blue",
+          "green",
+          "purple",
+          "orange"
+        ],
+        "pieceTemplate": "You fished out a {color} duck. Under it is the number {digit}."
+      }
     },
     {
       "id": "strongman",
       "title": "The Strongman Mallet",
       "kind": "text",
       "prompt": "The giant mallet is chained to the bell with a word lock. Carved on the handle: 'I'm tall when I'm young and short when I'm old.'",
-      "answers": ["candle", "a candle", "candles"],
-      "rewards": ["mallet"],
+      "answers": [
+        "candle",
+        "a candle",
+        "candles"
+      ],
+      "rewards": [
+        "mallet"
+      ],
       "hints": [
         "It gets shorter every time it's used.",
         "You light it on a birthday cake."
       ],
-      "solvedText": "The chain falls away. The mallet is huge, but together you can lift it."
+      "solvedText": "The chain falls away. The mallet is huge, but together you can lift it.",
+      "variants": [
+        {},
+        {
+          "prompt": "The giant mallet is chained to the bell with a word lock. Carved on the handle: 'What has a neck but no head?'",
+          "answers": [
+            "bottle"
+          ],
+          "hints": [
+            "You drink from it.",
+            "Juice or water can come in one."
+          ]
+        },
+        {
+          "prompt": "The giant mallet is chained to the bell with a word lock. Carved on the handle: 'What has lots of teeth but can't bite?'",
+          "answers": [
+            "comb"
+          ],
+          "hints": [
+            "You use it on your hair.",
+            "It keeps your hair neat and tidy."
+          ]
+        }
+      ]
     },
     {
       "id": "bell",
       "title": "The Strongman Bell",
       "kind": "use",
       "prompt": "Ring the strongman bell loud enough to wake up the snoring clown guard!",
-      "requires": ["mallet"],
+      "requires": [
+        "mallet"
+      ],
       "hints": [
         "Bells need something to hit them.",
         "Use the mallet on the bell."
       ],
-      "rewards": ["brass-key"],
+      "rewards": [
+        "brass-key"
+      ],
       "solvedText": "DING! The guard jumps up, yawns, and waddles off, dropping a big brass key."
     },
     {
@@ -107,7 +191,9 @@
       "title": "The Ticket Machine",
       "kind": "use",
       "prompt": "The gate's ticket machine blinks: 'One golden prize ticket to leave, please!'",
-      "requires": ["prize-ticket"],
+      "requires": [
+        "prize-ticket"
+      ],
       "hints": [
         "You won something shiny at the duck pond.",
         "Use the golden prize ticket."
@@ -119,24 +205,53 @@
       "title": "The Big Gate",
       "kind": "text",
       "prompt": "The last lock needs the brass key AND a password. Mister Giggles' voice crackles: 'Tell me the three carousel animals, first to last!'",
-      "answers": ["horse lion zebra"],
-      "requires": ["brass-key"],
-      "pieces": [
-        "You rode the carousel earlier: the FIRST animal was a horse.",
-        "You rode the carousel earlier: the SECOND animal was a lion.",
-        "You rode the carousel earlier: the THIRD animal was a zebra."
+      "requires": [
+        "brass-key"
       ],
       "hints": [
         "Three phones each remember one carousel animal.",
         "Say them in order, first to last, like: animal animal animal."
       ],
-      "solvedText": "The brass key turns and the password lights up the gate: HORSE, LION, ZEBRA!"
+      "solvedText": "The brass key turns and the password lights up the gate: {answer}!",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "horse",
+          "lion",
+          "zebra",
+          "tiger",
+          "elephant",
+          "giraffe",
+          "camel",
+          "bear",
+          "rabbit",
+          "dragon"
+        ],
+        "pieceTemplate": "You rode the carousel earlier: the {ordinal} animal was the {word}."
+      }
     }
   ],
   "items": [
-    { "id": "mirror-key", "name": "Little silver key", "description": "Tiny and shiny. It was hidden behind a mirror." },
-    { "id": "prize-ticket", "name": "Golden prize ticket", "description": "Won at the duck pond. It sparkles." },
-    { "id": "mallet", "name": "Giant mallet", "description": "The strongman's mallet. It takes teamwork to swing." },
-    { "id": "brass-key", "name": "Big brass key", "description": "Dropped by the sleepy clown guard." }
+    {
+      "id": "mirror-key",
+      "name": "Little silver key",
+      "description": "Tiny and shiny. It was hidden behind a mirror."
+    },
+    {
+      "id": "prize-ticket",
+      "name": "Golden prize ticket",
+      "description": "Won at the duck pond. It sparkles."
+    },
+    {
+      "id": "mallet",
+      "name": "Giant mallet",
+      "description": "The strongman's mallet. It takes teamwork to swing."
+    },
+    {
+      "id": "brass-key",
+      "name": "Big brass key",
+      "description": "Dropped by the sleepy clown guard."
+    }
   ]
 }

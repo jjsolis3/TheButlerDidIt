@@ -272,3 +272,14 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - rooms are listed at `/api/escape-rooms`, and a party is created with `POST /api/parties/escape`.
 - **Front end:** `src/web/src/escape/` holds the shelf, the TV (`EscapeStage`) and the phone (`EscapePhone`). The game routes pick them by `PartyInfo.kind`.
 
+**Replays** (`RoomVariants`):
+- **The seed:** `EscapeState.Seed` is the puzzle set. The server picks it when the party is created: random, today's date for the daily challenge, or a number the host types in. The engine takes it as given, so it stays free of randomness.
+- **Building the room:** the engine and the projector build `RoomFor(state, room)` from it on every command. Variants are picked and generators run with SplitMix64, whose sequence never changes between .NET versions, and each puzzle gets its own seed (seed xor a hash of its id).
+- **Caching:** the built room is cached per room and seed.
+- **Privacy:** the seed is withheld from views until the game ends, because the content is public and the answers could be worked out from it.
+
+**Leaderboards:**
+- `GameSession.OnSaving` runs inside the runtime's save. The escape session uses it to add an `EscapeResult` row in the same transaction that ends the game, so a result is never lost or counted twice (one per party, enforced by a unique index).
+- `GET /api/escape-rooms/{id}/leaderboard` ranks escapes by score, all time or today's.
+- Team names are returned only for the caller's own parties.
+

@@ -8,8 +8,9 @@ namespace ButlerDidIt.Escape.Engine;
 /// </summary>
 public static class EscapeProjector
 {
-    public static EscapeStageView Stage(EscapeState s, EscapeRoom room, DateTimeOffset now)
+    public static EscapeStageView Stage(EscapeState s, EscapeRoom template, DateTimeOffset now)
     {
+        var room = EscapeEngine.RoomFor(s, template);
         var playing = s.Phase != EscapePhase.Lobby;
         var stage = playing && s.Phase == EscapePhase.Playing ? room.Stages[s.StageIndex] : null;
         var puzzles = stage is null ? [] : stage.Puzzles.Select(id => Puzzle(s, room, room.FindPuzzle(id)!)).ToList();
@@ -32,13 +33,17 @@ public static class EscapeProjector
             s.StartedAt, s.Deadline, s.EndedAt, now,
             s.Feed,
             s.Solved.Count, room.Puzzles.Count, s.HintsUsed, s.WrongAttempts,
-            endText);
+            endText,
+            s.Daily,
+            // The puzzle set number only once it's over, so a group can replay it or challenge friends.
+            PuzzleSet: endText is null ? null : s.Seed);
     }
 
-    public static EscapePlayerView Player(EscapeState s, EscapeRoom room, Guid seatId, DateTimeOffset now)
+    public static EscapePlayerView Player(EscapeState s, EscapeRoom template, Guid seatId, DateTimeOffset now)
     {
+        var room = EscapeEngine.RoomFor(s, template);
         var me = s.FindPlayer(seatId) ?? throw new ButlerDidIt.Game.Engine.GameRuleException("You're not in this game.");
-        var stage = Stage(s, room, now);
+        var stage = Stage(s, template, now);
         // Only pieces for the stage in front of them: earlier ones are done, later ones would give the room away.
         var open = stage.Puzzles.Where(p => !p.Solved).Select(p => p.Id).ToHashSet();
         var pieces = s.Pieces

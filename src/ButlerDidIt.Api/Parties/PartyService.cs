@@ -129,6 +129,7 @@ public sealed class PartyRuntime(
             party.NextDueAt = next.NextDueAt;
             party.UpdatedAt = now;
 
+            next.OnSaving(db, party, session);
             beforeSave?.Invoke(party, next);
             await db.SaveChangesAsync(ct);
 

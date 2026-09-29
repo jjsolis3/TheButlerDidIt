@@ -100,8 +100,9 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
           <p className="font-display mt-2 text-3xl">{stage.phase === 'escaped' ? 'You escaped!' : 'Trapped!'}</p>
           <p className="mt-3 text-sm text-ink/90">{stage.endText}</p>
           <p className="mt-3 text-sm text-muted">
-            {formatDuration(elapsedSeconds(stage))} · {stage.solvedCount}/{stage.puzzleCount} puzzles · {stage.hintsUsed} hints
+            {formatDuration(elapsedSeconds(stage))} · {stage.solvedCount}/{stage.puzzleCount} puzzles · {stage.hintsUsed} hint{stage.hintsUsed === 1 ? '' : 's'}
           </p>
+          {stage.puzzleSet !== null && !stage.daily && <p className="mt-2 text-xs text-muted">Puzzle set #{stage.puzzleSet}: share it to challenge friends.</p>}
         </div>
       )}
     </div>

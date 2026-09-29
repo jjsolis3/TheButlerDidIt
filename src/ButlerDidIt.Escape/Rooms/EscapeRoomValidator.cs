@@ -13,7 +13,49 @@ public static class EscapeRoomValidator
     // Family rooms can be spooky, never gruesome.
     private static readonly string[] FamilyUnsafeWords = ["blood", "kill", "murder", "corpse", "gore", "stab", "dead", "death", "torture"];
 
+    /// <summary>How many seeds a templated room is built and checked with. Enough to cover every variant many times over.</summary>
+    public const int SeedsChecked = 200;
+
+    /// <summary>
+    /// Every problem with the room. A room with variants or generators is checked the way it will
+    /// be played: built from many seeds, each one validated (and played through) on its own.
+    /// </summary>
     public static List<string> Validate(EscapeRoom room)
+    {
+        var template = TemplateErrors(room);
+        if (template.Count > 0) return template;
+        if (!RoomVariants.IsTemplated(room)) return ValidateConcrete(room);
+        for (var seed = 0; seed < SeedsChecked; seed++)
+        {
+            var errors = ValidateConcrete(RoomVariants.Build(room, seed));
+            if (errors.Count > 0) return errors.Select(e => $"With puzzle set {seed}: {e}").ToList();
+        }
+        return [];
+    }
+
+    private static List<string> TemplateErrors(EscapeRoom room)
+    {
+        var errors = new List<string>();
+        foreach (var p in room.Puzzles)
+        {
+            if (p.Generator is not { } g) continue;
+            var (kind, placeholders, pool) = g.Type switch
+            {
+                GeneratorType.DigitFacts => (PuzzleKind.Code, new[] { "{ordinal}", "{fact}" }, FactBank.Facts.Count),
+                GeneratorType.ColorDigits => (PuzzleKind.Code, new[] { "{color}", "{digit}" }, Math.Min(g.Colors.Distinct().Count(), 9)),
+                _ => (PuzzleKind.Text, new[] { "{ordinal}", "{word}" }, g.Words.Distinct(StringComparer.OrdinalIgnoreCase).Count()),
+            };
+            if (p.Kind != kind) errors.Add($"Puzzle '{p.Id}' uses a {g.Type} generator, so it must be a {kind} puzzle.");
+            if (g.Count is < 2 or > 10) errors.Add($"Puzzle '{p.Id}': a generator makes 2 to 10 pieces.");
+            if (g.Count > pool) errors.Add($"Puzzle '{p.Id}' needs {g.Count} different {(g.Type == GeneratorType.WordSequence ? "words" : g.Type == GeneratorType.ColorDigits ? "colours" : "facts")} but has only {pool}.");
+            foreach (var ph in placeholders.Where(ph => !g.PieceTemplate.Contains(ph)))
+                errors.Add($"Puzzle '{p.Id}': the piece template must include {ph}.");
+        }
+        return errors;
+    }
+
+    /// <summary>A room with every puzzle fixed (no variants or generators left).</summary>
+    private static List<string> ValidateConcrete(EscapeRoom room)
     {
         var errors = new List<string>();
         if (string.IsNullOrWhiteSpace(room.Id)) errors.Add("The room needs an id.");

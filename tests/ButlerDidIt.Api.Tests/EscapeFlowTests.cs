@@ -21,11 +21,42 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
         return GameJson.Deserialize<T>(body);
     }
 
-    private async Task<(HttpClient Host, string Cookie, PartyInfo Party)> EscapePartyAsync(string room)
+    private async Task<(HttpClient Host, string Cookie, PartyInfo Party)> EscapePartyAsync(string room, PuzzleChoice puzzles = PuzzleChoice.Fresh, long? set = null, HttpClient? host = null, string? cookie = null)
     {
-        var (host, cookie) = await app.RegisterHostAsync($"escape{Guid.NewGuid():N}@example.com");
-        var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties/escape", new CreateEscapePartyRequest(room, PartyMode.SharedScreen), GameJson.Options));
-        return (host, cookie, party);
+        if (host is null) (host, cookie) = await app.RegisterHostAsync($"escape{Guid.NewGuid():N}@example.com");
+        var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties/escape", new CreateEscapePartyRequest(room, PartyMode.SharedScreen, null, puzzles, set), GameJson.Options));
+        return (host, cookie!, party);
+    }
+
+    private EscapeState StateOf(string code)
+    {
+        using var scope = app.Services.CreateScope();
+        var row = scope.ServiceProvider.GetRequiredService<AppDbContext>().Parties.AsNoTracking().Single(p => p.Code == code);
+        return GameJson.Deserialize<EscapeState>(row.State);
+    }
+
+    /// <summary>The room as this party plays it: its puzzle set's codes and riddles.</summary>
+    private EscapeRoom PlayedRoom(string code, string roomId) =>
+        EscapeEngine.RoomFor(StateOf(code), app.Services.GetRequiredService<EscapeCatalog>().Find(roomId)!);
+
+    /// <summary>Joins three guests, starts the clock and solves everything.</summary>
+    private async Task EscapeAsync(PartyInfo party, string cookie, string roomId)
+    {
+        var seats = new List<SeatResponse>();
+        foreach (var name in new[] { "Ada", "Ben", "Cy" })
+            seats.Add(await Read<SeatResponse>(await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/join", new JoinRequest(name))));
+        await using var tv = await app.ConnectAsync(cookie: cookie);
+        await using var phone = await app.ConnectAsync(seats[0].Token);
+        await tv.InvokeAsync("EscapeStart", party.Code);
+        var room = PlayedRoom(party.Code, roomId);
+        while (true)
+        {
+            var stage = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
+            if (stage.Phase != EscapePhase.Playing) break;
+            var next = stage.Puzzles.First(p => !p.Solved && p.Needs.Count == 0);
+            if (next.Kind == PuzzleKind.Use) await phone.InvokeAsync("EscapeUse", next.Id);
+            else await phone.InvokeAsync<bool>("EscapeAnswer", next.Id, room.FindPuzzle(next.Id)!.Answers[0]);
+        }
     }
 
     [Fact]
@@ -69,7 +100,7 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
             Assert.Contains((await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code)).Feed, f => f.Text.Contains("kettle"));
             await Task.Delay(EscapeEngine.WrongAnswerCooldown); // the lock resets
 
-            var room = app.Services.GetRequiredService<EscapeCatalog>().Find("the-workshop")!;
+            var room = PlayedRoom(party.Code, "the-workshop");
             var i = 0;
             while (true)
             {
@@ -132,5 +163,77 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
         await using var tv = await app.ConnectAsync(cookie: cookie);
         var ex = await Assert.ThrowsAsync<HubException>(() => tv.InvokeAsync("EscapeStart", party.Code));
         Assert.Contains("isn't part of this party's game", ex.Message);
+    }
+
+    [Fact]
+    public async Task Todays_challenge_is_the_same_for_everyone_and_a_puzzle_set_can_be_replayed()
+    {
+        var (_, _, a) = await EscapePartyAsync("the-funhouse", PuzzleChoice.Daily);
+        var (_, _, b) = await EscapePartyAsync("the-funhouse", PuzzleChoice.Daily);
+        Assert.Equal(StateOf(a.Code).Seed, StateOf(b.Code).Seed);
+        Assert.True(StateOf(a.Code).Daily);
+
+        var (_, _, replay) = await EscapePartyAsync("the-funhouse", PuzzleChoice.Replay, 4242);
+        Assert.Equal(4242, StateOf(replay.Code).Seed);
+        Assert.False(StateOf(replay.Code).Daily);
+
+        var (host, _) = await app.RegisterHostAsync($"bad{Guid.NewGuid():N}@example.com");
+        var bad = await host.PostAsJsonAsync("/api/parties/escape", new CreateEscapePartyRequest("the-funhouse", PartyMode.SharedScreen, null, PuzzleChoice.Replay, 5_000_000), GameJson.Options);
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, bad.StatusCode);
+    }
+
+    [Fact]
+    public async Task An_escape_is_recorded_once_and_ranked_and_only_its_host_sees_the_names()
+    {
+        var (host, cookie, party) = await EscapePartyAsync("the-funhouse", PuzzleChoice.Replay, 777);
+        await EscapeAsync(party, cookie, "the-funhouse");
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var partyId = (await db.Parties.SingleAsync(p => p.Code == party.Code)).Id;
+            var result = Assert.Single(await db.EscapeResults.Where(r => r.PartyId == partyId).ToListAsync());
+            Assert.True(result.Escaped);
+            Assert.Equal(777, result.Seed);
+            Assert.Equal("Ada, Ben, Cy", result.Team);
+            Assert.Equal(result.ElapsedSeconds + result.HintsUsed * 90, result.Score);
+        }
+
+        // The host sees their team's names and where this party ranked; everyone else sees only times.
+        var mine = await Read<Leaderboard>(await host.GetAsync($"/api/escape-rooms/the-funhouse/leaderboard?party={party.Code}"));
+        Assert.NotNull(mine.ThisParty);
+        Assert.Equal("Ada, Ben, Cy", mine.ThisParty!.Team);
+        Assert.Contains(mine.Top, e => e.ThisParty && e.Mine);
+        Assert.Contains(mine.MyBest, e => e.Team == "Ada, Ben, Cy");
+
+        var anyone = await app.CreateClient().GetStringAsync($"/api/escape-rooms/the-funhouse/leaderboard?party={party.Code}");
+        Assert.DoesNotContain("Ada", anyone);
+        Assert.Contains("\"thisParty\":null", anyone);
+
+        // The shelf shows the best score so far.
+        var shelf = GameJson.Deserialize<List<EscapeRoomSummary>>(await app.CreateClient().GetStringAsync("/api/escape-rooms"));
+        Assert.NotNull(shelf.Single(r => r.Id == "the-funhouse").BestScore);
+    }
+
+    [Fact]
+    public async Task Running_out_of_time_is_recorded_but_never_ranked()
+    {
+        var (host, cookie, party) = await EscapePartyAsync("the-workshop");
+        await Read<SeatResponse>(await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/join", new JoinRequest("Solo")));
+        await using var tv = await app.ConnectAsync(cookie: cookie);
+        await tv.InvokeAsync("EscapeStart", party.Code);
+
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var partyId = (await db.Parties.SingleAsync(p => p.Code == party.Code)).Id;
+        // The ticker's command, an hour late: the clock has run out.
+        await scope.ServiceProvider.GetRequiredService<ButlerDidIt.Api.Parties.PartyRuntime>().ExecuteAsync(partyId, (s, now) => s.Tick(now.AddHours(1)));
+        await scope.ServiceProvider.GetRequiredService<ButlerDidIt.Api.Parties.PartyRuntime>().ExecuteAsync(partyId, (s, now) => s.Tick(now.AddHours(2))); // nothing more to record
+
+        var result = Assert.Single(await db.EscapeResults.AsNoTracking().Where(r => r.PartyId == partyId).ToListAsync());
+        Assert.False(result.Escaped);
+        var board = await Read<Leaderboard>(await host.GetAsync($"/api/escape-rooms/the-workshop/leaderboard?party={party.Code}"));
+        Assert.Null(board.ThisParty);
+        Assert.DoesNotContain(board.Top, e => e.ThisParty);
     }
 }

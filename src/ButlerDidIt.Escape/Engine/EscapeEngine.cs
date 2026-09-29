@@ -16,13 +16,17 @@ public static class EscapeEngine
     public static readonly TimeSpan WrongAnswerCooldown = TimeSpan.FromSeconds(3);
     private const int FeedLength = 12;
 
-    public static EscapeState NewGame() => new();
+    public static EscapeState NewGame(long seed = 0, bool daily = false) => new() { Seed = seed, Daily = daily };
+
+    /// <summary>The room as this attempt plays it: its variants and generated codes picked from the state's seed.</summary>
+    public static EscapeRoom RoomFor(EscapeState s, EscapeRoom room) => RoomVariants.Build(room, s.Seed);
 
     public static DateTimeOffset? NextDueAt(EscapeState s) => s.Phase == EscapePhase.Playing ? s.Deadline : null;
 
-    public static EscapeState Apply(EscapeState state, EscapeRoom room, EscapeCommand command)
+    public static EscapeState Apply(EscapeState state, EscapeRoom template, EscapeCommand command)
     {
         if (command is EscapeTick tick) return Tick(state, tick.Now);
+        var room = RoomFor(state, template);
 
         var s = Clone(state);
         switch (command)
