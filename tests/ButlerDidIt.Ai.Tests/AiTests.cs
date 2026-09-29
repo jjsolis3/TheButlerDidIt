@@ -238,6 +238,42 @@ public class PromptTests
     }
 }
 
+public class MediaPlanTests
+{
+    private static Scenario Load(string id)
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "content"))) dir = dir.Parent;
+        return ContentLibrary.Load(Path.Combine(dir!.FullName, "content")).SelectMany(t => t.Scenarios).Single(s => s.Id == id);
+    }
+
+    [Fact]
+    public void Every_clue_gets_a_picture_drawn_from_its_title_alone()
+    {
+        var s = Load("death-at-blackwood-manor");
+        var plan = MediaPlan.For(s, TestAi.Theme, voices: false, images: true);
+
+        foreach (var clue in s.Clues)
+        {
+            var item = Assert.Single(plan, i => i.Key == MediaOverlay.ClueImage(clue.Id, clue.Title));
+            Assert.Equal(AiRole.Illustrator, item.Role);
+            Assert.Contains(clue.Title, item.Text);
+            // Nothing from the clue's text: it can differ between versions and give the game away.
+            Assert.DoesNotContain(clue.Text[..Math.Min(40, clue.Text.Length)], item.Text);
+        }
+        Assert.DoesNotContain(plan, i => i.Key.StartsWith("clue/", StringComparison.Ordinal) && i.Text.Contains(s.FindCharacter(s.Solution.MurdererId)!.Name));
+        Assert.DoesNotContain(MediaPlan.For(s, TestAi.Theme, voices: true, images: false), i => i.Key.StartsWith("clue/", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Renaming_a_clue_changes_its_picture_key()
+    {
+        Assert.Equal(MediaOverlay.ClueImage("c1", "Muddy boots"), MediaOverlay.ClueImage("c1", " Muddy boots "));
+        Assert.NotEqual(MediaOverlay.ClueImage("c1", "Muddy boots"), MediaOverlay.ClueImage("c1", "Clean boots"));
+        Assert.NotEqual(MediaOverlay.ClueImage("c1", "Muddy boots"), MediaOverlay.ClueImage("c2", "Muddy boots"));
+    }
+}
+
 public class ImageSizeTests
 {
     [Theory]

@@ -177,11 +177,13 @@ Setup instructions: [ai-setup.md](ai-setup.md).
  (OpenAI or Fake)                                  scenario when ContentCatalog loads it
 ```
 
-**Why prepare everything up front:** voice clips and pictures take seconds each. Making them while the guests watch would stall every scene. Instead, creating a party queues a job that makes every portrait, the victim and setting pictures, all narration and every NPC line. When it finishes, every screen of every party using that mystery is refreshed.
+**Why prepare everything up front:** voice clips and pictures take seconds each. Making them while the guests watch would stall every scene. Instead, creating a party queues a job that makes every portrait, the victim and setting pictures, a picture for each clue card, all narration and every NPC line. When it finishes, every screen of every party using that mystery is refreshed.
 
 **Why a cache keyed by a hash:** the same sentence in the same voice from the same model always sounds the same, so it's only paid for once. The hash of the request is the `MediaAssets.ContentHash` (unique), which also stops two workers from saving duplicates at the same time.
 
-**Why an overlay instead of editing the scenario:** hand-written scenario JSON stays exactly as written, and `ScenarioMedia` maps keys like `portrait/finch` or `line/finch/act1/0` to files. `MediaOverlay` (pure, in `ButlerDidIt.Game`) fills them in only where the author left `src` or `portrait` empty, so hand-made art always wins.
+**Why an overlay instead of editing the scenario:** hand-written scenario JSON stays exactly as written, and `ScenarioMedia` maps keys like `portrait/finch` or `line/finch/act1/0` to files. `MediaOverlay` (pure, in `ButlerDidIt.Game`) fills them in only where the author left `src`, `portrait` or `image` empty, so hand-made art always wins.
+
+**Why clue pictures use only the title:** a clue's text (and whether it's a red herring) can change between versions of a story, so the prompt is just "an evidence photograph of: *title*". The key, `clue/{id}/{hash of title}`, changes if the clue is renamed, so a renamed clue gets a new picture instead of the wrong one. Views only carry the clues a screen may see, so a private clue's picture reaches only its recipient.
 
 **Why background jobs claim work atomically:** `MediaWorker` and `GenerationWorker` move a job from `Queued` to `Running` with a single `UPDATE … WHERE Status = 'Queued'`. Only one worker can win, so a job never runs twice, even with several app instances. A media job interrupted by a restart goes back to `Queued` and skips what's already done.
 

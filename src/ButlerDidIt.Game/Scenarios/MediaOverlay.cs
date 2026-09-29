@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -18,6 +20,7 @@ namespace ButlerDidIt.Game.Scenarios;
 ///   cue/prologue/{i}, cue/finale/{i}   a cue's image or audio
 ///   cue/{actId}/{i}                    a cue inside an act
 ///   line/{characterId}/{actId}/{i}     an NPC's spoken line
+///   clue/{clueId}/{titleHash}          a clue card's picture, drawn from its title only
 /// </summary>
 public static class MediaOverlay
 {
@@ -26,6 +29,14 @@ public static class MediaOverlay
     public const string Setting = "setting";
     public static string Cue(string section, int index) => $"cue/{section}/{index}";
     public static string Line(string characterId, string actId, int index) => $"line/{characterId}/{actId}/{index}";
+
+    /// <summary>
+    /// A clue's picture is drawn from its title, so the key includes a hash of the title:
+    /// if the clue is renamed (in the editor, or by a version), the old picture no longer
+    /// matches and a new one is made instead of showing the wrong object.
+    /// </summary>
+    public static string ClueImage(string clueId, string title) =>
+        $"clue/{clueId}/{Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(title.Trim())))[..8]}";
 
     public static Scenario Apply(Scenario scenario, IReadOnlyDictionary<string, string> media)
     {
@@ -50,6 +61,13 @@ public static class MediaOverlay
                 }
             }
             priv["lineAudio"] = audio;
+        }
+
+        foreach (var clue in root["clues"]?.AsArray().OfType<JsonObject>() ?? [])
+        {
+            var id = clue["id"]?.GetValue<string>();
+            var title = clue["title"]?.GetValue<string>();
+            if (id is not null && title is not null) SetIfEmpty(clue, "image", media.GetValueOrDefault(ClueImage(id, title)));
         }
 
         if (root["victim"] is JsonObject victim) SetIfEmpty(victim, "portrait", media.GetValueOrDefault(Victim));

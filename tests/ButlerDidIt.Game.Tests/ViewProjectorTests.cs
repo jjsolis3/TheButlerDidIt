@@ -76,6 +76,23 @@ public class ViewProjectorTests
     }
 
     [Fact]
+    public void A_private_clue_picture_reaches_only_its_recipient()
+    {
+        var scenario = MediaOverlay.Apply(Create(), new Dictionary<string, string>
+        {
+            [MediaOverlay.ClueImage("c1", "Muddy boots")] = "/media/assets/PUBLIC_CLUE_PICTURE",
+            [MediaOverlay.ClueImage("c2", "A letter")] = "/media/assets/PRIVATE_CLUE_PICTURE",
+        });
+        var (s, _) = StartedGame();
+        while (!(s.Phase == Phase.Act && s.ActStep == ActStep.Mingle)) s = GameEngine.Apply(s, scenario, new Advance(T0));
+
+        Assert.Contains("PUBLIC_CLUE_PICTURE", StageJson(s, scenario));
+        Assert.DoesNotContain("PRIVATE_CLUE_PICTURE", StageJson(s, scenario));
+        Assert.Contains("PRIVATE_CLUE_PICTURE", PlayerJson(s, scenario, Alice)); // Alice plays the maid
+        Assert.DoesNotContain("PRIVATE_CLUE_PICTURE", PlayerJson(s, scenario, Bob));
+    }
+
+    [Fact]
     public void Lobby_dossier_shows_only_the_invitation()
     {
         var scenario = Create();

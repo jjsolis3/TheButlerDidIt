@@ -63,6 +63,14 @@ public class MediaFlowTests(FakeAiFactory app) : IClassFixture<FakeAiFactory>
         Assert.Equal(HttpStatusCode.OK, portrait.StatusCode);
         Assert.Equal("image/png", portrait.Content.Headers.ContentType!.MediaType);
 
+        // Every clue has a picture drawn from its title, which the clue cards show.
+        using (var check = app.Services.CreateScope())
+        {
+            var checkDb = check.ServiceProvider.GetRequiredService<AppDbContext>();
+            var scenario = await check.ServiceProvider.GetRequiredService<ButlerDidIt.Api.Content.ContentCatalog>().GetScenarioAsync(checkDb, party.ScenarioId);
+            Assert.All(scenario.Clues, c => Assert.StartsWith("/media/assets/", c.Image));
+        }
+
         // A second party with the same mystery reuses the files instead of paying again:
         // its preparation job finds nothing left to create.
         var (_, _, second) = await PartyAsync();

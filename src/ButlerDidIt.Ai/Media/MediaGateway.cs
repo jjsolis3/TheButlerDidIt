@@ -103,6 +103,15 @@ public static class MediaPlan
             items.Add(new MediaItem(MediaOverlay.Setting, AiRole.Illustrator,
                 $"Establishing shot of {s.Setting.Place}, {s.Setting.Era}. {s.Setting.Description} Style: {style}. Cinematic wide shot, moody. {noText}",
                 "", ImageShape.Landscape));
+
+            // Clue cards get a still life of the object in the title, and nothing else from the clue:
+            // its text (and whether it's a red herring) can differ between versions and can give the game away.
+            foreach (var clue in s.Clues.Where(c => string.IsNullOrEmpty(c.Image)))
+            {
+                items.Add(new MediaItem(MediaOverlay.ClueImage(clue.Id, clue.Title), AiRole.Illustrator,
+                    $"An evidence photograph for a murder mystery set in {s.Setting.Era}: {clue.Title}. A close-up still life of the object on a dark surface, no people. " +
+                    $"Style: {style}. {noText}", "", ImageShape.Landscape));
+            }
         }
 
         foreach (var (section, cues) in Sections(s))
