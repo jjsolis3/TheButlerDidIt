@@ -4,6 +4,8 @@ import type {
   AiStatus,
   ContentRating,
   EscapeRoomSummary,
+  Leaderboard,
+  PuzzleChoice,
   GenerationJob,
   MediaJob,
   Me,
@@ -87,7 +89,13 @@ export const api = {
 
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
   escapeRooms: () => request<EscapeRoomSummary[]>('GET', '/api/escape-rooms'),
-  createEscapeParty: (roomId: string, mode: PartyMode) => request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode }),
+  createEscapeParty: (roomId: string, mode: PartyMode, puzzles: PuzzleChoice, puzzleSet: number | null) =>
+    request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet }),
+  leaderboard: (roomId: string, daily: boolean, party?: string) =>
+    request<Leaderboard>(
+      'GET',
+      `/api/escape-rooms/${encodeURIComponent(roomId)}/leaderboard?daily=${daily}${party ? `&party=${encodeURIComponent(party)}` : ''}`,
+    ),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),
   // The content level isn't sent: the server uses the mystery's own rating.

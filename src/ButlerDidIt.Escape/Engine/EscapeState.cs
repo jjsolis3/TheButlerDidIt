@@ -17,6 +17,16 @@ public sealed class EscapeState
     /// <summary>Goes up with every change, so screens can ignore late, out-of-order updates.</summary>
     public int Version { get; set; }
     public EscapePhase Phase { get; set; }
+
+    /// <summary>
+    /// Which puzzle set this attempt plays: the room's variants and generated codes are all
+    /// picked from it (see RoomVariants). Never sent to browsers during the game, since the
+    /// content is open and the answers could be worked out from it; shown once it's over.
+    /// </summary>
+    public long Seed { get; set; }
+
+    /// <summary>Today's challenge: every group plays the same puzzle set today and shares a leaderboard.</summary>
+    public bool Daily { get; set; }
     public List<EscapePlayer> Players { get; set; } = [];
 
     public DateTimeOffset? StartedAt { get; set; }

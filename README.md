@@ -22,7 +22,7 @@ Mysteries come in two catalogs: **Adults** (mature, not explicit) and **Family**
 - 🎃 **Death in Room 13** (Adults, Halloween): a 1926 séance at a gothic grand hotel where no guest ever checks out, and thirteen minutes of total darkness.
 - 🎃 **The Witching Hour** (Adults, Halloween): a New England harvest festival, a reenactment of a 1692 witch trial, and a curse three hundred years old.
 
-**🔐 Escape rooms** are the second kind of game night. The group joins on their phones and races the clock through a series of rooms: codes, riddles, keys and tools, with clues split across everyone's phones so nobody can solve them alone. Hints help, but each one costs time. Two rooms so far:
+**🔐 Escape rooms** are the second kind of game night. The group joins on their phones and races the clock through a series of rooms: codes, riddles, keys and tools, with clues split across everyone's phones so nobody can solve them alone. Hints help, but each one costs time. Every game shuffles the room's codes, riddles and passwords, so you can play it again and again. Race your best time, take on **today's challenge** (the same puzzles for everyone), or replay a friend's puzzle set. Two rooms so far:
 - **The Workshop** (Adults): you wake up chained in a basement workshop, and the Tinkerer wants to play a game.
 - **The Funhouse After Dark** (Family): the carnival has closed, and Mister Giggles the robot clown has locked every door.
 

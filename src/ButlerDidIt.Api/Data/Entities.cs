@@ -294,3 +294,44 @@ public sealed class MediaJobEntity
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }
+
+/// <summary>
+/// One finished escape attempt, for the leaderboards. Written in the same save that ends the
+/// game, so a result can never be lost or counted twice. Kept when the party is cleaned up:
+/// it holds no seats, only first names for the host's own "best escapes" list.
+/// </summary>
+public sealed class EscapeResult
+{
+    public Guid Id { get; set; }
+
+    [MaxLength(120)]
+    public required string RoomId { get; set; }
+
+    public Guid PartyId { get; set; }
+
+    [MaxLength(450)]
+    public required string HostUserId { get; set; }
+
+    /// <summary>The puzzle set played.</summary>
+    public long Seed { get; set; }
+
+    /// <summary>Today's challenge: ranked against every group that played the same set that day.</summary>
+    public bool Daily { get; set; }
+
+    public bool Escaped { get; set; }
+    public int ElapsedSeconds { get; set; }
+    public int HintsUsed { get; set; }
+    public int WrongAttempts { get; set; }
+
+    /// <summary>What the leaderboard sorts by: the time taken, plus the time each hint cost. Lower is better.</summary>
+    public int Score { get; set; }
+
+    public int PlayerCount { get; set; }
+
+    /// <summary>The players' names. Only ever shown to the host who ran the game.</summary>
+    [MaxLength(400)]
+    public required string Team { get; set; }
+
+    public DateTimeOffset FinishedAt { get; set; }
+}
+

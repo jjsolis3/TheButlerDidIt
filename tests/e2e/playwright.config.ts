@@ -53,6 +53,8 @@ export default defineConfig({
       RateLimits__JoinPerMinute: process.env.E2E_JOINS_PER_MINUTE ?? '500',
       // …and every test signs up its own host, dozens an hour from one address.
       RateLimits__RegisterPerHour: '500',
+      // Escape rooms shuffle their codes for every game; this lets the test ask the server for them.
+      Escape__ExposeAnswersForTests: 'true',
       // Keep this run's generated files out of the developer's own media folder.
       Media__Root: process.env.E2E_MEDIA_ROOT ?? `${process.env.TMPDIR ?? '/tmp'}/butler-e2e-media-${Date.now()}`,
     },

@@ -4,6 +4,7 @@ import { Button, ErrorText, StatusPill } from '../components/ui'
 import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
+import { LeaderboardPanel } from './LeaderboardPanel'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
@@ -25,7 +26,7 @@ export function EscapeStage({ info, token }: { info: PartyInfo; token?: string }
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
         {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} />}
         {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} />}
-        {(stage.phase === 'escaped' || stage.phase === 'failed') && <Ending stage={stage} />}
+        {(stage.phase === 'escaped' || stage.phase === 'failed') && <Ending stage={stage} code={info.code} />}
       </main>
     </div>
   )
@@ -41,7 +42,9 @@ function Lobby({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInf
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
       <div>
-        <p className="text-xs tracking-[0.3em] text-accent uppercase">🔐 Escape room · {stage.timeLimitMinutes} minutes</p>
+        <p className="text-xs tracking-[0.3em] text-accent uppercase">
+          🔐 Escape room · {stage.timeLimitMinutes} minutes · {stage.daily ? "📅 Today's challenge" : '🎲 Shuffled puzzles'}
+        </p>
         <h1 className="font-display mt-2 text-5xl">{stage.roomTitle}</h1>
         <p className="mt-4 max-w-2xl text-lg text-ink/90">{stage.synopsis}</p>
         <h2 className="font-display mt-8 text-2xl">Who's trapped ({stage.players.length})</h2>
@@ -175,7 +178,7 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
   )
 }
 
-function Ending({ stage }: { stage: EscapeStageView }) {
+function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
   const escaped = stage.phase === 'escaped'
   return (
     <div className="mx-auto max-w-2xl py-12 text-center">
@@ -200,6 +203,13 @@ function Ending({ stage }: { stage: EscapeStageView }) {
           <dd className="font-display text-2xl">{stage.hintsUsed}</dd>
         </div>
       </dl>
+      {stage.puzzleSet !== null && (
+        <p className="mt-4 text-sm text-muted" data-testid="puzzle-set">
+          {stage.daily ? "Today's challenge" : 'Puzzle set'} <span className="font-display text-lg text-ink">#{stage.puzzleSet}</span>
+          {stage.daily ? '' : ': share it to challenge friends with the same puzzles.'}
+        </p>
+      )}
+      <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} />
     </div>
   )
 }

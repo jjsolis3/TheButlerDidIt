@@ -22,10 +22,15 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<GenerationJobEntity> GenerationJobs => Set<GenerationJobEntity>();
     public DbSet<ScenarioMediaEntity> ScenarioMedia => Set<ScenarioMediaEntity>();
     public DbSet<MediaJobEntity> MediaJobs => Set<MediaJobEntity>();
+    public DbSet<EscapeResult> EscapeResults => Set<EscapeResult>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
         base.OnModelCreating(b);
+
+        // Leaderboards read one room's escapes, best score first.
+        b.Entity<EscapeResult>().HasIndex(r => new { r.RoomId, r.Escaped, r.Score });
+        b.Entity<EscapeResult>().HasIndex(r => r.PartyId).IsUnique(); // one result per party
 
         // Documents are stored as jsonb rather than text: Postgres validates the
         // JSON and lets you query inside it, e.g.

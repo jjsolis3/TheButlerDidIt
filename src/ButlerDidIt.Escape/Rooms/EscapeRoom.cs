@@ -99,6 +99,56 @@ public sealed class EscapePuzzle
 
     /// <summary>Read out when it's solved.</summary>
     public required string SolvedText { get; init; }
+
+    /// <summary>
+    /// Hand-written alternatives (a different riddle, different numbers). Each play picks one from
+    /// the seed; fields a variant leaves out keep the values above.
+    /// </summary>
+    public List<PuzzleVariant> Variants { get; init; } = [];
+
+    /// <summary>
+    /// Builds the pieces and the answer from the seed instead (see <see cref="RoomVariants"/>).
+    /// Prompt, hints and solved text may use {order}, {facts} and {answer}.
+    /// </summary>
+    public PuzzleGenerator? Generator { get; init; }
+}
+
+public sealed class PuzzleVariant
+{
+    public string? Prompt { get; init; }
+    public List<string>? Answers { get; init; }
+    public List<string>? Pieces { get; init; }
+    public List<string>? Hints { get; init; }
+    public string? SolvedText { get; init; }
+}
+
+public enum GeneratorType
+{
+    /// <summary>A code whose digits are everyday facts ("the number of days in a week"), one fact per phone.</summary>
+    DigitFacts,
+
+    /// <summary>A code read from coloured objects in a given colour order; each phone sees one colour and its number.</summary>
+    ColorDigits,
+
+    /// <summary>A password of words in order; each phone remembers one word and its position.</summary>
+    WordSequence,
+}
+
+public sealed class PuzzleGenerator
+{
+    public GeneratorType Type { get; init; }
+
+    /// <summary>How many digits or words: one piece each.</summary>
+    public int Count { get; init; } = 3;
+
+    /// <summary>The text of each piece. Placeholders: {ordinal} (FIRST, SECOND…), {fact}, {color}, {digit}, {word}.</summary>
+    public required string PieceTemplate { get; init; }
+
+    /// <summary>For WordSequence: the words to choose from.</summary>
+    public List<string> Words { get; init; } = [];
+
+    /// <summary>For ColorDigits: the colours to choose from.</summary>
+    public List<string> Colors { get; init; } = [];
 }
 
 public sealed class EscapeItem
