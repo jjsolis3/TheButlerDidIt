@@ -151,6 +151,7 @@ builder.Services.AddScoped<MysteryGenerator>();
 builder.Services.AddScoped<VersionRemixer>();
 builder.Services.AddScoped<AiGameService>();
 builder.Services.AddSingleton<VerdictQueue>();
+builder.Services.AddSingleton<JobEvents>();
 builder.Services.AddHostedService<VerdictWorker>();
 builder.Services.AddSingleton<GenerationWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<GenerationWorker>());

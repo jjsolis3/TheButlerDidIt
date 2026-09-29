@@ -30,8 +30,11 @@ public sealed partial class FakeChatClient : IChatClient
     public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
         IEnumerable<ChatMessage> messages, ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        // Word by word, like a real model, so "typing" on the screens can be tested.
         var response = await GetResponseAsync(messages, options, cancellationToken);
-        foreach (var update in response.ToChatResponseUpdates()) yield return update;
+        foreach (Match word in Word().Matches(response.Text))
+            yield return new ChatResponseUpdate(ChatRole.Assistant, word.Value) { ModelId = response.ModelId };
+        yield return new ChatResponseUpdate { Role = ChatRole.Assistant, ModelId = response.ModelId, Contents = [new UsageContent(response.Usage!)] };
     }
 
     public object? GetService(Type serviceType, object? serviceKey = null) => serviceType.IsInstanceOfType(this) ? this : null;
@@ -126,6 +129,9 @@ public sealed partial class FakeChatClient : IChatClient
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
+
+    [GeneratedRegex(@"\S+\s*")]
+    private static partial Regex Word();
 
     [GeneratedRegex(@"TASK:\s*([a-z\-]+)")]
     private static partial Regex TaskLine();

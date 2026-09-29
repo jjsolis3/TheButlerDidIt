@@ -1,8 +1,11 @@
 using System.Threading.Channels;
 using ButlerDidIt.Ai;
 using ButlerDidIt.Ai.Prompts;
+using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Parties;
+using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 
 namespace ButlerDidIt.Api.Ai;
@@ -16,7 +19,7 @@ namespace ButlerDidIt.Api.Ai;
 ///   2. Call the AI outside the party lock, so the game never freezes while it thinks.
 ///   3. Complete* stores the answer, or Cancel* returns the slot if the AI failed.
 /// </summary>
-public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQueue verdicts, ButlerDidIt.Api.Media.MediaService media, ILogger<AiGameService> log)
+public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQueue verdicts, ButlerDidIt.Api.Media.MediaService media, AppDbContext db, ILogger<AiGameService> log)
 {
     public async Task AskNpcAsync(Guid partyId, Guid seatId, string characterId, string question, CancellationToken ct = default)
     {
@@ -27,8 +30,10 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
         {
             var asker = snapshot.State.FindPlayer(seatId)?.Name ?? "A guest";
             var (system, conversation) = NpcPrompt.Build(snapshot.Scenario, snapshot.State, characterId, asker, question.Trim(), snapshot.Party.ContentLevel, snapshot.State.Options.Tone);
+            var typing = new Throttle(TimeSpan.FromMilliseconds(150), parties.Clock);
             var answer = await ai.CompleteAsync(AiRole.Actor, system, conversation,
-                new AiCallContext(snapshot.Party.HostUserId, partyId, Purpose: "npc-answer"), maxOutputTokens: 400, ct: ct);
+                new AiCallContext(snapshot.Party.HostUserId, partyId, Purpose: "npc-answer"), maxOutputTokens: 400, ct: ct,
+                onText: text => typing.Ready() ? parties.SendNpcTypingAsync(snapshot, id, text) : Task.CompletedTask);
             var answered = await parties.ExecuteAsync(partyId, (_, now) => new CompleteNpcQuestion(now, id, answer), ct: ct);
             completed = true;
             if (answered.State.Ai.Voices) await VoiceAnswerAsync(answered, id, characterId, answer, ct);
@@ -97,6 +102,24 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
             verdicts.Enqueue(snapshot.Party.Id);
     }
 
+    /// <summary>
+    /// The verdict queue lives in memory, so a restart during the reveal would lose it.
+    /// On startup, queue again every recent party that is at the reveal and still waiting.
+    /// </summary>
+    public async Task<int> RequeueWaitingVerdictsAsync(CancellationToken ct)
+    {
+        var since = parties.Now.AddHours(-24);
+        var candidates = await db.Parties.AsNoTracking()
+            .Where(p => p.Status == PartyStatus.InProgress && p.UpdatedAt > since)
+            .Select(p => new { p.Id, p.State })
+            .ToListAsync(ct);
+        var waiting = candidates
+            .Where(p => GameJson.Deserialize<GameState>(p.State) is { Phase: Phase.Reveal, Ai.Verdicts: true, Verdicts.Count: 0, Players.Count: > 0 })
+            .ToList();
+        foreach (var party in waiting) verdicts.Enqueue(party.Id);
+        return waiting.Count;
+    }
+
     public async Task GenerateVerdictsAsync(Guid partyId, CancellationToken ct)
     {
         var snapshot = await parties.LoadAsync(partyId, ct);
@@ -117,6 +140,24 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
     }
 }
 
+/// <summary>
+/// Lets something happen at most once per interval: the first call passes at once, later
+/// ones only after the interval. The AI sends a few words at a time, and pushing every
+/// piece to every phone would be wasteful; a few updates a second look just as smooth.
+/// </summary>
+public sealed class Throttle(TimeSpan interval, TimeProvider clock)
+{
+    private long? _last;
+
+    public bool Ready()
+    {
+        var now = clock.GetTimestamp();
+        if (_last is { } last && clock.GetElapsedTime(last, now) < interval) return false;
+        _last = now;
+        return true;
+    }
+}
+
 /// <summary>A small in-memory queue of parties waiting for verdicts, drained by <see cref="VerdictWorker"/>.</summary>
 public sealed class VerdictQueue
 {
@@ -129,6 +170,17 @@ public sealed class VerdictWorker(VerdictQueue queue, IServiceScopeFactory scope
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        try
+        {
+            using var scope = scopes.CreateScope();
+            var requeued = await scope.ServiceProvider.GetRequiredService<AiGameService>().RequeueWaitingVerdictsAsync(stoppingToken);
+            if (requeued > 0) log.LogInformation("Picked up verdicts for {Count} parties after a restart", requeued);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            log.LogWarning(ex, "Could not look for parties waiting for verdicts");
+        }
+
         await foreach (var partyId in queue.ReadAllAsync(stoppingToken))
         {
             try

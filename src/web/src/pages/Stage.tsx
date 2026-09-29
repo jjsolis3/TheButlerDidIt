@@ -8,7 +8,8 @@ import { ClueCard, Countdown, FeedToasts, QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
 import { api } from '../lib/api'
 import { stageGuide } from '../lib/guide'
-import { useParty } from '../lib/hub'
+import { NpcTypingContext, useJobUpdates, useParty } from '../lib/hub'
+import { NpcAnswer } from '../components/NpcAnswer'
 import { seats } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
@@ -50,7 +51,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 }
 
 function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
-  const { stage, status, fatal, invoke } = useParty({ code: info.code, token, watchStage: true })
+  const { stage, status, fatal, invoke, typing } = useParty({ code: info.code, token, watchStage: true })
   const [begun, setBegun] = useState(false)
   const [muted, setMuted] = useState(false)
   useThemePalette(info.themeSlug)
@@ -98,26 +99,28 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
   }
 
   return (
-    <div className="grain flex min-h-dvh flex-col">
-      <StatusPill status={status} />
-      <TopBar stage={stage} info={info} muted={muted} onMute={() => setMuted((m) => !m)} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-32 sm:px-8">
-        <PhaseView
-          stage={stage}
-          info={info}
-          invoke={invoke}
-          muted={muted}
-          begun={begun || stage.phase === 'lobby'}
-          soundOn={begun}
-          onBegin={() => {
-            narrator.speak(' ', null, false)
-            setBegun(true)
-          }}
-        />
-      </main>
-      {info.isHost && <HostBar stage={stage} info={info} invoke={invoke} />}
-      <FeedToasts feed={stage.feed} offset="top-20" />
-    </div>
+    <NpcTypingContext.Provider value={typing}>
+      <div className="grain flex min-h-dvh flex-col">
+        <StatusPill status={status} />
+        <TopBar stage={stage} info={info} muted={muted} onMute={() => setMuted((m) => !m)} />
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-32 sm:px-8">
+          <PhaseView
+            stage={stage}
+            info={info}
+            invoke={invoke}
+            muted={muted}
+            begun={begun || stage.phase === 'lobby'}
+            soundOn={begun}
+            onBegin={() => {
+              narrator.speak(' ', null, false)
+              setBegun(true)
+            }}
+          />
+        </main>
+        {info.isHost && <HostBar stage={stage} info={info} invoke={invoke} />}
+        <FeedToasts feed={stage.feed} offset="top-20" />
+      </div>
+    </NpcTypingContext.Provider>
   )
 }
 
@@ -472,7 +475,7 @@ function InterrogationRoom({ stage }: { stage: StageView }) {
               <p className="text-muted">
                 {i.askerName} → <span className="text-accent">{i.characterName}</span>: “{i.question}”
               </p>
-              <p className={`font-display mt-2 text-lg leading-snug ${i.answer ? '' : 'candle text-muted italic'}`}>{i.answer ?? 'Thinking…'}</p>
+              <NpcAnswer interrogation={i} placeholder="Thinking…" className="font-display mt-2 text-lg leading-snug" />
             </li>
           ))}
         </ul>
@@ -946,29 +949,29 @@ function MediaPanel({ code }: { code: string }) {
   const [state, setState] = useState<{ ready: number; job: MediaJob | null } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const job = state?.job
+  const running = !!job && (job.status === 'queued' || job.status === 'running')
+  // While a job runs, re-fetch whenever the server signals progress, and every 15 seconds in case a signal is lost.
+  const updates = useJobUpdates(running)
   useEffect(() => {
     let active = true
-    let timer: ReturnType<typeof setTimeout>
-    const poll = async () => {
+    const load = async () => {
       try {
         const next = await api.partyMedia(code)
-        if (!active) return
-        setState(next)
-        if (next.job && (next.job.status === 'queued' || next.job.status === 'running')) timer = setTimeout(poll, 3000)
+        if (active) setState(next)
       } catch {
         /* no media features: hide the panel */
       }
     }
-    void poll()
+    void load()
+    const fallback = running ? setInterval(load, 15_000) : undefined
     return () => {
       active = false
-      clearTimeout(timer)
+      clearInterval(fallback)
     }
-  }, [code])
+  }, [code, running, updates])
 
-  if (!state || (!state.job && state.ready === 0)) return null
-  const job = state.job
-  const running = job && (job.status === 'queued' || job.status === 'running')
+  if (!state || (!job && state.ready === 0)) return null
   return (
     <div className="rounded-xl border border-line bg-surface p-4 text-sm">
       <p className="font-semibold">🎙️🎨 Voices & artwork</p>
@@ -990,7 +993,6 @@ function MediaPanel({ code }: { code: string }) {
             try {
               const started = await api.prepareMedia(code)
               setState((s) => ({ ready: s?.ready ?? 0, job: started }))
-              setTimeout(async () => setState(await api.partyMedia(code)), 3000)
             } catch (e) {
               setError((e as Error).message)
             }

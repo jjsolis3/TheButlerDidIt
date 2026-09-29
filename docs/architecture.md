@@ -70,8 +70,13 @@ If the host double-taps **Next** on slow Wi-Fi, two commands arrive together. Wi
 
 - `stage:{partyId}`: every screen watching the stage
 - `seat:{seatId}`: one guest's phone(s)
+- `user:{userId}`: a host's pages that are following a background job (`WatchMyJobs`)
 
 After every command, `PartyService.BroadcastAsync` sends a **complete snapshot** (not a diff) to each group. Snapshots are a few KB, and a phone that missed messages while asleep fixes itself with the next one.
+
+Two lighter messages sit beside the snapshots:
+- `npcTyping {interrogationId, text}`: an NPC's answer so far, while the AI is still writing it, sent to the stage and every seat at most every 150 ms. It isn't saved; the finished answer arrives in the next snapshot, and screens show `answer ?? typing[id]`, so the finished answer always wins.
+- `jobs`: sent to `user:{userId}` whenever one of that host's mystery or media jobs changes. It carries no data: the page re-fetches the job through its normal, access-checked endpoint, and still polls every 15 seconds in case a signal is lost.
 
 On the client (`src/web/src/lib/hub.ts`):
 
@@ -132,7 +137,7 @@ The AI lives in its own project, `src/ButlerDidIt.Ai`. It depends on the game ru
 **Why the engine never calls the AI:** AI calls are slow, cost money and can fail, while `GameEngine.Apply` must stay pure and instant. So every AI action is three commands:
 
 1. `BeginNpcQuestion` checks the rules (right phase, an NPC, questions left) and reserves a slot. Everyone immediately sees "Colonel Mustardseed is thinking…".
-2. The server calls the AI **outside** the party lock, so the game never freezes.
+2. The server calls the AI **outside** the party lock, so the game never freezes. The answer is streamed, and each piece is pushed to the screens as `npcTyping`, so guests watch it being "typed".
 3. `CompleteNpcQuestion` stores the answer, or `CancelNpcQuestion` gives the slot back if the AI failed.
 
 **Why prompts are built from what a character knows:** `NpcPrompt` only includes that character's own sheet, public facts and clues already found. The model can't leak the solution because it was never given it. That's far more reliable than telling a model "don't reveal X". Hints are built from the player's own `PlayerView`, which is already filtered by `ViewProjector`. Tests in `ButlerDidIt.Ai.Tests/AiTests.cs` check both.
@@ -144,6 +149,8 @@ The AI lives in its own project, `src/ButlerDidIt.Ai`. It depends on the game ru
 4. A **blind solver**: the Inspector sees only the evidence and must name the killer.
 
 Only a mystery that passes is saved, as a `ScenarioEntity` with `Source = AiGenerated`. It belongs to the host who generated it. It runs as a background job (`GenerationWorker`) because it takes longer than a web request should stay open.
+
+**Verdicts** are queued in memory when the reveal starts (`VerdictQueue`). So that a restart during the reveal doesn't lose them, `VerdictWorker` first looks for recent parties that are at the reveal with verdicts switched on and none written yet, and queues them again.
 
 **Keys and costs:**
 - API keys are encrypted with ASP.NET Data Protection (`AiKeyProtector`) before they reach the database.

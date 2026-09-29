@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { playerGuide } from '../lib/guide'
 import { GuideButton } from './Guide'
-import { useParty } from '../lib/hub'
+import { NpcTypingContext, useParty } from '../lib/hub'
+import { NpcAnswer } from './NpcAnswer'
 import type { PlayerView, StageView } from '../lib/types'
 import { Portrait } from './Portrait'
 import { ClueCard, Countdown, FeedToasts } from './Scene'
@@ -27,7 +28,7 @@ const PHASE_LABEL: Record<StageView['phase'], string> = {
  */
 export function PlayerScreen({ code, token, onLeave }: { code: string; token: string; onLeave: () => void }) {
   const [removed, setRemoved] = useState(false)
-  const { player, status, fatal, invoke } = useParty({ code, token, joinSeat: true, onRemoved: () => setRemoved(true) })
+  const { player, status, fatal, invoke, typing } = useParty({ code, token, joinSeat: true, onRemoved: () => setRemoved(true) })
 
   if (removed || fatal) {
     return (
@@ -41,11 +42,11 @@ export function PlayerScreen({ code, token, onLeave }: { code: string; token: st
   if (!player) return <p className="p-8 text-center text-muted">Finding your seat…</p>
 
   return (
-    <>
+    <NpcTypingContext.Provider value={typing}>
       <StatusPill status={status} />
       <PlayerBody view={player} invoke={invoke} token={token} />
       <FeedToasts feed={player.stage.feed} offset="top-28" />
-    </>
+    </NpcTypingContext.Provider>
   )
 }
 
@@ -785,7 +786,7 @@ function QuestionTab({ view, invoke }: { view: PlayerView; invoke: Invoke }) {
               <p className="text-muted">
                 <span className="text-ink">{i.askerName}</span> asked {i.characterName}: “{i.question}”
               </p>
-              <p className={`mt-2 ${i.answer ? '' : 'candle text-muted italic'}`}>{i.answer ?? `${i.characterName} is thinking…`}</p>
+              <NpcAnswer interrogation={i} placeholder={`${i.characterName} is thinking…`} className="mt-2" />
             </div>
           ))}
         </section>

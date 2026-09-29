@@ -39,6 +39,9 @@ public sealed class PartyLocks
     }
 }
 
+/// <summary>Part of an NPC's answer, pushed while the AI writes it.</summary>
+public sealed record NpcTypingEvent(Guid InterrogationId, string Text);
+
 public sealed record PartySnapshot(Party Party, GameState State, Scenario Scenario);
 
 /// <summary>
@@ -53,6 +56,7 @@ public sealed class PartyService(
     TimeProvider clock)
 {
     public DateTimeOffset Now => clock.GetUtcNow();
+    public TimeProvider Clock => clock;
 
     public async Task<PartySnapshot> LoadAsync(Guid partyId, CancellationToken ct = default)
     {
@@ -143,6 +147,15 @@ public sealed class PartyService(
         }
         await Task.WhenAll(tasks);
     }
+
+    /// <summary>
+    /// An NPC's answer so far, while the AI is still writing it. Everyone at the party may
+    /// see it (the finished answer is public too), so it goes to the stage and every seat.
+    /// It isn't saved: the finished answer arrives in the next normal update.
+    /// </summary>
+    public Task SendNpcTypingAsync(PartySnapshot s, Guid interrogationId, string text) =>
+        hub.Clients.Groups([PartyHub.StageGroup(s.Party.Id), .. s.State.Players.Select(p => PartyHub.SeatGroup(p.SeatId))])
+            .SendAsync("npcTyping", new NpcTypingEvent(interrogationId, text));
 
     public Task NotifySeatRemovedAsync(Guid seatId) =>
         hub.Clients.Group(PartyHub.SeatGroup(seatId)).SendAsync("removed");

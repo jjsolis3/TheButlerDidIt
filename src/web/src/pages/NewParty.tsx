@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
+import { useJobUpdates } from '../lib/hub'
 import { ConfirmEmailBanner } from './Account'
 import { useThemes } from '../lib/theme'
 import type { AiStatus, AuthOptions, ContentRating, GenerationJob, MysteryLength, PartyMode, ThemeCard, Tone } from '../lib/types'
@@ -345,21 +346,31 @@ function GenerateMystery({ themes, content, onReady }: { themes: ThemeCard[]; co
     onReadyRef.current = onReady
   }, [onReady])
 
-  // Poll the job every 2 seconds until it finishes. The work happens on the server,
-  // so closing this page doesn't stop it.
+  // Follow the job until it finishes: re-fetch whenever the server signals a change, and
+  // every 15 seconds in case a signal is lost. The work happens on the server, so closing
+  // this page doesn't stop it.
+  const jobId = job && (job.status === 'queued' || job.status === 'running') ? job.id : null
+  const updates = useJobUpdates(jobId !== null)
   useEffect(() => {
-    if (!job || job.status === 'succeeded' || job.status === 'failed') return
-    const id = setTimeout(async () => {
+    if (!jobId) return
+    let active = true
+    const refresh = async () => {
       try {
-        const next = await api.generationJob(job.id)
+        const next = await api.generationJob(jobId)
+        if (!active) return
         setJob(next)
         if (next.status === 'succeeded') await onReadyRef.current(next)
       } catch (e) {
-        setError((e as Error).message)
+        if (active) setError((e as Error).message)
       }
-    }, 2000)
-    return () => clearTimeout(id)
-  }, [job])
+    }
+    if (updates > 0) void refresh()
+    const fallback = setInterval(refresh, 15_000)
+    return () => {
+      active = false
+      clearInterval(fallback)
+    }
+  }, [jobId, updates])
 
   const start = async () => {
     if (!themeSlug) return

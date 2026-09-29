@@ -27,6 +27,7 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
 {
     public static string StageGroup(Guid partyId) => $"stage:{partyId}";
     public static string SeatGroup(Guid seatId) => $"seat:{seatId}";
+    public static string UserGroup(string userId) => $"user:{userId}";
 
     // ------------------------------------------------------------------ subscribe
 
@@ -51,6 +52,17 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
         await db.Seats.Where(s => s.Id == seatId).ExecuteUpdateAsync(u => u.SetProperty(s => s.LastSeenAt, parties.Now));
         var s = await parties.LoadAsync(partyId);
         return ViewProjector.Player(s.State, s.Scenario, seatId, parties.Now);
+    }
+
+    /// <summary>
+    /// Host only: hear a "jobs" signal whenever one of your mystery or media jobs makes progress,
+    /// so the page can refresh at once instead of polling. The signal carries no data; the page
+    /// fetches the job through the normal, access-checked endpoint.
+    /// </summary>
+    public async Task WatchMyJobs()
+    {
+        var userId = Context.User!.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new HubException("Sign in first.");
+        await Groups.AddToGroupAsync(Context.ConnectionId, UserGroup(userId));
     }
 
     // ------------------------------------------------------------------ player actions
@@ -183,6 +195,23 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
 
     private bool IsHostOf(Party party) =>
         Context.User!.FindFirstValue(ClaimTypes.NameIdentifier) is { } userId && userId == party.HostUserId;
+}
+
+/// <summary>Tells a host's open pages that one of their background jobs changed (see <see cref="PartyHub.WatchMyJobs"/>).</summary>
+public sealed class JobEvents(IHubContext<PartyHub> hub, ILogger<JobEvents> log)
+{
+    public async Task ChangedAsync(string hostUserId)
+    {
+        try
+        {
+            await hub.Clients.Group(PartyHub.UserGroup(hostUserId)).SendAsync("jobs");
+        }
+        catch (Exception ex)
+        {
+            // Pages fall back to polling, so a lost signal only makes them a little slower.
+            log.LogDebug(ex, "Could not signal job progress");
+        }
+    }
 }
 
 /// <summary>
