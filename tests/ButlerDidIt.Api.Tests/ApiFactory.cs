@@ -20,16 +20,26 @@ namespace ButlerDidIt.Api.Tests;
 /// </summary>
 public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly string _database = $"butler_test_{Guid.NewGuid():N}";
+    private readonly string _database;
+    private readonly bool _ownsDatabase;
+
+    public ApiFactory() : this($"butler_test_{Guid.NewGuid():N}", ownsDatabase: true) { }
+
+    /// <summary>For several servers sharing one database: only the owner creates and drops it.</summary>
+    protected ApiFactory(string database, bool ownsDatabase)
+    {
+        _database = database;
+        _ownsDatabase = ownsDatabase;
+    }
 
     /// <summary>A throwaway folder for generated and uploaded files.</summary>
     public string MediaRoot { get; } = Path.Combine(Path.GetTempPath(), $"butler_media_{Guid.NewGuid():N}");
 
-    private static string ServerConnection =>
+    public static string ServerConnection =>
         Environment.GetEnvironmentVariable("TEST_DATABASE_URL")
         ?? "Host=localhost;Port=5432;Username=butler;Password=butler;Database=postgres";
 
-    private string ConnectionString => new NpgsqlConnectionStringBuilder(ServerConnection) { Database = _database }.ConnectionString;
+    public string ConnectionString => new NpgsqlConnectionStringBuilder(ServerConnection) { Database = _database }.ConnectionString;
 
     protected virtual bool AllowRegistration => true;
 
@@ -48,6 +58,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        if (!_ownsDatabase) return;
         await using var conn = new NpgsqlConnection(ServerConnection);
         await conn.OpenAsync();
         await using var cmd = new NpgsqlCommand($"CREATE DATABASE \"{_database}\"", conn);
@@ -57,12 +68,13 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     async Task IAsyncLifetime.DisposeAsync()
     {
         await base.DisposeAsync();
+        if (Directory.Exists(MediaRoot)) Directory.Delete(MediaRoot, recursive: true);
+        if (!_ownsDatabase) return;
         NpgsqlConnection.ClearAllPools();
         await using var conn = new NpgsqlConnection(ServerConnection);
         await conn.OpenAsync();
         await using var cmd = new NpgsqlCommand($"DROP DATABASE IF EXISTS \"{_database}\" WITH (FORCE)", conn);
         await cmd.ExecuteNonQueryAsync();
-        if (Directory.Exists(MediaRoot)) Directory.Delete(MediaRoot, recursive: true);
     }
 
     /// <summary>Registers a host account and returns a client that sends its auth cookie, plus the cookie itself for hub connections.</summary>

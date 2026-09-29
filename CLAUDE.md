@@ -4,7 +4,7 @@ Murder-mystery party game: ASP.NET Core 10 + SignalR + EF Core/PostgreSQL back e
 
 ## Commands
 
-- Back-end tests: `dotnet test` (needs Postgres; `TEST_DATABASE_URL` overrides the default `Host=localhost;Username=butler;Password=butler`)
+- Back-end tests: `dotnet test` (needs Postgres; `TEST_DATABASE_URL` overrides the default `Host=localhost;Username=butler;Password=butler`). The multi-server and S3 tests are skipped unless `TEST_REDIS_URL` (e.g. `localhost:6379`) and `TEST_S3_URL` (an S3 emulator such as `moto_server -p 9000`, with `TEST_S3_ACCESS_KEY`/`TEST_S3_SECRET_KEY`) are set
 - Run API: `dotnet run --project src/ButlerDidIt.Api` (http://localhost:5080)
 - Front end: `cd src/web && npm run dev` (http://localhost:5173, proxies to :5080); `npx tsc -b`, `npm run lint`, `npm run build` (builds into src/ButlerDidIt.Api/wwwroot)
 - E2E: build the front end first, then `cd tests/e2e && npx playwright test`

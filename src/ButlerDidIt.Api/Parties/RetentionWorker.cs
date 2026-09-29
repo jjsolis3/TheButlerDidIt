@@ -1,4 +1,5 @@
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Api.Media;
 using ButlerDidIt.Game.Engine;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ public sealed class RetentionOptions
 /// <item>Selfies that no longer belong to any party are deleted.</item>
 /// </list>
 /// </summary>
-public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<RetentionOptions> options, TimeProvider clock, ILogger<RetentionWorker> log)
+public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<RetentionOptions> options, ClusterLock cluster, TimeProvider clock, ILogger<RetentionWorker> log)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -58,6 +59,10 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
     /// <param name="now">Overridable so tests can "fast-forward" time.</param>
     public async Task<Result> RunOnceAsync(CancellationToken ct, DateTimeOffset? now = null)
     {
+        // With several servers, one clean-up at a time is enough.
+        await using var turn = await cluster.TryAcquireAsync("retention", ct);
+        if (turn is null) return new Result(0, 0, 0);
+
         var at = now ?? clock.GetUtcNow();
         var o = options.Value;
         var deleted = o.IdlePartyDays > 0 ? await DeleteIdlePartiesAsync(at.AddDays(-o.IdlePartyDays), ct) : 0;
@@ -91,7 +96,7 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
     {
         var db = sp.GetRequiredService<AppDbContext>();
         // Take the party's lock so we never delete it halfway through someone's command.
-        using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
+        await using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
         {
             var seatIds = await db.Seats.Where(s => s.PartyId == id).Select(s => s.Id).ToListAsync(ct);
             await db.PlayerNotes.Where(n => seatIds.Contains(n.SeatId)).ExecuteDeleteAsync(ct);
@@ -123,7 +128,7 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
             foreach (var player in snapshot.State.Players.Where(p => p.PhotoUrl is not null))
                 await parties.ExecuteAsync(id, (_, t) => new SetPlayerPhoto(t, player.SeatId, null), ct: ct);
 
-            using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
+            await using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
             {
                 var seatIds = await db.Seats.Where(s => s.PartyId == id).Select(s => s.Id).ToListAsync(ct);
                 await db.PlayerNotes.Where(n => seatIds.Contains(n.SeatId)).ExecuteDeleteAsync(ct);

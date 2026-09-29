@@ -3,6 +3,7 @@ using ButlerDidIt.Ai;
 using ButlerDidIt.Ai.Prompts;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Parties;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,7 @@ namespace ButlerDidIt.Api.Ai;
 ///   2. Call the AI outside the party lock, so the game never freezes while it thinks.
 ///   3. Complete* stores the answer, or Cancel* returns the slot if the AI failed.
 /// </summary>
-public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQueue verdicts, ButlerDidIt.Api.Media.MediaService media, AppDbContext db, ILogger<AiGameService> log)
+public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQueue verdicts, ButlerDidIt.Api.Media.MediaService media, AppDbContext db, ClusterLock cluster, ILogger<AiGameService> log)
 {
     public async Task AskNpcAsync(Guid partyId, Guid seatId, string characterId, string question, CancellationToken ct = default)
     {
@@ -122,6 +123,10 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
 
     public async Task GenerateVerdictsAsync(Guid partyId, CancellationToken ct)
     {
+        // With several servers, two may pick up the same party after a restart; only one writes (and pays for) its verdicts.
+        await using var turn = await cluster.TryAcquireAsync($"verdicts:{partyId}", ct);
+        if (turn is null) return;
+
         var snapshot = await parties.LoadAsync(partyId, ct);
         if (!snapshot.State.Ai.Verdicts || snapshot.State.Verdicts.Count > 0 || snapshot.State.Players.Count == 0) return;
 

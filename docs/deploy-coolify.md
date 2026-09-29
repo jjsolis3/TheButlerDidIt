@@ -130,6 +130,22 @@ The app tidies up after itself every 6 hours:
 
 Set either to `0` to keep things forever.
 
+## Running more than one server
+
+One server comfortably runs many parties at once, so most hosts never need this. To run two or more copies of the app behind a load balancer (for redundancy or very large events), all copies must share the database, and each of these switches on something they need:
+
+| Variable | Value | Why |
+|---|---|---|
+| `SCALE_MULTI_INSTANCE` | `true` | Servers take turns through the database: one command per party at a time, one server drops the timed clues, one runs the clean-up. |
+| `REDIS_URL` | e.g. `redis:6379` | Live updates reach every screen, whichever server it's connected to. Add a Redis service (Coolify has a one-click Redis). |
+| `DATA_PROTECTION_STORE` | `Database` | Every server uses the same sign-in keys, so hosts stay signed in whichever server answers. On first start, the keys already in the `keys` volume are copied into the database, so saved AI keys keep working. Keep the volume mounted for that first start. |
+| `MEDIA_STORAGE` | `S3` | Pictures, voices and selfies go in a bucket every server can reach. Also set `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, and for anything but AWS, `S3_SERVICE_URL` (e.g. `https://<account>.r2.cloudflarestorage.com`) and `S3_REGION` (`auto` for R2). |
+| `MIGRATE_ON_STARTUP` | `false` (optional) | Run migrations once as a deploy step instead: `dotnet ButlerDidIt.Api.dll --migrate` migrates, loads the content, and exits. Without this, servers starting together simply take turns. |
+
+**Moving existing media to S3:** copy the `media` volume into the bucket, keeping the folder layout (`2026-09/…`), for example with `rclone copy /path/to/media r2:your-bucket`. The database stores each file's path, so the same paths work in the bucket.
+
+Files are always served through the app (`/media/assets/…`), so the bucket can stay private.
+
 ## Updating
 
 Push to the deployed branch and click **Deploy** (or enable automatic deployments on push). Database migrations run automatically on start.

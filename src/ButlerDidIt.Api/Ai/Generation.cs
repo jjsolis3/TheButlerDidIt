@@ -5,6 +5,7 @@ using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Hubs;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
@@ -65,7 +66,7 @@ public static class GenerationEndpoints
 /// more, far longer than a web request should stay open, so the page follows the
 /// job instead: each change sends a "jobs" signal (see <see cref="JobEvents"/>).
 /// </summary>
-public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider clock, JobEvents events, ILogger<GenerationWorker> log) : BackgroundService
+public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider clock, JobEvents events, ClusterLock cluster, ILogger<GenerationWorker> log) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -87,14 +88,22 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
     /// <summary>
     /// A job left "Running" when the server stopped will never finish, so fail it with an honest
     /// message. A party that was waiting for a remix starts with a hand-written version instead.
+    ///
+    /// With several servers, a "Running" job may belong to another server that is busy with it,
+    /// so only jobs with no progress for <see cref="ScaleDefaults.StaleJobAfter"/> count as interrupted.
     /// </summary>
     private async Task MarkInterruptedJobsAsync(CancellationToken ct)
     {
         using var scope = scopes.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var waiting = await db.GenerationJobs.Where(j => j.Status == GenerationStatus.Running && j.PartyId != null)
-            .Select(j => j.PartyId!.Value).ToListAsync(ct);
-        await db.GenerationJobs.Where(j => j.Status == GenerationStatus.Running)
+        var interrupted = db.GenerationJobs.Where(j => j.Status == GenerationStatus.Running);
+        if (cluster.Enabled)
+        {
+            var staleBefore = clock.GetUtcNow() - ScaleDefaults.StaleJobAfter;
+            interrupted = interrupted.Where(j => j.UpdatedAt < staleBefore);
+        }
+        var waiting = await interrupted.Where(j => j.PartyId != null).Select(j => j.PartyId!.Value).ToListAsync(ct);
+        await interrupted
             .ExecuteUpdateAsync(u => u
                 .SetProperty(j => j.Status, GenerationStatus.Failed)
                 .SetProperty(j => j.Error, "The server restarted while this mystery was being written. Please try again."), ct);

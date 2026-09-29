@@ -34,7 +34,7 @@ public static class PartyKit
     {
         // Host only: booklets and clue cards contain every secret and the solution.
         app.MapGet("/api/parties/{code}/kit/{kind}.pdf", async (string code, string kind, ClaimsPrincipal user, HttpRequest request,
-            PartyService parties, AppDbContext db, MediaStore store, CancellationToken ct) =>
+            PartyService parties, AppDbContext db, IMediaStore store, CancellationToken ct) =>
         {
             if (!Kinds.Contains(kind)) return Results.NotFound();
             var party = await parties.FindByCodeAsync(code, ct);
@@ -289,7 +289,7 @@ public static class PartyKit
 }
 
 /// <summary>Loads portraits for the PDFs from the media store. Only generated or uploaded assets are embedded.</summary>
-public sealed class ImageLoader(AppDbContext db, MediaStore store)
+public sealed class ImageLoader(AppDbContext db, IMediaStore store)
 {
     public async Task<byte[]?> LoadAsync(string? url, CancellationToken ct)
     {
@@ -297,6 +297,10 @@ public sealed class ImageLoader(AppDbContext db, MediaStore store)
         if (!Guid.TryParse(url["/media/assets/".Length..], out var id)) return null;
         var asset = await db.MediaAssets.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id, ct);
         if (asset is null || !asset.ContentType.StartsWith("image/", StringComparison.Ordinal) || asset.ContentType == "image/svg+xml") return null;
-        return store.Resolve(asset.Path) is { } path ? await File.ReadAllBytesAsync(path, ct) : null;
+        await using var file = await store.OpenReadAsync(asset.Path, ct);
+        if (file is null) return null;
+        using var bytes = new MemoryStream();
+        await file.CopyToAsync(bytes, ct);
+        return bytes.ToArray();
     }
 }

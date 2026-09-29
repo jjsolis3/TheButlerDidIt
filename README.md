@@ -45,7 +45,7 @@ See [docs/ai-setup.md](docs/ai-setup.md).
 | Server | ASP.NET Core 10, SignalR (real-time), EF Core + PostgreSQL, ASP.NET Core Identity |
 | Front end | React 19 + TypeScript, Vite, Tailwind CSS |
 | Tests | xUnit (engine + API against real Postgres), Playwright (full parties in real browsers) |
-| Deployment | One Docker image + Postgres via `docker-compose.yml`, deployed with Coolify |
+| Deployment | One Docker image + Postgres via `docker-compose.yml`, deployed with Coolify. Optional Redis and S3 for running several servers |
 
 ## Run it locally
 

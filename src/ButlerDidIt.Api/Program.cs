@@ -12,6 +12,7 @@ using ButlerDidIt.Api.Kit;
 using ButlerDidIt.Api.Media;
 using ButlerDidIt.Ai.Media;
 using ButlerDidIt.Api.Parties;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using Microsoft.AspNetCore.Authentication;
@@ -21,8 +22,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Npgsql;
 
-var builder = WebApplication.CreateBuilder(args);
+// `--migrate` is our own flag (see "startup tasks" below). Take it out before ASP.NET reads the
+// arguments as settings, which would otherwise treat the next argument as its value.
+var migrateOnly = args.Contains("--migrate");
+var builder = WebApplication.CreateBuilder(args.Where(a => a != "--migrate").ToArray());
 var config = builder.Configuration;
 
 // ---------------------------------------------------------------- options
@@ -33,11 +38,17 @@ builder.Services.Configure<AppOptions>(config.GetSection("App"));
 builder.Services.Configure<AiOptions>(config.GetSection("Ai"));
 builder.Services.Configure<MediaOptions>(config.GetSection("Media"));
 builder.Services.Configure<RetentionOptions>(config.GetSection("Retention"));
+builder.Services.Configure<ScaleOptions>(config.GetSection("Scale"));
+var scale = config.GetSection("Scale").Get<ScaleOptions>() ?? new ScaleOptions();
 
 // ---------------------------------------------------------------- database
-builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseNpgsql(config.GetConnectionString("Default")
-        ?? throw new InvalidOperationException("Set ConnectionStrings__Default to your PostgreSQL connection string.")));
+var connectionString = config.GetConnectionString("Default")
+    ?? throw new InvalidOperationException("Set ConnectionStrings__Default to your PostgreSQL connection string.");
+builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
+
+// Locks shared by every server (Postgres advisory locks). They only do something with
+// Scale:MultiInstance on; one server uses in-process locks, exactly as before.
+builder.Services.AddSingleton(_ => new ClusterLock(scale.MultiInstance ? NpgsqlDataSource.Create(connectionString) : null));
 
 // ---------------------------------------------------------------- authentication
 // Two ways to prove who you are:
@@ -86,15 +97,18 @@ builder.Services.AddAuthorizationBuilder()
         .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, SeatTokens.Scheme)
         .RequireAuthenticatedUser());
 
-// Keys that encrypt the auth cookie. If they only lived in memory, every redeploy
-// would log every host out. In Docker, point this at a mounted volume.
-if (config["DataProtection:KeysPath"] is { Length: > 0 } keysPath)
+// Keys that encrypt the auth cookie (and the AI API keys). If they only lived in memory,
+// every redeploy would log every host out. In Docker, point KeysPath at a mounted volume.
+// With several servers, every server must use the same keys, so keep them in the database
+// (DataProtection:Store=Database); see DataProtectionKeyImport for moving existing keys there.
+var dataProtection = builder.Services.AddDataProtection().SetApplicationName("ButlerDidIt");
+if (string.Equals(config["DataProtection:Store"], "Database", StringComparison.OrdinalIgnoreCase))
 {
-    builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keysPath)).SetApplicationName("ButlerDidIt");
+    dataProtection.PersistKeysToDbContext<AppDbContext>();
 }
-else
+else if (config["DataProtection:KeysPath"] is { Length: > 0 } keysPath)
 {
-    builder.Services.AddDataProtection().SetApplicationName("ButlerDidIt");
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
 }
 
 // ---------------------------------------------------------------- rate limiting
@@ -160,18 +174,28 @@ builder.Services.AddHostedService(sp => sp.GetRequiredService<GenerationWorker>(
 builder.Services.AddSingleton<IMediaClientFactory>(sp =>
     new MediaClientFactory(allowFake: sp.GetRequiredService<IOptions<AiOptions>>().Value.AllowFakeProvider));
 builder.Services.AddScoped<MediaGateway>();
-builder.Services.AddSingleton<MediaStore>();
+// Local folder by default; S3-compatible storage (Media:Storage=S3) when several servers must share the files.
+if (string.Equals(config["Media:Storage"], "S3", StringComparison.OrdinalIgnoreCase))
+    builder.Services.AddSingleton<IMediaStore, S3MediaStore>();
+else
+    builder.Services.AddSingleton<IMediaStore, LocalMediaStore>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddSingleton<MediaWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<MediaWorker>());
 
-builder.Services
+var signalR = builder.Services
     .AddSignalR(o => o.AddFilter<GameRuleHubFilter>())
     .AddJsonProtocol(o =>
     {
         o.PayloadSerializerOptions.PropertyNamingPolicy = GameJson.Options.PropertyNamingPolicy;
         o.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase));
     });
+// SignalR groups live inside one process. With several servers, Redis relays every message to
+// all of them, so the TV on one server hears about a guest's move made on another.
+if (scale.Redis is { Length: > 0 } redis)
+{
+    signalR.AddStackExchangeRedis(redis, o => o.Configuration.ChannelPrefix = StackExchange.Redis.RedisChannel.Literal("butler"));
+}
 
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 builder.Services.AddProblemDetails();
@@ -183,16 +207,28 @@ QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 var app = builder.Build();
 
 // ---------------------------------------------------------------- startup tasks
-// Apply database migrations and load content before accepting traffic. Fine for
-// a single instance; with several instances you'd run migrations as a deploy step.
-if (!app.Configuration.GetValue<bool>("SkipStartupTasks"))
+// Apply database migrations and load content before accepting traffic.
+//   * `dotnet ButlerDidIt.Api.dll --migrate` does only this and exits: a deploy step that runs
+//     before the new servers start (set Database__MigrateOnStartup=false on the servers then).
+//   * With several servers starting together, the startup lock makes them take turns, so two
+//     never seed the same themes at once. The second finds nothing left to do.
+if (migrateOnly || !app.Configuration.GetValue<bool>("SkipStartupTasks"))
 {
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-    var contentRoot = Path.Combine(app.Environment.ContentRootPath, app.Services.GetRequiredService<IOptions<ContentOptions>>().Value.Root);
-    await app.Services.GetRequiredService<ContentCatalog>().SeedAsync(contentRoot);
-    await AiConfigSeeder.SeedAsync(app.Services);
+    await using (await app.Services.GetRequiredService<ClusterLock>().AcquireAsync("startup", CancellationToken.None))
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (migrateOnly || app.Configuration.GetValue("Database:MigrateOnStartup", true)) await db.Database.MigrateAsync();
+        await DataProtectionKeyImport.RunAsync(app.Configuration, db, app.Logger);
+        var contentRoot = Path.Combine(app.Environment.ContentRootPath, app.Services.GetRequiredService<IOptions<ContentOptions>>().Value.Root);
+        await app.Services.GetRequiredService<ContentCatalog>().SeedAsync(contentRoot);
+        await AiConfigSeeder.SeedAsync(app.Services);
+    }
+    if (migrateOnly)
+    {
+        app.Logger.LogInformation("Database migrated and content loaded; exiting because of --migrate.");
+        return;
+    }
 }
 
 // ---------------------------------------------------------------- pipeline

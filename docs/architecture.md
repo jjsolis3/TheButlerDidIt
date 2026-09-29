@@ -61,8 +61,8 @@ Rule violations throw `GameRuleException` with a message that is safe to show pl
 
 If the host double-taps **Next** on slow Wi-Fi, two commands arrive together. Without protection both would read act 1 and both would write act 2, losing a step or dropping clues twice. Two layers prevent that (`PartyService.cs`):
 
-1. **A lock per party** (`PartyLocks`, a `SemaphoreSlim` per party id): commands for one party run one at a time; different parties never wait on each other.
-2. **Optimistic concurrency** (`Party.Version` mapped to Postgres' `xmin`): if two saves ever do race, for example after scaling to several servers, the second fails instead of silently overwriting.
+1. **A lock per party** (`PartyLocks`, a `SemaphoreSlim` per party id): commands for one party run one at a time; different parties never wait on each other. With several servers (`Scale:MultiInstance`), the command also takes the party's `ClusterLock`, a Postgres advisory lock, so a tap that reaches another server waits too (see section 13).
+2. **Optimistic concurrency** (`Party.Version` mapped to Postgres' `xmin`): if two saves ever do race, the second fails instead of silently overwriting.
 
 ## 5. Real-time updates with SignalR
 
@@ -205,3 +205,21 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 Selfies record their `PartyId`, deliberately without a foreign key: removing the database row must also remove the file on disk, which only application code can do. A replaced or removed selfie is deleted immediately. Generated voices and pictures are shared between parties, so they are never deleted with a party.
 
 Clearing selfie URLs from a finished game goes through the engine (`SetPlayerPhoto`) like any other state change, so the saved state never points at a deleted file.
+
+## 13. Running more than one server
+
+Everything here is off by default: one server behaves exactly as described above. Each piece is switched on with a setting (see "Running more than one server" in [deploy-coolify.md](deploy-coolify.md)).
+
+| Problem with two servers | What handles it |
+|---|---|
+| SignalR groups live in one process: the TV on server A wouldn't hear a guest's move on server B | A **Redis backplane** (`Scale:Redis`) relays every message to every server |
+| Two taps on different servers could run the same party's command at once | `PartyLocks` also takes a **cluster lock** per party (`Scale:MultiInstance`) |
+| Every server would drop the midway clues, run clean-up, or write verdicts | Each round, only the server that gets the `ticker`, `retention` or `verdicts:{party}` lock does the work |
+| A restarting server would fail or re-queue jobs another server is running | Only jobs with no progress for 10 minutes count as interrupted |
+| Each server would make its own sign-in keys, so a cookie from one fails on another | Keys are stored in the database (`DataProtection:Store=Database`). Existing key files are copied in the first time, so saved AI keys still decrypt |
+| Two servers starting together would both seed content, and migrations should be a deploy step | Startup takes a `startup` lock; `--migrate` migrates and exits; `Database:MigrateOnStartup=false` skips it on the servers |
+| Files on one server's disk aren't on the other | `IMediaStore` has a local store and an **S3** store (`Media:Storage=S3`) |
+
+**Why Postgres advisory locks rather than Redis locks:** every server already has a database connection, and an advisory lock belongs to the connection that holds it. If a server crashes mid-command, its connection drops and Postgres releases the lock, so there's no lock expiry to tune. `ClusterLock` uses transaction-level locks (`pg_advisory_xact_lock`) on a dedicated connection, so a lock can't outlive its transaction even when the connection goes back to the pool.
+
+**Why files still go through the app with S3:** `/media/assets/{id}` reads the file from the store and streams it. Asset URLs stay the same whichever store is used, and costume selfies are never exposed as public bucket links.
