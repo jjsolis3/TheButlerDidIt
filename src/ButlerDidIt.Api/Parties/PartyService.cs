@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Hubs;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using ButlerDidIt.Game.Scenarios;
@@ -18,24 +19,44 @@ namespace ButlerDidIt.Api.Parties;
 /// tap would be lost, or worse, clues would drop twice. Different parties never
 /// block each other.
 ///
-/// This works because we run a single server instance. With several instances
-/// you'd use a distributed lock (Postgres advisory locks or Redis); the xmin
-/// concurrency token on Party is the safety net in either case.
+/// Inside one server a SemaphoreSlim per party does the job. With several servers
+/// (Scale:MultiInstance) the command also takes the party's <see cref="ClusterLock"/>,
+/// so a tap arriving at another server waits too. The in-process lock is still taken
+/// first, so commands queued on the same server don't each hold a database connection
+/// while they wait. The xmin concurrency token on Party is the safety net in either case.
 /// </summary>
-public sealed class PartyLocks
+public sealed class PartyLocks(ClusterLock cluster)
 {
     private readonly ConcurrentDictionary<Guid, SemaphoreSlim> _locks = new();
 
-    public async Task<IDisposable> AcquireAsync(Guid partyId, CancellationToken ct)
+    public async Task<IAsyncDisposable> AcquireAsync(Guid partyId, CancellationToken ct)
     {
         var gate = _locks.GetOrAdd(partyId, _ => new SemaphoreSlim(1, 1));
         await gate.WaitAsync(ct);
-        return new Releaser(gate);
+        try
+        {
+            return new Releaser(gate, await cluster.AcquireAsync($"party:{partyId}", ct));
+        }
+        catch
+        {
+            gate.Release();
+            throw;
+        }
     }
 
-    private sealed class Releaser(SemaphoreSlim gate) : IDisposable
+    private sealed class Releaser(SemaphoreSlim gate, IAsyncDisposable shared) : IAsyncDisposable
     {
-        public void Dispose() => gate.Release();
+        public async ValueTask DisposeAsync()
+        {
+            try
+            {
+                await shared.DisposeAsync();
+            }
+            finally
+            {
+                gate.Release();
+            }
+        }
     }
 }
 
@@ -100,7 +121,7 @@ public sealed class PartyService(
         Action<PartySnapshot>? beforeSave = null,
         CancellationToken ct = default)
     {
-        using (await locks.AcquireAsync(partyId, ct))
+        await using (await locks.AcquireAsync(partyId, ct))
         {
             var snapshot = await LoadAsync(partyId, ct);
             var now = Now;

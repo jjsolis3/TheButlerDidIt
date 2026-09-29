@@ -16,12 +16,12 @@ public static class MediaApi
     {
         // Generated and uploaded files. Asset ids are random GUIDs, so URLs can't be guessed.
         // They are cached forever by browsers because an asset never changes once created.
-        app.MapGet("/media/assets/{id:guid}", async (Guid id, AppDbContext db, MediaStore store, HttpContext http, CancellationToken ct) =>
+        app.MapGet("/media/assets/{id:guid}", async (Guid id, AppDbContext db, IMediaStore store, HttpContext http, CancellationToken ct) =>
         {
             var asset = await db.MediaAssets.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id, ct);
-            if (asset is null || store.Resolve(asset.Path) is not { } file) return Results.NotFound();
+            if (asset is null || await store.OpenReadAsync(asset.Path, ct) is not { } file) return Results.NotFound();
             http.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
-            return Results.File(file, asset.ContentType, enableRangeProcessing: true);
+            return Results.Stream(file, asset.ContentType, enableRangeProcessing: true);
         });
 
         // ---- Host: status of voice/art preparation for a party's mystery, and a button to (re)start it.

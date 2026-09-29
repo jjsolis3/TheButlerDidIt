@@ -47,6 +47,17 @@ services:
       Ai__Roles__Voice__Model: "${AI_VOICE_MODEL:-}"
       Ai__Roles__Illustrator__Provider: "${AI_MEDIA_PROVIDER_NAME:-}"
       Ai__Roles__Illustrator__Model: "${AI_IMAGE_MODEL:-}"
+      # ---- More than one server (optional; see "Running more than one server" in docs/deploy-coolify.md).
+      Scale__MultiInstance: "${SCALE_MULTI_INSTANCE:-false}"
+      Scale__Redis: "${REDIS_URL:-}"
+      DataProtection__Store: "${DATA_PROTECTION_STORE:-}"   # Database: share sign-in keys between servers
+      Database__MigrateOnStartup: "${MIGRATE_ON_STARTUP:-true}"
+      Media__Storage: "${MEDIA_STORAGE:-Local}"            # Local | S3
+      Media__S3__ServiceUrl: "${S3_SERVICE_URL:-}"
+      Media__S3__Region: "${S3_REGION:-auto}"
+      Media__S3__Bucket: "${S3_BUCKET:-}"
+      Media__S3__AccessKey: "${S3_ACCESS_KEY:-}"
+      Media__S3__SecretKey: "${S3_SECRET_KEY:-}"
     volumes:
       - keys:/data/keys   # keeps hosts logged in across redeploys
       - media:/data/media # generated images and voices (milestone 3)

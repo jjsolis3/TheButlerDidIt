@@ -1,4 +1,5 @@
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Game.Engine;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +11,12 @@ namespace ButlerDidIt.Api.Parties;
 /// Every few seconds it asks the database "which parties have something due?"
 /// using the indexed NextDueAt column, so it stays cheap however many old
 /// parties are stored. Timer countdowns themselves run in the browsers.
+///
+/// With several servers each runs a ticker, but only the one that gets the "ticker"
+/// cluster lock does the work each round; the others skip it. If that server stops,
+/// another takes the lock on the next round.
 /// </summary>
-public sealed class PartyTicker(IServiceScopeFactory scopes, TimeProvider clock, ILogger<PartyTicker> log) : BackgroundService
+public sealed class PartyTicker(IServiceScopeFactory scopes, ClusterLock cluster, TimeProvider clock, ILogger<PartyTicker> log) : BackgroundService
 {
     private static readonly TimeSpan Interval = TimeSpan.FromSeconds(2);
 
@@ -34,6 +39,9 @@ public sealed class PartyTicker(IServiceScopeFactory scopes, TimeProvider clock,
 
     public async Task TickOnceAsync(CancellationToken ct)
     {
+        await using var turn = await cluster.TryAcquireAsync("ticker", ct);
+        if (turn is null) return; // another server is ticking right now
+
         var now = clock.GetUtcNow();
         List<Guid> due;
         using (var scope = scopes.CreateScope())

@@ -6,6 +6,7 @@ using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Parties;
+using ButlerDidIt.Api.Scale;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
 using Microsoft.EntityFrameworkCore;
@@ -13,51 +14,12 @@ using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Media;
 
-public sealed class MediaOptions
-{
-    /// <summary>Folder for generated and uploaded files. In Docker this is the `media` volume at /data/media.</summary>
-    public string Root { get; set; } = "data/media";
-}
-
-/// <summary>Saves files to the media folder. A small seam so S3-compatible storage (#16) can replace it later.</summary>
-public sealed class MediaStore(IOptions<MediaOptions> options, IWebHostEnvironment env)
-{
-    private string Root => Path.GetFullPath(Path.Combine(env.ContentRootPath, options.Value.Root));
-
-    public async Task<string> SaveAsync(byte[] bytes, string extension, CancellationToken ct)
-    {
-        var relative = Path.Combine(DateTime.UtcNow.ToString("yyyy-MM"), $"{Guid.NewGuid():N}.{extension}");
-        var full = Path.Combine(Root, relative);
-        Directory.CreateDirectory(Path.GetDirectoryName(full)!);
-        await File.WriteAllBytesAsync(full, bytes, ct);
-        return relative.Replace('\\', '/');
-    }
-
-    /// <summary>Resolves a stored relative path, refusing anything that escapes the media folder.</summary>
-    public string? Resolve(string relative)
-    {
-        var full = Path.GetFullPath(Path.Combine(Root, relative));
-        return full.StartsWith(Root + Path.DirectorySeparatorChar, StringComparison.Ordinal) && File.Exists(full) ? full : null;
-    }
-
-    public void Delete(string relative)
-    {
-        if (Resolve(relative) is { } full) File.Delete(full);
-    }
-
-    public static string Url(Guid assetId) => $"/media/assets/{assetId}";
-
-    /// <summary>The asset id inside one of our media URLs, or null for anything else (e.g. hand-made theme art).</summary>
-    public static Guid? AssetIdFromUrl(string? url) =>
-        url is not null && url.StartsWith("/media/assets/", StringComparison.Ordinal) && Guid.TryParse(url["/media/assets/".Length..], out var id) ? id : null;
-}
-
 /// <summary>
 /// Creates voice clips and pictures through <see cref="MediaGateway"/>, with a
 /// cache: the same text in the same voice (or the same prompt) from the same model
 /// is only ever generated and paid for once, by hashing the request.
 /// </summary>
-public sealed class MediaService(AppDbContext db, MediaGateway media, MediaStore store, TimeProvider clock)
+public sealed class MediaService(AppDbContext db, MediaGateway media, IMediaStore store, TimeProvider clock)
 {
     public async Task<Guid> SpeechAsync(string text, string voice, AiCallContext context, CancellationToken ct)
     {
@@ -82,7 +44,7 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, MediaStore
         var file = await create();
         var asset = new MediaAsset
         {
-            Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(file.Bytes, file.Extension, ct), ContentHash = hash,
+            Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(file.Bytes, file.Extension, file.ContentType, ct), ContentHash = hash,
             Provider = provider[..Math.Min(provider.Length, 60)], Prompt = prompt, ContentType = file.ContentType,
             SizeBytes = file.Bytes.Length, CreatedAt = clock.GetUtcNow(),
         };
@@ -96,7 +58,7 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, MediaStore
         {
             // Two requests generated the same thing at once; keep the first and drop ours.
             db.Entry(asset).State = EntityState.Detached;
-            store.Delete(asset.Path);
+            await store.DeleteAsync(asset.Path, CancellationToken.None);
             return await db.MediaAssets.AsNoTracking().Where(a => a.ContentHash == hash).Select(a => a.Id).FirstAsync(ct);
         }
     }
@@ -106,7 +68,7 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, MediaStore
     {
         var asset = new MediaAsset
         {
-            Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(bytes, extension, ct),
+            Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(bytes, extension, contentType, ct),
             ContentHash = Convert.ToHexString(SHA256.HashData(Guid.NewGuid().ToByteArray())), Provider = "upload",
             ContentType = contentType, SizeBytes = bytes.Length, CreatedAt = clock.GetUtcNow(), PartyId = partyId,
         };
@@ -125,7 +87,7 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, MediaStore
         await db.SaveChangesAsync(ct);
         // Delete the files only after the rows are gone: a crash in between leaves an
         // unreferenced file (harmless), never a row pointing at a missing file.
-        foreach (var asset in assets) store.Delete(asset.Path);
+        foreach (var asset in assets) await store.DeleteAsync(asset.Path, ct);
     }
 }
 
@@ -136,15 +98,21 @@ public sealed record MediaJobView(Guid Id, MediaJobStatus Status, int Total, int
 /// narration, every NPC line, every portrait and scene. Results are shared by
 /// every party that plays the same scenario.
 /// </summary>
-public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock, JobEvents events, ILogger<MediaWorker> log) : BackgroundService
+public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock, JobEvents events, ClusterLock cluster, ILogger<MediaWorker> log) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using (var scope = scopes.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await db.MediaJobs.Where(j => j.Status == MediaJobStatus.Running)
-                .ExecuteUpdateAsync(u => u.SetProperty(j => j.Status, MediaJobStatus.Queued), stoppingToken); // resume after a restart
+            // Resume after a restart. With several servers, leave jobs another server is still making progress on.
+            var interrupted = db.MediaJobs.Where(j => j.Status == MediaJobStatus.Running);
+            if (cluster.Enabled)
+            {
+                var staleBefore = clock.GetUtcNow() - ScaleDefaults.StaleJobAfter;
+                interrupted = interrupted.Where(j => j.UpdatedAt < staleBefore);
+            }
+            await interrupted.ExecuteUpdateAsync(u => u.SetProperty(j => j.Status, MediaJobStatus.Queued), stoppingToken);
         }
 
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));

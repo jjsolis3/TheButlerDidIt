@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ButlerDidIt.Api.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options)
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options), IDataProtectionKeyContext
 {
+    /// <summary>The sign-in encryption keys, when DataProtection:Store=Database (so every server shares them).</summary>
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
+
     public DbSet<ThemeEntity> Themes => Set<ThemeEntity>();
     public DbSet<ScenarioEntity> Scenarios => Set<ScenarioEntity>();
     public DbSet<Party> Parties => Set<Party>();
