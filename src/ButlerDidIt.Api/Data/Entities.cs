@@ -84,6 +84,16 @@ public enum PartyMode
     PassAndPlay,
 }
 
+/// <summary>Which game a party plays. Each kind has its own rules engine and screens (see Games/GameModules.cs).</summary>
+public enum GameKind
+{
+    /// <summary>A murder mystery: the original game.</summary>
+    Mystery,
+
+    /// <summary>An escape room (#67). Not playable yet.</summary>
+    EscapeRoom,
+}
+
 public enum PartyStatus
 {
     Lobby,
@@ -101,6 +111,10 @@ public sealed class Party
     [MaxLength(450)]
     public required string HostUserId { get; set; }
 
+    /// <summary>The game this party plays. Every party before escape rooms is a mystery, which is also the default.</summary>
+    public GameKind Kind { get; set; } = GameKind.Mystery;
+
+    /// <summary>What the party plays: a mystery's scenario id (later, an escape room's id).</summary>
     [MaxLength(120)]
     public required string ScenarioId { get; set; }
 

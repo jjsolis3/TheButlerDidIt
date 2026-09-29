@@ -6,6 +6,7 @@ import { Button, ErrorText, StatusPill } from '../components/ui'
 import { api } from '../lib/api'
 import { stageGuide } from '../lib/guide'
 import { useParty } from '../lib/hub'
+import { UnsupportedGame } from '../components/UnsupportedGame'
 import { useThemePalette } from '../lib/theme'
 import type { PartyInfo, StageView } from '../lib/types'
 import { useMe } from '../lib/useMe'
@@ -35,6 +36,7 @@ export default function Remote() {
   if (error) return <Centered>{error}</Centered>
   if (!info) return <Centered>Finding your party…</Centered>
   if (!info.isHost) return <Centered>Only the host of party {code} can use its remote.</Centered>
+  if (info.kind !== 'mystery') return <UnsupportedGame kind={info.kind} />
   return <RemoteScreen info={info} />
 }
 

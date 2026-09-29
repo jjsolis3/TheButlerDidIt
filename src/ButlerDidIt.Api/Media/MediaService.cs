@@ -197,12 +197,13 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
 
         // New art and voices: refresh every screen of every party using this scenario.
         catalog.Invalidate(job.ScenarioId);
-        var parties = sp.GetRequiredService<PartyService>();
+        var runtime = sp.GetRequiredService<PartyRuntime>();
         var partyIds = await db.Parties.AsNoTracking()
             .Where(p => p.ScenarioId == job.ScenarioId && p.Status != PartyStatus.Finished).Select(p => p.Id).ToListAsync(ct);
         foreach (var id in partyIds)
         {
-            await parties.BroadcastAsync(await parties.LoadAsync(id, ct), clock.GetUtcNow());
+            var (_, session) = await runtime.LoadAsync(id, ct);
+            await runtime.BroadcastAsync(id, session, clock.GetUtcNow());
         }
     }
 

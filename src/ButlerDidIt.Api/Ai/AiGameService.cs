@@ -111,7 +111,7 @@ public sealed class AiGameService(PartyService parties, AiGateway ai, VerdictQue
     {
         var since = parties.Now.AddHours(-24);
         var candidates = await db.Parties.AsNoTracking()
-            .Where(p => p.Status == PartyStatus.InProgress && p.UpdatedAt > since)
+            .Where(p => p.Kind == GameKind.Mystery && p.Status == PartyStatus.InProgress && p.UpdatedAt > since)
             .Select(p => new { p.Id, p.State })
             .ToListAsync(ct);
         var waiting = candidates

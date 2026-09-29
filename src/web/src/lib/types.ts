@@ -372,7 +372,12 @@ export interface PartyInfo {
   isHost: boolean
   /** "Surprise me": the version (and so the killer) is dealt when the evening begins. Host only. */
   dealAtStart: boolean
+  /** Which game the party plays; each kind has its own screens. */
+  kind: GameKind
 }
+
+/** Kinds of game night. Escape rooms (#67) are on their way. */
+export type GameKind = 'mystery' | 'escapeRoom'
 
 export interface SeatResponse {
   seatId: string

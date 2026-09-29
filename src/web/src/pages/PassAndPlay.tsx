@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { PlayerScreen } from '../components/PlayerScreen'
+import { UnsupportedGame } from '../components/UnsupportedGame'
 import { Button, ErrorText, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import { seats, type StoredSeat } from '../lib/seats'
 import { useThemePalette } from '../lib/theme'
+import type { GameKind } from '../lib/types'
 
 /**
  * One device, many players. The host's device holds a seat token for every
@@ -19,10 +21,17 @@ export default function PassAndPlay() {
   const [open, setOpen] = useState<StoredSeat | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [themeSlug, setThemeSlug] = useState<string>()
+  const [kind, setKind] = useState<GameKind>()
   useThemePalette(themeSlug)
 
   useEffect(() => {
-    api.party(code).then((p) => setThemeSlug(p.themeSlug), () => {})
+    api.party(code).then(
+      (p) => {
+        setThemeSlug(p.themeSlug)
+        setKind(p.kind)
+      },
+      () => {},
+    )
   }, [code])
 
   const add = async () => {
@@ -37,6 +46,8 @@ export default function PassAndPlay() {
       setError((e as Error).message)
     }
   }
+
+  if (kind && kind !== 'mystery') return <UnsupportedGame kind={kind} />
 
   if (open) {
     return (

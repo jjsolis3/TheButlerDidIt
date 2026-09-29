@@ -57,10 +57,10 @@ public sealed class PartyTicker(IServiceScopeFactory scopes, ClusterLock cluster
         {
             // A fresh scope (and so a fresh DbContext) per party keeps failures isolated.
             using var scope = scopes.CreateScope();
-            var parties = scope.ServiceProvider.GetRequiredService<PartyService>();
+            var runtime = scope.ServiceProvider.GetRequiredService<PartyRuntime>();
             try
             {
-                await parties.ExecuteAsync(partyId, (_, t) => new Tick(t), ct: ct);
+                await runtime.ExecuteAsync(partyId, (s, t) => s.Tick(t), ct: ct);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

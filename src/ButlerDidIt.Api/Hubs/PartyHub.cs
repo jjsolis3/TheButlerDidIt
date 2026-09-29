@@ -23,7 +23,7 @@ namespace ButlerDidIt.Api.Hubs;
 ///   * Host controls take the party code and check the signed-in user owns the party.
 /// </summary>
 [Authorize(Policy = AuthPolicies.PartyMember)]
-public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbContext db, AiGameService aiGame) : Hub
+public sealed class PartyHub(PartyService parties, PartyRuntime runtime, PartyDealer dealer, AppDbContext db, AiGameService aiGame) : Hub
 {
     public static string StageGroup(Guid partyId) => $"stage:{partyId}";
     public static string SeatGroup(Guid seatId) => $"seat:{seatId}";
@@ -31,8 +31,11 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
 
     // ------------------------------------------------------------------ subscribe
 
-    /// <summary>Start receiving the public stage view. Allowed for the host and any seated guest.</summary>
-    public async Task<StageView> WatchParty(string code)
+    /// <summary>
+    /// Start receiving the public stage view. Allowed for the host and any seated guest.
+    /// Works for every kind of game: the view is whatever the party's game module projects.
+    /// </summary>
+    public async Task<object> WatchParty(string code)
     {
         var party = await parties.FindByCodeAsync(code) ?? throw new HubException("Party not found.");
         var isHost = IsHostOf(party);
@@ -40,18 +43,18 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
         if (!isHost && !isGuest) throw new HubException("You are not part of this party.");
 
         await Groups.AddToGroupAsync(Context.ConnectionId, StageGroup(party.Id));
-        var s = await parties.LoadAsync(party.Id);
-        return ViewProjector.Stage(s.State, s.Scenario, parties.Now);
+        var (_, session) = await runtime.LoadAsync(party.Id);
+        return session.StageView(runtime.Now);
     }
 
     /// <summary>Start receiving this seat's private view (the dossier).</summary>
-    public async Task<PlayerView> JoinSeat()
+    public async Task<object> JoinSeat()
     {
         var (seatId, partyId) = RequireSeat();
         await Groups.AddToGroupAsync(Context.ConnectionId, SeatGroup(seatId));
         await db.Seats.Where(s => s.Id == seatId).ExecuteUpdateAsync(u => u.SetProperty(s => s.LastSeenAt, parties.Now));
-        var s = await parties.LoadAsync(partyId);
-        return ViewProjector.Player(s.State, s.Scenario, seatId, parties.Now);
+        var (_, session) = await runtime.LoadAsync(partyId);
+        return session.PlayerView(seatId, runtime.Now);
     }
 
     /// <summary>
@@ -152,17 +155,19 @@ public sealed class PartyHub(PartyService parties, PartyDealer dealer, AppDbCont
     public Task SpinSpotlight(string code) => AsHost(code, (_, now) => new SpinSpotlight(now));
     public Task ConvertToNpc(string code, Guid seatId) => AsHost(code, (_, now) => new ConvertToNpc(now, seatId));
 
+    /// <summary>Every kind of game has seats, so this goes through the runtime rather than the mystery rules.</summary>
     public async Task RemoveSeat(string code, Guid seatId)
     {
+        var party = await RequireHostParty(code);
         // Removing the Seat row in the same SaveChanges as the new state means the
         // token stops working at exactly the moment the player leaves the game.
-        await AsHost(code, (_, now) => new RemovePlayer(now, seatId), beforeSave: s =>
+        await runtime.ExecuteAsync(party.Id, (s, now) => s.RemovePlayer(now, seatId), beforeSave: (p, _) =>
         {
             var seat = db.Seats.Local.FirstOrDefault(x => x.Id == seatId)
-                ?? db.Seats.FirstOrDefault(x => x.Id == seatId && x.PartyId == s.Party.Id);
+                ?? db.Seats.FirstOrDefault(x => x.Id == seatId && x.PartyId == p.Id);
             if (seat is not null) db.Seats.Remove(seat);
         });
-        await parties.NotifySeatRemovedAsync(seatId);
+        await runtime.NotifySeatRemovedAsync(seatId);
     }
 
     // ------------------------------------------------------------------ helpers

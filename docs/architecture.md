@@ -223,3 +223,28 @@ Everything here is off by default: one server behaves exactly as described above
 **Why Postgres advisory locks rather than Redis locks:** every server already has a database connection, and an advisory lock belongs to the connection that holds it. If a server crashes mid-command, its connection drops and Postgres releases the lock, so there's no lock expiry to tune. `ClusterLock` uses transaction-level locks (`pg_advisory_xact_lock`) on a dedicated connection, so a lock can't outlive its transaction even when the connection goes back to the pool.
 
 **Why files still go through the app with S3:** `/media/assets/{id}` reads the file from the store and streams it. Asset URLs stay the same whichever store is used, and costume selfies are never exposed as public bucket links.
+
+## 14. Game kinds: one platform, several games
+
+A party has a `GameKind`: `Mystery` today, with `EscapeRoom` on its way (#67). Everything around the game is shared, and only the rules and screens differ per kind:
+
+| Shared by every game (the platform) | Per game |
+|---|---|
+| Host accounts, join codes, seats and seat tokens, the hub and its groups, reconnects | The pure rules engine (`ButlerDidIt.Game` for mysteries) |
+| `PartyRuntime`: the party lock, load, save (state, status, next wake-up), broadcast | Its views and their privacy rules (`ViewProjector` for mysteries) |
+| Joining, removing a seat, costume selfies, the ticker, retention | Its hub actions and pages (the mystery's `PartyService`, dealer, AI game master, kit, recap) |
+| AI gateway, media pipeline, scaling, backups | Its content (scenarios, and later escape rooms) |
+
+**How a game plugs in:**
+- **The module:** a game is an `IGameModule` (`src/ButlerDidIt.Api/Games/`). It loads a party's row into a `GameSession`, which gives the platform what it needs:
+  - the seats, status and next wake-up;
+  - the stage and player views;
+  - the four commands every game supports: add or remove a player, set a player's photo, and tick.
+- **Registration:** `GameModules` finds the module by the party's kind. A kind with no module is a friendly "can't run … games yet", not a crash.
+- **The mystery:** `MysteryModule` wraps the existing engine. `PartyService` keeps its mystery-typed API (`ExecuteAsync`, `ChangeAsync`, `PartySnapshot`) on top of `PartyRuntime`, and refuses parties of another kind. So a mystery action can never run against another game.
+- **The front end:**
+  - `PartyInfo.kind` tells the pages which screens to show.
+  - `useParty` is generic over its view types, so a new game reuses the connection, reconnects and version checks.
+
+**Why the seam is shaped this way:** the platform already did the hard, shared work (locks, reconnects, privacy, scaling). A new game should only have to bring its rules and screens. Tests use a stand-in escape module (`GameKindTests`) to prove joining, seats, live views and the ticker work for a game that isn't a mystery.
+

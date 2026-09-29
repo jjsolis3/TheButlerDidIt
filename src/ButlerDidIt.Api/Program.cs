@@ -7,6 +7,7 @@ using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
+using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Kit;
 using ButlerDidIt.Api.Media;
@@ -145,6 +146,10 @@ builder.Services.ConfigureHttpJsonOptions(o =>
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ContentCatalog>();
 builder.Services.AddSingleton<PartyLocks>();
+// Each kind of game plugs in as a module; the platform finds it by the party's GameKind.
+builder.Services.AddSingleton<IGameModule, MysteryModule>();
+builder.Services.AddSingleton<GameModules>();
+builder.Services.AddScoped<PartyRuntime>();
 builder.Services.AddScoped<PartyService>();
 builder.Services.AddScoped<PartyDealer>();
 builder.Services.AddHostedService<PartyTicker>();
