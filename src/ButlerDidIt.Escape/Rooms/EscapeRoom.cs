@@ -299,7 +299,15 @@ public sealed record EscapePuzzle
     /// validator can check it's found in time. Made by <see cref="RoomVariants"/>; never written by hand.
     /// </summary>
     public List<string> KeyAt { get; init; } = [];
+
+    /// <summary>For ciphers: which code, and its key as written into the room. Made by <see cref="RoomVariants"/>; never sent as it is.</summary>
+    public CipherDecoder? Decoder { get; init; }
+
+    /// <summary>For deductions: the things in the row, in the order the code reads them (public: the prompt lists them too).</summary>
+    public List<string> Lineup { get; init; } = [];
 }
+
+public sealed record CipherDecoder(CipherType Type, string Key);
 
 /// <summary>A square grid of lights, numbered row by row from the top left. <see cref="Lit"/> lists the ones that are on.</summary>
 public sealed record SwitchGrid(int Size, List<int> Lit);

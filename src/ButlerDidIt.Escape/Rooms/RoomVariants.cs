@@ -54,6 +54,8 @@ public static partial class RoomVariants
         string prompt = v?.Prompt ?? p.Prompt, solved = v?.SolvedText ?? p.SolvedText;
         List<string> answers = v?.Answers ?? p.Answers, pieces = v?.Pieces ?? p.Pieces, hints = v?.Hints ?? p.Hints;
         SwitchGrid? grid = null;
+        CipherDecoder? decoder = null;
+        List<string> lineup = [];
 
         if (p.Generator is { } g)
         {
@@ -61,19 +63,24 @@ public static partial class RoomVariants
             answers = made.Grid is null ? [made.Answer] : [];
             pieces = made.Pieces;
             grid = made.Grid;
-            if (made.Key is { } key) keys[p.Id] = key;
+            lineup = made.Lineup ?? [];
+            if (made.Key is { } key)
+            {
+                keys[p.Id] = key;
+                decoder = new CipherDecoder(g.Cipher, key);
+            }
             prompt = Fill(prompt, made);
             solved = Fill(solved, made);
             hints = hints.Select(h => Fill(h, made)).ToList();
         }
 
         // The concrete puzzle is fixed: no variants or generator left to pick from.
-        return p with { Prompt = prompt, Answers = answers, Pieces = pieces, Hints = hints, SolvedText = solved, Grid = grid, Variants = [], Generator = null };
+        return p with { Prompt = prompt, Answers = answers, Pieces = pieces, Hints = hints, SolvedText = solved, Grid = grid, Decoder = decoder, Lineup = lineup, Variants = [], Generator = null };
     }
 
     /// <param name="Fills">Placeholders for the prompt, hints and solved text, besides {answer}.</param>
     /// <param name="Key">For ciphers: what {key:&lt;puzzle id&gt;} becomes.</param>
-    private sealed record Made(string Answer, List<string> Pieces, Dictionary<string, string> Fills, SwitchGrid? Grid = null, string? Key = null);
+    private sealed record Made(string Answer, List<string> Pieces, Dictionary<string, string> Fills, SwitchGrid? Grid = null, string? Key = null, List<string>? Lineup = null);
 
     private static Made Generate(PuzzleGenerator g, SeededRandom rng, EscapeDifficulty difficulty)
     {
@@ -121,7 +128,7 @@ public static partial class RoomVariants
             {
                 var d = PuzzleGenerators.Deduction(g.Words, difficulty, rng);
                 var template = g.PieceTemplate.Length == 0 ? "{clue}" : g.PieceTemplate;
-                return new Made(d.Answer, d.ClueTexts.Select(t => template.Replace("{clue}", t)).ToList(), New(("{items}", PuzzleGenerators.ListItems(d.Items))));
+                return new Made(d.Answer, d.ClueTexts.Select(t => template.Replace("{clue}", t)).ToList(), New(("{items}", PuzzleGenerators.ListItems(d.Items))), Lineup: d.Items);
             }
             case GeneratorType.Switches:
             {

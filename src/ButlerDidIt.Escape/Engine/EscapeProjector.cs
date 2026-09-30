@@ -105,6 +105,17 @@ public static class EscapeProjector
             PieceCount: s.Pieces.Where(x => x.PuzzleId == p.Id && !x.IsHidden).Select(x => x.SeatId).Distinct().Count(),
             PiecesHidden: s.Pieces.Count(x => x.PuzzleId == p.Id && x.IsHidden),
             Finds: p.Kind == PuzzleKind.Search ? new EscapeFindsView(p.Finds.Count(s.Examined.Contains), p.Finds.Count) : null,
-            Switches: p.Grid is { } grid ? new EscapeSwitchesView(grid.Size, EscapeEngine.LitNow(s, p)) : null);
+            Switches: p.Grid is { } grid ? new EscapeSwitchesView(grid.Size, EscapeEngine.LitNow(s, p)) : null,
+            Cipher: p.Decoder is { } d ? Cipher(s, p, d) : null,
+            Deduction: p.Lineup.Count > 0 ? new EscapeDeductionView(p.Lineup, p.Lineup.Count) : null);
+    }
+
+    private static EscapeCipherView Cipher(EscapeState s, EscapePuzzle p, CipherDecoder d)
+    {
+        var unlocked = EscapeEngine.KeyFound(s, p);
+        var table = unlocked && d.Type is CipherType.Symbols or CipherType.Morse
+            ? PuzzleGenerators.KeyTable(d.Type, d.Key).Select(e => new EscapeKeyEntry(e.Code, e.Letter)).ToList()
+            : null;
+        return new EscapeCipherView(d.Type, unlocked, table);
     }
 }

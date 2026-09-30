@@ -95,7 +95,17 @@ public sealed record EscapePuzzleView(
     /// <summary>For Search puzzles: how many of the spots it needs have been searched, of how many.</summary>
     EscapeFindsView? Finds,
     /// <summary>For Switches puzzles: the grid as it is now.</summary>
-    EscapeSwitchesView? Switches);
+    EscapeSwitchesView? Switches,
+    /// <summary>For ciphers: which decoding tool the phones offer, once the key has been found.</summary>
+    EscapeCipherView? Cipher,
+    /// <summary>For deductions: the things to line up, for the phones' logic grid.</summary>
+    EscapeDeductionView? Deduction);
+
+/// <param name="Unlocked">The group has found the key (numbers and mirror need none).</param>
+/// <param name="Table">For symbols and Morse: the key card, only once unlocked. Never the shift amount: finding it is the puzzle.</param>
+public sealed record EscapeCipherView(CipherType Type, bool Unlocked, IReadOnlyList<EscapeKeyEntry>? Table);
+public sealed record EscapeKeyEntry(string Code, string Letter);
+public sealed record EscapeDeductionView(IReadOnlyList<string> Items, int Spots);
 
 public sealed record EscapeFindsView(int Found, int Total);
 public sealed record EscapeSwitchesView(int Size, IReadOnlyList<int> Lit);
