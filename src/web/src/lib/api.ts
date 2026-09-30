@@ -172,8 +172,15 @@ export const api = {
     testProvider: (id: string, model: string) =>
       request<{ ok: boolean; message: string; milliseconds: number }>('POST', `/api/admin/ai/providers/${id}/test`, { model }),
     roles: () => request<RoleView[]>('GET', '/api/admin/ai/roles'),
-    setRole: (role: AiRole, providerId: string, model: string, maxOutputTokens: number | null) =>
-      request<void>('PUT', `/api/admin/ai/roles/${role}`, { providerId, model, maxOutputTokens, temperature: null }),
+    setRole: (role: AiRole, providerId: string, model: string, maxOutputTokens: number | null, claude?: { effort: string | null; refusalFallbackModel: string | null }) =>
+      request<void>('PUT', `/api/admin/ai/roles/${role}`, {
+        providerId,
+        model,
+        maxOutputTokens,
+        temperature: null,
+        effort: claude?.effort ?? null,
+        refusalFallbackModel: claude?.refusalFallbackModel ?? null,
+      }),
     clearRole: (role: AiRole) => request<void>('DELETE', `/api/admin/ai/roles/${role}`),
     prices: () => request<PriceView[]>('GET', '/api/admin/ai/prices'),
     setPrice: (p: PriceView) => request<void>('PUT', '/api/admin/ai/prices', p),

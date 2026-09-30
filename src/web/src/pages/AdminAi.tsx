@@ -263,7 +263,7 @@ function Roles({ roles, providers, onChange, onError }: { roles: RoleView[]; pro
           // with them, instead of the card copying new props into its own state.
           return (
             <RoleCard
-              key={`${r.id}:${current?.providerId}:${current?.model}`}
+              key={`${r.id}:${current?.providerId}:${current?.model}:${current?.effort}:${current?.refusalFallbackModel}`}
               info={r}
               current={current}
               providers={providers}
@@ -286,9 +286,13 @@ function RoleCard({
 }: { info: (typeof ROLES)[number]; current?: RoleView; providers: ProviderView[] } & SectionProps) {
   const [providerId, setProviderId] = useState(current?.providerId ?? '')
   const [model, setModel] = useState(current?.model ?? '')
+  const [effort, setEffort] = useState(current?.effort ?? '')
+  const [fallback, setFallback] = useState(current?.refusalFallbackModel ?? '')
   const [saved, setSaved] = useState(false)
 
   const kind = providers.find((p) => p.id === providerId)?.kind
+  // Effort and a refusal fallback are Claude options; the server refuses them for other providers.
+  const claude = kind === 'anthropic' ? { effort: effort || null, refusalFallbackModel: fallback.trim() || null } : undefined
   const suggestions = (kind && MODEL_SUGGESTIONS[kind]) ?? []
 
   return (
@@ -296,7 +300,7 @@ function RoleCard({
       <p className="font-display text-xl">{info.title}</p>
       <p className="mt-1 mb-3 text-xs text-muted">{info.body}</p>
       <div className="space-y-2">
-        <select className={inputClass} value={providerId} onChange={(e) => setProviderId(e.target.value)}>
+        <select className={inputClass} value={providerId} onChange={(e) => setProviderId(e.target.value)} aria-label={`Provider for ${info.title}`}>
           <option value="">Not set: feature off</option>
           {providers.map((p) => (
             <option key={p.id} value={p.id}>
@@ -310,6 +314,28 @@ function RoleCard({
             <option key={m} value={m} />
           ))}
         </datalist>
+        {kind === 'anthropic' && (
+          <>
+            <label className="block text-xs text-muted">
+              Effort (how hard Claude thinks: lower is faster and cheaper; not for Haiku)
+              <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value)} aria-label={`Effort for ${info.title}`}>
+                <option value="">Model default</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="xhigh">Extra high</option>
+              </select>
+            </label>
+            <input
+              className={inputClass}
+              list={`models-${info.id}`}
+              placeholder="Fallback model if Claude declines (optional)"
+              aria-label={`Refusal fallback model for ${info.title}`}
+              value={fallback}
+              onChange={(e) => setFallback(e.target.value)}
+            />
+          </>
+        )}
         <div className="flex items-center gap-2">
           <Button
             className="min-h-9 py-1"
@@ -317,7 +343,7 @@ function RoleCard({
               onError(null)
               try {
                 if (!providerId) await api.admin.clearRole(info.id)
-                else await api.admin.setRole(info.id, providerId, model, null)
+                else await api.admin.setRole(info.id, providerId, model, null, claude)
                 setSaved(true)
                 setTimeout(() => setSaved(false), 2000)
                 await onChange()

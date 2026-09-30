@@ -59,5 +59,25 @@ public class AdminAiTests(ApiFactory app) : IClassFixture<ApiFactory>
             Json($$"""{"providerId":"{{localId}}","model":"tts-1","maxOutputTokens":null,"temperature":null}"""));
         Assert.Equal(HttpStatusCode.BadRequest, voice.StatusCode);
         Assert.Contains("needs an OpenAI or Gemini provider", await voice.Content.ReadAsStringAsync());
+
+        // Claude's options (#63): effort and a refusal fallback, saved, shown back, and refused for other providers.
+        var claude = await admin.PostAsync("/api/admin/ai/providers",
+            Json("""{"name":"Claude","kind":"anthropic","baseUrl":null,"apiKey":"sk-ant-test"}"""));
+        var claudeId = JsonDocument.Parse(await claude.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetString();
+        var actor = await admin.PutAsync("/api/admin/ai/roles/actor",
+            Json($$"""{"providerId":"{{claudeId}}","model":"claude-opus-5-5","maxOutputTokens":null,"temperature":null,"effort":"Low","refusalFallbackModel":" claude-opus-4-8 "}"""));
+        Assert.True(actor.StatusCode == HttpStatusCode.NoContent, $"{(int)actor.StatusCode} {await actor.Content.ReadAsStringAsync()}");
+        var saved2 = await admin.GetStringAsync("/api/admin/ai/roles");
+        Assert.Contains("\"model\":\"claude-opus-5-5\",\"maxOutputTokens\":null,\"temperature\":null,\"effort\":\"low\",\"refusalFallbackModel\":\"claude-opus-4-8\"", saved2);
+
+        var turbo = await admin.PutAsync("/api/admin/ai/roles/actor",
+            Json($$"""{"providerId":"{{claudeId}}","model":"claude-opus-5-5","maxOutputTokens":null,"temperature":null,"effort":"turbo"}"""));
+        Assert.Equal(HttpStatusCode.BadRequest, turbo.StatusCode);
+        Assert.Contains("Effort must be one of: low, medium, high, xhigh", await turbo.Content.ReadAsStringAsync());
+
+        var notClaude = await admin.PutAsync("/api/admin/ai/roles/storyteller",
+            Json($$"""{"providerId":"{{providerId}}","model":"gemini-3.8-flash","maxOutputTokens":null,"temperature":null,"effort":"low"}"""));
+        Assert.Equal(HttpStatusCode.BadRequest, notClaude.StatusCode);
+        Assert.Contains("are Claude settings", await notClaude.Content.ReadAsStringAsync());
     }
 }

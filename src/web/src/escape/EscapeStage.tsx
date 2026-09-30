@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
 import { useParty } from '../lib/hub'
@@ -46,7 +47,7 @@ function Tv({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; 
       </div>
       {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} />}
       {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} />}
-      {over && <Ending stage={stage} code={info.code} />}
+      {over && <Ending stage={stage} code={info.code} isHost={info.isHost} />}
     </main>
   )
 }
@@ -227,7 +228,7 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
   )
 }
 
-function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
+function Ending({ stage, code, isHost }: { stage: EscapeStageView; code: string; isHost: boolean }) {
   const escaped = stage.phase === 'escaped'
   // The doors are taken away once they've swung open; the bars stay, faded, as part of the "trapped" look.
   const [doorsOpen, setDoorsOpen] = useState(false)
@@ -279,6 +280,34 @@ function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
         </p>
       )}
       <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} minutes={stage.timeLimitMinutes} difficulty={stage.difficulty} />
+      <EndingActions stage={stage} isHost={isHost} />
     </div>
+  )
+}
+
+const actionClass = 'inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm transition'
+
+/**
+ * The way out once the game is over. The host can run the same room again (same length and difficulty,
+ * fresh puzzles) or pick another game; anyone else just goes home.
+ */
+function EndingActions({ stage, isHost }: { stage: EscapeStageView; isHost: boolean }) {
+  const again = new URLSearchParams({ game: 'escape', room: stage.roomId, minutes: String(stage.timeLimitMinutes), difficulty: stage.difficulty })
+  return (
+    <nav className="mt-8 flex flex-wrap justify-center gap-3" aria-label="What next">
+      {isHost && (
+        <>
+          <Link to={`/host/new?${again}`} className={`${actionClass} bg-accent font-semibold text-bg hover:brightness-110`}>
+            🔁 Play this room again
+          </Link>
+          <Link to="/host/new?game=escape" className={`${actionClass} border border-line bg-surface hover:border-accent`}>
+            🗝️ Host another game
+          </Link>
+        </>
+      )}
+      <Link to="/" className={`${actionClass} text-muted underline hover:text-ink`}>
+        Home
+      </Link>
+    </nav>
   )
 }

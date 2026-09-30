@@ -120,6 +120,16 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByTestId('your-rank')).toContainText(/You ranked #\d+/)
   await expect(tv.getByRole('region', { name: 'Leaderboard' })).toContainText('Ada, Ben, Cy')
   await tv.screenshot({ path: `${SHOTS}/94-escape-escaped.png` })
+
+  // ---- A way out: guests go home; the host can run the same room again, with the same length and difficulty picked.
+  await expect(phones[0].getByRole('link', { name: 'Back to home' })).toBeVisible()
+  await expect(tv.getByRole('link', { name: /Host another game/ })).toBeVisible()
+  await tv.getByRole('link', { name: /Play this room again/ }).click()
+  await tv.waitForURL(/\/host\/new\?game=escape&room=the-workshop/)
+  await expect(tv.getByRole('tab', { name: /Escape room/ })).toHaveAttribute('aria-selected', 'true')
+  await expect(tv.getByRole('button', { name: /The Workshop/ })).toHaveAttribute('aria-pressed', 'true')
+  await expect(tv.getByRole('radio', { name: /45 minutes/ })).toBeChecked()
+  await expect(tv.getByRole('radio', { name: /Normal/ })).toBeChecked()
 })
 
 test('an escape room written by AI from a theme lands on the host shelf, ready to play', async ({ browser }) => {

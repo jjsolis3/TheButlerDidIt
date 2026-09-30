@@ -41,6 +41,9 @@ Small local models (Ollama) are fine for the Actor. They often struggle to write
 3. **Providers → Add provider.** Pick the type and paste the API key. Keys are encrypted before they are stored and are never shown again.
 4. **Test connection** with a model name to confirm the key works.
 5. **Who does what:** pick a provider and model for Storyteller, Actor and Inspector, then Save. Optionally pick an OpenAI or Gemini provider for Voice (e.g. `tts-1` or `gemini-2.5-flash-preview-tts`) and Illustrator (e.g. `dall-e-3` or `gemini-2.5-flash-image`).
+   With a Claude provider, two more settings appear:
+   - **Effort:** how hard Claude thinks. Lower is faster and cheaper, which suits the Actor's short in-character replies. Leave it on *Model default* for the Storyteller. Claude Haiku 4.5 doesn't take an effort setting, so leave it on *Model default* for Haiku.
+   - **Fallback model if Claude declines:** when a safety filter refuses a request, this model retries it within the same call, for example `claude-opus-4-8`.
 6. **Prices:** add prices for any non-Claude models (US$ per million tokens, from the provider's pricing page) so costs are tracked correctly.
    - **Voices** are charged per character, which the usage log records as input tokens. For `tts-1` enter the price per million characters in *In $/1M* (check OpenAI's pricing page).
    - **Pictures** are charged per image: enter it in *Per call $* (for example the price of one `dall-e-3` 1024×1792 image).
@@ -65,7 +68,7 @@ AI_VOICE_MODEL=tts-1
 AI_IMAGE_MODEL=dall-e-3
 ```
 
-Environment settings are applied at every start-up and overwrite the same-named provider and role on the admin page. For several providers, configure them on the admin page, or use the full form `Ai__Providers__1__Name=…`, `Ai__Providers__1__Kind=…` and so on.
+Environment settings are applied at every start-up and overwrite the same-named provider and role on the admin page. The Claude-only role settings have environment forms too: `Ai__Roles__Actor__Effort=low` and `Ai__Roles__Storyteller__RefusalFallbackModel=claude-opus-4-8`. For several providers, configure them on the admin page, or use the full form `Ai__Providers__1__Name=…`, `Ai__Providers__1__Kind=…` and so on.
 
 ## 3. Costs and budgets
 
@@ -86,6 +89,8 @@ Environment settings are applied at every start-up and overwrite the same-named 
 - **Costume selfies** never go to an AI provider. They are shrunk, stripped of metadata (including GPS location) and stored on your server.
 - **What's sent:** player names and questions go to the AI provider you configured. If that matters to your guests, choose a provider whose data policy you're comfortable with, or run Ollama locally.
 
+To check each provider against its real API before a party, see [Verifying the real AI providers](verifying-providers.md).
+
 ## 5. Troubleshooting
 
 | Symptom | Fix |
@@ -97,4 +102,5 @@ Environment settings are applied at every start-up and overwrite the same-named 
 | Generation fails repeatedly | Try a stronger Storyteller model; small models often produce invalid mysteries. |
 | "The Voice role needs an OpenAI or Gemini provider" (or Illustrator) | Claude and Ollama can't make voices or pictures. Add an OpenAI or Gemini provider for those roles. |
 | "Gemini returned no image" / "no voice clip" | The model name isn't an image or speech model: use a `…-image` model for the Illustrator and a `…-tts` model for the Voice. |
+| "The AI (Claude) declined this request" | A safety filter refused it. Try rewording, or set a *fallback model* for that role on the admin page. |
 | Lobby says some items "couldn't be made" | Usually a picture refused by the provider's safety filter. Press *Fill in anything missing* to retry; the rest of the mystery is unaffected. |

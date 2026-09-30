@@ -111,6 +111,7 @@ docs/                   architecture, deployment and scenario-writing guides
 - [Writing a mystery](docs/writing-scenarios.md)
 - [Writing an escape room](docs/writing-escape-rooms.md)
 - [Setting up the AI game master](docs/ai-setup.md)
+- [Verifying the real AI providers](docs/verifying-providers.md)
 
 ## Roadmap
 

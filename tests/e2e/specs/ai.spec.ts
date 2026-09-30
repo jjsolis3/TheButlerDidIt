@@ -40,6 +40,19 @@ test('AI game master: generate a mystery, question an NPC, get a hint and hear t
   await expect(host.getByText('from environment variables')).toBeVisible()
   await host.screenshot({ path: `${SHOTS}/20-admin-ai.png`, fullPage: true })
 
+  // Claude's own settings (#63) appear once a role is pointed at a Claude provider. Nothing is saved here:
+  // the roles stay on the fake AI for the rest of the run.
+  await host.getByRole('button', { name: 'Add provider' }).click()
+  await host.getByLabel('Name').fill('Claude (e2e)')
+  await host.getByLabel('Type').selectOption('anthropic')
+  await host.getByLabel('API key').fill('sk-ant-e2e')
+  await host.locator('form').getByRole('button', { name: 'Add provider' }).click()
+  await expect(host.getByLabel('Effort for Actor')).toHaveCount(0)
+  await host.getByLabel('Provider for Actor').selectOption({ label: 'Claude (e2e)' })
+  await expect(host.getByLabel('Effort for Actor')).toBeVisible()
+  await expect(host.getByLabel('Refusal fallback model for Actor')).toBeVisible()
+  await host.getByLabel('Effort for Actor').selectOption('low')
+
   // ---- Generate a brand-new family-friendly mystery for a "Coming soon" theme.
   await host.goto('/host/new')
   await host.getByRole('button', { name: /Write a brand-new mystery with AI/ }).click()

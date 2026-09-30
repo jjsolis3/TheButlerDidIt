@@ -45,7 +45,7 @@ public sealed class AiGateway(
             ?? throw new AiUnavailableException($"No AI is set up for the {role} role yet. An admin can configure it under Admin → AI.");
         await budget.EnsureWithinBudgetAsync(context.HostUserId, ct);
 
-        var client = factory.Create(config.Provider, config.Model);
+        var client = factory.Create(config.Provider, config.Model, config.RefusalFallbackModel);
         var options = BuildOptions(config, maxOutputTokens, jsonOutput);
         List<ChatMessage> messages = [new(ChatRole.System, systemPrompt), .. conversation];
 
@@ -55,6 +55,13 @@ public sealed class AiGateway(
             var response = onText is null
                 ? await client.GetStreamingResponseAsync(messages, options, ct).ToChatResponseAsync(ct)
                 : await StreamAsync(client, messages, options, onText, ct);
+            // A safety refusal (stop_reason "refusal") comes back as a normal reply that stopped early.
+            if (response.FinishReason == ChatFinishReason.ContentFilter)
+            {
+                await RecordAsync(config, context, response.Usage, stopwatch, success: false, error: "The model declined the request (refusal).", ct);
+                throw new AiCallFailedException(
+                    $"The AI ({config.Provider.Name}) declined this request. Try rewording it, or an admin can set a fallback model for the {role} role under Admin → AI.");
+            }
             await RecordAsync(config, context, response.Usage, stopwatch, success: true, error: null, ct);
 
             var text = response.Text.Trim();
@@ -105,7 +112,7 @@ public sealed class AiGateway(
         return updates.ToChatResponse();
     }
 
-    private static ChatOptions BuildOptions(AiRoleSettings config, int maxOutputTokens, bool jsonOutput)
+    public static ChatOptions BuildOptions(AiRoleSettings config, int maxOutputTokens, bool jsonOutput)
     {
         var options = new ChatOptions
         {
@@ -116,6 +123,10 @@ public sealed class AiGateway(
         // Current Claude models reject sampling settings like temperature, so only
         // send one when the admin set it and the provider accepts it.
         if (config.Temperature is { } t && config.Provider.Kind != AiProviderKind.Anthropic) options.Temperature = t;
+
+        // Claude's effort (#63): the Anthropic client sends it as output_config.effort, with adaptive thinking.
+        if (config.Provider.Kind == AiProviderKind.Anthropic && AiEffort.Parse(config.Effort) is { } effort)
+            options.Reasoning = new ReasoningOptions { Effort = effort };
 
         // OpenAI-style APIs (OpenAI, Gemini, Ollama) have a "JSON mode" that forces valid
         // JSON. For Claude the prompt asks for JSON and JsonExtraction copes with the rest.
