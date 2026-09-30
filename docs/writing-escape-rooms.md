@@ -1,6 +1,6 @@
 # Writing an escape room
 
-An escape room is one JSON file in `content/escape/`. The app checks every room when it starts, and in the tests: a broken room, or one that can't be escaped, stops the app with a list of what's wrong. See `the-workshop.json` (Adults) and `the-funhouse.json` (Family) for complete examples.
+An escape room is one JSON file in `content/escape/`. The app checks every room when it starts, and in the tests: a broken room, or one that can't be escaped, stops the app with a list of what's wrong. See `the-workshop.json` for a complete example (walked through below, in *Worked example*).
 
 ## The shape
 
@@ -74,6 +74,7 @@ A real escape room is searched, not just solved. A stage can have a **scene**: a
 | `clue` | A line written into the group's shared **notebook**. |
 | `requires` | A tool needed to find anything (the UV lamp). Without it, the player sees `lockedText` and can come back later. Tools are never used up. |
 | `hidesPieces` | A hiding place for clue pieces (see *Playing solo* below). |
+| `minDifficulty` | Only in the scene at this difficulty or harder: `"hard"` adds decoys and red herrings for experts. |
 
 A spot with only a `look` is a **decoy**. It's harmless on Easy and Normal, but on Hard searching it costs 10 seconds. So put anything useful in `gives` or `clue`, not only in the look.
 
@@ -187,12 +188,37 @@ The AI only writes words. It never changes a puzzle, an answer or the clock.
 
 With a Storyteller model set up, a host can type a theme on the escape shelf ("a haunted lighthouse") and get a new room in this same format, on their own shelf only. The AI writes the story, the riddles and the villain, and it picks which generators fill the codes and passwords. So every code comes from the same proven templates as yours, and nothing it writes is saved unless the validator passes. A tester AI also has to crack each riddle from its prompt and pieces alone. A good hand-written room is still the best model: the AI is shown this format and follows the same rules. For now the AI writes only codes, riddles and use puzzles; scenes, ciphers, patterns, logic puzzles and light panels are hand-written until it's taught them (#86).
 
+## Editions
+
+`edition` (default 1) says which version of the room this is. When you rebuild a room so that old times no longer compare (new puzzles, a different number of them), bump it: each edition gets its own leaderboards. Old results stay in the database; they just drop off the boards and the shelf's best time. Small fixes (a typo, a better hint) don't need a new edition.
+
+## Worked example: the Workshop, rebuilt
+
+The Workshop (edition 2) keeps its story, villain and riddles, and wraps them in things to search, look at and put together. Here's its first stage, step by step:
+
+1. **A kept riddle** (the tape recorder, with its variants) gives a **rusty key**. It's rusted solid.
+2. **A search puzzle**, *The Floor*, needs the drain, the loose tiles and the crate searched. It gives an **oil can**.
+3. **A recipe** puts the rusty key and the oil can together: the **oiled key**.
+4. **The shackles** are the stage's one `use` step, gated on the oiled key, so they're never a one-tap freebie.
+5. **A logic puzzle**, *The Oil Drums* (`deduction`), deals its clues to the phones, or hides them in the stage's `hidesPieces` spots when fewer players join. It gives a **UV torch**, a tool that's never used up.
+6. **A shift cipher**, *The Tape Label* (`minMinutes: 45`), has its key on the cassette recorder: `"look": "…'Wind me back {key:rewind}.'"`.
+
+The torch comes back later. In stage 2, the photo halves from the workbench and the drawer make a photograph, and its closer look (`inspectRequires: "uv-torch"`) holds the key to the symbols cipher. On Hard, a notebook spot that only appears on Hard (`minDifficulty: "hard"`, `requires: "uv-torch"`) holds the key to an extra Morse puzzle. A Hard-only coat hook holds a broken key that fits nothing: a red herring.
+
+The scene is laid out on the 1000 × 600 canvas with spots that don't overlap:
+- two decoys, the pipes and the bare bulb, whose looks add atmosphere;
+- five hiding places, enough for a solo player's extra clue pieces at every difficulty;
+- the spots that matter.
+
+Across lengths and difficulties it plays 9 puzzles at 30 minutes, 13 at 45 and 15 at 60, plus Hard's extra. The validator plays every one of those through, 200 puzzle sets each, and the content tests check the room clears the bar for shipped rooms (`ContentBarTests`), including that no cipher word is already written somewhere in the room.
+
 ## Leaderboards
 
 When a game ends, its result is saved in the same step that ends the game. The **score** is the time taken plus the time each hint cost, and lower is better. The ending screen shows where the group ranked, all time or on today's challenge. Times are public. Team names only ever appear on the host's own escapes.
 
 ## Tips
 
+- **Keep cipher words out of the room's own text.** If "shelter" is in the synopsis, a cipher that spells SHELTER is answered before it's decoded (and the AI's prompts would carry it too). The content tests catch this.
 - **Make them search.** A scene with a few decoys, a tool that reveals something, and a key written somewhere unexpected feels like a real room. Codes the group has to work out (a cipher, a pattern, a logic puzzle) beat codes read off a phone.
 - **Make the phones matter.** Put at least one puzzle with 3–4 `pieces` in each room. Write every piece so it only makes sense together with the others, for example "the SECOND digit is…".
 - **Chain the rooms with items.** A key found in stage 1 opens something in stage 2 or 3. The validator proves no item is needed before it can be found.
