@@ -44,6 +44,14 @@ public sealed class AiRoleEntity
 
     public int? MaxOutputTokens { get; set; }
     public float? Temperature { get; set; }
+
+    /// <summary>For Claude: low, medium, high or xhigh (<see cref="ButlerDidIt.Ai.AiEffort"/>). Null: the model's default.</summary>
+    [MaxLength(10)]
+    public string? Effort { get; set; }
+
+    /// <summary>For Claude: the model that retries a request this one declined.</summary>
+    [MaxLength(120)]
+    public string? RefusalFallbackModel { get; set; }
 }
 
 /// <summary>Admin-maintained price list, used to estimate what each call cost.</summary>

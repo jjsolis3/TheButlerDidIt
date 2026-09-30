@@ -40,7 +40,32 @@ public enum AiRole
 
 public sealed record AiProviderSettings(Guid Id, string Name, AiProviderKind Kind, string? BaseUrl, string? ApiKey);
 
-public sealed record AiRoleSettings(AiRole Role, AiProviderSettings Provider, string Model, int? MaxOutputTokens, float? Temperature);
+/// <param name="Effort">For Claude: how hard the model thinks (<see cref="AiEffort"/>). Null: the model's default. Other providers ignore it.</param>
+/// <param name="RefusalFallbackModel">For Claude: a model that retries a request the first one declined (a safety refusal). Null: no retry.</param>
+public sealed record AiRoleSettings(AiRole Role, AiProviderSettings Provider, string Model, int? MaxOutputTokens, float? Temperature,
+    string? Effort = null, string? RefusalFallbackModel = null);
+
+/// <summary>
+/// Claude's effort levels, as the admin page and configuration write them. Lower effort thinks less:
+/// faster and cheaper answers, which suits the Actor's short in-character replies (#63).
+/// </summary>
+public static class AiEffort
+{
+    public static readonly IReadOnlyList<string> Levels = ["low", "medium", "high", "xhigh"];
+
+    /// <summary>The level as Microsoft.Extensions.AI names it, which the Anthropic client sends as <c>output_config.effort</c>. Null when unset or unknown.</summary>
+    public static Microsoft.Extensions.AI.ReasoningEffort? Parse(string? level) => level?.Trim().ToLowerInvariant() switch
+    {
+        "low" => Microsoft.Extensions.AI.ReasoningEffort.Low,
+        "medium" => Microsoft.Extensions.AI.ReasoningEffort.Medium,
+        "high" => Microsoft.Extensions.AI.ReasoningEffort.High,
+        "xhigh" => Microsoft.Extensions.AI.ReasoningEffort.ExtraHigh,
+        _ => null,
+    };
+
+    /// <summary>The level to store: one of <see cref="Levels"/>, or null for blank or unknown.</summary>
+    public static string? Normalize(string? level) => Parse(level) is null ? null : level!.Trim().ToLowerInvariant();
+}
 
 /// <summary>Who an AI call is for, so usage can be attributed and budgets enforced.</summary>
 public sealed record AiCallContext(string HostUserId, Guid? PartyId = null, Guid? JobId = null, string Purpose = "");

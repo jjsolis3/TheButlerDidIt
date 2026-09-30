@@ -12,8 +12,9 @@ namespace ButlerDidIt.Api.Ai;
 
 public sealed record ProviderView(Guid Id, string Name, AiProviderKind Kind, string? BaseUrl, bool HasApiKey, bool FromConfig);
 public sealed record ProviderRequest(string Name, AiProviderKind Kind, string? BaseUrl, string? ApiKey);
-public sealed record RoleView(AiRole Role, Guid? ProviderId, string? ProviderName, string? Model, int? MaxOutputTokens, float? Temperature);
-public sealed record RoleRequest(Guid ProviderId, string Model, int? MaxOutputTokens, float? Temperature);
+public sealed record RoleView(AiRole Role, Guid? ProviderId, string? ProviderName, string? Model, int? MaxOutputTokens, float? Temperature,
+    string? Effort, string? RefusalFallbackModel);
+public sealed record RoleRequest(Guid ProviderId, string Model, int? MaxOutputTokens, float? Temperature, string? Effort = null, string? RefusalFallbackModel = null);
 public sealed record PriceView(string Model, decimal InputPerMillion, decimal OutputPerMillion, decimal PerRequest = 0m);
 public sealed record TestRequest(string Model);
 public sealed record TestResult(bool Ok, string Message, long Milliseconds);
@@ -114,7 +115,7 @@ public static class AiAdminEndpoints
             return Enum.GetValues<AiRole>().Select(role =>
             {
                 var r = rows.FirstOrDefault(x => x.Role == role);
-                return new RoleView(role, r?.ProviderId, r?.Provider?.Name, r?.Model, r?.MaxOutputTokens, r?.Temperature);
+                return new RoleView(role, r?.ProviderId, r?.Provider?.Name, r?.Model, r?.MaxOutputTokens, r?.Temperature, r?.Effort, r?.RefusalFallbackModel);
             });
         });
 
@@ -130,6 +131,12 @@ public static class AiAdminEndpoints
             // Voices and pictures need a media API; only some providers have one (see MediaClientFactory).
             if (role is AiRole.Voice or AiRole.Illustrator && !ButlerDidIt.Ai.Media.MediaClientFactory.SupportsMedia(provider.Kind))
                 return Results.Problem($"The {role} role needs an OpenAI or Gemini provider ({provider.Kind} doesn't make {(role == AiRole.Voice ? "voices" : "pictures")}).", statusCode: 400);
+            // Effort and a refusal fallback are Claude options (#63); other providers would silently ignore them.
+            if (!string.IsNullOrWhiteSpace(req.Effort) && AiEffort.Normalize(req.Effort) is null)
+                return Results.Problem($"Effort must be one of: {string.Join(", ", AiEffort.Levels)}.", statusCode: 400);
+            var claudeOnly = !string.IsNullOrWhiteSpace(req.Effort) || !string.IsNullOrWhiteSpace(req.RefusalFallbackModel);
+            if (claudeOnly && provider.Kind != AiProviderKind.Anthropic)
+                return Results.Problem($"Effort and a refusal fallback are Claude settings; {provider.Name} is {provider.Kind}.", statusCode: 400);
             var row = await db.AiRoles.FindAsync([role], ct);
             if (row is null)
             {
@@ -140,6 +147,8 @@ public static class AiAdminEndpoints
             row.Model = req.Model.Trim();
             row.MaxOutputTokens = req.MaxOutputTokens is > 0 ? req.MaxOutputTokens : null;
             row.Temperature = req.Temperature;
+            row.Effort = AiEffort.Normalize(req.Effort);
+            row.RefusalFallbackModel = string.IsNullOrWhiteSpace(req.RefusalFallbackModel) ? null : req.RefusalFallbackModel.Trim();
             await db.SaveChangesAsync(ct);
             return Results.NoContent();
         });

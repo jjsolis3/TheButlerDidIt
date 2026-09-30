@@ -16,6 +16,8 @@ namespace ButlerDidIt.Api.Ai;
 ///   Ai__Providers__0__ApiKey=sk-ant-…
 ///   Ai__Roles__Storyteller__Provider=Claude
 ///   Ai__Roles__Storyteller__Model=claude-opus-5
+///   Ai__Roles__Actor__Effort=low                          (Claude: low, medium, high or xhigh)
+///   Ai__Roles__Storyteller__RefusalFallbackModel=claude-opus-4-8
 /// </summary>
 public sealed class AiOptions
 {
@@ -46,6 +48,12 @@ public sealed class AiOptions
         public string Provider { get; set; } = "";
         public string Model { get; set; } = "";
         public int? MaxOutputTokens { get; set; }
+
+        /// <summary>For Claude: low, medium, high or xhigh.</summary>
+        public string? Effort { get; set; }
+
+        /// <summary>For Claude: a model that retries a declined request, e.g. claude-opus-4-8.</summary>
+        public string? RefusalFallbackModel { get; set; }
     }
 }
 
@@ -79,7 +87,7 @@ public sealed class DbAiSettingsSource(AppDbContext db, AiKeyProtector keys) : I
         var row = await db.AiRoles.AsNoTracking().Include(r => r.Provider).FirstOrDefaultAsync(r => r.Role == role, ct);
         if (row?.Provider is not { } p) return null;
         var provider = new AiProviderSettings(p.Id, p.Name, p.Kind, p.BaseUrl, keys.Unprotect(p.EncryptedApiKey));
-        return new AiRoleSettings(role, provider, row.Model, row.MaxOutputTokens, row.Temperature);
+        return new AiRoleSettings(role, provider, row.Model, row.MaxOutputTokens, row.Temperature, row.Effort, row.RefusalFallbackModel);
     }
 }
 
@@ -183,6 +191,8 @@ public static class AiConfigSeeder
             row.ProviderId = provider.Id;
             row.Model = r.Model;
             row.MaxOutputTokens = r.MaxOutputTokens;
+            row.Effort = AiEffort.Normalize(r.Effort);
+            row.RefusalFallbackModel = string.IsNullOrWhiteSpace(r.RefusalFallbackModel) ? null : r.RefusalFallbackModel.Trim();
         }
         await db.SaveChangesAsync(ct);
     }

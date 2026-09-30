@@ -444,6 +444,10 @@ export interface RoleView {
   model: string | null
   maxOutputTokens: number | null
   temperature: number | null
+  /** Claude only: low, medium, high or xhigh. Null: the model's default. */
+  effort: string | null
+  /** Claude only: the model that retries a request this one declined. */
+  refusalFallbackModel: string | null
 }
 
 export interface PriceView {
