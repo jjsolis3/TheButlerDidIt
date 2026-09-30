@@ -30,4 +30,9 @@
     <None Include="..\ButlerDidIt.Escape.Tests\Fixtures\**" Link="Fixtures\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The escape-room bot every test project plays rooms with. -->
+    <Compile Include="..\Shared\EscapeBot.cs" Link="Shared\EscapeBot.cs" />
+  </ItemGroup>
+
 </Project>

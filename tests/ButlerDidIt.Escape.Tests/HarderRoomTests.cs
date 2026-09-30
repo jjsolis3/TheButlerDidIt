@@ -1,5 +1,6 @@
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using ButlerDidIt.Escape.Testing;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using ButlerDidIt.Game.Scenarios;
@@ -32,23 +33,9 @@ public static class Lab
 
     public static EscapeState Do(this EscapeState s, EscapeCommand c) => EscapeEngine.Apply(s, Room, c);
 
-    /// <summary>
-    /// Plays the game the way a thorough group would: search every spot it can, look closely at everything,
-    /// put together what fits, then solve the next puzzle it can. <paramref name="check"/> runs before every move.
-    /// </summary>
-    public static EscapeState PlayToEnd(EscapeState s, EscapeRoom template, Guid[] seats, Action<EscapeState>? check = null)
-    {
-        var t = T0;
-        for (var move = 0; s.Phase == EscapePhase.Playing; move++)
-        {
-            Assert.True(move < 500, "the game should end");
-            check?.Invoke(s);
-            t = t.AddSeconds(5);
-            s = EscapeEngine.Apply(s, template, NextMove(s, EscapeEngine.RoomFor(s, template), seats[move % seats.Length], t));
-        }
-        check?.Invoke(s);
-        return s;
-    }
+    /// <summary>Plays the game to the end with the shared <see cref="EscapeBot"/>. <paramref name="check"/> runs before every move.</summary>
+    public static EscapeState PlayToEnd(EscapeState s, EscapeRoom template, Guid[] seats, Action<EscapeState>? check = null) =>
+        EscapeBot.PlayToEnd(s, template, seats, T0, check);
 
     /// <summary>A solo game played (as <see cref="PlayToEnd"/> would) until stage <paramref name="stage"/> (0-based) opens.</summary>
     public static EscapeState PlayToStage(int stage, long seed = 7, EscapeDifficulty? difficulty = null)
@@ -58,49 +45,12 @@ public static class Lab
         while (s.StageIndex < stage)
         {
             t = t.AddSeconds(5);
-            s = s.Do(NextMove(s, EscapeEngine.RoomFor(s, Room), Ada, t));
+            s = s.Do(EscapeBot.NextMove(s, EscapeEngine.RoomFor(s, Room), Ada, t));
         }
         return s;
     }
 
-    private static EscapeCommand NextMove(EscapeState s, EscapeRoom room, Guid seat, DateTimeOffset t)
-    {
-        var stage = room.Stages[s.StageIndex];
-        if (stage.Scene?.Objects.FirstOrDefault(o => !s.Examined.Contains(o.Id) && (o.Requires is null || s.Inventory.Contains(o.Requires))) is { } spot)
-            return new ExamineSpot(t, seat, spot.Id);
-        if (s.Inventory.Select(room.FindItem).FirstOrDefault(i => i!.Inspect is not null && !s.Inspected.Contains(i.Id)
-                && (i.InspectRequires is null || s.Inventory.Contains(i.InspectRequires))) is { } item)
-            return new InspectItem(t, seat, item.Id);
-        if (room.Recipes.FirstOrDefault(r => r.Items.All(s.Inventory.Contains)) is { } recipe)
-            return new CombineItems(t, seat, recipe.Items[1], recipe.Items[0]); // either order works
-        var puzzle = stage.Puzzles.Select(id => room.FindPuzzle(id)!)
-            .First(p => !s.IsSolved(p.Id) && p.Kind != PuzzleKind.Search && p.Requires.All(s.Inventory.Contains));
-        return puzzle.Kind switch
-        {
-            PuzzleKind.Use => new UseItems(t, seat, puzzle.Id),
-            PuzzleKind.Switches => new PressSwitch(t, seat, puzzle.Id, SolveLights(puzzle.Grid!.Size, EscapeEngine.LitNow(s, puzzle))[0]),
-            _ => new SubmitAnswer(t, seat, puzzle.Id, puzzle.Answers[0]),
-        };
-    }
-
-    /// <summary>The fewest presses that turn every light on, by trying every set of presses.</summary>
-    public static List<int> SolveLights(int size, IEnumerable<int> lit)
-    {
-        var cells = size * size;
-        var start = lit.Aggregate(0, (m, c) => m | 1 << c);
-        var masks = Enumerable.Range(0, cells).Select(c => PuzzleGenerators.Press(size, [], c).Aggregate(0, (m, x) => m | 1 << x)).ToArray();
-        var all = (1 << cells) - 1;
-        List<int>? best = null;
-        for (var set = 0; set <= all; set++)
-        {
-            var count = System.Numerics.BitOperations.PopCount((uint)set);
-            if (best is not null && count >= best.Count) continue;
-            var state = start;
-            for (var c = 0; c < cells; c++) if ((set >> c & 1) == 1) state ^= masks[c];
-            if (state == all) best = Enumerable.Range(0, cells).Where(c => (set >> c & 1) == 1).ToList();
-        }
-        return best ?? throw new InvalidOperationException("unsolvable");
-    }
+    public static List<int> SolveLights(int size, IEnumerable<int> lit) => EscapeBot.SolveLights(size, lit);
 }
 
 public class LaboratoryTests
@@ -275,7 +225,7 @@ public class LaboratoryTests
     [Fact]
     public void Rooms_without_hiding_spots_deal_every_piece_to_a_phone_as_before()
     {
-        var workshop = Rooms.Get("the-workshop");
+        var workshop = Rooms.Get("the-workshop") with { Stages = Rooms.Get("the-workshop").Stages.Select(st => st with { Scene = null }).ToList() };
         var s = EscapeEngine.NewGame(3);
         s = EscapeEngine.Apply(s, workshop, new AddEscapePlayer(T0, Ada, "Ada", true, false));
         s = EscapeEngine.Apply(s, workshop, new StartEscape(T0));
@@ -385,23 +335,29 @@ public class LaboratoryTests
 /// <summary>What the screens must never see in the newer puzzles, at every length and difficulty.</summary>
 public class HarderPrivacyTests
 {
-    public static TheoryData<EscapeDifficulty, int> Games()
+    private static EscapeRoom RoomById(string id) => id == Lab.Room.Id ? Lab.Room : Rooms.Get(id);
+
+    /// <summary>The Laboratory and every shipped room, at every length and difficulty.</summary>
+    public static TheoryData<string, EscapeDifficulty, int> Games()
     {
-        var data = new TheoryData<EscapeDifficulty, int>();
-        foreach (var d in Enum.GetValues<EscapeDifficulty>())
-            foreach (var minutes in Lab.Room.PlayableLengths) data.Add(d, minutes);
+        var data = new TheoryData<string, EscapeDifficulty, int>();
+        foreach (var room in Rooms.Library.Prepend(Lab.Room))
+            foreach (var d in Enum.GetValues<EscapeDifficulty>())
+                foreach (var minutes in room.PlayableLengths) data.Add(room.Id, d, minutes);
         return data;
     }
 
     [Theory]
     [MemberData(nameof(Games))]
-    public void Unsearched_spots_unread_items_hidden_pieces_and_answers_stay_on_the_server(EscapeDifficulty difficulty, int minutes)
+    public void Unsearched_spots_unread_items_hidden_pieces_and_answers_stay_on_the_server(string roomId, EscapeDifficulty difficulty, int minutes)
     {
-        var template = Lab.Room;
+        var template = RoomById(roomId);
         var seats = new[] { Lab.Ada, Lab.Ben };
         foreach (var seed in new long[] { 3, 987654321 })
         {
-            var start = Lab.Started(difficulty, seed, minutes, seats);
+            var s0 = EscapeEngine.NewGame(seed, minutes: minutes, difficulty: difficulty);
+            for (var i = 0; i < seats.Length; i++) s0 = EscapeEngine.Apply(s0, template, new AddEscapePlayer(Lab.T0, seats[i], $"P{i}", i == 0, false));
+            var start = EscapeEngine.Apply(s0, template, new StartEscape(Lab.T0));
             var room = RoomVariants.Build(template, seed, difficulty); // every puzzle, including ones this game leaves out
             Lab.PlayToEnd(start, template, seats, s =>
             {
@@ -430,7 +386,10 @@ public class HarderPrivacyTests
                 {
                     foreach (var p in room.Puzzles)
                         foreach (var answer in p.Answers.Where(a => a.Length >= 3))
-                            Assert.False(stageJson.Contains($"\"{answer}\"", StringComparison.OrdinalIgnoreCase), $"answer of {p.Id} leaked");
+                        {
+                            var at = stageJson.IndexOf($"\"{answer}\"", StringComparison.OrdinalIgnoreCase);
+                            Assert.True(at < 0, $"answer of {p.Id} leaked: …{(at < 0 ? "" : stageJson[Math.Max(0, at - 120)..Math.Min(stageJson.Length, at + 40)])}…");
+                        }
                     if (seed > 1000) Assert.DoesNotContain(seed.ToString(), stageJson); // a short one could be any number on screen
                 }
             });
@@ -469,6 +428,7 @@ public class PuzzleProofTests
                 var t = m.Shown.Append(m.Next).ToList();
                 Assert.True(t.All(x => x > 0));
                 Assert.True(m.Next < 100_000, "a code short enough to type");
+                Assert.True(m.Next >= 100, "a code too long to guess by trying them all");
                 switch (m.Rule)
                 {
                     case PuzzleGenerators.SequenceRule.Arithmetic:

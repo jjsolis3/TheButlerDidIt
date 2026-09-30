@@ -8,8 +8,15 @@
   "minPlayers": 2,
   "maxPlayers": 6,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45, 60],
-  "seasons": ["halloween"],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 120,
   "soundscape": "haunted",
   "intro": "Good evening, my patients. Lights out was hours ago, and yet here you are, awake. How restless. The doors of my ward are locked, as they have always been. If you want to leave, you will have to earn it, together. I'll be listening on the PA. I am always listening. Your treatment begins now.",
@@ -18,27 +25,363 @@
   "gameMaster": {
     "name": "The Night Warden",
     "persona": "Speaks over the asylum's crackling PA system in a soft, sing-song voice, like a nurse doing rounds at three in the morning. Calls the group 'my patients'. Never raises his voice: the calmer he sounds, the worse it is. Treats every solved lock as a worrying symptom.",
-    "voice": { "accent": "en-GB", "pitch": 0.8, "rate": 0.9, "style": "soft, sing-song, clinical" }
+    "voice": {
+      "accent": "en-GB",
+      "pitch": 0.8,
+      "rate": 0.9,
+      "style": "soft, sing-song, clinical"
+    }
   },
   "stages": [
     {
       "id": "cells",
       "title": "Cell Block C",
-      "description": "Three iron beds, bolted to the floor. The paint on the walls hangs in long strips, and a bulb flickers behind a wire cage. The cell door has a small observation slot, locked from the outside, and a patient chart hangs from the end of your bed.",
-      "puzzles": ["observation-slot", "chart", "cell-door"]
+      "description": "Three iron beds, bolted to the floor. The paint on the walls hangs in long strips, and a bulb flickers behind a wire cage. Barred window, a drain in the floor, a bucket in the corner. The cell door has a small observation slot, locked from the outside, and a patient chart hangs from the end of your bed.",
+      "puzzles": [
+        "observation-slot",
+        "cell-search",
+        "cell-door",
+        "chart",
+        "scratches"
+      ],
+      "scene": {
+        "backdrop": "haunted",
+        "objects": [
+          {
+            "id": "window-bars",
+            "prop": "window",
+            "x": 40,
+            "y": 40,
+            "w": 160,
+            "h": 140,
+            "label": "barred window",
+            "look": "Moonlight through the bars. Scratched into the sill, over and over: {key:scratches}",
+            "hidesPieces": true
+          },
+          {
+            "id": "bulb",
+            "prop": "lamp",
+            "x": 260,
+            "y": 20,
+            "w": 110,
+            "h": 110,
+            "label": "flickering bulb",
+            "look": "It buzzes behind its wire cage. On, off. On, off."
+          },
+          {
+            "id": "peeling-paint",
+            "prop": "poster",
+            "x": 420,
+            "y": 40,
+            "w": 180,
+            "h": 200,
+            "label": "peeling paint",
+            "look": "Long strips of paint. Behind one, someone has scratched tally marks into the plaster.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mattress",
+            "prop": "bed",
+            "x": 40,
+            "y": 300,
+            "w": 300,
+            "h": 160,
+            "label": "mattress",
+            "look": "Thin and stained. Something hard is sewn into the lining.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bedframe",
+            "prop": "table",
+            "x": 40,
+            "y": 470,
+            "w": 300,
+            "h": 110,
+            "label": "bedframe",
+            "look": "Iron, bolted to the floor. A strip of tape is stuck underneath.",
+            "hidesPieces": true
+          },
+          {
+            "id": "drain",
+            "prop": "vent",
+            "x": 420,
+            "y": 480,
+            "w": 150,
+            "h": 100,
+            "label": "floor drain",
+            "look": "You fish down the drain with the magnet on its string. Click. The key comes up, dripping.",
+            "requires": "magnet-line",
+            "gives": "cell-key",
+            "lockedText": "Something glints far down the drain, below the grate. Your fingers can't reach it."
+          },
+          {
+            "id": "bucket",
+            "prop": "barrel",
+            "x": 620,
+            "y": 420,
+            "w": 140,
+            "h": 150,
+            "label": "bucket",
+            "look": "An empty tin bucket. You'd rather not know what it was for."
+          },
+          {
+            "id": "cell-door",
+            "prop": "door",
+            "x": 800,
+            "y": 120,
+            "w": 170,
+            "h": 440,
+            "label": "cell door",
+            "look": "Solid steel. There's a keyhole on the inside, which makes no sense for a cell."
+          },
+          {
+            "id": "chalk-marks",
+            "prop": "sign",
+            "x": 620,
+            "y": 230,
+            "w": 150,
+            "h": 150,
+            "label": "chalk marks",
+            "look": "Chalk tallies on the wall, and under them an old reflex hammer.",
+            "gives": "reflex-hammer",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     },
     {
       "id": "treatment",
       "title": "The Treatment Wing",
-      "description": "A long corridor of white tiles. Wheelchairs stand in a row, as if waiting for someone. At the far end, a glass medicine cabinet glows under a single lamp, beside a staff locker and a security door with a card reader.",
-      "puzzles": ["medicine-cabinet", "staff-locker", "security-door"]
+      "description": "A long corridor of white tiles. Wheelchairs stand in a row, as if waiting for someone. A nurses' desk, a gurney, a linen cart and a laundry chute line the walls. At the far end, a glass medicine cabinet glows under a single lamp, beside a staff locker and a security door with a card reader.",
+      "puzzles": [
+        "medicine-cabinet",
+        "wheelchairs",
+        "mirror-tiles",
+        "light-board",
+        "staff-locker",
+        "security-door"
+      ],
+      "scene": {
+        "backdrop": "haunted",
+        "objects": [
+          {
+            "id": "notice-board",
+            "prop": "poster",
+            "x": 30,
+            "y": 40,
+            "w": 180,
+            "h": 180,
+            "label": "notice board",
+            "look": "Visiting hours, crossed out. A timetable for treatments nobody remembers.",
+            "hidesPieces": true
+          },
+          {
+            "id": "sink",
+            "prop": "table",
+            "x": 240,
+            "y": 40,
+            "w": 160,
+            "h": 120,
+            "label": "cracked sink",
+            "look": "The tap drips in a slow, steady rhythm.",
+            "hidesPieces": true
+          },
+          {
+            "id": "filing-tray",
+            "prop": "drawer",
+            "x": 240,
+            "y": 200,
+            "w": 160,
+            "h": 110,
+            "label": "filing tray",
+            "look": "Empty forms, all signed by the same Warden.",
+            "hidesPieces": true
+          },
+          {
+            "id": "laundry-chute",
+            "prop": "vent",
+            "x": 430,
+            "y": 40,
+            "w": 140,
+            "h": 130,
+            "label": "laundry chute",
+            "look": "A cold draught blows up from far below.",
+            "hidesPieces": true
+          },
+          {
+            "id": "medicine-cabinet-spot",
+            "prop": "cabinet",
+            "x": 600,
+            "y": 40,
+            "w": 170,
+            "h": 300,
+            "label": "medicine cabinet",
+            "look": "Glass shelves of pill bottles, glowing under the lamp."
+          },
+          {
+            "id": "staff-locker-spot",
+            "prop": "cabinet",
+            "x": 800,
+            "y": 40,
+            "w": 170,
+            "h": 300,
+            "label": "staff locker",
+            "look": "Grey metal, dented. A riddle is written inside its little window."
+          },
+          {
+            "id": "wheelchairs-spot",
+            "prop": "machine",
+            "x": 30,
+            "y": 330,
+            "w": 260,
+            "h": 200,
+            "label": "wheelchairs",
+            "look": "A row of wheelchairs, each a different colour. A drawer with a keypad is fixed under the last one.",
+            "hidesPieces": true
+          },
+          {
+            "id": "nurses-desk",
+            "prop": "desk",
+            "x": 320,
+            "y": 380,
+            "w": 220,
+            "h": 160,
+            "label": "nurses' desk",
+            "look": "A cold cup of tea, a ringing phone that never rings.",
+            "hidesPieces": true
+          },
+          {
+            "id": "gurney",
+            "prop": "bed",
+            "x": 570,
+            "y": 420,
+            "w": 220,
+            "h": 150,
+            "label": "gurney",
+            "look": "A sheet over a gurney. Only pillows underneath, thank goodness.",
+            "hidesPieces": true
+          },
+          {
+            "id": "linen-cart",
+            "prop": "box",
+            "x": 820,
+            "y": 400,
+            "w": 160,
+            "h": 170,
+            "label": "linen cart",
+            "look": "Folded sheets, starched stiff.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "records",
       "soundscape": "drone",
       "title": "The Records Room",
-      "description": "Filing cabinets tower to the ceiling, their drawers hanging open. An old reel-to-reel tape player is wired into the exit gate, which has a heavy keyhole and a three-digit keypad.",
-      "puzzles": ["tape-player", "exit-gate"]
+      "description": "Filing cabinets tower to the ceiling, their drawers hanging open. A desk, a card index and a radiator line the room, and an X-ray light box hangs dark on the wall. An old reel-to-reel tape player is wired into the exit gate, which has a heavy keyhole and a three-digit keypad.",
+      "puzzles": [
+        "patient-numbers",
+        "tape-player",
+        "case-file",
+        "warden-word",
+        "exit-gate"
+      ],
+      "scene": {
+        "backdrop": "haunted",
+        "objects": [
+          {
+            "id": "filing-cabinets",
+            "prop": "cabinet",
+            "x": 30,
+            "y": 40,
+            "w": 200,
+            "h": 400,
+            "label": "filing cabinets",
+            "look": "Drawers of patient files. Every photograph has been removed.",
+            "hidesPieces": true
+          },
+          {
+            "id": "reel-shelf",
+            "prop": "shelf",
+            "x": 260,
+            "y": 40,
+            "w": 240,
+            "h": 140,
+            "label": "shelf of tapes",
+            "look": "Reels of tape, each labelled with a date and a patient number.",
+            "hidesPieces": true
+          },
+          {
+            "id": "padded-wall",
+            "prop": "poster",
+            "x": 260,
+            "y": 200,
+            "w": 240,
+            "h": 150,
+            "label": "padded panel",
+            "look": "Under the UV light, words bloom across the padding in the Warden's hand: {key:warden-word}",
+            "requires": "uv-penlight",
+            "lockedText": "A padded panel, torn at the seams. Nothing you can see.",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "records-desk",
+            "prop": "desk",
+            "x": 260,
+            "y": 380,
+            "w": 240,
+            "h": 170,
+            "label": "records desk",
+            "look": "A typewriter with a half-finished report. It stops mid-word.",
+            "hidesPieces": true
+          },
+          {
+            "id": "light-box",
+            "prop": "machine",
+            "x": 540,
+            "y": 40,
+            "w": 180,
+            "h": 160,
+            "label": "X-ray light box",
+            "look": "Under the UV penlight, a table of symbols appears on the film: {key:case-file}",
+            "requires": "uv-penlight",
+            "lockedText": "A dead X-ray light box with blank film clipped to it. Or is it blank?"
+          },
+          {
+            "id": "card-index",
+            "prop": "drawer",
+            "x": 540,
+            "y": 420,
+            "w": 180,
+            "h": 130,
+            "label": "card index",
+            "look": "Index cards in faded ink. One is missing.",
+            "hidesPieces": true
+          },
+          {
+            "id": "exit-gate-spot",
+            "prop": "door",
+            "x": 760,
+            "y": 40,
+            "w": 200,
+            "h": 360,
+            "label": "exit gate",
+            "look": "Iron bars, a heavy keyhole and a three-digit keypad."
+          },
+          {
+            "id": "radiator",
+            "prop": "vent",
+            "x": 760,
+            "y": 440,
+            "w": 200,
+            "h": 120,
+            "label": "radiator",
+            "look": "Stone cold. It hasn't been on in fifty years.",
+            "hidesPieces": true
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -47,18 +390,26 @@
       "title": "The Observation Slot",
       "kind": "text",
       "prompt": "A word lock holds the slot in your cell door shut. The PA crackles: 'I can fill your whole cell, yet I take up no space at all. Tell me what I am, and I'll let you look.'",
-      "answers": ["light", "the light", "lamplight"],
-      "rewards": ["cell-key"],
+      "answers": [
+        "light",
+        "the light",
+        "lamplight"
+      ],
+      "rewards": [
+        "hospital-string"
+      ],
       "hints": [
         "Look up at that flickering bulb.",
         "Flick a switch and the cell is full of it."
       ],
-      "solvedText": "The slot scrapes open. Something small drops through it and rings on the floor: a key on a loop of hospital string.",
+      "solvedText": "The slot scrapes open. A key on a loop of hospital string drops through, bounces once and vanishes down the floor drain. Only the string is left on your side.",
       "variants": [
         {},
         {
           "prompt": "A word lock holds the slot in your cell door shut. The PA crackles: 'Speak my name and I am gone. Tell me what I am, and I'll let you look.'",
-          "answers": ["silence"],
+          "answers": [
+            "silence"
+          ],
           "hints": [
             "The PA has just gone very quiet. What's left?",
             "It's broken the moment anybody talks."
@@ -66,13 +417,50 @@
         },
         {
           "prompt": "A word lock holds the slot in your cell door shut. The PA crackles: 'I follow you everywhere in the light, and I vanish when it's gone. Tell me what I am, and I'll let you look.'",
-          "answers": ["shadow", "your shadow", "shadows"],
+          "answers": [
+            "shadow",
+            "your shadow",
+            "shadows"
+          ],
           "hints": [
             "Look at the wall behind you under the flickering bulb.",
             "It copies every move you make, and it's always right behind you."
           ]
         }
       ]
+    },
+    {
+      "id": "cell-search",
+      "title": "The Cell",
+      "kind": "search",
+      "prompt": "Search your cell properly: the mattress, the peeling paint and the bedframe.",
+      "finds": [
+        "mattress",
+        "peeling-paint",
+        "bedframe"
+      ],
+      "rewards": [
+        "magnet"
+      ],
+      "hints": [
+        "Three things in the cell are worth a closer look.",
+        "Search the mattress, the peeling paint and the bedframe."
+      ],
+      "solvedText": "Sewn into the mattress lining, taped under the bedframe, hidden behind the paint: the pieces of a small, strong magnet. You fit them together."
+    },
+    {
+      "id": "cell-door",
+      "title": "The Cell Door",
+      "kind": "use",
+      "prompt": "The cell door is solid steel, with a keyhole on the inside. A cell should never lock from the inside.",
+      "requires": [
+        "cell-key"
+      ],
+      "hints": [
+        "The key that came through the slot is down the drain. You'll need to fish it out.",
+        "Tie the magnet to the string, fish the key out of the drain, then use it on the door."
+      ],
+      "solvedText": "The key turns with a clunk. The door swings out into a long, tiled corridor. The PA sighs: 'Oh dear. Wandering again.'"
     },
     {
       "id": "chart",
@@ -92,34 +480,121 @@
       }
     },
     {
-      "id": "cell-door",
-      "title": "The Cell Door",
-      "kind": "use",
-      "prompt": "The cell door is solid steel, with a keyhole on the inside. A cell should never lock from the inside.",
-      "requires": ["cell-key"],
+      "id": "scratches",
+      "minMinutes": 45,
+      "title": "The Scratched Wall",
+      "kind": "text",
+      "prompt": "Scratched into the wall above your bed by a previous patient, in a scramble: {cipher}. The chart's lockbox has a second lock that wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "forgotten",
+          "sleepless",
+          "visitor",
+          "lonely",
+          "midnight",
+          "hollow"
+        ]
+      },
       "hints": [
-        "Something that came through the slot fits a keyhole.",
-        "Use the key on the string on the cell door."
+        "The previous patient left a number somewhere near the window.",
+        "Move every letter back along the alphabet by that number.",
+        "It says {answer}."
       ],
-      "solvedText": "The key turns with a clunk. The door swings out into a long, tiled corridor. The PA sighs: 'Oh dear. Wandering again.'"
+      "solvedText": "The second lock gives. Inside, a photograph of the ward in happier days, with one face circled."
     },
     {
       "id": "medicine-cabinet",
       "title": "The Medicine Cabinet",
       "kind": "code",
       "prompt": "The glass medicine cabinet has a 3-digit lock. A typed label on the glass reads: '{order}. Take as directed.'",
-      "rewards": ["keycard"],
+      "rewards": [
+        "pill-bottle"
+      ],
       "hints": [
         "Each phone saw one colour of pill bottle, and how many of them there were.",
         "Read them in the label's order: {order}."
       ],
-      "solvedText": "The cabinet clicks open. Behind the bottles, taped to the back panel: a staff keycard with the photo scratched out.",
+      "solvedText": "The cabinet clicks open. Among the bottles, one rattles differently from the others. You take it.",
       "generator": {
         "type": "colorDigits",
         "count": 3,
-        "colors": ["white", "blue", "pink", "yellow", "green", "orange"],
+        "colors": [
+          "white",
+          "blue",
+          "pink",
+          "yellow",
+          "green",
+          "orange"
+        ],
         "pieceTemplate": "You counted the {color} pill bottles on the cabinet's shelves: there were {digit}."
       }
+    },
+    {
+      "id": "wheelchairs",
+      "title": "The Wheelchairs",
+      "kind": "code",
+      "prompt": "The wheelchairs in the corridor: {items}. The drawer under the last one has a keypad. A card taped to it: 'Each chair's place, 1 nearest the door, in the order I list them.'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "red chair",
+          "blue chair",
+          "grey chair",
+          "white chair",
+          "green chair"
+        ],
+        "pieceTemplate": "Written on a torn treatment slip in your pocket: {clue}"
+      },
+      "rewards": [
+        "uv-penlight"
+      ],
+      "hints": [
+        "Each phone holds a fact about the chairs. Put them all together.",
+        "Start with the chair you're surest of, and mark each spot yes or no.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The drawer slides open. Inside: a nurse's penlight with a violet bulb."
+    },
+    {
+      "id": "mirror-tiles",
+      "title": "The Mirror Writing",
+      "kind": "text",
+      "prompt": "Painted across the tiles in the Warden's folded alphabet: {cipher}. A word lock on the nurses' desk drawer waits.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "sedative",
+          "asleep",
+          "gentle",
+          "docile",
+          "slumber",
+          "murmur"
+        ]
+      },
+      "hints": [
+        "The Warden folds the alphabet in half.",
+        "A is Z, B is Y, C is X… Read it letter by letter.",
+        "It says {answer}."
+      ],
+      "solvedText": "The drawer clicks open. Only a list of patients inside, every name crossed out."
+    },
+    {
+      "id": "light-board",
+      "minMinutes": 45,
+      "title": "The Light Board",
+      "kind": "switches",
+      "prompt": "The nurses' station has a board of call lights, all jammed. Each switch flips its light and the ones beside it. Light them all.",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row with the switches below it.",
+        "Press {answer}."
+      ],
+      "solvedText": "Every call light glows at once. Down the corridor, a buzzer sounds, and the PA laughs softly."
     },
     {
       "id": "staff-locker",
@@ -127,7 +602,11 @@
       "title": "The Staff Locker",
       "kind": "text",
       "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'I have keys but open no locks. I have space but no room. You can enter, but you can never go inside.'",
-      "answers": ["keyboard", "a keyboard", "computer keyboard"],
+      "answers": [
+        "keyboard",
+        "a keyboard",
+        "computer keyboard"
+      ],
       "hints": [
         "Think about the computer at the nurses' station.",
         "You type on it."
@@ -137,7 +616,10 @@
         {},
         {
           "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'I have a head and a tail, but no body. Flip me to decide your fate.'",
-          "answers": ["coin", "a coin"],
+          "answers": [
+            "coin",
+            "a coin"
+          ],
           "hints": [
             "Check your pockets.",
             "Heads or tails?"
@@ -145,7 +627,10 @@
         },
         {
           "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'The more I dry, the wetter I get.'",
-          "answers": ["towel", "a towel"],
+          "answers": [
+            "towel",
+            "a towel"
+          ],
           "hints": [
             "Think about the washrooms down the hall.",
             "You use one after a bath."
@@ -158,13 +643,31 @@
       "title": "The Security Door",
       "kind": "use",
       "prompt": "The security door at the end of the wing has a card reader, blinking red. A sign beneath it: STAFF ONLY.",
-      "requires": ["keycard"],
-      "rewards": ["master-key"],
+      "requires": [
+        "staff-pass"
+      ],
+      "rewards": [
+        "master-key"
+      ],
       "hints": [
-        "You found something that belongs to the staff.",
-        "Use the keycard on the card reader."
+        "You need something only the staff would carry.",
+        "Look closely at the pill bottle that rattles, then use what's inside on the reader."
       ],
       "solvedText": "The reader beeps green and the door hisses open. Just inside, on the floor, as if someone left it for you: a heavy iron master key."
+    },
+    {
+      "id": "patient-numbers",
+      "title": "The Patient Numbers",
+      "kind": "code",
+      "prompt": "The file drawers are stamped with patient numbers: {sequence}. The last drawer is locked, and its keypad wants the next one.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to the next.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "The drawer opens on your own file. The photograph is recent."
     },
     {
       "id": "tape-player",
@@ -180,17 +683,80 @@
       "generator": {
         "type": "wordSequence",
         "count": 3,
-        "words": ["lullaby", "cradle", "mother", "winter", "candle", "orchard", "violin", "sparrow", "chapel", "lantern", "ribbon", "willow"],
+        "words": [
+          "lullaby",
+          "cradle",
+          "mother",
+          "winter",
+          "candle",
+          "orchard",
+          "violin",
+          "sparrow",
+          "chapel",
+          "lantern",
+          "ribbon",
+          "willow"
+        ],
         "pieceTemplate": "You heard it on the PA as you ran down the corridor: the {ordinal} word the Warden whispered was '{word}'."
       }
+    },
+    {
+      "id": "case-file",
+      "minMinutes": 45,
+      "title": "The Case File",
+      "kind": "text",
+      "prompt": "A case file is stamped in symbols: {cipher}. The gate's second keypad has a letter lock too.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "therapy",
+          "doctor",
+          "sanatorium",
+          "insomnia",
+          "clinic",
+          "restraint"
+        ]
+      },
+      "hints": [
+        "The symbols need a key. Something that only shows up in the right light.",
+        "Shine the UV penlight on the X-ray light box, then read the symbols."
+      ],
+      "solvedText": "The letter lock clunks open. Inside the case file, a single line: 'Patient is not to be released.'"
+    },
+    {
+      "id": "warden-word",
+      "minDifficulty": "hard",
+      "title": "The Warden's Last Word",
+      "kind": "text",
+      "prompt": "The PA ticks by itself, a slow pattern of short and long clicks: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "sleep",
+          "dream",
+          "hollow",
+          "sorrow"
+        ]
+      },
+      "hints": [
+        "Short and long clicks need a key. The Warden wrote it somewhere only UV light can find.",
+        "Shine the penlight on the padded panel, then read the clicks letter by letter."
+      ],
+      "solvedText": "The clicking stops. The PA is silent for the first time since you woke."
     },
     {
       "id": "exit-gate",
       "title": "The Exit Gate",
       "kind": "code",
       "prompt": "The gate takes the master key AND a 3-digit code. Painted on the wall beside it: 'Your cell's number, then the floor you woke on, then how many beds you shared.'",
-      "answers": ["713"],
-      "requires": ["master-key"],
+      "answers": [
+        "713"
+      ],
+      "requires": [
+        "master-key"
+      ],
       "pieces": [
         "You remember the number stencilled on your cell door: 7.",
         "You remember the sign in the stairwell: FLOOR 1.",
@@ -204,7 +770,9 @@
       "variants": [
         {},
         {
-          "answers": ["425"],
+          "answers": [
+            "425"
+          ],
           "pieces": [
             "You remember the number stencilled on your cell door: 4.",
             "You remember the sign in the stairwell: FLOOR 2.",
@@ -212,7 +780,9 @@
           ]
         },
         {
-          "answers": ["936"],
+          "answers": [
+            "936"
+          ],
           "pieces": [
             "You remember the number stencilled on your cell door: 9.",
             "You remember the sign in the stairwell: FLOOR 3.",
@@ -223,8 +793,62 @@
     }
   ],
   "items": [
-    { "id": "cell-key", "name": "Key on a string", "description": "Small and cold, on a loop of hospital string. It came through the slot." },
-    { "id": "keycard", "name": "Staff keycard", "description": "The photo has been scratched out with something sharp." },
-    { "id": "master-key", "name": "Iron master key", "description": "Heavy and old. Stamped on the bow: WARD C." }
+    {
+      "id": "hospital-string",
+      "name": "Hospital string",
+      "description": "A loop of hospital string. The key that was tied to it is gone."
+    },
+    {
+      "id": "magnet",
+      "name": "Magnet",
+      "description": "Small and strong, rebuilt from three pieces."
+    },
+    {
+      "id": "magnet-line",
+      "name": "Magnet on a string",
+      "description": "The magnet tied to the hospital string. Good for fishing."
+    },
+    {
+      "id": "cell-key",
+      "name": "Key on a string",
+      "description": "Small and cold, dripping from the drain."
+    },
+    {
+      "id": "pill-bottle",
+      "name": "Rattling pill bottle",
+      "description": "Brown glass. It rattles, but not like pills.",
+      "inspect": "You tip it out: no pills, just a staff pass, rolled tight, with the photo scratched off.",
+      "inspectGives": "staff-pass"
+    },
+    {
+      "id": "staff-pass",
+      "name": "Staff pass",
+      "description": "A laminated staff pass with a magnetic strip. The photo has been scratched out."
+    },
+    {
+      "id": "uv-penlight",
+      "name": "UV penlight",
+      "description": "A nurse's penlight with a violet bulb. Some writing only shows up under it."
+    },
+    {
+      "id": "master-key",
+      "name": "Iron master key",
+      "description": "Heavy and old. Stamped on the bow: WARD C."
+    },
+    {
+      "id": "reflex-hammer",
+      "name": "Reflex hammer",
+      "description": "A little rubber hammer for testing knees. It doesn't fit any lock."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "hospital-string",
+        "magnet"
+      ],
+      "makes": "magnet-line",
+      "text": "You knot the string around the magnet. A fishing line, of sorts."
+    }
   ]
 }

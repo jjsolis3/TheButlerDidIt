@@ -87,7 +87,8 @@ public static class EscapeRoomValidator
         var errors = new List<string>();
         foreach (var p in room.Puzzles)
         {
-            if (p.Kind == PuzzleKind.Switches && p.Generator?.Type != GeneratorType.Switches)
+            // A built room has the lights themselves (Grid) instead of the generator that made them.
+            if (p.Kind == PuzzleKind.Switches && p.Generator?.Type != GeneratorType.Switches && p.Grid is null)
                 errors.Add($"Puzzle '{p.Id}' is a Switches puzzle, so it needs a Switches generator to set its lights.");
             if (p.Generator is not { } g) continue;
             var prompts = p.Variants.Select(v => v.Prompt).OfType<string>().Prepend(p.Prompt).ToList();

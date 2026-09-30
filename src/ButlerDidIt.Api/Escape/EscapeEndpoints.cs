@@ -15,7 +15,7 @@ namespace ButlerDidIt.Api.Escape;
 /// <summary>One line of a leaderboard. Team names appear only on the host's own escapes.</summary>
 public sealed record LeaderboardEntry(int Rank, int Score, int ElapsedSeconds, int HintsUsed, int PlayerCount, DateTimeOffset FinishedAt, bool Mine, string? Team, bool ThisParty);
 
-public sealed record Leaderboard(string RoomId, bool Daily, int Minutes, EscapeDifficulty Difficulty, IReadOnlyList<LeaderboardEntry> Top, LeaderboardEntry? ThisParty, IReadOnlyList<LeaderboardEntry> MyBest);
+public sealed record Leaderboard(string RoomId, bool Daily, int Minutes, EscapeDifficulty Difficulty, int Edition, IReadOnlyList<LeaderboardEntry> Top, LeaderboardEntry? ThisParty, IReadOnlyList<LeaderboardEntry> MyBest);
 
 /// <param name="Minutes">The clock: 30, 45 or 60.</param>
 public sealed record EscapeRoomGenerateRequest(string? Theme, ButlerDidIt.Game.Scenarios.ContentRating ContentRating, int Minutes);
@@ -33,10 +33,11 @@ public static class EscapeEndpoints
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var mine = hostId is null ? [] : await rooms.OwnedAsync(db, hostId, ct);
             var ids = mine.Concat(rooms.Rooms).Select(r => r.Id).ToList();
-            var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).AtDifficulty(EscapeDifficulty.Normal).GroupBy(r => new { r.RoomId, r.Minutes })
-                .Select(g => new { g.Key.RoomId, g.Key.Minutes, Best = g.Min(r => r.Score) }).ToListAsync(ct);
-            // The card's best escape is at the room's own length on Normal; other lengths and difficulties are ranked on their own.
-            int? Best(EscapeRoom r) => best.Where(b => b.RoomId == r.Id && (b.Minutes ?? r.TimeLimitMinutes) == r.TimeLimitMinutes).Min(b => (int?)b.Best);
+            var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).AtDifficulty(EscapeDifficulty.Normal).GroupBy(r => new { r.RoomId, r.Minutes, r.Edition })
+                .Select(g => new { g.Key.RoomId, g.Key.Minutes, g.Key.Edition, Best = g.Min(r => r.Score) }).ToListAsync(ct);
+            // The card's best escape is on the room's current edition, at its own length on Normal; the rest are ranked on their own.
+            int? Best(EscapeRoom r) => best.Where(b => b.RoomId == r.Id && (b.Minutes ?? r.TimeLimitMinutes) == r.TimeLimitMinutes && (b.Edition ?? 1) == r.Edition)
+                .Min(b => (int?)b.Best);
             return Results.Ok(mine.Select(r => EscapeRoomSummary.For(r, Best(r), generated: true))
                 .Concat(rooms.Rooms.Select(r => EscapeRoomSummary.For(r, Best(r)))));
         });
@@ -93,7 +94,7 @@ public static class EscapeEndpoints
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var today = PuzzleSets.For(PuzzleChoice.Daily, null, parties.Now).Seed;
 
-            var results = db.EscapeResults.AsNoTracking().Where(r => r.RoomId == id && r.Escaped).AtLength(room, minutes ?? room.TimeLimitMinutes).AtDifficulty(level);
+            var results = db.EscapeResults.AsNoTracking().Where(r => r.RoomId == id && r.Escaped).AtLength(room, minutes ?? room.TimeLimitMinutes).AtDifficulty(level).AtEdition(room);
             if (daily == true) results = results.Where(r => r.Daily && r.Seed == today);
             var ranked = results.OrderBy(r => r.Score).ThenBy(r => r.FinishedAt);
 
@@ -116,7 +117,7 @@ public static class EscapeEndpoints
 
             var myBest = hostId is null ? [] : (await results.Where(r => r.HostUserId == hostId).OrderBy(r => r.Score).Take(5).ToListAsync(ct))
                 .Select(r => Entry(r, 0)).ToList();
-            return Results.Ok(new Leaderboard(id, daily == true, minutes ?? room.TimeLimitMinutes, level, top, mine, myBest));
+            return Results.Ok(new Leaderboard(id, daily == true, minutes ?? room.TimeLimitMinutes, level, room.Edition, top, mine, myBest));
         });
 
         // For the end-to-end tests only (Escape:ExposeAnswersForTests): the answers of a party's puzzle set,

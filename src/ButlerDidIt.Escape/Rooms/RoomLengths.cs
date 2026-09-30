@@ -6,7 +6,8 @@ namespace ButlerDidIt.Escape.Rooms;
 /// <summary>
 /// Cuts a room down to one game. A puzzle with <see cref="EscapePuzzle.MinMinutes"/> above the
 /// game's length, or <see cref="EscapePuzzle.MinDifficulty"/> above its difficulty, is left out (with
-/// it, any stage left empty), and the clock is set to the length. <see cref="EscapeRoomValidator"/>
+/// it, any stage left empty), as is any scene spot above its <see cref="SceneObject.MinDifficulty"/>;
+/// and the clock is set to the length. <see cref="EscapeRoomValidator"/>
 /// plays every length and difficulty through, so a cut can never leave a puzzle waiting for a key
 /// that only a left-out puzzle gave.
 /// </summary>
@@ -19,7 +20,8 @@ public static class RoomLengths
     public static EscapeRoom Cut(EscapeRoom room, int? minutes, EscapeDifficulty difficulty = EscapeDifficulty.Normal)
     {
         var length = minutes ?? room.TimeLimitMinutes;
-        if (length == room.TimeLimitMinutes && room.Puzzles.All(p => Plays(p, length, difficulty))) return room; // nothing to cut
+        if (length == room.TimeLimitMinutes && room.Puzzles.All(p => Plays(p, length, difficulty)) && room.SceneObjects.All(o => Shows(o, difficulty)))
+            return room; // nothing to cut
         return Cache.GetOrCreateValue(room).GetOrAdd((length, difficulty), key =>
         {
             var kept = room.Puzzles.Where(p => Plays(p, key.Item1, key.Item2)).ToList();
@@ -28,10 +30,18 @@ public static class RoomLengths
             {
                 TimeLimitMinutes = key.Item1,
                 Puzzles = kept,
-                Stages = room.Stages.Select(s => s with { Puzzles = s.Puzzles.Where(ids.Contains).ToList() }).Where(s => s.Puzzles.Count > 0).ToList(),
+                Stages = room.Stages
+                    .Select(s => s with
+                    {
+                        Puzzles = s.Puzzles.Where(ids.Contains).ToList(),
+                        Scene = s.Scene is null ? null : s.Scene with { Objects = s.Scene.Objects.Where(o => Shows(o, key.Item2)).ToList() },
+                    })
+                    .Where(s => s.Puzzles.Count > 0).ToList(),
             };
         });
     }
+
+    public static bool Shows(SceneObject spot, EscapeDifficulty difficulty) => spot.MinDifficulty is not { } level || level <= difficulty;
 
     public static bool Plays(EscapePuzzle puzzle, int minutes, EscapeDifficulty difficulty = EscapeDifficulty.Normal) =>
         (puzzle.MinMinutes is not { } min || min <= minutes) && (puzzle.MinDifficulty is not { } level || level <= difficulty);

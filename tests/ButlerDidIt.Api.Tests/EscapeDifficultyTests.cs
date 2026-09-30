@@ -71,28 +71,7 @@ public class EscapeDifficultyTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Contains(first.Puzzles, p => p.Kind == PuzzleKind.Search && p.Finds is { Found: 0, Total: 3 });
         var template = LoadLab() with { Id = roomId };
 
-        for (var move = 0; ; move++)
-        {
-            Assert.True(move < 300);
-            var s = StateOf(party.Code);
-            if (s.Phase != EscapePhase.Playing) break;
-            var room = EscapeEngine.RoomFor(s, template);
-            var stage = room.Stages[s.StageIndex];
-            if (stage.Scene?.Objects.FirstOrDefault(o => !s.Examined.Contains(o.Id) && (o.Requires is null || s.Inventory.Contains(o.Requires))) is { } spot)
-                await phone.InvokeAsync("EscapeExamine", spot.Id);
-            else if (s.Inventory.Select(room.FindItem).FirstOrDefault(i => i!.Inspect is not null && !s.Inspected.Contains(i.Id)
-                         && (i.InspectRequires is null || s.Inventory.Contains(i.InspectRequires))) is { } item)
-                await phone.InvokeAsync("EscapeInspect", item.Id);
-            else if (room.Recipes.FirstOrDefault(r => r.Items.All(s.Inventory.Contains)) is { } recipe)
-                await phone.InvokeAsync("EscapeCombine", recipe.Items[0], recipe.Items[1]);
-            else
-            {
-                var puzzle = stage.Puzzles.Select(id => room.FindPuzzle(id)!).First(p => !s.IsSolved(p.Id) && p.Kind != PuzzleKind.Search && p.Requires.All(s.Inventory.Contains));
-                if (puzzle.Kind == PuzzleKind.Use) await phone.InvokeAsync("EscapeUse", puzzle.Id);
-                else if (puzzle.Kind == PuzzleKind.Switches) await phone.InvokeAsync("EscapePress", puzzle.Id, FirstPress(puzzle.Grid!.Size, EscapeEngine.LitNow(s, puzzle)));
-                else Assert.True(await phone.InvokeAsync<bool>("EscapeAnswer", puzzle.Id, puzzle.Answers[0]));
-            }
-        }
+        await EscapeHubBot.PlayToEndAsync([phone], [seat.SeatId], template, () => StateOf(party.Code));
 
         var end = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
         Assert.Equal(EscapePhase.Escaped, end.Phase);
@@ -149,17 +128,5 @@ public class EscapeDifficultyTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Equal(EscapeDifficulty.Easy, StateOf(easy.Code).Difficulty);
         var board = await Read<Leaderboard>(await host.GetAsync("/api/escape-rooms/the-workshop/leaderboard?difficulty=Easy"));
         Assert.Equal(EscapeDifficulty.Easy, board.Difficulty);
-    }
-
-    private static int FirstPress(int size, IReadOnlyList<int> lit)
-    {
-        var cells = size * size;
-        for (var set = 1; set < 1 << cells; set++)
-        {
-            IEnumerable<int> on = lit;
-            for (var c = 0; c < cells; c++) if ((set >> c & 1) == 1) on = PuzzleGenerators.Press(size, on, c);
-            if (on.Count() == cells) return Enumerable.Range(0, cells).First(c => (set >> c & 1) == 1);
-        }
-        throw new InvalidOperationException("unsolvable");
     }
 }

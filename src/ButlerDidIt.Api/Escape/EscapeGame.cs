@@ -131,6 +131,10 @@ public static class EscapeResults
     public static IQueryable<EscapeResult> AtLength(this IQueryable<EscapeResult> results, EscapeRoom room, int minutes) =>
         minutes == room.TimeLimitMinutes ? results.Where(r => r.Minutes == minutes || r.Minutes == null) : results.Where(r => r.Minutes == minutes);
 
+    /// <summary>A room's results on its current edition. Results from before editions count as edition 1.</summary>
+    public static IQueryable<EscapeResult> AtEdition(this IQueryable<EscapeResult> results, EscapeRoom room) =>
+        room.Edition == 1 ? results.Where(r => r.Edition == 1 || r.Edition == null) : results.Where(r => r.Edition == room.Edition);
+
     /// <summary>A room's results at one difficulty. Results from before difficulties existed count as Normal.</summary>
     public static IQueryable<EscapeResult> AtDifficulty(this IQueryable<EscapeResult> results, EscapeDifficulty difficulty) =>
         difficulty == EscapeDifficulty.Normal
@@ -216,6 +220,7 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
             Daily = State.Daily,
             Minutes = State.Minutes ?? Room.TimeLimitMinutes,
             Difficulty = State.Level,
+            Edition = Room.Edition,
             Escaped = State.Phase == EscapePhase.Escaped,
             ElapsedSeconds = elapsed,
             HintsUsed = State.HintsUsed,

@@ -50,6 +50,12 @@ public sealed record EscapeRoom
     /// <summary>Seasonal shelves the room is on, like a mystery theme's: "halloween".</summary>
     public List<string> Seasons { get; init; } = [];
 
+    /// <summary>
+    /// Which version of the room this is. Bump it when the room is rebuilt so its old times no longer
+    /// compare: each edition has its own leaderboards (results remember theirs; older ones count as 1).
+    /// </summary>
+    public int Edition { get; init; } = 1;
+
     /// <summary>The lengths on offer, shortest first.</summary>
     public IReadOnlyList<int> PlayableLengths => Lengths.Count == 0 ? [TimeLimitMinutes] : Lengths.Distinct().Order().ToList();
 
@@ -169,6 +175,9 @@ public sealed record SceneObject
 
     /// <summary>A hiding place for clue pieces nobody's phone holds, when fewer players join than a puzzle has pieces.</summary>
     public bool HidesPieces { get; init; }
+
+    /// <summary>Only in the scene at this difficulty or harder (Hard's extra decoys and red herrings). Null: always there.</summary>
+    public EscapeDifficulty? MinDifficulty { get; init; }
 }
 
 /// <summary>The props the screens can draw. A new one needs a drawing in src/web too.</summary>

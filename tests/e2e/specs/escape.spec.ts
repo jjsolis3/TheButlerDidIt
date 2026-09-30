@@ -1,5 +1,6 @@
 import { expect, test, type Browser } from '@playwright/test'
-import { mkdirSync, readFileSync } from 'node:fs'
+import { mkdirSync } from 'node:fs'
+import { loadRoom, playThrough } from './escape-play'
 
 // An escape-room night: the host opens The Workshop on the TV, three phones join, and the group
 // works through every room, with clues split across their phones, until they escape.
@@ -8,21 +9,9 @@ const SHOTS = 'screenshots'
 mkdirSync(SHOTS, { recursive: true })
 const phone = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
 
-interface Puzzle {
-  id: string
-  title: string
-  kind: 'code' | 'text' | 'use'
-  minMinutes?: number
-}
 // The room's layout comes from its file; the answers are shuffled for every game, so the test asks
 // the server for this game's (an endpoint that only exists when Escape__ExposeAnswersForTests is set).
-const room = JSON.parse(readFileSync('../../content/escape/the-workshop.json', 'utf8')) as {
-  stages: { title: string; puzzles: string[] }[]
-  puzzles: Puzzle[]
-}
-const puzzle = (id: string) => room.puzzles.find((p) => p.id === id)!
-// The game is played at the room's standard length (45 minutes): puzzles kept for longer games aren't in it.
-const played = (id: string) => (puzzle(id).minMinutes ?? 0) <= 45
+const room = loadRoom('../../content/escape/the-workshop.json')
 
 async function joinAs(browser: Browser, code: string, name: string) {
   const page = await (await browser.newContext(phone)).newPage()
@@ -62,7 +51,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   // Three lengths; the standard one is picked, and a quicker game plays fewer puzzles.
   await expect(tv.getByRole('radio', { name: /45 minutes/ })).toBeChecked()
   await expect(tv.getByText('⏱️ 30 minutes')).toBeVisible()
-  await expect(tv.getByText(/5 puzzles · a quicker game/)).toBeVisible()
+  await expect(tv.getByText(/9 puzzles · a quicker game/)).toBeVisible()
   // Fresh puzzles by default; today's challenge and replaying a puzzle set are the other choices.
   await expect(tv.getByRole('radio', { name: /Fresh puzzles/ })).toBeChecked()
   await expect(tv.getByRole('radio', { name: /Today's challenge/ })).toBeVisible()
@@ -113,26 +102,11 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByText(/an hour is worth/)).toBeVisible() // the villain's welcome
   await phones[0].waitForTimeout(3200) // the lock resets after a wrong answer
 
-  // ---- Work through every room, taking turns on the phones.
-  let turn = 0
-  for (const stage of room.stages) {
-    await expect(tv.getByRole('heading', { name: stage.title })).toBeVisible()
-    for (const id of stage.puzzles.filter(played)) {
-      const p = puzzle(id)
-      const who = phones[turn++ % phones.length]
-      const card = who.getByTestId(`phone-puzzle-${id}`)
-      if (p.kind === 'use') {
-        await card.getByRole('button', { name: 'Use it' }).click()
-      } else {
-        await card.getByLabel(`Answer for ${p.title}`).fill(answers[id]!)
-        await card.getByRole('button', { name: 'Try' }).click()
-      }
-      const last = stage === room.stages[room.stages.length - 1] && id === stage.puzzles.filter(played).at(-1)
-      if (!last) await expect(tv.getByText(`solved ${p.title}.`)).toBeVisible() // the last one goes straight to the ending
-      if (id === 'toolbox') await tv.screenshot({ path: `${SHOTS}/92-escape-workbench-tv.png` })
-      if (id === 'cabinet') await who.screenshot({ path: `${SHOTS}/93-escape-phone.png` })
-    }
-  }
+  // ---- Work through every room, taking turns on the phones: searching the scene, looking closely at what
+  // they find, putting things together and solving what opens up.
+  await expect(tv.getByTestId('scene')).toBeVisible()
+  await tv.screenshot({ path: `${SHOTS}/92-escape-scene-tv.png` })
+  await playThrough(tv, phones, room, answers, '93-escape-workshop')
 
   // ---- Out!
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()

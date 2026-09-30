@@ -327,6 +327,9 @@ public sealed class EscapeResult
     /// <summary>How hard the game was: each difficulty is ranked apart. Null (every result from before difficulties existed) means Normal.</summary>
     public ButlerDidIt.Escape.Rooms.EscapeDifficulty? Difficulty { get; set; }
 
+    /// <summary>Which edition of the room was played: a rebuilt room starts new leaderboards. Null (results from before editions) is edition 1.</summary>
+    public int? Edition { get; set; }
+
     public bool Escaped { get; set; }
     public int ElapsedSeconds { get; set; }
     public int HintsUsed { get; set; }

@@ -1,6 +1,7 @@
 using System.Reflection;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using ButlerDidIt.Escape.Testing;
 
 namespace ButlerDidIt.Escape.Tests;
 
@@ -21,11 +22,7 @@ public class AtmosphereTests
     private static EscapeState ToStage(EscapeState s, EscapeRoom template, int stageIndex)
     {
         while (s.StageIndex < stageIndex && s.Phase == EscapePhase.Playing)
-        {
-            var room = EscapeEngine.RoomFor(s, template);
-            var p = room.Stages[s.StageIndex].Puzzles.Select(id => room.FindPuzzle(id)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
-            s = EscapeEngine.Apply(s, template, p.Kind == PuzzleKind.Use ? new UseItems(T0, Ada, p.Id) : new SubmitAnswer(T0, Ada, p.Id, p.Answers[0]));
-        }
+            s = EscapeEngine.Apply(s, template, EscapeBot.NextMove(s, EscapeEngine.RoomFor(s, template), Ada, T0));
         return s;
     }
 
@@ -71,10 +68,16 @@ public class AtmosphereTests
         {
             var built = RoomVariants.Build(template, 42);
             foreach (var property in typeof(EscapeRoom).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                         .Where(p => p.Name != nameof(EscapeRoom.Puzzles) && p.SetMethod is not null)) // settings, not computed ones
+                         // Settings, not computed ones. Stages and items are rebuilt when cipher keys are written into their text; checked below.
+                         .Where(p => p.Name is not (nameof(EscapeRoom.Puzzles) or nameof(EscapeRoom.Stages) or nameof(EscapeRoom.Items)) && p.SetMethod is not null))
             {
                 Assert.True(Equals(property.GetValue(template), property.GetValue(built)), $"{template.Id}: {property.Name} was lost building a puzzle set.");
             }
+            Assert.Equal(template.Stages.Select(s => (s.Id, s.Title, s.Description, s.Soundscape, string.Join(",", s.Puzzles))),
+                built.Stages.Select(s => (s.Id, s.Title, s.Description, s.Soundscape, string.Join(",", s.Puzzles))));
+            Assert.Equal(template.SceneObjects.Select(o => (o.Id, o.Prop, o.X, o.Y, o.W, o.H, o.Gives, o.HidesPieces)),
+                built.SceneObjects.Select(o => (o.Id, o.Prop, o.X, o.Y, o.W, o.H, o.Gives, o.HidesPieces)));
+            Assert.Equal(template.Items.Select(i => (i.Id, i.Name, i.InspectGives)), built.Items.Select(i => (i.Id, i.Name, i.InspectGives)));
         }
     }
 }
