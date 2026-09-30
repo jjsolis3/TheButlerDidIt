@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using ButlerDidIt.Ai.Prompts;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using ButlerDidIt.Escape.Testing;
 using ButlerDidIt.Game;
 
 namespace ButlerDidIt.Ai.Tests;
@@ -47,8 +48,7 @@ public class EscapePromptTests
                     AssertClean(EscapePrompts.Hint(template, s, puzzle.Id, 0, now), secret, $"{roomId} seed {seed}: hint for {puzzle.Id}");
                 AssertClean(EscapePrompts.Narration(template, s, s.Cues[^1], now), secret, $"{roomId} seed {seed}: narration after step {step}");
 
-                var next = open.First(p => p.Requires.All(s.Inventory.Contains));
-                s = EscapeEngine.Apply(s, template, next.Kind == PuzzleKind.Use ? new UseItems(now, Ben, next.Id) : new SubmitAnswer(now, Ben, next.Id, next.Answers[0]));
+                s = EscapeEngine.Apply(s, template, EscapeBot.NextMove(s, room, Ben, now));
             }
             AssertClean(EscapePrompts.Narration(template, s, s.Cues[^1], T0.AddHours(1)), [], $"{roomId} seed {seed}: the ending");
         }

@@ -627,6 +627,8 @@ export interface Leaderboard {
   minutes: number
   /** …and so does each difficulty */
   difficulty: EscapeDifficulty
+  /** …and each edition of the room: a rebuilt room starts new boards */
+  edition: number
   top: LeaderboardEntry[]
   thisParty: LeaderboardEntry | null
   myBest: LeaderboardEntry[]

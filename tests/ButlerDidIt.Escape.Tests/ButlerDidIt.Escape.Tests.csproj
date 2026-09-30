@@ -27,4 +27,9 @@
     <ProjectReference Include="..\..\src\ButlerDidIt.Escape\ButlerDidIt.Escape.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The escape-room bot every test project plays rooms with. -->
+    <Compile Include="..\Shared\EscapeBot.cs" Link="Shared\EscapeBot.cs" />
+  </ItemGroup>
+
 </Project>

@@ -48,15 +48,8 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
         await using var tv = await app.ConnectAsync(cookie: cookie);
         await using var phone = await app.ConnectAsync(seats[0].Token);
         await tv.InvokeAsync("EscapeStart", party.Code);
-        var room = PlayedRoom(party.Code, roomId);
-        while (true)
-        {
-            var stage = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
-            if (stage.Phase != EscapePhase.Playing) break;
-            var next = stage.Puzzles.First(p => !p.Solved && p.Needs.Count == 0);
-            if (next.Kind == PuzzleKind.Use) await phone.InvokeAsync("EscapeUse", next.Id);
-            else await phone.InvokeAsync<bool>("EscapeAnswer", next.Id, room.FindPuzzle(next.Id)!.Answers[0]);
-        }
+        var template = app.Services.GetRequiredService<EscapeCatalog>().Find(roomId)!;
+        await EscapeHubBot.PlayToEndAsync([phone], [seats[0].SeatId], template, () => StateOf(party.Code));
     }
 
     [Fact]
@@ -101,16 +94,10 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
             await Task.Delay(EscapeEngine.WrongAnswerCooldown); // the lock resets
 
             var room = PlayedRoom(party.Code, "the-workshop");
-            var i = 0;
-            while (true)
-            {
-                stage = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
-                if (stage.Phase != EscapePhase.Playing) break;
-                var next = stage.Puzzles.First(p => !p.Solved && p.Needs.Count == 0);
-                var phone = phones[i++ % phones.Count];
-                if (next.Kind == PuzzleKind.Use) await phone.InvokeAsync("EscapeUse", next.Id);
-                else Assert.True(await phone.InvokeAsync<bool>("EscapeAnswer", next.Id, room.FindPuzzle(next.Id)!.Answers[0]));
-            }
+            // Taking turns on the phones: searching, looking closely, combining and solving.
+            await EscapeHubBot.PlayToEndAsync(phones, seats.Select(x => x.SeatId).ToList(), app.Services.GetRequiredService<EscapeCatalog>().Find("the-workshop")!,
+                () => StateOf(party.Code));
+            stage = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
 
             Assert.Equal(EscapePhase.Escaped, stage.Phase);
             Assert.Equal(room.EscapedText, stage.EndText);

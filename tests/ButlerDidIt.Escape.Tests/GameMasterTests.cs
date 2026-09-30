@@ -1,5 +1,6 @@
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using ButlerDidIt.Escape.Testing;
 using ButlerDidIt.Game.Engine;
 
 namespace ButlerDidIt.Escape.Tests;
@@ -29,11 +30,13 @@ public class GameMasterTests
             .First(p => p.Kind != PuzzleKind.Use && p.Requires.Count == 0 && !s.IsSolved(p.Id));
     }
 
+    /// <summary>Plays (searching, looking and combining as needed) until one more puzzle is solved.</summary>
     private static EscapeState SolveNext(EscapeState s, DateTimeOffset at)
     {
-        var room = EscapeEngine.RoomFor(s, Workshop);
-        var puzzle = room.Stages[s.StageIndex].Puzzles.Select(id => room.FindPuzzle(id)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
-        return EscapeEngine.Apply(s, Workshop, puzzle.Kind == PuzzleKind.Use ? new UseItems(at, Ben, puzzle.Id) : new SubmitAnswer(at, Ben, puzzle.Id, puzzle.Answers[0]));
+        var solved = s.Solved.Count;
+        while (s.Phase == EscapePhase.Playing && s.Solved.Count == solved)
+            s = EscapeEngine.Apply(s, Workshop, EscapeBot.NextMove(s, EscapeEngine.RoomFor(s, Workshop), Ben, at));
+        return s;
     }
 
     private static EscapePuzzleView View(EscapeState s, string puzzleId, DateTimeOffset now) =>

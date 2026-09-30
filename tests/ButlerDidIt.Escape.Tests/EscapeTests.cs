@@ -1,5 +1,6 @@
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using ButlerDidIt.Escape.Testing;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using ButlerDidIt.Game.Scenarios;
@@ -134,12 +135,11 @@ public class EngineTests
     /// <summary>Solves whatever is open, the way a group that knows the answers would.</summary>
     private static EscapeState SolveNext(EscapeState s, EscapeRoom template, DateTimeOffset at, Guid seat)
     {
-        var room = EscapeEngine.RoomFor(s, template); // the answers of this attempt's puzzle set
-        var stage = room.Stages[s.StageIndex];
-        var puzzle = stage.Puzzles.Select(id => room.FindPuzzle(id)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
-        return EscapeEngine.Apply(s, template, puzzle.Kind == PuzzleKind.Use
-            ? new UseItems(at, seat, puzzle.Id)
-            : new SubmitAnswer(at, seat, puzzle.Id, puzzle.Answers[0]));
+        // Searching, looking closely and combining as needed, until one more puzzle opens.
+        var solved = s.Solved.Count;
+        while (s.Phase == EscapePhase.Playing && s.Solved.Count == solved)
+            s = EscapeEngine.Apply(s, template, EscapeBot.NextMove(s, EscapeEngine.RoomFor(s, template), seat, at));
+        return s;
     }
 
     /// <summary>Every room at every length it offers, with two puzzle sets each.</summary>
@@ -305,11 +305,8 @@ public class PrivacyTests
                     Assert.DoesNotContain(piece, phoneJson);
             }
 
-            // Solve the next open puzzle and look again.
-            var next = current.Puzzles.Select(pid => room.FindPuzzle(pid)!).First(p => !s.IsSolved(p.Id) && p.Requires.All(s.Inventory.Contains));
-            s = EscapeEngine.Apply(s, template, next.Kind == PuzzleKind.Use
-                ? new UseItems(T0.AddMinutes(step), seats[0], next.Id)
-                : new SubmitAnswer(T0.AddMinutes(step), seats[0], next.Id, next.Answers[0]));
+            // Make the next move (search, look, combine or solve) and look again.
+            s = EscapeEngine.Apply(s, template, EscapeBot.NextMove(s, played, seats[step % seats.Length], T0.AddMinutes(step)));
         }
         Assert.Equal(seed, EscapeProjector.Stage(s, template, T0).PuzzleSet); // shown once it's over, to replay or share
     }
