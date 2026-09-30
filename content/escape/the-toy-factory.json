@@ -8,7 +8,12 @@
   "minPlayers": 2,
   "maxPlayers": 8,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45, 60],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 90,
   "soundscape": "workshop",
   "intro": "Beep. Boop. INTRUDERS! The Tick-Tock Toy Factory is CLOSED, and I, Sprocket, Foreman of the Night Shift, have locked every door. Want to go home? Then fix my factory! Work together, share what you find, and get out before the morning whistle. Clank!",
@@ -17,27 +22,367 @@
   "gameMaster": {
     "name": "Sprocket",
     "persona": "A grumpy wind-up robot foreman who clanks, whirs and grumbles about 'unauthorised fun'. Secretly delighted whenever the group solves one of his puzzles, though he'd never admit it. Never scary: more cross old uncle than villain.",
-    "voice": { "accent": "en-GB", "pitch": 1.2, "rate": 1.05, "style": "clanky, grumpy, robotic" }
+    "voice": {
+      "accent": "en-GB",
+      "pitch": 1.2,
+      "rate": 1.05,
+      "style": "clanky, grumpy, robotic"
+    }
   },
   "stages": [
     {
       "id": "assembly",
       "title": "The Assembly Line",
-      "description": "Conveyor belts snake across the room, piled with half-built teddy bears and tin soldiers. A giant toy robot stands frozen in front of the exit, and a control panel blinks beside the belt.",
-      "puzzles": ["control-panel", "teddy-tester", "giant-robot"]
+      "description": "Conveyor belts snake across the room, piled with half-built teddy bears and tin soldiers. A giant toy robot stands frozen in front of the exit, a control panel blinks beside the belt, and toy chests, scrap bins and drawers of spare parts are everywhere.",
+      "puzzles": [
+        "control-panel",
+        "assembly-search",
+        "tin-soldiers",
+        "teddy-tester",
+        "giant-robot"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "giant-robot-spot",
+            "prop": "statue",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "giant robot",
+            "look": "A toy robot as big as a fridge, frozen mid-step. There's a keyhole in its back."
+          },
+          {
+            "id": "panel",
+            "prop": "machine",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "control panel",
+            "look": "Blinking buttons and a word lock. Sprocket's sticky note is on it."
+          },
+          {
+            "id": "teddy-pile",
+            "prop": "box",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "pile of teddies",
+            "look": "Half-stuffed teddy bears. One of them has a curly metal rod stuffed inside instead of fluff.",
+            "hidesPieces": true
+          },
+          {
+            "id": "conveyor",
+            "prop": "machine",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "conveyor belt",
+            "look": "Tin soldiers ride past in a line. Stuck in the belt's rollers: nothing but fluff.",
+            "hidesPieces": true
+          },
+          {
+            "id": "spare-parts",
+            "prop": "drawer",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "spare parts drawer",
+            "look": "Springs, buttons and googly eyes, all sorted into tiny tubs.",
+            "hidesPieces": true
+          },
+          {
+            "id": "toy-chest",
+            "prop": "chest",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "toy chest",
+            "look": "Wooden blocks and a spinning top. At the bottom, a little brass pin.",
+            "hidesPieces": true
+          },
+          {
+            "id": "robot-parts",
+            "prop": "crate",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "crate of robot arms",
+            "look": "Dozens of little robot arms, waving at nothing.",
+            "hidesPieces": true
+          },
+          {
+            "id": "stool",
+            "prop": "desk",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "foreman's stool",
+            "look": "Sprocket's stool, with a cushion that says BOSS. Under it: a greasy oil can with no oil.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tool-board",
+            "prop": "shelf",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "tool board",
+            "look": "Tiny screwdrivers, each hung in its place, all bolted down.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bin",
+            "prop": "barrel",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "scrap bin",
+            "look": "Wonky teddy ears and a very sad jack-in-the-box.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "paint",
       "soundscape": "carnival",
       "title": "The Paint Shop",
-      "description": "Everything is splattered in colour: the walls, the floor, the ceiling. Shelves of paint pots line one wall, a coat rack of painters' smocks stands in the corner, and a huge paint mixer rumbles next to a gearbox with a missing piece.",
-      "puzzles": ["paint-mixer", "coat-rack", "gearbox"]
+      "description": "Everything is splattered in colour: the walls, the floor, the ceiling. Shelves of paint pots line one wall, a coat rack of painters' smocks stands in the corner, a panel of coloured bulbs sits dark, and a huge paint mixer rumbles next to a gearbox with a missing piece.",
+      "puzzles": [
+        "paint-mixer",
+        "paint-codes",
+        "colour-lights",
+        "coat-rack",
+        "gearbox"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "paint-pots",
+            "prop": "shelf",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "paint pots",
+            "look": "Rows and rows of pots. Some are red, some are blue, some are every colour at once."
+          },
+          {
+            "id": "mixer",
+            "prop": "machine",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "paint mixer",
+            "look": "It rumbles and wobbles. A 3-digit lock holds its hatch shut."
+          },
+          {
+            "id": "gearbox-spot",
+            "prop": "cabinet",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "gearbox",
+            "look": "A big box of spinning gears, with one empty space in the middle."
+          },
+          {
+            "id": "colour-panel",
+            "prop": "sign",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "colour panel",
+            "look": "A panel of little coloured bulbs, all dark. The code chart beside it is written in numbers."
+          },
+          {
+            "id": "splat-rug",
+            "prop": "rug",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "splattered rug",
+            "look": "It was white once. Now it's every colour there is.",
+            "hidesPieces": true
+          },
+          {
+            "id": "smock-rack",
+            "prop": "lamp",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "coat rack",
+            "look": "Painters' smocks with deep pockets, all full of old paint rags.",
+            "hidesPieces": true
+          },
+          {
+            "id": "paint-bucket",
+            "prop": "barrel",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "paint bucket",
+            "look": "A bucket of sparkly purple. You dip a finger in. Now you have a sparkly purple finger.",
+            "hidesPieces": true
+          },
+          {
+            "id": "easel",
+            "prop": "painting",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "easel",
+            "look": "A half-finished painting of Sprocket, looking very handsome.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "dock",
       "title": "The Shipping Dock",
-      "description": "Crates of toys are stacked high, ready for the delivery trucks. A toy parrot squawks from inside one crate, and the big loading door has a slot for a shipping label and a three-digit keypad.",
-      "puzzles": ["parrot-crate", "loading-door"]
+      "description": "Crates of toys are stacked high, ready for the delivery trucks. A toy parrot squawks from inside one crate, a clipboard hangs by a trolley and a mail sack, and the big loading door has a slot for a shipping label and a three-digit keypad.",
+      "puzzles": [
+        "delivery-numbers",
+        "parrot-crate",
+        "delivery-note",
+        "beep-signal",
+        "loading-door"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "loading-door-spot",
+            "prop": "door",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "loading door",
+            "look": "A big roll-up door with a label slot and a keypad."
+          },
+          {
+            "id": "clipboard",
+            "prop": "sign",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "clipboard",
+            "look": "The delivery driver's clipboard. Scrawled at the bottom: 'Delivery code: slide back {key:delivery-note}.'"
+          },
+          {
+            "id": "parrot-box",
+            "prop": "crate",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "squawking crate",
+            "look": "A toy parrot peeks through the slats and says 'Squawk!'"
+          },
+          {
+            "id": "crate-stack",
+            "prop": "box",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "stacked crates",
+            "look": "Crates of toys, stacked taller than you. Labels everywhere.",
+            "hidesPieces": true
+          },
+          {
+            "id": "trolley",
+            "prop": "crate",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "trolley",
+            "look": "A trolley with one wobbly wheel. It goes round in circles.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mail-sack",
+            "prop": "barrel",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "mail sack",
+            "look": "Letters to Sprocket, mostly complaints about squeaky teddies.",
+            "hidesPieces": true
+          },
+          {
+            "id": "pallet",
+            "prop": "rug",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "wooden pallet",
+            "look": "Splinters, and a lost badge with a smiling sun on it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "dock-lockers",
+            "prop": "cabinet",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "drivers’ lockers",
+            "look": "Hats, flasks and a map of every town the trucks go to.",
+            "hidesPieces": true
+          },
+          {
+            "id": "radio-shelf",
+            "prop": "shelf",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "radio shelf",
+            "look": "Under the magnifier, tiny writing shows up on the radio's back: {key:beep-signal}",
+            "requires": "magnifier",
+            "lockedText": "There's something written on the back of the radio, far too tiny to read.",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "sock-basket",
+            "prop": "box",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "lost socks basket",
+            "look": "Hundreds of odd socks. You take one stripy one, just in case.",
+            "gives": "odd-sock",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -46,18 +391,28 @@
       "title": "The Control Panel",
       "kind": "text",
       "prompt": "The conveyor's control panel has a word lock. Sprocket has stuck a note on it: 'What has lots of keys but can't open a single door? Answer me, and I'll give you MY key.'",
-      "answers": ["piano", "a piano", "keyboard"],
-      "rewards": ["wind-up-key"],
+      "answers": [
+        "piano",
+        "a piano",
+        "keyboard"
+      ],
+      "rewards": [
+        "key-handle"
+      ],
       "hints": [
         "Listen: somewhere in the factory, a toy is playing a tune.",
         "You play it with your fingers. It has black and white keys."
       ],
-      "solvedText": "The panel pops open with a TING! Inside: a big brass wind-up key.",
+      "solvedText": "The panel pops open with a TING! Inside: the curly handle of a big wind-up key. Just the handle.",
       "variants": [
         {},
         {
           "prompt": "The conveyor's control panel has a word lock. Sprocket has stuck a note on it: 'What has one eye but can't see a thing? Answer me, and I'll give you MY key.'",
-          "answers": ["needle", "a needle", "sewing needle"],
+          "answers": [
+            "needle",
+            "a needle",
+            "sewing needle"
+          ],
           "hints": [
             "Think about how teddy bears are stitched together.",
             "You push thread through its eye."
@@ -65,13 +420,63 @@
         },
         {
           "prompt": "The conveyor's control panel has a word lock. Sprocket has stuck a note on it: 'What goes up and down but never moves? Answer me, and I'll give you MY key.'",
-          "answers": ["stairs", "staircase", "steps", "a staircase"],
+          "answers": [
+            "stairs",
+            "staircase",
+            "steps",
+            "a staircase"
+          ],
           "hints": [
             "Think about how you got up to the factory floor.",
             "You climb them one at a time."
           ]
         }
       ]
+    },
+    {
+      "id": "assembly-search",
+      "title": "The Missing Key Rod",
+      "kind": "search",
+      "prompt": "The wind-up key's rod is hidden somewhere on the line. Search the pile of teddies, the toy chest and the foreman's stool.",
+      "finds": [
+        "teddy-pile",
+        "toy-chest",
+        "stool"
+      ],
+      "rewards": [
+        "key-shaft"
+      ],
+      "hints": [
+        "Three places on the assembly line each hide a clue.",
+        "Dig through the teddies, the toy chest and under the foreman's stool."
+      ],
+      "solvedText": "A rod from a teddy, a pin from the chest, and oil from under the stool: you slide the pin in and oil it. A wind-up key's rod!"
+    },
+    {
+      "id": "tin-soldiers",
+      "title": "The Tin Soldier Parade",
+      "kind": "code",
+      "prompt": "Five tin soldiers must march in the right order: {items}. The drawer under the belt has a keypad: 'Each soldier's place, first in line is 1, in the order I list them.'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "red soldier",
+          "blue soldier",
+          "green soldier",
+          "gold soldier",
+          "silver soldier"
+        ],
+        "pieceTemplate": "Stamped on a soldier's boot: {clue}"
+      },
+      "rewards": [
+        "magnifier"
+      ],
+      "hints": [
+        "Every phone has a clue. Share them all out loud.",
+        "Start with the one you're surest about, and try each place.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The soldiers salute and the drawer slides open. Inside: Sprocket's magnifier, for inspecting teeny-tiny screws."
     },
     {
       "id": "teddy-tester",
@@ -95,10 +500,12 @@
       "title": "The Giant Robot",
       "kind": "use",
       "prompt": "A toy robot as big as a fridge blocks the way out, frozen mid-step. There's a keyhole in its back.",
-      "requires": ["wind-up-key"],
+      "requires": [
+        "wind-up-key"
+      ],
       "hints": [
-        "Wind-up toys need winding.",
-        "Use the wind-up key on the giant robot."
+        "Wind-up toys need winding, and your key is in two pieces.",
+        "Put the key handle and the key rod together, then use the wind-up key on the robot."
       ],
       "solvedText": "Crank, crank, crank! The robot beeps a happy tune and marches out of the way, straight into the paint shop."
     },
@@ -107,18 +514,66 @@
       "title": "The Paint Mixer",
       "kind": "code",
       "prompt": "The paint mixer has a 3-digit lock. Sprocket's sign on it says: '{order}!'",
-      "rewards": ["gear"],
+      "rewards": [
+        "paint-tin"
+      ],
       "hints": [
         "Each phone saw one colour of paint pot, and how many of them there were.",
         "Read them in the sign's order: {order}."
       ],
-      "solvedText": "The mixer swirls every colour together into a rainbow, then spits out a shiny golden gear. Plink!",
+      "solvedText": "The mixer swirls every colour together, then spits out a little paint tin. Plink! Something rattles inside.",
       "generator": {
         "type": "colorDigits",
         "count": 3,
-        "colors": ["red", "blue", "yellow", "green", "purple", "orange"],
+        "colors": [
+          "red",
+          "blue",
+          "yellow",
+          "green",
+          "purple",
+          "orange"
+        ],
         "pieceTemplate": "You counted the {color} paint pots on your shelf: there were {digit} of them."
       }
+    },
+    {
+      "id": "paint-codes",
+      "title": "The Paint Code Chart",
+      "kind": "text",
+      "prompt": "Sprocket labels his paint pots in numbers so nobody else can read them. The newest one says: {cipher}. The chart's lock wants the colour's name.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "rainbow",
+          "sparkle",
+          "brush",
+          "glitter",
+          "stripes",
+          "polka"
+        ]
+      },
+      "hints": [
+        "Each number is a letter.",
+        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "It says {answer}."
+      ],
+      "solvedText": "Correct! The chart flips over. On the back: 'Paint shop rules: NO FUN. Signed, Sprocket.'"
+    },
+    {
+      "id": "colour-lights",
+      "minMinutes": 45,
+      "title": "The Colour Lights",
+      "kind": "switches",
+      "prompt": "The panel of coloured bulbs flickers on. Each button lights its bulb and flips the ones beside it. Turn every light on to mix the perfect colour.",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the buttons in the row below it.",
+        "Press {answer}."
+      ],
+      "solvedText": "Every bulb glows and the paint pots burble happily. Sprocket mutters: 'Beginner's luck.'"
     },
     {
       "id": "coat-rack",
@@ -126,7 +581,11 @@
       "title": "The Painters' Coat Rack",
       "kind": "text",
       "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'I have a thumb and four fingers, but I'm not alive.'",
-      "answers": ["glove", "a glove", "gloves"],
+      "answers": [
+        "glove",
+        "a glove",
+        "gloves"
+      ],
       "hints": [
         "Look at what the painters wear to keep their hands clean.",
         "You wear it on your hand."
@@ -136,18 +595,24 @@
         {},
         {
           "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'What can you catch but never throw?'",
-          "answers": ["cold", "a cold"],
+          "answers": [
+            "cold",
+            "a cold"
+          ],
           "hints": [
             "Achoo!",
             "You might catch one in winter."
           ]
         },
         {
-          "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'What has four legs but can't walk?'",
-          "answers": ["table", "a table", "chair", "a chair"],
+          "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'What has a head and a tail, but no body?'",
+          "answers": [
+            "coin",
+            "a coin"
+          ],
           "hints": [
-            "Look at the furniture in the paint shop.",
-            "You eat your dinner at one."
+            "Look in the painters' pockets for spare change.",
+            "You flip it to decide heads or tails."
           ]
         }
       ]
@@ -157,13 +622,31 @@
       "title": "The Gearbox",
       "kind": "use",
       "prompt": "The gearbox that runs the shipping dock is missing one golden gear. Without it, nothing moves.",
-      "requires": ["gear"],
-      "rewards": ["shipping-label"],
+      "requires": [
+        "gear"
+      ],
+      "rewards": [
+        "shipping-label"
+      ],
       "hints": [
-        "Something shiny came out of the paint mixer.",
-        "Use the golden gear on the gearbox."
+        "Something shiny was hiding in the paint tin, too small to see.",
+        "Look closely at the paint tin with the magnifier, then use the golden gear on the gearbox."
       ],
       "solvedText": "The gear clicks into place and the whole factory whirs. A printer beside the gearbox prints out a shipping label with your names on it!"
+    },
+    {
+      "id": "delivery-numbers",
+      "title": "The Delivery Numbers",
+      "kind": "code",
+      "prompt": "The crate numbers go: {sequence}. The next crate's number is missing, and the dock's keypad wants it.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "Beep! The keypad lights green and the trolley rolls itself out of the way."
     },
     {
       "id": "parrot-crate",
@@ -179,17 +662,80 @@
       "generator": {
         "type": "wordSequence",
         "count": 3,
-        "words": ["kite", "drum", "train", "ball", "blocks", "rocket", "marble", "puppet", "whistle", "teddy", "yoyo", "spinner"],
+        "words": [
+          "kite",
+          "drum",
+          "train",
+          "ball",
+          "blocks",
+          "rocket",
+          "marble",
+          "puppet",
+          "whistle",
+          "teddy",
+          "yoyo",
+          "spinner"
+        ],
         "pieceTemplate": "You read it on a crate label: the {ordinal} toy on Sprocket's favourites list is the {word}."
       }
+    },
+    {
+      "id": "delivery-note",
+      "minMinutes": 60,
+      "title": "The Delivery Note",
+      "kind": "text",
+      "prompt": "A crumpled delivery note is in code: {cipher}. The driver's lock wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "parcel",
+          "ribbon",
+          "wrapper",
+          "sticker",
+          "bubble"
+        ]
+      },
+      "hints": [
+        "How far to slide the letters is written somewhere. Check the driver's clipboard.",
+        "Slide every letter back along the alphabet by that many places.",
+        "It says {answer}."
+      ],
+      "solvedText": "The lock clicks. The note is a list of toys, all ready to be delivered to children."
+    },
+    {
+      "id": "beep-signal",
+      "minDifficulty": "hard",
+      "title": "The Beeping Radio",
+      "kind": "text",
+      "prompt": "The dock radio beeps in dots and dashes: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "widget",
+          "gadget",
+          "gizmo",
+          "doodad"
+        ]
+      },
+      "hints": [
+        "These need a key. Sprocket wrote it too small to read without a magnifier.",
+        "Swap each one for its letter, one at a time."
+      ],
+      "solvedText": "The radio falls quiet. Sprocket grumbles: 'Who taught you Morse code?'"
     },
     {
       "id": "loading-door",
       "title": "The Loading Door",
       "kind": "code",
       "prompt": "The loading door needs the shipping label AND a 3-digit code. Sprocket's note: 'Robots on my assembly line, then mixers in my paint shop, then trucks at my dock!'",
-      "answers": ["524"],
-      "requires": ["shipping-label"],
+      "answers": [
+        "524"
+      ],
+      "requires": [
+        "shipping-label"
+      ],
       "pieces": [
         "You counted the robots on the assembly line: 5.",
         "You remember the paint shop: it had 2 mixers.",
@@ -203,7 +749,9 @@
       "variants": [
         {},
         {
-          "answers": ["613"],
+          "answers": [
+            "613"
+          ],
           "pieces": [
             "You counted the robots on the assembly line: 6.",
             "You remember the paint shop: it had 1 mixer.",
@@ -211,7 +759,9 @@
           ]
         },
         {
-          "answers": ["835"],
+          "answers": [
+            "835"
+          ],
           "pieces": [
             "You counted the robots on the assembly line: 8.",
             "You remember the paint shop: it had 3 mixers.",
@@ -222,8 +772,58 @@
     }
   ],
   "items": [
-    { "id": "wind-up-key", "name": "Brass wind-up key", "description": "Big and shiny, with a curly handle. It came from Sprocket's control panel." },
-    { "id": "gear", "name": "Golden gear", "description": "Warm from the paint mixer, and still a bit sticky." },
-    { "id": "shipping-label", "name": "Shipping label", "description": "It has all your names on it, and says: DELIVER TO HOME." }
+    {
+      "id": "key-handle",
+      "name": "Key handle",
+      "description": "The curly handle of a big brass wind-up key."
+    },
+    {
+      "id": "key-shaft",
+      "name": "Key rod",
+      "description": "The long rod of a wind-up key, oiled and ready."
+    },
+    {
+      "id": "wind-up-key",
+      "name": "Brass wind-up key",
+      "description": "Big and shiny, with a curly handle. All in one piece."
+    },
+    {
+      "id": "magnifier",
+      "name": "Magnifier",
+      "description": "Sprocket's magnifying glass, for teeny-tiny things."
+    },
+    {
+      "id": "paint-tin",
+      "name": "Little paint tin",
+      "description": "It rattles when you shake it.",
+      "inspect": "Under the magnifier you spot it: a golden gear, stuck inside a blob of paint! You pick it out.",
+      "inspectRequires": "magnifier",
+      "inspectGives": "gear"
+    },
+    {
+      "id": "gear",
+      "name": "Golden gear",
+      "description": "Picked out of a paint tin, and still a bit sticky."
+    },
+    {
+      "id": "shipping-label",
+      "name": "Shipping label",
+      "description": "It has all your names on it, and says: DELIVER TO HOME."
+    },
+    {
+      "id": "odd-sock",
+      "name": "Odd sock",
+      "description": "One stripy sock. Its partner is long gone."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "key-handle",
+        "key-shaft"
+      ],
+      "makes": "wind-up-key",
+      "text": "The handle clicks onto the rod. A whole wind-up key!"
+    }
   ]
 }

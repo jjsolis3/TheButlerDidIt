@@ -244,7 +244,7 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
     {
         var (host, cookie) = await app.RegisterHostAsync($"short{Guid.NewGuid():N}@example.com");
         // A length the room doesn't offer is refused.
-        var bad = await host.PostAsJsonAsync("/api/parties/escape", new CreateEscapePartyRequest("the-funhouse", PartyMode.SharedScreen, Minutes: 60), GameJson.Options);
+        var bad = await host.PostAsJsonAsync("/api/parties/escape", new CreateEscapePartyRequest("the-funhouse", PartyMode.SharedScreen, Minutes: 90), GameJson.Options);
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, bad.StatusCode);
 
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties/escape",

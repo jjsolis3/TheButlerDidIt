@@ -147,8 +147,14 @@ export async function playThrough(tv: Page, phones: Page[], room: RoomFile, answ
         for (const cell of solveLights(Math.sqrt(lit.length), lit)) {
           const before = await cells.nth(cell).getAttribute('aria-pressed')
           await cells.nth(cell).click()
-          const now = await textOf(card)
-          if (now !== null && !now.startsWith('✅')) await expect(cells.nth(cell)).not.toHaveAttribute('aria-pressed', before!)
+          // The light flips, or (on the last press) the panel is solved and its grid gives way to the solved text.
+          await expect
+            .poll(async () => {
+              const now = await textOf(card)
+              if (now === null || now.startsWith('✅')) return true
+              return (await cells.nth(cell).getAttribute('aria-pressed', { timeout: 500 }).catch(() => before)) !== before
+            })
+            .toBe(true)
         }
       } else {
         const input = card.getByLabel(`Answer for ${puzzle.title}`)

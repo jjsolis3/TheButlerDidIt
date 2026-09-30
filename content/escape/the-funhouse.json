@@ -8,8 +8,15 @@
   "minPlayers": 2,
   "maxPlayers": 8,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45],
-  "seasons": ["halloween"],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 90,
   "soundscape": "carnival",
   "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out. Ha-ha-HONK!",
@@ -18,37 +25,370 @@
   "gameMaster": {
     "name": "Mister Giggles",
     "persona": "A mischievous robot clown who honks, giggles and loves a good trick. Cheeky and silly, never scary: he teases the group when they're stuck and cheers (a little grumpily) when they win his games.",
-    "voice": { "accent": "en-US", "pitch": 1.4, "rate": 1.1, "style": "bouncy, squeaky, playful" }
+    "voice": {
+      "accent": "en-US",
+      "pitch": 1.4,
+      "rate": 1.1,
+      "style": "bouncy, squeaky, playful"
+    }
   },
   "stages": [
     {
       "id": "mirrors",
       "soundscape": "haunted",
       "title": "The Hall of Mirrors",
-      "description": "A thousand of you stare back from the wobbly mirrors. Somewhere in here is the way out, and something is written backwards on the glass.",
+      "description": "A thousand of you stare back from the wobbly mirrors. Something shiny is stuck on top of the tallest one, a giant clown head grins by the popcorn cart, and one corner is far too dark to see into. A little door hides at the back.",
       "puzzles": [
         "mirror-riddle",
+        "mirror-search",
+        "mirror-lineup",
+        "giggle-note",
         "little-door"
-      ]
+      ],
+      "scene": {
+        "backdrop": "carnival",
+        "objects": [
+          {
+            "id": "tallest-mirror",
+            "prop": "mirror",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "tallest mirror",
+            "look": "Something silver glints on top of the tallest mirror. With the grabber you pinch it down: a little silver key!",
+            "gives": "mirror-key",
+            "requires": "grabber",
+            "lockedText": "Something silver glints on top of the tallest mirror, way too high to reach."
+          },
+          {
+            "id": "popcorn-cart",
+            "prop": "box",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "popcorn cart",
+            "look": "Stale popcorn everywhere. Under the scoop: the shiny body of a flashlight, with nothing inside it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "prize-shelf",
+            "prop": "shelf",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "prize shelf",
+            "look": "Teddy bears, rubber snakes and a plastic crown. Tucked behind them: a flashlight's glass lens.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bench",
+            "prop": "table",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "bench",
+            "look": "A squishy bench for tired feet. Under the cushion: a flashlight's on-off switch.",
+            "hidesPieces": true
+          },
+          {
+            "id": "dark-corner",
+            "prop": "vent",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "dark corner",
+            "look": "In the torch beam, a note glows on the wall: 'Giggle code! Slide every letter back {key:giggle-note}. Honk!'",
+            "requires": "torch",
+            "lockedText": "Too dark to see a thing in here. You'd need a light."
+          },
+          {
+            "id": "wobbly-mirror",
+            "prop": "mirror",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "wobbly mirror",
+            "look": "You look like a string of spaghetti with a tiny head. Mister Giggles would love that."
+          },
+          {
+            "id": "lost-property",
+            "prop": "crate",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "lost property box",
+            "look": "One flip-flop, a yo-yo and a lot of odd mittens.",
+            "hidesPieces": true
+          },
+          {
+            "id": "clown-head",
+            "prop": "statue",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "giant clown head",
+            "look": "A giant grinning clown head with its mouth wide open. Nothing in there but a sweet wrapper.",
+            "hidesPieces": true
+          },
+          {
+            "id": "little-door-spot",
+            "prop": "door",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "little door",
+            "look": "A door just big enough to crawl through, with a tiny silver lock."
+          },
+          {
+            "id": "squeaky-floor",
+            "prop": "rug",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "squeaky floorboard",
+            "look": "It squeaks. Loudly. That's all it does.",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     },
     {
       "id": "booths",
       "title": "The Game Booths",
-      "description": "Past the mirrors, the midway game booths glow. The duck pond is still bubbling, and the strongman bell stands in the corner with a lock on its mallet.",
+      "description": "Past the mirrors, the midway game booths glow. The duck pond is still bubbling, the strongman bell stands tall with no mallet, and a fortune machine flickers beside a wall of numbered balloons.",
       "puzzles": [
         "duck-pond",
-        "strongman"
-      ]
+        "strongman",
+        "bell",
+        "ticket-machine",
+        "balloon-darts",
+        "fortune-teller"
+      ],
+      "scene": {
+        "backdrop": "carnival",
+        "objects": [
+          {
+            "id": "duck-tank",
+            "prop": "barrel",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "duck pond",
+            "look": "Plastic ducks bob round and round. The fishing rods are all tangled up."
+          },
+          {
+            "id": "hammer-rack",
+            "prop": "shelf",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "hammer rack",
+            "look": "Among the toy hammers: one long, heavy wooden handle with no head.",
+            "gives": "mallet-handle"
+          },
+          {
+            "id": "strongman-tower",
+            "prop": "sign",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "strongman tower",
+            "look": "A tall red tower with a shiny bell on top. 'Ring me if you can!'"
+          },
+          {
+            "id": "candy-floss",
+            "prop": "machine",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "candy floss machine",
+            "look": "Sticky pink fluff on everything. Your fingers will never be the same.",
+            "hidesPieces": true
+          },
+          {
+            "id": "ring-toss",
+            "prop": "table",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "ring toss",
+            "look": "Wooden bottles and a pile of hoops, all missing their bottles.",
+            "hidesPieces": true
+          },
+          {
+            "id": "hoopla-stall",
+            "prop": "crate",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "hoopla stall",
+            "look": "Cardboard boxes of prizes nobody ever won.",
+            "hidesPieces": true
+          },
+          {
+            "id": "prize-bins",
+            "prop": "chest",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "prize bins",
+            "look": "Whistles, stickers and a hundred bouncy balls.",
+            "hidesPieces": true
+          },
+          {
+            "id": "fortune-booth",
+            "prop": "cabinet",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "fortune machine",
+            "look": "A mechanical fortune teller in a glass box. Its crystal ball flickers when you walk past."
+          },
+          {
+            "id": "balloon-wall",
+            "prop": "poster",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "balloon wall",
+            "look": "Rows of balloons, each with a number painted on it."
+          }
+        ]
+      }
     },
     {
       "id": "gate",
       "title": "The Big Top Gate",
-      "description": "The exit gate is right there, but a sleepy clown guard is snoring in front of it, and the ticket machine is blinking.",
+      "description": "The exit gate is right there, under a big poster of Mister Giggles. The carousel has stopped, the guard's chair is empty, and a costume trunk sits by the lamp post.",
       "puzzles": [
-        "bell",
-        "ticket-machine",
+        "clown-poster",
+        "carousel-sign",
+        "juggling-code",
         "exit-gate"
-      ]
+      ],
+      "scene": {
+        "backdrop": "carnival",
+        "objects": [
+          {
+            "id": "big-gate",
+            "prop": "door",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "big gate",
+            "look": "Tall striped bars and two locks: one for a key, one for a password."
+          },
+          {
+            "id": "guard-chair",
+            "prop": "desk",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "guard's chair",
+            "look": "The clown guard's chair, still warm. A newspaper full of doodles.",
+            "hidesPieces": true
+          },
+          {
+            "id": "carousel",
+            "prop": "statue",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "carousel",
+            "look": "The painted animals are frozen mid-gallop. One of them winks at you. Probably."
+          },
+          {
+            "id": "ticket-bin",
+            "prop": "barrel",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "ticket bin",
+            "look": "Hundreds of torn tickets. Admit one, admit one, admit one…",
+            "hidesPieces": true
+          },
+          {
+            "id": "clown-poster-wall",
+            "prop": "poster",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "clown poster",
+            "look": "Mister Giggles, grinning, with a big red nose. Letters are scribbled across the bottom."
+          },
+          {
+            "id": "lamp-post",
+            "prop": "lamp",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "lamp post",
+            "look": "A striped lamp post covered in stickers.",
+            "hidesPieces": true
+          },
+          {
+            "id": "costume-trunk",
+            "prop": "chest",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "costume trunk",
+            "look": "Floppy shoes, a curly wig and a polka-dot bow tie.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tent-flap",
+            "prop": "window",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "dark tent flap",
+            "look": "Your torch lights up the inside of the tent flap. Painted there is a table of silly symbols: {key:juggling-code}",
+            "requires": "torch",
+            "lockedText": "Something is painted inside the tent flap, but it's too dark to see.",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "joke-box",
+            "prop": "box",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "joke box",
+            "look": "A box of tricks. Inside: a squeaky red nose.",
+            "gives": "squeaky-nose",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -63,13 +403,13 @@
         "eggs"
       ],
       "rewards": [
-        "mirror-key"
+        "grabber"
       ],
       "hints": [
         "Read it from right to left: 'What has to be broken before you can use it?'",
         "You crack it for breakfast."
       ],
-      "solvedText": "The mirror slides aside with a giggle. On a hook behind it: a little silver key.",
+      "solvedText": "The mirror slides aside with a giggle. Behind it: a long grabber on a stick, the kind for reaching high shelves.",
       "variants": [
         {},
         {
@@ -96,6 +436,76 @@
       ]
     },
     {
+      "id": "mirror-search",
+      "title": "Bits of a Flashlight",
+      "kind": "search",
+      "prompt": "Mister Giggles hid a flashlight in pieces! Search the popcorn cart, the prize shelf and the bench.",
+      "finds": [
+        "popcorn-cart",
+        "prize-shelf",
+        "bench"
+      ],
+      "rewards": [
+        "flashlight"
+      ],
+      "hints": [
+        "Three places near the mirrors each hide one part.",
+        "Look in the popcorn cart, on the prize shelf and under the bench."
+      ],
+      "solvedText": "Body, lens and switch click together: a flashlight! But it doesn't turn on. No batteries."
+    },
+    {
+      "id": "mirror-lineup",
+      "title": "The Mirror Line-Up",
+      "kind": "code",
+      "prompt": "Five funny mirrors stand in a row: {items}. The battery box beside them has a keypad. A sign says: 'Each mirror's place, far left is 1, in the order I list them!'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "tall mirror",
+          "short mirror",
+          "wavy mirror",
+          "round mirror",
+          "twisty mirror"
+        ],
+        "pieceTemplate": "Written in lipstick on a mirror: {clue}"
+      },
+      "rewards": [
+        "batteries"
+      ],
+      "hints": [
+        "Every phone has a clue about the mirrors. Share them all.",
+        "Start with the mirror you're surest about, and try each place.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The battery box pops open. Two fat batteries roll out. Honk!"
+    },
+    {
+      "id": "giggle-note",
+      "minMinutes": 45,
+      "title": "The Giggle Code",
+      "kind": "text",
+      "prompt": "A note in wobbly handwriting is stuck to the biggest mirror: {cipher}. 'Say it and I'll open up!'",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "pie",
+          "juggle",
+          "tickle",
+          "wiggle",
+          "banana",
+          "custard"
+        ]
+      },
+      "hints": [
+        "Mister Giggles wrote how far to slide the letters somewhere dark.",
+        "Shine the torch into the dark corner, then slide every letter back that many places.",
+        "It says {answer}."
+      ],
+      "solvedText": "The note curls up and blows a raspberry. The mirrors stop wobbling for a moment."
+    },
+    {
       "id": "little-door",
       "title": "The Little Door",
       "kind": "use",
@@ -111,18 +521,17 @@
     },
     {
       "id": "duck-pond",
-      "minMinutes": 45,
       "title": "The Duck Pond Prize Box",
       "kind": "code",
-      "prompt": "The prize box has a 3-digit lock. The sign says: '{order}!' Each of you fished out one rubber duck.",
+      "prompt": "The duck pond's prize box has a 3-digit lock. The sign says: '{order}!' Each of you fished out one rubber duck.",
       "rewards": [
-        "prize-ticket"
+        "rubber-duck"
       ],
       "hints": [
         "Each phone has one duck. Say your duck's color and number out loud.",
         "Put them in the sign's order: {order}."
       ],
-      "solvedText": "Quack! The prize box pops open. Inside: one shiny golden prize ticket.",
+      "solvedText": "Quack! The prize box pops open. Inside: one extra-large rubber duck, with something stuck to its tummy.",
       "generator": {
         "type": "colorDigits",
         "count": 3,
@@ -148,13 +557,13 @@
         "candles"
       ],
       "rewards": [
-        "mallet"
+        "mallet-head"
       ],
       "hints": [
         "It gets shorter every time it's used.",
         "You light it on a birthday cake."
       ],
-      "solvedText": "The chain falls away. The mallet is huge, but together you can lift it.",
+      "solvedText": "The word lock pops open and the strongman's cupboard swings wide. Inside: the mallet's huge head. But where's its handle?",
       "variants": [
         {},
         {
@@ -188,8 +597,8 @@
         "mallet"
       ],
       "hints": [
-        "Bells need something to hit them.",
-        "Use the mallet on the bell."
+        "Bells need something big to hit them, and you have two halves of one.",
+        "Put the mallet head on the handle from the hammer rack, then use the mallet on the bell."
       ],
       "rewards": [
         "brass-key"
@@ -200,16 +609,145 @@
       "id": "ticket-machine",
       "minMinutes": 45,
       "title": "The Ticket Machine",
-      "kind": "use",
-      "prompt": "The gate's ticket machine blinks: 'One golden prize ticket to leave, please!'",
+      "kind": "switches",
+      "prompt": "The ticket machine gobbles your golden ticket and its lights go wild! Each button lights its bulb and flips the ones beside it. Turn every light on.",
       "requires": [
         "prize-ticket"
       ],
+      "generator": {
+        "type": "switches"
+      },
       "hints": [
-        "You won something shiny at the duck pond.",
-        "Use the golden prize ticket."
+        "Work from the top row down: fix each row using the buttons in the row below it.",
+        "Press {answer}."
       ],
-      "solvedText": "The machine swallows the ticket and plays a happy tune. One lock on the gate clicks open."
+      "solvedText": "Every bulb glows and the machine plays a happy tune. Ding-ding-ding!"
+    },
+    {
+      "id": "balloon-darts",
+      "minMinutes": 45,
+      "title": "The Balloon Darts",
+      "kind": "code",
+      "prompt": "The numbers on the balloons go: {sequence}. The prize lock wants the next balloon's number.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how much each number grows by.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "POP! Every balloon bursts at once and glitter rains down."
+    },
+    {
+      "id": "fortune-teller",
+      "minMinutes": 60,
+      "title": "The Fortune Machine",
+      "kind": "text",
+      "prompt": "The fortune machine's crystal ball flickers: 'What can you catch but never throw?'",
+      "answers": [
+        "cold",
+        "a cold"
+      ],
+      "hints": [
+        "You might catch it in winter.",
+        "Achoo!"
+      ],
+      "solvedText": "A little card slides out: 'You will escape… maybe. Ha-ha-HONK!'",
+      "variants": [
+        {},
+        {
+          "prompt": "The fortune machine's crystal ball flickers: 'What has an eye but cannot see?'",
+          "answers": [
+            "needle",
+            "a needle"
+          ],
+          "hints": [
+            "You use it for sewing.",
+            "Thread goes through its eye."
+          ]
+        },
+        {
+          "prompt": "The fortune machine's crystal ball flickers: 'What gets wetter the more it dries?'",
+          "answers": [
+            "towel",
+            "a towel"
+          ],
+          "hints": [
+            "You use it after a bath.",
+            "It dries you off."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clown-poster",
+      "title": "The Clown Poster",
+      "kind": "text",
+      "prompt": "Scribbled across the bottom of the clown poster, in Mister Giggles' back-to-front alphabet: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "wacky",
+          "bounce",
+          "prank",
+          "confetti",
+          "noodle",
+          "bubbles"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A is Z, B is Y, C is X… Swap every letter.",
+        "It says {answer}."
+      ],
+      "solvedText": "The poster's eyes roll and it honks. One of the gate's bars wiggles loose."
+    },
+    {
+      "id": "carousel-sign",
+      "minMinutes": 60,
+      "title": "The Carousel Sign",
+      "kind": "text",
+      "prompt": "The carousel's sign has lost its letters. Only numbers are left: {cipher}. Say the word to make it spin.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "pony",
+          "twirl",
+          "organ",
+          "saddle",
+          "whirl"
+        ]
+      },
+      "hints": [
+        "Each number is a letter.",
+        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "It says {answer}."
+      ],
+      "solvedText": "The carousel wheezes into life and goes round once, tootling. Then it stops again."
+    },
+    {
+      "id": "juggling-code",
+      "minDifficulty": "hard",
+      "title": "The Juggling Code",
+      "kind": "text",
+      "prompt": "A juggling pin hangs over the gate, painted with silly symbols: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "juggler",
+          "acrobat",
+          "unicycle",
+          "trapeze"
+        ]
+      },
+      "hints": [
+        "The symbols need a key. It's painted somewhere dark.",
+        "Shine the torch on the dark tent flap, then swap each symbol for its letter."
+      ],
+      "solvedText": "The juggling pin drops into your hands. 'Not bad!' grumbles Mister Giggles."
     },
     {
       "id": "exit-gate",
@@ -245,24 +783,84 @@
   ],
   "items": [
     {
+      "id": "grabber",
+      "name": "Grabber",
+      "description": "A long stick with a claw on the end, for reaching things up high."
+    },
+    {
       "id": "mirror-key",
       "name": "Little silver key",
-      "description": "Tiny and shiny. It was hidden behind a mirror."
+      "description": "Tiny and shiny. It was hidden on top of the tallest mirror."
+    },
+    {
+      "id": "flashlight",
+      "name": "Flashlight",
+      "description": "Put back together, but it won't turn on."
+    },
+    {
+      "id": "batteries",
+      "name": "Batteries",
+      "description": "Two fat batteries."
+    },
+    {
+      "id": "torch",
+      "name": "Glowing flashlight",
+      "description": "It works! A bright beam for dark corners."
+    },
+    {
+      "id": "rubber-duck",
+      "name": "Giant rubber duck",
+      "description": "An extra-large rubber duck from the prize box.",
+      "inspect": "You turn it over. Stuck to its tummy is a golden prize ticket! You peel it off.",
+      "inspectGives": "prize-ticket"
     },
     {
       "id": "prize-ticket",
       "name": "Golden prize ticket",
-      "description": "Won at the duck pond. It sparkles."
+      "description": "Peeled off a rubber duck's tummy. It sparkles."
+    },
+    {
+      "id": "mallet-head",
+      "name": "Mallet head",
+      "description": "The strongman mallet's huge wooden head, with a hole for a handle."
+    },
+    {
+      "id": "mallet-handle",
+      "name": "Long handle",
+      "description": "A long, heavy wooden handle."
     },
     {
       "id": "mallet",
       "name": "Giant mallet",
-      "description": "The strongman's mallet. It takes teamwork to swing."
+      "description": "The strongman's mallet, all in one piece. It takes teamwork to swing."
     },
     {
       "id": "brass-key",
       "name": "Big brass key",
       "description": "Dropped by the sleepy clown guard."
+    },
+    {
+      "id": "squeaky-nose",
+      "name": "Squeaky red nose",
+      "description": "It squeaks when you squeeze it. That's all it does."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "flashlight",
+        "batteries"
+      ],
+      "makes": "torch",
+      "text": "The batteries slide in and the flashlight blinks on. Light!"
+    },
+    {
+      "items": [
+        "mallet-head",
+        "mallet-handle"
+      ],
+      "makes": "mallet",
+      "text": "The handle slots into the mallet's head with a THUNK."
     }
   ]
 }

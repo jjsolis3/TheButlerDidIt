@@ -212,6 +212,8 @@ The scene is laid out on the 1000 × 600 canvas with spots that don't overlap:
 
 Across lengths and difficulties it plays 9 puzzles at 30 minutes, 13 at 45 and 15 at 60, plus Hard's extra. The validator plays every one of those through, 200 puzzle sets each, and the content tests check the room clears the bar for shipped rooms (`ContentBarTests`), including that no cipher word is already written somewhere in the room.
 
+The Family rooms (edition 2) follow the same shape with gentler parts: the Pirate Ship's apple-barrel riddle gives a ladle, the ladle fishes the galley key out of the stew pot, and a spyglass put together from a lens (a logic puzzle about the cook's pots) and a tube (a search) reads the shift cipher's key off a buoy far out at sea. Their ciphers are numbers (A = 1), mirror and shift with short words; symbols and Morse only turn up on Hard. Easy deals smaller logic puzzles and number patterns.
+
 ## Leaderboards
 
 When a game ends, its result is saved in the same step that ends the game. The **score** is the time taken plus the time each hint cost, and lower is better. The ending screen shows where the group ranked, all time or on today's challenge. Times are public. Team names only ever appear on the host's own escapes.
@@ -219,6 +221,7 @@ When a game ends, its result is saved in the same step that ends the game. The *
 ## Tips
 
 - **Keep cipher words out of the room's own text.** If "shelter" is in the synopsis, a cipher that spells SHELTER is answered before it's decoded (and the AI's prompts would carry it too). The content tests catch this.
+- **Keep answers out of the screens' words.** A riddle whose answer is "clock" can't have a spot drawn as a `clock` prop, and one answered "table" collides with the `"table"` a cipher's view carries. Nor can a hint repeat a prompt word for word. The privacy tests catch all three.
 - **Make them search.** A scene with a few decoys, a tool that reveals something, and a key written somewhere unexpected feels like a real room. Codes the group has to work out (a cipher, a pattern, a logic puzzle) beat codes read off a phone.
 - **Make the phones matter.** Put at least one puzzle with 3–4 `pieces` in each room. Write every piece so it only makes sense together with the others, for example "the SECOND digit is…".
 - **Chain the rooms with items.** A key found in stage 1 opens something in stage 2 or 3. The validator proves no item is needed before it can be found.
