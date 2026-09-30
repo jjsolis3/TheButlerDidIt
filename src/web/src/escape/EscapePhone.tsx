@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { Button, ErrorText, StatusPill, inputClass } from '../components/ui'
 import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView } from '../lib/types'
@@ -103,6 +104,9 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
             {formatDuration(elapsedSeconds(stage))} · {stage.solvedCount}/{stage.puzzleCount} puzzles · {stage.hintsUsed} hint{stage.hintsUsed === 1 ? '' : 's'}
           </p>
           {stage.puzzleSet !== null && !stage.daily && <p className="mt-2 text-xs text-muted">Puzzle set #{stage.puzzleSet}: share it to challenge friends.</p>}
+          <Link to="/" className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg border border-line px-4 py-2 text-sm hover:border-accent">
+            Back to home
+          </Link>
         </div>
       )}
     </div>

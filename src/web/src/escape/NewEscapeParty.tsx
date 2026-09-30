@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { Button, ErrorText, FilterChip, inputClass } from '../components/ui'
 import { api } from '../lib/api'
 import type { AiStatus, ContentRating, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
@@ -12,14 +12,20 @@ const isHalloween = (room: EscapeRoomSummary) => room.seasons.includes('hallowee
 export function NewEscapeParty() {
   const navigate = useNavigate()
   const [rooms, setRooms] = useState<EscapeRoomSummary[] | null>(null)
-  const [chosen, setChosen] = useState<string>()
+  // "Play this room again" links here with the room, length and difficulty just played (?room=…&minutes=…&difficulty=…).
+  const [params] = useSearchParams()
+  const askedRoom = params.get('room')
+  const [chosen, setChosen] = useState<string | undefined>(askedRoom ?? undefined)
   // Adults and Family shelves, and a Halloween filter within them, like the mystery shelf.
   const [shelf, setShelf] = useState<ContentRating>('mature')
   const [halloweenOnly, setHalloweenOnly] = useState(false)
   const [spookySeason] = useState(() => new Date().getMonth() === 9) // October; read once, not on every render
   // The game's length. Only kept while the chosen room offers it (worked out during render below).
-  const [chosenMinutes, setChosenMinutes] = useState<number>()
-  const [difficulty, setDifficulty] = useState<EscapeDifficulty>('normal')
+  const [chosenMinutes, setChosenMinutes] = useState<number | undefined>(() => Number(params.get('minutes')) || undefined)
+  const [difficulty, setDifficulty] = useState<EscapeDifficulty>(() => {
+    const d = params.get('difficulty')
+    return d === 'easy' || d === 'hard' ? d : 'normal'
+  })
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   // Fresh puzzles every time by default; today's challenge races every other group; a puzzle set
   // number (shown at the end of every game) replays exactly the same puzzles.
@@ -32,9 +38,14 @@ export function NewEscapeParty() {
   const [useAi, setUseAi] = useState(true)
 
   useEffect(() => {
-    api.escapeRooms().then(setRooms, (e: Error) => setError(e.message))
+    api.escapeRooms().then((all) => {
+      setRooms(all)
+      // A room asked for in the link opens on its own shelf. Unknown ids are ignored (the shelf's first room is picked).
+      const asked = all.find((r) => r.id === askedRoom)
+      if (asked) setShelf(asked.contentRating)
+    }, (e: Error) => setError(e.message))
     api.aiStatus().then(setAi, () => setAi(null))
-  }, [])
+  }, [askedRoom])
 
   // A room written by AI goes to the top of the shelf, selected, ready to play.
   const onWritten = async (job: GenerationJob) => {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { Button, Card, ErrorText, Eyebrow, Field, FilterChip, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import { useJobUpdates } from '../lib/hub'
@@ -59,7 +59,9 @@ export default function NewParty() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   // Which kind of game night. Mysteries first: the original game.
-  const [game, setGame] = useState<GameKind>('mystery')
+  // ?game=escape opens the escape rooms, e.g. from "Host another game" on an escape room's ending.
+  const [params] = useSearchParams()
+  const [game, setGame] = useState<GameKind>(params.get('game') === 'escape' ? 'escapeRoom' : 'mystery')
 
   useEffect(() => {
     if (me === null) navigate('/login')
