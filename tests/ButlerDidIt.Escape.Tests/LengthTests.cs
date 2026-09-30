@@ -26,7 +26,7 @@ public class LengthTests
         Assert.DoesNotContain(thirty.Stages.SelectMany(s => s.Puzzles), id => id is "cabinet" or "fusebox" or "doll");
 
         var sixty = RoomLengths.Cut(room, 60);
-        Assert.Equal(room.Puzzles.Count, sixty.Puzzles.Count); // everything, the doll included
+        Assert.Equal(room.Puzzles.Count(p => p.MinDifficulty is null), sixty.Puzzles.Count); // everything but Hard's extras, the doll included
 
         // The room's own length (and parties from before lengths, with none recorded) skips only the longer game's extras.
         var standard = RoomLengths.Cut(room, null);
@@ -63,10 +63,10 @@ public class LengthTests
     [Fact]
     public void A_shorter_game_that_still_needs_a_key_from_a_left_out_puzzle_is_caught()
     {
-        // The tape gives the rusty key the shackles need; keeping the shackles but not the tape at 30 minutes breaks the room.
+        // The tape gives the rusty key the shackles need (once it's oiled); keeping the shackles but not the tape at 30 minutes breaks the room.
         var room = WithPuzzle(Copy(Workshop), "tape", p => p with { MinMinutes = 45 });
         var errors = EscapeRoomValidator.Validate(room);
-        Assert.Contains(errors, e => e.StartsWith("At 30 minutes:") && e.Contains("rusty-key"));
+        Assert.Contains(errors, e => e.StartsWith("At 30 minutes:") && e.Contains("'shackles'") && e.Contains("oiled-key"));
     }
 
     [Fact]

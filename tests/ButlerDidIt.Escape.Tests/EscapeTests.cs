@@ -207,7 +207,7 @@ public class EngineTests
     {
         var s = Started(Workshop, Ada, Ben);
         var ex = Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new UseItems(T0, Ada, "shackles")));
-        Assert.Contains("Rusty key", ex.Message);
+        Assert.Contains("Oiled key", ex.Message);
         ex = Assert.Throws<GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0, Ada, "toolbox", "3728")));
         Assert.Contains("isn't in this part", ex.Message);
     }

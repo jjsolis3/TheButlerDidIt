@@ -225,7 +225,7 @@ public class LaboratoryTests
     [Fact]
     public void Rooms_without_hiding_spots_deal_every_piece_to_a_phone_as_before()
     {
-        var workshop = Rooms.Get("the-workshop");
+        var workshop = Rooms.Get("the-workshop") with { Stages = Rooms.Get("the-workshop").Stages.Select(st => st with { Scene = null }).ToList() };
         var s = EscapeEngine.NewGame(3);
         s = EscapeEngine.Apply(s, workshop, new AddEscapePlayer(T0, Ada, "Ada", true, false));
         s = EscapeEngine.Apply(s, workshop, new StartEscape(T0));
@@ -386,7 +386,10 @@ public class HarderPrivacyTests
                 {
                     foreach (var p in room.Puzzles)
                         foreach (var answer in p.Answers.Where(a => a.Length >= 3))
-                            Assert.False(stageJson.Contains($"\"{answer}\"", StringComparison.OrdinalIgnoreCase), $"answer of {p.Id} leaked");
+                        {
+                            var at = stageJson.IndexOf($"\"{answer}\"", StringComparison.OrdinalIgnoreCase);
+                            Assert.True(at < 0, $"answer of {p.Id} leaked: …{(at < 0 ? "" : stageJson[Math.Max(0, at - 120)..Math.Min(stageJson.Length, at + 40)])}…");
+                        }
                     if (seed > 1000) Assert.DoesNotContain(seed.ToString(), stageJson); // a short one could be any number on screen
                 }
             });
@@ -425,6 +428,7 @@ public class PuzzleProofTests
                 var t = m.Shown.Append(m.Next).ToList();
                 Assert.True(t.All(x => x > 0));
                 Assert.True(m.Next < 100_000, "a code short enough to type");
+                Assert.True(m.Next >= 100, "a code too long to guess by trying them all");
                 switch (m.Rule)
                 {
                     case PuzzleGenerators.SequenceRule.Arithmetic:

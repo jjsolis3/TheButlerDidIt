@@ -90,4 +90,31 @@ public class ContentBarTests
                 }
         }
     }
+
+    /// <summary>
+    /// A cipher's word is its answer, so it mustn't already be written in the room: in a title, a description, a spot,
+    /// an item, a hint, or the few words every prompt carries ("minutes"). Otherwise the answer is on screen, or in
+    /// the AI's prompt, before anyone decodes anything.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(RebuiltRooms))]
+    public void Cipher_words_are_nowhere_else_in_the_room(string id)
+    {
+        var room = Rooms.Get(id);
+        var texts = new List<string> { room.Title, room.Synopsis, room.Intro, room.EscapedText, room.FailedText, room.Theme, room.ArtStyle, room.Host.Name, room.Host.Persona,
+            "minutes seconds time left hints used wrong answers stage puzzles solved" };
+        foreach (var s in room.Stages) texts.AddRange([s.Id, s.Title, s.Description]);
+        foreach (var o in room.SceneObjects) texts.AddRange(new[] { o.Id, o.Label, o.Prop, o.Look, o.Clue, o.LockedText }.OfType<string>());
+        foreach (var i in room.Items) texts.AddRange(new[] { i.Id, i.Name, i.Description, i.Inspect }.OfType<string>());
+        foreach (var p in room.Puzzles)
+        {
+            texts.AddRange([p.Id, p.Title, p.Prompt, p.SolvedText, .. p.Hints, .. p.Pieces]);
+            foreach (var v in p.Variants) texts.AddRange(new[] { v.Prompt, v.SolvedText }.OfType<string>().Concat(v.Hints ?? []).Concat(v.Pieces ?? []));
+        }
+        var all = string.Join(" ", texts);
+        foreach (var p in room.Puzzles.Where(p => p.Generator?.Type == GeneratorType.Cipher))
+            foreach (var word in p.Generator!.Words)
+                Assert.False(System.Text.RegularExpressions.Regex.IsMatch(all, $@"(?<![\p{{L}}]){word}(?![\p{{L}}])", System.Text.RegularExpressions.RegexOptions.IgnoreCase),
+                    $"{p.Id}'s word '{word}' is already written in the room");
+    }
 }

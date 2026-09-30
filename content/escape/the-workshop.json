@@ -8,8 +8,15 @@
   "minPlayers": 2,
   "maxPlayers": 6,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45, 60],
-  "seasons": ["halloween"],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 120,
   "soundscape": "workshop",
   "intro": "Hello. You don't know me, but I know all of you. You have wasted every hour you were given, so tonight I will teach you what an hour is worth. You are chained in my workshop. Everything you need to leave is in this room: keys, tools, and each other. Nobody escapes alone. The clock on the wall is yours. Let the game begin.",
@@ -18,38 +25,339 @@
   "gameMaster": {
     "name": "The Tinkerer",
     "persona": "Speaks through a crackling cassette recorder: calm, precise, coldly polite, never shouts. Sees wasted time as the real crime and treats the room as a lesson. Dry, unsettling approval when the group does well; quiet disappointment when they flounder.",
-    "voice": { "accent": "en-US", "pitch": 0.7, "rate": 0.85, "style": "low, slow, measured" }
+    "voice": {
+      "accent": "en-US",
+      "pitch": 0.7,
+      "rate": 0.85,
+      "style": "low, slow, measured"
+    }
   },
   "stages": [
     {
       "id": "chains",
       "title": "The Chains",
-      "description": "Heavy chains run from your ankles to the pipes. A cassette recorder sits on the floor, and a wall clock ticks just out of reach.",
+      "description": "Heavy chains run from your ankles to the pipes. A cassette recorder sits on the floor beside a drain, a bucket and a crate, and five oil drums stand against the wall under a ticking clock, just out of reach.",
       "puzzles": [
         "tape",
-        "shackles"
-      ]
+        "floor-search",
+        "drums",
+        "shackles",
+        "rewind"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "pipes",
+            "prop": "pipe",
+            "x": 20,
+            "y": 40,
+            "w": 180,
+            "h": 300,
+            "label": "pipes",
+            "look": "Rusted pipes, sweating in the damp. Your chains are padlocked around them."
+          },
+          {
+            "id": "bare-bulb",
+            "prop": "lamp",
+            "x": 260,
+            "y": 30,
+            "w": 130,
+            "h": 130,
+            "label": "bare bulb",
+            "look": "A single bulb on a wire, buzzing. It swings when you breathe."
+          },
+          {
+            "id": "recorder",
+            "prop": "machine",
+            "x": 250,
+            "y": 420,
+            "w": 150,
+            "h": 120,
+            "label": "cassette recorder",
+            "look": "The tape recorder. Scratched into its side: 'Wind me back {key:rewind}.'",
+            "hidesPieces": true
+          },
+          {
+            "id": "drain",
+            "prop": "vent",
+            "x": 440,
+            "y": 470,
+            "w": 140,
+            "h": 100,
+            "label": "drain",
+            "look": "A drain grate in a puddle of oily water. Something was wedged under it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tiles",
+            "prop": "rug",
+            "x": 620,
+            "y": 480,
+            "w": 180,
+            "h": 90,
+            "label": "loose floor tiles",
+            "look": "One tile lifts. Just grit and a dead spider's web underneath.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bucket",
+            "prop": "barrel",
+            "x": 830,
+            "y": 420,
+            "w": 140,
+            "h": 150,
+            "label": "bucket",
+            "look": "A bucket of grey water. You'd rather not put your hand in, but you do.",
+            "hidesPieces": true
+          },
+          {
+            "id": "crate",
+            "prop": "crate",
+            "x": 650,
+            "y": 250,
+            "w": 150,
+            "h": 150,
+            "label": "crate",
+            "look": "Rags, empty bottles and a smell of old oil.",
+            "hidesPieces": true
+          },
+          {
+            "id": "drums-wall",
+            "prop": "barrel",
+            "x": 430,
+            "y": 60,
+            "w": 200,
+            "h": 160,
+            "label": "oil drums",
+            "look": "Five drums in a row, each painted a different colour. A locker behind them has a keypad."
+          },
+          {
+            "id": "mirror-shard",
+            "prop": "mirror",
+            "x": 850,
+            "y": 60,
+            "w": 120,
+            "h": 140,
+            "label": "mirror shard",
+            "look": "A shard of mirror. Your own face, tired and scared. Nothing else.",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     },
     {
       "id": "workbench",
       "title": "The Workbench",
-      "description": "Free of the pipes, you stumble to a workbench covered in rusted tools. A steel toolbox and a tall cabinet are both locked. Someone has written on your hands.",
+      "description": "Free of the pipes, you stumble to a workbench covered in rusted tools. A steel toolbox and a tall cabinet are both locked. A pegboard, a drawer, a pile of rags and an old calendar surround you. Someone has written on your hands.",
       "puzzles": [
         "toolbox",
-        "cabinet"
-      ]
+        "mirror-note",
+        "cabinet",
+        "blueprint",
+        "tool-outlines"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "workbench",
+            "prop": "desk",
+            "x": 40,
+            "y": 330,
+            "w": 300,
+            "h": 200,
+            "label": "workbench",
+            "look": "Rusted tools, all bolted down. A vice holds half of a torn photograph.",
+            "gives": "photo-left",
+            "hidesPieces": true
+          },
+          {
+            "id": "drawer",
+            "prop": "drawer",
+            "x": 380,
+            "y": 420,
+            "w": 160,
+            "h": 100,
+            "label": "bench drawer",
+            "look": "Under a greasy rag: the other half of a torn photograph.",
+            "gives": "photo-right",
+            "hidesPieces": true
+          },
+          {
+            "id": "pegboard",
+            "prop": "shelf",
+            "x": 60,
+            "y": 40,
+            "w": 300,
+            "h": 220,
+            "label": "pegboard",
+            "look": "Painted outlines of tools. Four of the shapes are empty."
+          },
+          {
+            "id": "rags",
+            "prop": "box",
+            "x": 580,
+            "y": 440,
+            "w": 160,
+            "h": 120,
+            "label": "pile of rags",
+            "look": "Oily rags, stiff with dirt.",
+            "hidesPieces": true
+          },
+          {
+            "id": "calendar",
+            "prop": "sign",
+            "x": 420,
+            "y": 60,
+            "w": 150,
+            "h": 180,
+            "label": "calendar",
+            "look": "A calendar from years ago. Every single day has been crossed out.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tall-cabinet",
+            "prop": "cabinet",
+            "x": 800,
+            "y": 120,
+            "w": 170,
+            "h": 420,
+            "label": "tall cabinet",
+            "look": "Its letter lock stares back at you. A riddle is painted above it."
+          },
+          {
+            "id": "steel-toolbox",
+            "prop": "chest",
+            "x": 600,
+            "y": 230,
+            "w": 170,
+            "h": 130,
+            "label": "steel toolbox",
+            "look": "Heavy, cold, and locked with four dials."
+          }
+        ]
+      }
     },
     {
       "id": "door",
       "soundscape": "drone",
       "title": "The Door",
-      "description": "Past the workbench: a steel door with a keypad, a dead fuse box, and a wire cage bolted to the wall. A doll with painted cheeks watches from a shelf.",
+      "description": "Past the workbench: a steel door with a keypad, a dead fuse box, and a wire cage bolted to the wall. A doll with painted cheeks watches from a shelf, a monitor hisses static, and something is stashed under the stairs.",
       "puzzles": [
-        "fusebox",
         "cage",
+        "fusebox",
+        "tally",
         "doll",
+        "message",
         "exit-door"
-      ]
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "fuse-box",
+            "prop": "machine",
+            "x": 40,
+            "y": 60,
+            "w": 170,
+            "h": 200,
+            "label": "fuse box",
+            "look": "One slot is empty. A breaker panel of little bulbs sits dark beside it."
+          },
+          {
+            "id": "wire-cage",
+            "prop": "box",
+            "x": 250,
+            "y": 60,
+            "w": 170,
+            "h": 170,
+            "label": "wire cage",
+            "look": "A brass key hangs inside. The wire is far too thick to bend."
+          },
+          {
+            "id": "under-stairs",
+            "prop": "crate",
+            "x": 40,
+            "y": 380,
+            "w": 240,
+            "h": 180,
+            "label": "under the stairs",
+            "look": "Behind a sack of cement: the heavy jaws of a pair of bolt cutters, with no handles.",
+            "gives": "cutter-jaws",
+            "hidesPieces": true
+          },
+          {
+            "id": "doormat",
+            "prop": "rug",
+            "x": 330,
+            "y": 480,
+            "w": 220,
+            "h": 90,
+            "label": "doormat",
+            "look": "A doormat that says WELCOME. Someone has a sense of humour.",
+            "hidesPieces": true
+          },
+          {
+            "id": "doll-shelf",
+            "prop": "statue",
+            "x": 470,
+            "y": 60,
+            "w": 150,
+            "h": 190,
+            "label": "doll's shelf",
+            "look": "The doll's glass eyes follow you. Its dress is covered in coloured ribbons.",
+            "hidesPieces": true
+          },
+          {
+            "id": "monitor",
+            "prop": "sign",
+            "x": 660,
+            "y": 60,
+            "w": 160,
+            "h": 130,
+            "label": "monitor",
+            "look": "Static, and now and then a flicker of the doll's grinning face.",
+            "hidesPieces": true
+          },
+          {
+            "id": "steel-door",
+            "prop": "door",
+            "x": 820,
+            "y": 240,
+            "w": 160,
+            "h": 330,
+            "label": "steel door",
+            "look": "A keypad and a heavy lock. The frame is covered in scratches."
+          },
+          {
+            "id": "notebook",
+            "prop": "drawer",
+            "x": 600,
+            "y": 330,
+            "w": 170,
+            "h": 110,
+            "label": "notebook on the step",
+            "look": "Blank pages. Under the UV torch, writing blooms across them: {key:message}",
+            "requires": "uv-torch",
+            "lockedText": "Blank pages. Or are they?",
+            "minDifficulty": "hard",
+            "hidesPieces": true
+          },
+          {
+            "id": "coat-hook",
+            "prop": "sign",
+            "x": 600,
+            "y": 460,
+            "w": 170,
+            "h": 110,
+            "label": "coat hook",
+            "look": "A broken key hangs on the hook. It doesn't look like it fits anything.",
+            "gives": "broken-key",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -82,37 +390,131 @@
       ]
     },
     {
+      "id": "floor-search",
+      "title": "The Floor",
+      "kind": "search",
+      "prompt": "The chains are just long enough to reach the floor. Search it: the drain, the loose tiles and the crate.",
+      "finds": [
+        "drain",
+        "tiles",
+        "crate"
+      ],
+      "rewards": [
+        "oil-can"
+      ],
+      "hints": [
+        "You can reach three things on the floor from where you're chained.",
+        "Search the drain, the loose tiles and the crate."
+      ],
+      "solvedText": "Between the drain, the tiles and the crate, you piece it together: a small can of oil, half full."
+    },
+    {
+      "id": "drums",
+      "title": "The Oil Drums",
+      "kind": "code",
+      "prompt": "The oil drums by the wall: {items}. The locker behind them has a keypad. Stencilled on it: 'Each drum's place, far left is 1, in the order I list them.'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "red drum",
+          "black drum",
+          "grey drum",
+          "green drum",
+          "white drum"
+        ],
+        "pieceTemplate": "Scratched into the pipe beside you: {clue}"
+      },
+      "rewards": [
+        "uv-torch"
+      ],
+      "hints": [
+        "Every phone holds a fact about the drums. Put them all together.",
+        "Start with the drum you're surest about, and mark each spot yes or no.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The locker pops open. Inside: a small UV torch, its light a sickly violet."
+    },
+    {
       "id": "shackles",
       "title": "The Shackles",
       "kind": "use",
       "prompt": "Your ankles are chained to the pipes with a heavy padlock. The keyhole is caked with rust.",
       "requires": [
-        "rusty-key"
+        "oiled-key"
       ],
       "hints": [
-        "Something you found fits a padlock.",
-        "Use the rusty key on the shackles."
+        "The key alone won't turn in that rust.",
+        "Put the oil on the rusty key, then use it on the shackles."
       ],
-      "solvedText": "The key grinds, then turns. The chains rattle to the floor. You can reach the workbench."
+      "solvedText": "The oiled key grinds, then turns. The chains rattle to the floor. You can reach the workbench."
+    },
+    {
+      "id": "rewind",
+      "minMinutes": 45,
+      "title": "The Tape Label",
+      "kind": "text",
+      "prompt": "The cassette's label is written in a scramble: {cipher}. The recorder won't play the next message until you say it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "patience",
+          "regret",
+          "hourglass",
+          "reckoning",
+          "wasteful",
+          "lateness"
+        ]
+      },
+      "hints": [
+        "The recorder itself tells you how far to wind it back.",
+        "Move every letter back along the alphabet by that many.",
+        "It says {answer}."
+      ],
+      "solvedText": "The recorder clicks. 'Good. You're learning to listen.' The tape whirs on."
     },
     {
       "id": "toolbox",
       "title": "The Steel Toolbox",
       "kind": "code",
-      "prompt": "A 4-digit combination lock. Scratched into the lid: 'Each of you carries part of the code. Read your hands.'",
+      "prompt": "A combination lock with a dial for each of you. Scratched into the lid: 'Each of you carries part of the code. Read your hands.'",
       "rewards": [
-        "bolt-cutters"
+        "cutter-handles"
       ],
       "hints": [
         "Every phone holds one of the four digits. Read them out loud, in order.",
         "In order: {facts}."
       ],
-      "solvedText": "The lid springs open. Inside, wrapped in oily cloth: a pair of bolt cutters.",
+      "solvedText": "The lid springs open. Inside, wrapped in oily cloth: a pair of red bolt-cutter handles, with no blades.",
       "generator": {
         "type": "digitFacts",
-        "count": 4,
+        "count": 3,
         "pieceTemplate": "Written on your palm in marker: the {ordinal} digit is {fact}."
       }
+    },
+    {
+      "id": "mirror-note",
+      "title": "The Folded Alphabet",
+      "kind": "text",
+      "prompt": "Scratched into the bench in the Tinkerer's alphabet, the one he folds in half: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "hurry",
+          "trust",
+          "silent",
+          "quickly",
+          "beware",
+          "obedient"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter becomes the last.",
+        "A is Z, B is Y, C is X… Read it letter by letter.",
+        "It says {answer}."
+      ],
+      "solvedText": "As you say the word, the bench's vice springs loose with a clang. The Tinkerer approves."
     },
     {
       "id": "cabinet",
@@ -158,19 +560,45 @@
       ]
     },
     {
-      "id": "fusebox",
+      "id": "blueprint",
       "minMinutes": 45,
-      "title": "The Fuse Box",
-      "kind": "use",
-      "prompt": "The emergency lights are dead. The fuse box on the wall has one empty slot.",
-      "requires": [
-        "fuse"
+      "title": "The Blueprint",
+      "kind": "text",
+      "prompt": "A blueprint is pinned above the bench. Its title is written in symbols: {cipher}. A letter lock below wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "hinges",
+          "spanner",
+          "pliers",
+          "chisel",
+          "crowbar",
+          "wrench"
+        ]
+      },
+      "hints": [
+        "Somewhere there's a key to these symbols. Something you can only see in the right light.",
+        "Put the torn photo back together and look at it under the UV torch.",
+        "The title reads {answer}."
+      ],
+      "solvedText": "The lock drops open. The blueprint is a plan of this very room, with a cross drawn on the stairs."
+    },
+    {
+      "id": "tool-outlines",
+      "minMinutes": 60,
+      "title": "The Missing Tools",
+      "kind": "search",
+      "prompt": "Four tools are missing from the pegboard. Where did they go? Check the pegboard and the calendar.",
+      "finds": [
+        "pegboard",
+        "calendar"
       ],
       "hints": [
-        "What goes in an empty slot in a fuse box?",
-        "Use the fuse from the cabinet."
+        "The pegboard shows what's missing; the calendar shows how long they've been gone.",
+        "Search the pegboard and the calendar."
       ],
-      "solvedText": "The lights stutter on. A monitor above the door blinks awake: the Tinkerer's doll, grinning. 'Almost free. Count what saved you.'"
+      "solvedText": "Four empty outlines, and a calendar with every day crossed out. Whoever took those tools has been gone a long time."
     },
     {
       "id": "cage",
@@ -181,13 +609,45 @@
         "bolt-cutters"
       ],
       "hints": [
-        "Thick wire needs a strong tool.",
-        "Use the bolt cutters from the toolbox."
+        "Thick wire needs a strong tool, and you have half of one.",
+        "Put the handles from the toolbox together with the jaws from under the stairs, then cut the cage."
       ],
       "rewards": [
         "exit-key"
       ],
       "solvedText": "The cutters bite through the wire with a snap. The brass key drops into your hand."
+    },
+    {
+      "id": "fusebox",
+      "minMinutes": 45,
+      "title": "The Fuse Box",
+      "kind": "switches",
+      "prompt": "With the fuse in, the breaker panel wakes: each switch lights its bulb and flips the ones beside it. Turn every light on.",
+      "requires": [
+        "fuse"
+      ],
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the switches in the row below it.",
+        "Press {answer}."
+      ],
+      "solvedText": "The lights stutter on. A monitor above the door blinks awake: the Tinkerer's doll, grinning. 'Almost free. Count what saved you.'"
+    },
+    {
+      "id": "tally",
+      "title": "The Tally Marks",
+      "kind": "code",
+      "prompt": "Scratched into the door frame by someone who was here before you: {sequence}. A little keypad under the scratches waits for the next number.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how much each number grows by.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "The keypad beeps. Somewhere inside the door, a bolt slides back. One down."
     },
     {
       "id": "doll",
@@ -203,9 +663,38 @@
       "generator": {
         "type": "colorDigits",
         "count": 3,
-        "colors": ["red", "black", "white", "grey", "brown", "green"],
+        "colors": [
+          "red",
+          "black",
+          "white",
+          "grey",
+          "brown",
+          "green"
+        ],
         "pieceTemplate": "On the doll's dress you spot a {color} ribbon with the number {digit} stitched into it."
       }
+    },
+    {
+      "id": "message",
+      "minDifficulty": "hard",
+      "title": "The Tinkerer's Telegraph",
+      "kind": "text",
+      "prompt": "A telegraph key taps by itself, over and over: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "forgive",
+          "goodbye",
+          "regret",
+          "farewell"
+        ]
+      },
+      "hints": [
+        "The dots and dashes need a key. It's written where only UV light can find it.",
+        "Shine the torch on the notebook by the stairs, then read the taps letter by letter."
+      ],
+      "solvedText": "The tapping stops. In the silence, the Tinkerer sighs: 'You were paying attention after all.'"
     },
     {
       "id": "exit-door",
@@ -220,7 +709,7 @@
       ],
       "pieces": [
         "You remember the wall clock's hands: it stopped at 9 o'clock.",
-        "You remember the toolbox: besides the bolt cutters it held exactly 4 tools.",
+        "You remember the toolbox: besides the cutter handles it held exactly 4 tools.",
         "You remember the pipes: there were 2 chains, one on each ankle."
       ],
       "hints": [
@@ -236,7 +725,7 @@
           ],
           "pieces": [
             "You remember the wall clock's hands: it stopped at 3 o'clock.",
-            "You remember the toolbox: besides the bolt cutters it held exactly 6 tools.",
+            "You remember the toolbox: besides the cutter handles it held exactly 6 tools.",
             "You remember the pipes: there were 2 chains, one on each ankle."
           ]
         },
@@ -246,7 +735,7 @@
           ],
           "pieces": [
             "You remember the wall clock's hands: it stopped at 7 o'clock.",
-            "You remember the toolbox: besides the bolt cutters it held exactly 5 tools.",
+            "You remember the toolbox: besides the cutter handles it held exactly 5 tools.",
             "You remember the pipes: there were 2 chains, one on each ankle."
           ]
         }
@@ -257,12 +746,54 @@
     {
       "id": "rusty-key",
       "name": "Rusty key",
-      "description": "Small and flaking. It was taped behind the clock."
+      "description": "Small and flaking. It was taped behind the clock. Rusted solid."
+    },
+    {
+      "id": "oil-can",
+      "name": "Oil can",
+      "description": "A small can of oil, half full."
+    },
+    {
+      "id": "oiled-key",
+      "name": "Oiled key",
+      "description": "The rusty key, dripping with oil. It might turn now."
+    },
+    {
+      "id": "uv-torch",
+      "name": "UV torch",
+      "description": "A small torch with a violet light. Some writing only shows up under it."
+    },
+    {
+      "id": "photo-left",
+      "name": "Torn photo (left)",
+      "description": "Half of a photograph: a group of people standing in this workshop."
+    },
+    {
+      "id": "photo-right",
+      "name": "Torn photo (right)",
+      "description": "The other half of a photograph."
+    },
+    {
+      "id": "photo",
+      "name": "Photograph",
+      "description": "A group of people standing in this very workshop, all smiling. None of them look happy.",
+      "inspect": "Under the UV torch, a table of symbols glows across the back: {key:blueprint}",
+      "inspectRequires": "uv-torch"
+    },
+    {
+      "id": "cutter-handles",
+      "name": "Cutter handles",
+      "description": "Heavy red handles, with nothing on the end."
+    },
+    {
+      "id": "cutter-jaws",
+      "name": "Cutter jaws",
+      "description": "The heavy steel jaws of a pair of bolt cutters."
     },
     {
       "id": "bolt-cutters",
       "name": "Bolt cutters",
-      "description": "Heavy, with red handles. They could cut through almost anything."
+      "description": "Handles and jaws, together again. They could cut through almost anything."
     },
     {
       "id": "fuse",
@@ -273,6 +804,37 @@
       "id": "exit-key",
       "name": "Brass key",
       "description": "Big, heavy and polished. It has a tag: EXIT."
+    },
+    {
+      "id": "broken-key",
+      "name": "Broken key",
+      "description": "Snapped in half. Whatever it opened, it won't open it now."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "rusty-key",
+        "oil-can"
+      ],
+      "makes": "oiled-key",
+      "text": "You work the oil into the rusty key until it moves freely."
+    },
+    {
+      "items": [
+        "photo-left",
+        "photo-right"
+      ],
+      "makes": "photo",
+      "text": "The two halves of the photograph line up. Smiling faces, all of them strangers."
+    },
+    {
+      "items": [
+        "cutter-handles",
+        "cutter-jaws"
+      ],
+      "makes": "bolt-cutters",
+      "text": "The jaws slot onto the handles with a heavy click. Bolt cutters."
     }
   ]
 }

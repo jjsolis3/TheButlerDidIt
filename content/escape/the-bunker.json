@@ -8,7 +8,12 @@
   "minPlayers": 2,
   "maxPlayers": 6,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45, 60],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 120,
   "soundscape": "drone",
   "intro": "Attention. This is the Overseer. You have been selected for a survival exercise. The surface hatch is sealed. The only way out is the blast door at the far end of this bunker, and it opens only for a team that works like one. Every camera is on you. Every mistake is logged. The exercise begins now.",
@@ -17,28 +22,366 @@
   "gameMaster": {
     "name": "The Overseer",
     "persona": "A clipped, emotionless military voice on the bunker's intercom. Treats everything as a drill: logs every mistake, grades every solve, and calls the group 'recruits'. Never threatens directly; the cold politeness does the work.",
-    "voice": { "accent": "en-US", "pitch": 0.75, "rate": 0.95, "style": "clipped, flat, military" }
+    "voice": {
+      "accent": "en-US",
+      "pitch": 0.75,
+      "rate": 0.95,
+      "style": "clipped, flat, military"
+    }
   },
   "stages": [
     {
       "id": "decon",
       "title": "The Decontamination Room",
-      "description": "Tiled walls, a row of shower heads and a drain in the floor. Gas masks hang on hooks, a steel locker stands by the door, and a panel beside the showers blinks, waiting for a password.",
-      "puzzles": ["shower-panel", "mask-locker", "decon-door"]
+      "description": "Tiled walls, a row of shower heads and a drain in the floor. Gas masks hang on hooks above a bench, a clipboard is screwed to the wall, and a steel locker stands by the door. A panel beside the showers blinks, waiting for a password.",
+      "puzzles": [
+        "shower-panel",
+        "decon-search",
+        "decon-door",
+        "mask-locker",
+        "decon-log"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "showers",
+            "prop": "pipe",
+            "x": 30,
+            "y": 30,
+            "w": 260,
+            "h": 160,
+            "label": "shower heads",
+            "look": "Rusted nozzles. One is stuffed with a rag, and behind the rag, a filter canister.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tiled-wall",
+            "prop": "poster",
+            "x": 320,
+            "y": 30,
+            "w": 200,
+            "h": 160,
+            "label": "tiled wall",
+            "look": "Cracked white tiles. Someone has scratched a tally of days into the grout, then stopped."
+          },
+          {
+            "id": "masks",
+            "prop": "shelf",
+            "x": 560,
+            "y": 30,
+            "w": 200,
+            "h": 160,
+            "label": "gas masks",
+            "look": "A row of gas masks on hooks. One still has its strap. You take it.",
+            "gives": "gas-mask",
+            "hidesPieces": true
+          },
+          {
+            "id": "clipboard",
+            "prop": "sign",
+            "x": 800,
+            "y": 30,
+            "w": 170,
+            "h": 160,
+            "label": "clipboard",
+            "look": "A decontamination log. At the bottom, in the Overseer's neat print: 'Offset {key:decon-log}.'",
+            "hidesPieces": true
+          },
+          {
+            "id": "bench",
+            "prop": "table",
+            "x": 30,
+            "y": 260,
+            "w": 300,
+            "h": 120,
+            "label": "bench",
+            "look": "A steel bench, bolted down. Stencilled underneath: STAY SEATED.",
+            "hidesPieces": true
+          },
+          {
+            "id": "drain",
+            "prop": "vent",
+            "x": 380,
+            "y": 420,
+            "w": 160,
+            "h": 110,
+            "label": "floor drain",
+            "look": "You unscrew the grate. Lying in the silt: a small key.",
+            "requires": "screwdriver",
+            "gives": "locker-key",
+            "lockedText": "Something glints under the drain grate. The grate is screwed down tight."
+          },
+          {
+            "id": "first-aid",
+            "prop": "box",
+            "x": 580,
+            "y": 260,
+            "w": 180,
+            "h": 130,
+            "label": "first-aid box",
+            "look": "Empty, except for an expired ration voucher.",
+            "gives": "ration-voucher",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "steel-locker",
+            "prop": "cabinet",
+            "x": 820,
+            "y": 230,
+            "w": 150,
+            "h": 330,
+            "label": "steel locker",
+            "look": "A steel locker with a three-digit dial."
+          }
+        ]
+      }
     },
     {
       "id": "bunks",
       "soundscape": "workshop",
       "title": "The Bunks and the Mess",
-      "description": "Narrow bunks line the walls, each with a footlocker at its foot. In the mess, a stopped clock hangs over a long table, a ration crate sits padlocked in the corner, and a hatch leads deeper in.",
-      "puzzles": ["ration-crate", "footlocker", "mess-hatch"]
+      "description": "Narrow bunks line the walls, a row of footlockers at their feet. In the mess, a stopped clock hangs over a long table, a stove and a cupboard stand by a shelf of ration tins, a crate sits padlocked in the corner, and a dusty vent leads deeper in beside the hatch.",
+      "puzzles": [
+        "ration-crate",
+        "footlockers",
+        "tin-labels",
+        "footlocker",
+        "mess-hatch"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "noticeboard",
+            "prop": "poster",
+            "x": 30,
+            "y": 30,
+            "w": 170,
+            "h": 150,
+            "label": "noticeboard",
+            "look": "A duty rota. Every name on it is one of yours.",
+            "hidesPieces": true
+          },
+          {
+            "id": "stopped-clock",
+            "prop": "clock",
+            "x": 230,
+            "y": 30,
+            "w": 120,
+            "h": 120,
+            "label": "stopped clock",
+            "look": "The mess clock. Its hands haven't moved in years."
+          },
+          {
+            "id": "tin-shelf",
+            "prop": "shelf",
+            "x": 380,
+            "y": 30,
+            "w": 220,
+            "h": 140,
+            "label": "shelf of tins",
+            "look": "Rows of ration tins, each stamped with a number.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cupboard",
+            "prop": "cabinet",
+            "x": 630,
+            "y": 30,
+            "w": 160,
+            "h": 170,
+            "label": "cupboard",
+            "look": "Tin plates, tin cups, tin everything.",
+            "hidesPieces": true
+          },
+          {
+            "id": "dusty-vent",
+            "prop": "vent",
+            "x": 820,
+            "y": 30,
+            "w": 150,
+            "h": 110,
+            "label": "dusty vent",
+            "look": "With the mask sealed tight you push into the choking dust. Taped inside the vent: an access badge.",
+            "requires": "sealed-mask",
+            "gives": "access-badge",
+            "lockedText": "A wall of choking dust. You'd need a working gas mask to breathe in there."
+          },
+          {
+            "id": "bunk-left",
+            "prop": "bed",
+            "x": 30,
+            "y": 220,
+            "w": 260,
+            "h": 150,
+            "label": "left bunks",
+            "look": "Thin mattresses, grey blankets folded with military corners.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bunk-right",
+            "prop": "bed",
+            "x": 320,
+            "y": 220,
+            "w": 260,
+            "h": 150,
+            "label": "right bunks",
+            "look": "A name tag on each bunk. Yours are there.",
+            "hidesPieces": true
+          },
+          {
+            "id": "stove",
+            "prop": "machine",
+            "x": 620,
+            "y": 230,
+            "w": 160,
+            "h": 150,
+            "label": "stove",
+            "look": "Cold. A pan of something long past eating.",
+            "hidesPieces": true
+          },
+          {
+            "id": "ration-crate-spot",
+            "prop": "crate",
+            "x": 820,
+            "y": 200,
+            "w": 150,
+            "h": 150,
+            "label": "ration crate",
+            "look": "Padlocked, with an order of colours stamped on the lid."
+          },
+          {
+            "id": "footlocker-row",
+            "prop": "chest",
+            "x": 30,
+            "y": 420,
+            "w": 300,
+            "h": 150,
+            "label": "footlockers",
+            "look": "A row of coloured footlockers. One has a riddle scratched into its lid.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mess-table",
+            "prop": "table",
+            "x": 380,
+            "y": 420,
+            "w": 400,
+            "h": 150,
+            "label": "mess table",
+            "look": "A long table, set for a meal nobody came to.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "command",
       "soundscape": "space",
       "title": "The Command Room",
-      "description": "Banks of switches and dead screens. A radio hisses with static, and at the far end the great blast door waits, with a keyhole and a three-digit keypad.",
-      "puzzles": ["radio", "blast-door"]
+      "description": "Banks of switches and dead screens. A radio hisses on a desk beside a map table, a filing locker and a supply box, and at the far end the great blast door waits, with a keyhole and a three-digit keypad.",
+      "puzzles": [
+        "orders",
+        "countdown",
+        "radio",
+        "switchboard",
+        "distress",
+        "blast-door"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "switch-banks",
+            "prop": "machine",
+            "x": 30,
+            "y": 30,
+            "w": 300,
+            "h": 180,
+            "label": "banks of switches",
+            "look": "Hundreds of switches, all labelled in a code you don't recognise."
+          },
+          {
+            "id": "dead-screens",
+            "prop": "sign",
+            "x": 360,
+            "y": 30,
+            "w": 260,
+            "h": 150,
+            "label": "dead screens",
+            "look": "Black glass. One screen flickers with numbers, then dies again.",
+            "hidesPieces": true
+          },
+          {
+            "id": "codebook-panel",
+            "prop": "safe",
+            "x": 650,
+            "y": 30,
+            "w": 140,
+            "h": 180,
+            "label": "wall panel",
+            "look": "You unscrew the panel. Inside, a signals codebook, open at a dog-eared page: {key:distress}",
+            "requires": "screwdriver",
+            "lockedText": "A wall panel, held shut with four screws.",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "radio-desk",
+            "prop": "desk",
+            "x": 30,
+            "y": 260,
+            "w": 280,
+            "h": 160,
+            "label": "radio desk",
+            "look": "The radio hisses. Under it, a pad of message forms.",
+            "hidesPieces": true
+          },
+          {
+            "id": "map-table",
+            "prop": "table",
+            "x": 340,
+            "y": 260,
+            "w": 280,
+            "h": 160,
+            "label": "map table",
+            "look": "A map of the bunker, with every exit crossed out but one.",
+            "hidesPieces": true
+          },
+          {
+            "id": "filing-locker",
+            "prop": "cabinet",
+            "x": 650,
+            "y": 260,
+            "w": 140,
+            "h": 280,
+            "label": "filing locker",
+            "look": "Personnel files. Yours are on top.",
+            "hidesPieces": true
+          },
+          {
+            "id": "supply-box",
+            "prop": "box",
+            "x": 340,
+            "y": 450,
+            "w": 200,
+            "h": 120,
+            "label": "supply box",
+            "look": "Batteries, flares, a coil of wire.",
+            "hidesPieces": true
+          },
+          {
+            "id": "blast-door-spot",
+            "prop": "door",
+            "x": 820,
+            "y": 30,
+            "w": 160,
+            "h": 520,
+            "label": "blast door",
+            "look": "Two metres of steel, a keyhole and a three-digit keypad."
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -47,18 +390,27 @@
       "title": "The Shower Panel",
       "kind": "text",
       "prompt": "The panel wants a password. The intercom clicks: 'I speak without a mouth and hear without ears. Down here, I am the only one who answers you. Identify me, recruits.'",
-      "answers": ["echo", "an echo", "echoes"],
-      "rewards": ["locker-key"],
+      "answers": [
+        "echo",
+        "an echo",
+        "echoes"
+      ],
+      "rewards": [
+        "screwdriver"
+      ],
       "hints": [
         "Shout down the corridor and listen.",
         "It's your own voice, coming back off the concrete."
       ],
-      "solvedText": "The panel beeps and the showers sputter on for a second. When they stop, a small key is lying in the drain grate.",
+      "solvedText": "The panel beeps and the showers sputter on for a second. When they stop, a screwdriver has dropped from the ceiling panel onto the tiles. Something glints under the drain grate.",
       "variants": [
         {},
         {
           "prompt": "The panel wants a password. The intercom clicks: 'I can be broken without ever being held, and I was made to you the moment you arrived. Identify me, recruits.'",
-          "answers": ["promise", "a promise"],
+          "answers": [
+            "promise",
+            "a promise"
+          ],
           "hints": [
             "The Overseer said he'd let you out if you worked together. What was that?",
             "You make one, you keep one, you break one."
@@ -66,13 +418,49 @@
         },
         {
           "prompt": "The panel wants a password. The intercom clicks: 'I have a bed but never sleep, and a mouth but never eat. I run far above your heads. Identify me, recruits.'",
-          "answers": ["river", "a river"],
+          "answers": [
+            "river",
+            "a river"
+          ],
           "hints": [
             "Think about the water flowing outside, far above the bunker.",
             "It runs down to the sea."
           ]
         }
       ]
+    },
+    {
+      "id": "decon-search",
+      "title": "Decontamination",
+      "kind": "search",
+      "prompt": "Search the room before the Overseer grades you: the shower heads, the gas masks and the bench.",
+      "finds": [
+        "showers",
+        "masks",
+        "bench"
+      ],
+      "rewards": [
+        "filter-canister"
+      ],
+      "hints": [
+        "Three things in this room are worth searching.",
+        "Search the shower heads, the gas masks and the bench."
+      ],
+      "solvedText": "From behind the rag in the shower head you pull a filter canister. It still has its seal."
+    },
+    {
+      "id": "decon-door",
+      "title": "The Decontamination Door",
+      "kind": "use",
+      "prompt": "A heavy door with a small, old-fashioned keyhole leads out of decontamination. A sign above it: DO NOT PROCEED UNTIL CLEAN.",
+      "requires": [
+        "locker-key"
+      ],
+      "hints": [
+        "Something turned up in the drain.",
+        "Use the small key on the decontamination door."
+      ],
+      "solvedText": "The door unseals with a hiss of stale air. Beyond it: rows of bunks, and the smell of old canned food."
     },
     {
       "id": "mask-locker",
@@ -92,34 +480,107 @@
       }
     },
     {
-      "id": "decon-door",
-      "title": "The Decontamination Door",
-      "kind": "use",
-      "prompt": "A heavy door with a small, old-fashioned keyhole leads out of decontamination. A sign above it: DO NOT PROCEED UNTIL CLEAN.",
-      "requires": ["locker-key"],
+      "id": "decon-log",
+      "minMinutes": 45,
+      "title": "The Decontamination Log",
+      "kind": "text",
+      "prompt": "The last line of the decontamination log is in a scramble: {cipher}. The steel locker has a second, letter lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "quarantine",
+          "sirens",
+          "bulkhead",
+          "hazard",
+          "ventilate",
+          "curfew"
+        ]
+      },
       "hints": [
-        "Something turned up in the drain.",
-        "Use the small key on the decontamination door."
+        "The Overseer wrote the offset on the clipboard.",
+        "Move every letter back along the alphabet by that many.",
+        "It says {answer}."
       ],
-      "solvedText": "The door unseals with a hiss of stale air. Beyond it: rows of bunks, and the smell of old canned food."
+      "solvedText": "The letter lock clicks. 'Adequate,' says the intercom."
     },
     {
       "id": "ration-crate",
       "title": "The Ration Crate",
       "kind": "code",
       "prompt": "The ration crate has a 3-digit padlock. Stamped on the lid: '{order}. All rations are counted.'",
-      "rewards": ["access-badge"],
+      "rewards": [
+        "field-manual"
+      ],
       "hints": [
         "Each phone saw one colour of ration tin, and how many of them there were.",
         "Read them in the order stamped on the lid: {order}."
       ],
-      "solvedText": "The padlock snaps open. Under the tins, in a plastic sleeve: an access badge with a faded photo and the word COMMAND.",
+      "solvedText": "The padlock snaps open. Under the tins, in a plastic sleeve: a battered field manual.",
       "generator": {
         "type": "colorDigits",
         "count": 3,
-        "colors": ["green", "grey", "brown", "black", "white", "red"],
+        "colors": [
+          "green",
+          "grey",
+          "brown",
+          "black",
+          "white",
+          "red"
+        ],
         "pieceTemplate": "You counted the {color} ration tins on your shelf: there were {digit}."
       }
+    },
+    {
+      "id": "footlockers",
+      "title": "The Footlockers",
+      "kind": "code",
+      "prompt": "The footlockers at the foot of the bunks: {items}. A keypad on the hatch's fuse cupboard reads: 'Each footlocker's place, 1 by the door, in the order I list them.'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "green footlocker",
+          "grey footlocker",
+          "brown footlocker",
+          "black footlocker",
+          "white footlocker"
+        ],
+        "pieceTemplate": "From the Overseer's inspection notes, on your phone: {clue}"
+      },
+      "rewards": [
+        "fuse"
+      ],
+      "hints": [
+        "Every phone has a line of the inspection notes. Put them together.",
+        "Start with the footlocker you're surest of, and mark each place yes or no.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The fuse cupboard opens. Inside, a single spare fuse, labelled COMMAND."
+    },
+    {
+      "id": "tin-labels",
+      "minMinutes": 45,
+      "title": "The Tin Labels",
+      "kind": "text",
+      "prompt": "The ration tins are stamped with numbers instead of labels: {cipher}. The crate's inner lid has a letter lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "beans",
+          "peaches",
+          "biscuits",
+          "cocoa",
+          "sardines",
+          "porridge"
+        ]
+      },
+      "hints": [
+        "Each number is a letter of the alphabet.",
+        "A is 1, B is 2, all the way to Z at 26.",
+        "It spells {answer}."
+      ],
+      "solvedText": "The inner lid lifts. 'Resourceful,' the intercom admits."
     },
     {
       "id": "footlocker",
@@ -127,7 +588,12 @@
       "title": "The Footlocker",
       "kind": "text",
       "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I have a neck but no head, and two arms but no hands.'",
-      "answers": ["shirt", "a shirt", "jacket", "a jacket"],
+      "answers": [
+        "shirt",
+        "a shirt",
+        "jacket",
+        "a jacket"
+      ],
       "hints": [
         "Look at the uniforms hanging off the bunks.",
         "You wear it on the top half of your body."
@@ -137,7 +603,11 @@
         {},
         {
           "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I can travel all around the world while staying in one corner.'",
-          "answers": ["stamp", "a stamp", "postage stamp"],
+          "answers": [
+            "stamp",
+            "a stamp",
+            "postage stamp"
+          ],
           "hints": [
             "Look at the old letters pinned above the bunks.",
             "It goes in the corner of an envelope."
@@ -145,7 +615,11 @@
         },
         {
           "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I am full of words, but I have never said one.'",
-          "answers": ["book", "a book", "books"],
+          "answers": [
+            "book",
+            "a book",
+            "books"
+          ],
           "hints": [
             "Check the shelf above the bunks.",
             "You read it, page by page."
@@ -158,13 +632,54 @@
       "title": "The Mess Hatch",
       "kind": "use",
       "prompt": "The hatch leading deeper into the bunker has a badge reader, blinking red. Stencilled beside it: COMMAND STAFF ONLY.",
-      "requires": ["access-badge"],
-      "rewards": ["launch-key"],
+      "requires": [
+        "access-badge"
+      ],
+      "rewards": [
+        "launch-key"
+      ],
       "hints": [
-        "You found something with the word COMMAND on it.",
-        "Use the access badge on the hatch's reader."
+        "The badge reader needs a badge. Something is taped inside the dusty vent.",
+        "Seal a gas mask with the filter, search the vent, then use the access badge on the hatch."
       ],
       "solvedText": "The reader turns green and the hatch swings down. Hanging just inside, on a chain: a heavy steel key labelled BLAST DOOR."
+    },
+    {
+      "id": "orders",
+      "title": "The Standing Orders",
+      "kind": "text",
+      "prompt": "The standing orders on the wall are typed in symbols: {cipher}. The command terminal wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "evacuate",
+          "standby",
+          "lockdown",
+          "override",
+          "sentry",
+          "perimeter"
+        ]
+      },
+      "hints": [
+        "The symbols need a key. Somebody pencilled one into a book you found.",
+        "Look closely at the field manual from the ration crate, then read the symbols."
+      ],
+      "solvedText": "The terminal flickers: ORDER ACKNOWLEDGED. A screen comes alive with a countdown."
+    },
+    {
+      "id": "countdown",
+      "title": "The Countdown",
+      "kind": "code",
+      "prompt": "A screen scrolls numbers: {sequence}. The blast door's first lock wants the next one.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to the next.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "The screen stops scrolling. A heavy bolt in the blast door slides back."
     },
     {
       "id": "radio",
@@ -180,17 +695,74 @@
       "generator": {
         "type": "wordSequence",
         "count": 3,
-        "words": ["falcon", "harbour", "anvil", "glacier", "beacon", "thunder", "meridian", "citadel", "orbit", "granite", "sentinel", "tundra"],
+        "words": [
+          "falcon",
+          "harbour",
+          "anvil",
+          "glacier",
+          "beacon",
+          "thunder",
+          "meridian",
+          "citadel",
+          "orbit",
+          "granite",
+          "sentinel",
+          "tundra"
+        ],
         "pieceTemplate": "You caught it through the radio static: the {ordinal} code word was '{word}'."
       }
+    },
+    {
+      "id": "switchboard",
+      "minMinutes": 45,
+      "title": "The Switchboard",
+      "kind": "switches",
+      "prompt": "With the fuse in, the switchboard powers up: each switch lights its lamp and flips the ones beside it. Light every lamp.",
+      "requires": [
+        "fuse"
+      ],
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row with the switches below it.",
+        "Press {answer}."
+      ],
+      "solvedText": "Every lamp glows green. Across the room, the dead screens blink back to life."
+    },
+    {
+      "id": "distress",
+      "minDifficulty": "hard",
+      "title": "The Distress Call",
+      "kind": "text",
+      "prompt": "The radio beeps a message in short and long tones, over and over: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "mayday",
+          "rescue",
+          "signal",
+          "beacon"
+        ]
+      },
+      "hints": [
+        "Short and long tones need a key. There's a signals codebook in this room, behind a panel.",
+        "Unscrew the wall panel, then read the tones letter by letter."
+      ],
+      "solvedText": "The tones stop. For a moment, somebody else's voice cuts through the static, then it's gone."
     },
     {
       "id": "blast-door",
       "title": "The Blast Door",
       "kind": "code",
       "prompt": "The blast door takes the steel key AND a 3-digit code. On the only working screen: 'Your bunk number, then the hour the mess clock stopped, then how many gas masks hung by the showers.'",
-      "answers": ["628"],
-      "requires": ["launch-key"],
+      "answers": [
+        "628"
+      ],
+      "requires": [
+        "launch-key"
+      ],
       "pieces": [
         "You remember the number painted on your bunk: 6.",
         "You remember the mess clock: it stopped at 2 o'clock.",
@@ -204,7 +776,9 @@
       "variants": [
         {},
         {
-          "answers": ["413"],
+          "answers": [
+            "413"
+          ],
           "pieces": [
             "You remember the number painted on your bunk: 4.",
             "You remember the mess clock: it stopped at 1 o'clock.",
@@ -212,7 +786,9 @@
           ]
         },
         {
-          "answers": ["957"],
+          "answers": [
+            "957"
+          ],
           "pieces": [
             "You remember the number painted on your bunk: 9.",
             "You remember the mess clock: it stopped at 5 o'clock.",
@@ -223,8 +799,66 @@
     }
   ],
   "items": [
-    { "id": "locker-key", "name": "Small key", "description": "Wet from the drain. Too small for any door you've seen." },
-    { "id": "access-badge", "name": "Access badge", "description": "A faded photo and one word: COMMAND." },
-    { "id": "launch-key", "name": "Steel key", "description": "Heavy, on a chain. The tag reads BLAST DOOR." }
+    {
+      "id": "screwdriver",
+      "name": "Screwdriver",
+      "description": "A flat-head screwdriver. It dropped from the ceiling."
+    },
+    {
+      "id": "locker-key",
+      "name": "Small key",
+      "description": "Wet from the drain. Too small for any door you've seen."
+    },
+    {
+      "id": "filter-canister",
+      "name": "Filter canister",
+      "description": "A gas-mask filter, still sealed."
+    },
+    {
+      "id": "gas-mask",
+      "name": "Gas mask",
+      "description": "An old gas mask with no filter. Useless on its own."
+    },
+    {
+      "id": "sealed-mask",
+      "name": "Working gas mask",
+      "description": "The mask with a fresh filter screwed in. You can breathe through it."
+    },
+    {
+      "id": "access-badge",
+      "name": "Access badge",
+      "description": "A faded photo and one word: COMMAND."
+    },
+    {
+      "id": "field-manual",
+      "name": "Field manual",
+      "description": "A battered army field manual.",
+      "inspect": "Pencilled into the margin of the last page, a table of symbols: {key:orders}"
+    },
+    {
+      "id": "fuse",
+      "name": "Spare fuse",
+      "description": "A heavy fuse, labelled COMMAND."
+    },
+    {
+      "id": "launch-key",
+      "name": "Steel key",
+      "description": "Heavy, on a chain. The tag reads BLAST DOOR."
+    },
+    {
+      "id": "ration-voucher",
+      "name": "Ration voucher",
+      "description": "Expired years ago. It doesn't open anything."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "gas-mask",
+        "filter-canister"
+      ],
+      "makes": "sealed-mask",
+      "text": "You screw the filter into the mask. It seals with a hiss."
+    }
   ]
 }

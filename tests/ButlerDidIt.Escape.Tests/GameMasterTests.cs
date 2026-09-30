@@ -62,17 +62,25 @@ public class GameMasterTests
         var s = Started(AllOn);
         Assert.Equal([CueKind.Start], s.Cues.Select(c => c.Kind));
 
-        for (var i = 0; s.Phase == EscapePhase.Playing; i++) s = SolveNext(s, T0.AddMinutes(i + 1));
-        var kinds = s.Cues.Select(c => c.Kind).ToList();
+        // The state keeps only the latest few moments, so collect them as they happen.
+        var seen = new Dictionary<int, EscapeCue>();
+        for (var i = 0; s.Phase == EscapePhase.Playing; i++)
+        {
+            s = SolveNext(s, T0.AddMinutes(i + 1));
+            foreach (var cue in s.Cues) seen.TryAdd(cue.Id, cue);
+        }
+        var cues = seen.Values.OrderBy(c => c.Id).ToList();
+        var kinds = cues.Select(c => c.Kind).ToList();
 
         // The last moment is the escape itself, not the solve that caused it.
         Assert.Equal(CueKind.Escaped, kinds[^1]);
         Assert.Equal(Workshop.Stages.Count - 1, kinds.Count(k => k == CueKind.StageOpened));
+        Assert.Contains(CueKind.Found, kinds); // searching turned things up
         Assert.DoesNotContain(CueKind.Failed, kinds);
-        var opened = s.Cues.First(c => c.Kind == CueKind.StageOpened);
+        var opened = cues.First(c => c.Kind == CueKind.StageOpened);
         Assert.Equal("Ben", opened.PlayerName);
         Assert.Equal(Workshop.Stages[1].Title, opened.StageTitle);
-        Assert.Equal(s.Cues.Select(c => c.Id).Order(), s.Cues.Select(c => c.Id)); // ids only go up
+        Assert.Equal(cues.Select(c => c.Id), Enumerable.Range(1, cues.Count)); // ids only go up, none skipped
     }
 
     [Fact]

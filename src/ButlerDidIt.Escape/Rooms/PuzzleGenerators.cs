@@ -133,6 +133,10 @@ public static class PuzzleGenerators
         public string Text => string.Join(", ", Shown) + ", ?";
     }
 
+    /// <summary>
+    /// A pattern whose next term is always a three-digit (or longer) code: short codes are too easy to guess
+    /// by trying them all, and they turn up by chance in other numbers on screen ("38 minutes left").
+    /// </summary>
     public static SequenceMade Sequence(EscapeDifficulty difficulty, SeededRandom rng)
     {
         var rule = difficulty switch
@@ -147,21 +151,21 @@ public static class PuzzleGenerators
         {
             case SequenceRule.Arithmetic:
             {
-                long a = 1 + rng.Next(20), d = 2 + rng.Next(8);
+                long a = 100 + rng.Next(100), d = 2 + rng.Next(8);
                 for (var i = 0; i < 6; i++) terms.Add(a + d * i);
                 shown = 5;
                 break;
             }
             case SequenceRule.Geometric:
             {
-                long a = 1 + rng.Next(5), r = 2 + rng.Next(2);
+                long a = 4 + rng.Next(6), r = 2 + rng.Next(2);
                 for (var i = 0; i < 6; i++) terms.Add(i == 0 ? a : terms[^1] * r);
                 shown = 5;
                 break;
             }
             case SequenceRule.Alternating:
             {
-                long a = 1 + rng.Next(20), p = 2 + rng.Next(8), q = 2 + rng.Next(8);
+                long a = 100 + rng.Next(100), p = 2 + rng.Next(8), q = 2 + rng.Next(8);
                 if (q == p) q = p + 1;
                 terms.Add(a);
                 for (var i = 1; i < 7; i++) terms.Add(terms[^1] + (i % 2 == 1 ? p : q));
@@ -170,14 +174,14 @@ public static class PuzzleGenerators
             }
             case SequenceRule.Quadratic:
             {
-                long a = 1 + rng.Next(10), b = 1 + rng.Next(5), c = 2 + rng.Next(3);
+                long a = 100 + rng.Next(100), b = 1 + rng.Next(5), c = 2 + rng.Next(3);
                 for (long i = 0; i < 6; i++) terms.Add(a + b * i + c * i * (i - 1) / 2);
                 shown = 5;
                 break;
             }
             case SequenceRule.Interleaved:
             {
-                long a1 = 1 + rng.Next(9), d1 = 2 + rng.Next(6), a2 = 20 + rng.Next(20), d2 = 2 + rng.Next(6);
+                long a1 = 1 + rng.Next(9), d1 = 2 + rng.Next(6), a2 = 100 + rng.Next(100), d2 = 2 + rng.Next(6);
                 if (d2 == d1) d2 = d1 + 1;
                 for (var i = 0; i < 8; i++) terms.Add(i % 2 == 0 ? a1 + d1 * (i / 2) : a2 + d2 * (i / 2));
                 shown = 7;
@@ -185,7 +189,7 @@ public static class PuzzleGenerators
             }
             default:
             {
-                long x = 1 + rng.Next(5), y = x + 1 + rng.Next(5);
+                long x = 10 + rng.Next(10), y = x + 1 + rng.Next(10);
                 terms.AddRange([x, y]);
                 for (var i = 2; i < 7; i++) terms.Add(terms[^1] + terms[^2]);
                 shown = 6;
