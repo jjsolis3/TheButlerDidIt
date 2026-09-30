@@ -8,8 +8,15 @@
   "minPlayers": 2,
   "maxPlayers": 8,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45, 60],
-  "seasons": ["halloween"],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 90,
   "soundscape": "haunted",
   "intro": "Oh my, oh dear, what have you done? You read the spell, and now it's begun! Every door is locked up tight, until you solve my puzzles right. Share your clues and work as one, and you'll be home when the magic's done!",
@@ -18,28 +25,405 @@
   "gameMaster": {
     "name": "Professor Quill",
     "persona": "The wizard's enchanted feather pen: flustered, kind and very talkative. Speaks in little rhyming couplets whenever he can, fusses when the group is stuck, and cheers wildly when they solve something. Never scary.",
-    "voice": { "accent": "en-GB", "pitch": 1.3, "rate": 1.1, "style": "fluttery, cheerful, rhyming" }
+    "voice": {
+      "accent": "en-GB",
+      "pitch": 1.3,
+      "rate": 1.1,
+      "style": "fluttery, cheerful, rhyming"
+    }
   },
   "stages": [
     {
       "id": "library",
       "title": "The Floating Library",
-      "description": "Books float in slow circles below the ceiling, and candles hover beside them. A huge spellbook lies open on a stand, a bookshelf drifts past with a golden clasp on it, and the library door is locked tight.",
-      "puzzles": ["spellbook", "floating-shelf", "library-door"]
+      "description": "Books float in slow circles below the ceiling, and candles hover beside them. A huge spellbook lies open on its stand, something glitters on top of the tallest bookshelf, a blank scroll hangs on the wall, and the library door is locked tight.",
+      "puzzles": [
+        "spellbook",
+        "library-search",
+        "candles",
+        "floating-shelf",
+        "quill-code",
+        "library-door"
+      ],
+      "scene": {
+        "backdrop": "haunted",
+        "objects": [
+          {
+            "id": "top-shelf",
+            "prop": "bookshelf",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "top of the tall shelf",
+            "look": "You sweep the broom along the top of the shelf. Down tumbles a little silver key, with a sneeze of dust!",
+            "gives": "silver-key",
+            "requires": "broom",
+            "lockedText": "Something glitters on top of the tallest bookshelf, far too high to reach."
+          },
+          {
+            "id": "spellbook-stand",
+            "prop": "table",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "spellbook stand",
+            "look": "The huge spellbook, open on its stand. Its pages turn by themselves."
+          },
+          {
+            "id": "blank-scroll",
+            "prop": "painting",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "blank scroll",
+            "look": "Through the moon lens, silvery writing appears: 'Quill's secret code: slide back {key:quill-code}.'",
+            "requires": "moon-lens",
+            "lockedText": "A scroll with nothing on it. Nothing at all. Or is there?"
+          },
+          {
+            "id": "library-door-spot",
+            "prop": "door",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "library door",
+            "look": "A heavy wooden door with a tiny keyhole that glitters silver."
+          },
+          {
+            "id": "reading-chair",
+            "prop": "desk",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "reading chair",
+            "look": "A squashy armchair. Down the side of the cushion: a round brass frame, the kind that holds a lens.",
+            "hidesPieces": true
+          },
+          {
+            "id": "book-pile",
+            "prop": "box",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "pile of books",
+            "look": "Books about dragons, books about teapots, and one about how to talk to snails.",
+            "hidesPieces": true
+          },
+          {
+            "id": "globe",
+            "prop": "statue",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "spinning globe",
+            "look": "A globe of a world you've never seen. It spins on its own and hums.",
+            "hidesPieces": true
+          },
+          {
+            "id": "rug",
+            "prop": "rug",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "star rug",
+            "look": "A rug covered in stitched stars. Under a corner: dust bunnies, and nothing else.",
+            "hidesPieces": true
+          },
+          {
+            "id": "candle-shelf",
+            "prop": "shelf",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "candle shelf",
+            "look": "Candles of every colour, dripping wax. The wax spells nothing at all.",
+            "hidesPieces": true
+          },
+          {
+            "id": "ink-desk",
+            "prop": "drawer",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "ink drawer",
+            "look": "Feather pens, blotting paper and a pot of glittery ink.",
+            "hidesPieces": true
+          },
+          {
+            "id": "owl-perch",
+            "prop": "lamp",
+            "x": 520,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "owl perch",
+            "look": "An owl blinks at you and hoots. It isn't telling.",
+            "hidesPieces": true
+          },
+          {
+            "id": "scroll-rack",
+            "prop": "cabinet",
+            "x": 770,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "scroll rack",
+            "look": "Rolled-up maps, rolled-up spells and one rolled-up sock.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "lab",
       "soundscape": "carnival",
       "title": "The Potion Lab",
-      "description": "Bubbling cauldrons, jars of glowing ingredients and a shelf of potion bottles in every colour. A tall magic mirror stands in the corner, and its glass ripples when you walk past.",
-      "puzzles": ["ingredient-cabinet", "cauldron", "magic-mirror"]
+      "description": "Bubbling cauldrons, jars of glowing ingredients and a shelf of potion bottles in every colour. A tall magic mirror stands in the corner, its glass rippling, and a row of dark rune stones is set into the wall beside the broom cupboard.",
+      "puzzles": [
+        "ingredient-cabinet",
+        "potion-labels",
+        "runes",
+        "cauldron",
+        "magic-mirror"
+      ],
+      "scene": {
+        "backdrop": "haunted",
+        "objects": [
+          {
+            "id": "cabinet-spot",
+            "prop": "cabinet",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "ingredient cabinet",
+            "look": "A cabinet with a 3-digit lock and a spell card stuck to the door."
+          },
+          {
+            "id": "mirror-spot",
+            "prop": "mirror",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "magic mirror",
+            "look": "Its glass ripples like water. Your reflection waves, a moment too late."
+          },
+          {
+            "id": "potion-shelf",
+            "prop": "shelf",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "potion shelf",
+            "look": "Bottles in every colour, with labels written in numbers."
+          },
+          {
+            "id": "broom-cupboard",
+            "prop": "drawer",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "broom cupboard",
+            "look": "Brooms, a bucket, and a long thin stick of dragon-wood that hums in your hand.",
+            "gives": "wand-stick"
+          },
+          {
+            "id": "rune-panel",
+            "prop": "sign",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "rune stones",
+            "look": "Stones set in the wall, each carved with a rune. They're all dark."
+          },
+          {
+            "id": "jar-shelf",
+            "prop": "box",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "jar of eyeballs",
+            "look": "Pickled gumballs. Probably. You don't want to find out.",
+            "hidesPieces": true
+          },
+          {
+            "id": "herb-rack",
+            "prop": "plant",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "herb rack",
+            "look": "Bunches of drying herbs that smell of peppermint and old socks.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bubble-pot",
+            "prop": "barrel",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "small cauldron",
+            "look": "It blows one bubble, then another, then a raspberry.",
+            "hidesPieces": true
+          },
+          {
+            "id": "recipe-book",
+            "prop": "bookshelf",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "recipe books",
+            "look": "'Potions for Beginners', 'Potions for Show-Offs', 'Potions That Went Wrong'.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "observatory",
       "soundscape": "space",
       "title": "The Observatory",
-      "description": "Up the spiral stairs, the roof opens onto the night sky. A great brass telescope points at the stars, owls blink from the rafters, and the tower's last door waits beside a glowing keypad.",
-      "puzzles": ["telescope", "tower-door"]
+      "description": "Up the spiral stairs, the roof opens onto the night sky. A great brass telescope points at the stars, owls blink from the rafters, a star chart hangs by a frosty window, and the tower's last door waits beside a glowing keypad.",
+      "puzzles": [
+        "star-count",
+        "telescope",
+        "constellation",
+        "rune-spell",
+        "tower-door"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "telescope-spot",
+            "prop": "machine",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "great telescope",
+            "look": "A great brass telescope, locked with a word dial."
+          },
+          {
+            "id": "tower-door-spot",
+            "prop": "door",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "tower door",
+            "look": "The tower's last door, with a glowing keypad and a slot shaped like a scroll."
+          },
+          {
+            "id": "star-chart",
+            "prop": "poster",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "star chart",
+            "look": "A chart of the sky. The star names are written in Quill's back-to-front alphabet."
+          },
+          {
+            "id": "rafters",
+            "prop": "lamp",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "rafters",
+            "look": "Owls blink down at you. One of them winks.",
+            "hidesPieces": true
+          },
+          {
+            "id": "armillary",
+            "prop": "statue",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "brass rings",
+            "look": "Brass rings that spin around each other like planets.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cushions",
+            "prop": "rug",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "stargazing cushions",
+            "look": "Big soft cushions for lying back and looking up.",
+            "hidesPieces": true
+          },
+          {
+            "id": "trunk",
+            "prop": "chest",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "wizard's trunk",
+            "look": "Spare hats, spare robes and a spare beard.",
+            "hidesPieces": true
+          },
+          {
+            "id": "log-desk",
+            "prop": "desk",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "star log",
+            "look": "Notes about every star, in very small writing.",
+            "hidesPieces": true
+          },
+          {
+            "id": "moon-window",
+            "prop": "window",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "moon window",
+            "look": "Through the moon lens, the window's frost turns into a table of runes: {key:rune-spell}",
+            "requires": "moon-lens",
+            "lockedText": "The window is frosted over with odd swirly patterns.",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "hat-stand",
+            "prop": "box",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "hat box",
+            "look": "A box of wizard hats. You put one on. It's a bit big.",
+            "gives": "floppy-hat",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -48,18 +432,27 @@
       "title": "The Spellbook",
       "kind": "text",
       "prompt": "The spellbook's pages are locked with a word charm. Professor Quill reads the riddle: 'I have a golden face and rise every day, I chase the night far, far away. What am I?'",
-      "answers": ["sun", "the sun"],
-      "rewards": ["silver-key"],
+      "answers": [
+        "sun",
+        "the sun"
+      ],
+      "rewards": [
+        "broom"
+      ],
       "hints": [
         "Look out of the tower window when morning comes.",
         "It lights up the whole sky in the daytime."
       ],
-      "solvedText": "The spellbook flutters its pages and coughs up a little silver key. Professor Quill claps: 'Oh, well done, clever one!'",
+      "solvedText": "The spellbook flutters its pages and a little flying broom zooms out, then flops into your hands. Professor Quill claps: 'Oh, well done, clever one!'",
       "variants": [
         {},
         {
           "prompt": "The spellbook's pages are locked with a word charm. Professor Quill reads the riddle: 'I fall from the sky but never get hurt, I fill up the puddles and wash off the dirt. What am I?'",
-          "answers": ["rain", "the rain", "raindrops"],
+          "answers": [
+            "rain",
+            "the rain",
+            "raindrops"
+          ],
           "hints": [
             "Look at the clouds outside the window.",
             "You need an umbrella when it comes."
@@ -67,13 +460,62 @@
         },
         {
           "prompt": "The spellbook's pages are locked with a word charm. Professor Quill reads the riddle: 'I have a bark but I never bite, I stand up tall all day and night. What am I?'",
-          "answers": ["tree", "a tree", "trees"],
+          "answers": [
+            "tree",
+            "a tree",
+            "trees"
+          ],
           "hints": [
             "Look out of the window at the forest around the tower.",
             "Leaves grow on it, and birds build nests in it."
           ]
         }
       ]
+    },
+    {
+      "id": "library-search",
+      "title": "The Lost Lens Frame",
+      "kind": "search",
+      "prompt": "Professor Quill lost the frame of his moon lens. 'It fell by the chair, or the books, or the globe!' Search them.",
+      "finds": [
+        "reading-chair",
+        "book-pile",
+        "globe"
+      ],
+      "rewards": [
+        "lens-frame"
+      ],
+      "hints": [
+        "Three spots in the library each hold a clue.",
+        "Search the reading chair, the pile of books and the spinning globe."
+      ],
+      "solvedText": "Down the side of the chair, under the books, behind the globe: there it is, a round brass lens frame."
+    },
+    {
+      "id": "candles",
+      "title": "The Floating Candles",
+      "kind": "code",
+      "prompt": "Five candles float in a row: {items}. A little locked box floats with them: 'Each candle's place, far left is 1, in the order I list them!'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "pink candle",
+          "blue candle",
+          "green candle",
+          "gold candle",
+          "white candle"
+        ],
+        "pieceTemplate": "Written in melted wax: {clue}"
+      },
+      "rewards": [
+        "moon-glass"
+      ],
+      "hints": [
+        "Every phone has a clue. Share them all out loud.",
+        "Start with the one you're surest about, and try each place.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The candles flare and the box pops open. Inside: a round piece of pale glass that glows like the moon."
     },
     {
       "id": "floating-shelf",
@@ -93,14 +535,41 @@
       }
     },
     {
+      "id": "quill-code",
+      "minMinutes": 45,
+      "title": "Quill's Secret Code",
+      "kind": "text",
+      "prompt": "Scribbled in the margin of the spellbook: {cipher}. Professor Quill blushes: 'My secret word! Oh, I'd rather not say…'",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "toad",
+          "newt",
+          "cloak",
+          "goblin",
+          "pixie",
+          "sprite"
+        ]
+      },
+      "hints": [
+        "How far to slide the letters is written somewhere. Look at something blank through the right lens.",
+        "Slide every letter back along the alphabet by that many places.",
+        "It says {answer}."
+      ],
+      "solvedText": "'Oh, you worked it out! Nobody ever works it out!'"
+    },
+    {
       "id": "library-door",
       "title": "The Library Door",
       "kind": "use",
-      "prompt": "The library door has a tiny keyhole that glitters silver. A note pinned to it: 'The key you need is not far away, the spellbook will give it, if you say.'",
-      "requires": ["silver-key"],
+      "prompt": "The library door has a tiny keyhole that glitters silver. A note pinned to it: 'The key you need is up so high, a broom will help it say goodbye!'",
+      "requires": [
+        "silver-key"
+      ],
       "hints": [
-        "Something shiny came out of the spellbook.",
-        "Use the silver key on the library door."
+        "Something glitters on top of the tallest bookshelf.",
+        "Sweep the top of the shelf with the broom, then use the silver key on the door."
       ],
       "solvedText": "Click! The door creaks open, and the smell of bubbling potions drifts up the stairs."
     },
@@ -109,18 +578,66 @@
       "title": "The Ingredient Cabinet",
       "kind": "code",
       "prompt": "The ingredient cabinet has a 3-digit lock. A spell card on it reads: '{order}! Mix them in that order!'",
-      "rewards": ["wand"],
+      "rewards": [
+        "wand-core"
+      ],
       "hints": [
         "Each phone saw one colour of potion bottle, and how many of them there were.",
         "Read them in the spell card's order: {order}."
       ],
-      "solvedText": "The cabinet doors swing open with a puff of glitter. Resting on the top shelf: the wizard's spare wand.",
+      "solvedText": "The cabinet doors swing open with a puff of glitter. Resting on the top shelf: a glowing wand core, like a tiny star. But no wand to put it in.",
       "generator": {
         "type": "colorDigits",
         "count": 3,
-        "colors": ["red", "blue", "green", "purple", "gold", "silver"],
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "purple",
+          "gold",
+          "silver"
+        ],
         "pieceTemplate": "You counted the {color} potion bottles on the shelf: there were {digit}."
       }
+    },
+    {
+      "id": "potion-labels",
+      "title": "The Potion Labels",
+      "kind": "text",
+      "prompt": "The newest potion bottle's label is written in numbers: {cipher}. The shelf won't let go of it until you say what's inside.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "frog",
+          "slime",
+          "sparkle",
+          "fizz",
+          "honey",
+          "pepper"
+        ]
+      },
+      "hints": [
+        "Each number is a letter.",
+        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "It says {answer}."
+      ],
+      "solvedText": "The bottle pops its cork and hiccups a bubble. Correct!"
+    },
+    {
+      "id": "runes",
+      "minMinutes": 45,
+      "title": "The Rune Stones",
+      "kind": "switches",
+      "prompt": "The rune stones flicker. Touch one and it lights, and flips the stones beside it. Light every rune!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the buttons in the row below it.",
+        "Press {answer}."
+      ],
+      "solvedText": "Every rune glows and the whole lab hums a happy chord."
     },
     {
       "id": "cauldron",
@@ -128,7 +645,11 @@
       "title": "The Grumbling Cauldron",
       "kind": "text",
       "prompt": "The biggest cauldron has a lid locked with a word charm. It burbles a riddle: 'What kind of room has no doors and no windows at all?'",
-      "answers": ["mushroom", "a mushroom", "mushrooms"],
+      "answers": [
+        "mushroom",
+        "a mushroom",
+        "mushrooms"
+      ],
       "hints": [
         "Look at the ingredients in the jars.",
         "It grows in damp forests and wears a little cap."
@@ -138,7 +659,11 @@
         {},
         {
           "prompt": "The biggest cauldron has a lid locked with a word charm. It burbles a riddle: 'I'm taller than trees and my top touches the sky, but I have no legs and I never say hi.'",
-          "answers": ["mountain", "a mountain", "mountains"],
+          "answers": [
+            "mountain",
+            "a mountain",
+            "mountains"
+          ],
           "hints": [
             "Look out of the lab window at the far horizon.",
             "It's very, very tall and rocky, and people climb it."
@@ -146,7 +671,10 @@
         },
         {
           "prompt": "The biggest cauldron has a lid locked with a word charm. It burbles a riddle: 'I run but never walk, I have a mouth but never talk.'",
-          "answers": ["river", "a river"],
+          "answers": [
+            "river",
+            "a river"
+          ],
           "hints": [
             "Think about the water flowing far below the tower.",
             "It runs all the way to the sea."
@@ -159,13 +687,31 @@
       "title": "The Magic Mirror",
       "kind": "use",
       "prompt": "The magic mirror's glass ripples, but it won't let anyone through. Written in the steam on it: 'Wave a wand, and I'll show you the way.'",
-      "requires": ["wand"],
-      "rewards": ["star-map"],
+      "requires": [
+        "wand"
+      ],
+      "rewards": [
+        "star-map"
+      ],
       "hints": [
-        "Mirrors like this need a little magic.",
-        "Use the wand on the magic mirror."
+        "Mirrors like this need a little magic, and a wand has two parts.",
+        "Put the wand core in the stick from the broom cupboard, then use the wand on the mirror."
       ],
       "solvedText": "You wave the wand. The mirror glows, and a rolled-up star map slides out of the glass into your hands. Stairs appear behind it!"
+    },
+    {
+      "id": "star-count",
+      "title": "The Star Count",
+      "kind": "code",
+      "prompt": "The stars in each row of the star chart go: {sequence}. The keypad by the telescope wants the next row.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "Twinkle! The keypad glows, and one by one the stars on the ceiling light up."
     },
     {
       "id": "telescope",
@@ -181,17 +727,80 @@
       "generator": {
         "type": "wordSequence",
         "count": 3,
-        "words": ["dragon", "unicorn", "phoenix", "griffin", "owl", "comet", "lantern", "crown", "castle", "fox", "swan", "harp"],
+        "words": [
+          "dragon",
+          "unicorn",
+          "phoenix",
+          "griffin",
+          "owl",
+          "comet",
+          "lantern",
+          "crown",
+          "castle",
+          "fox",
+          "swan",
+          "harp"
+        ],
         "pieceTemplate": "Professor Quill whispered it in your ear: the {ordinal} star-word is '{word}'."
       }
+    },
+    {
+      "id": "constellation",
+      "minMinutes": 60,
+      "title": "The Back-to-Front Stars",
+      "kind": "text",
+      "prompt": "A star name on the chart is in Quill's back-to-front alphabet: {cipher}. The chart's lock wants the real name.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "planet",
+          "nebula",
+          "orbit",
+          "galaxy",
+          "meteor"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A is Z, B is Y, C is X… Swap every letter.",
+        "It says {answer}."
+      ],
+      "solvedText": "The chart sparkles and the name glows gold. Professor Quill does a loop-the-loop."
+    },
+    {
+      "id": "rune-spell",
+      "minDifficulty": "hard",
+      "title": "The Rune Spell",
+      "kind": "text",
+      "prompt": "Carved over the tower door, a spell in runes: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "enchant",
+          "abracadabra",
+          "sorcery",
+          "hocuspocus"
+        ]
+      },
+      "hints": [
+        "These need a key. Something frosty needs looking at through the moon lens.",
+        "Swap each one for its letter, one at a time."
+      ],
+      "solvedText": "You say the spell. The door's runes flash, and Professor Quill gasps: 'Real magic!'"
     },
     {
       "id": "tower-door",
       "title": "The Tower Door",
       "kind": "code",
       "prompt": "The tower's last door needs the star map AND a 3-digit code. Professor Quill's note: 'Floating books in the library, then bubbling cauldrons in the lab, then owls up here in the rafters!'",
-      "answers": ["735"],
-      "requires": ["star-map"],
+      "answers": [
+        "735"
+      ],
+      "requires": [
+        "star-map"
+      ],
       "pieces": [
         "You counted the floating books in the library: 7.",
         "You remember the potion lab: 3 cauldrons were bubbling.",
@@ -205,7 +814,9 @@
       "variants": [
         {},
         {
-          "answers": ["482"],
+          "answers": [
+            "482"
+          ],
           "pieces": [
             "You counted the floating books in the library: 4.",
             "You remember the potion lab: 8 cauldrons were bubbling.",
@@ -213,7 +824,9 @@
           ]
         },
         {
-          "answers": ["916"],
+          "answers": [
+            "916"
+          ],
           "pieces": [
             "You counted the floating books in the library: 9.",
             "You remember the potion lab: 1 cauldron was bubbling.",
@@ -224,8 +837,73 @@
     }
   ],
   "items": [
-    { "id": "silver-key", "name": "Little silver key", "description": "It came out of the spellbook, and it tickles your hand." },
-    { "id": "wand", "name": "Spare wand", "description": "A bit bent, but it still sparkles when you wave it." },
-    { "id": "star-map", "name": "Star map", "description": "A rolled-up map of the night sky. The stars on it twinkle." }
+    {
+      "id": "broom",
+      "name": "Little flying broom",
+      "description": "It wriggles. It wants to sweep something up high."
+    },
+    {
+      "id": "silver-key",
+      "name": "Little silver key",
+      "description": "It came off the top shelf, and it tickles your hand."
+    },
+    {
+      "id": "moon-glass",
+      "name": "Moon glass",
+      "description": "A round piece of pale glass that glows like the moon."
+    },
+    {
+      "id": "lens-frame",
+      "name": "Lens frame",
+      "description": "A round brass frame with an empty middle."
+    },
+    {
+      "id": "moon-lens",
+      "name": "Moon lens",
+      "description": "Moon glass in a brass frame. Through it, hidden writing shines."
+    },
+    {
+      "id": "wand-core",
+      "name": "Wand core",
+      "description": "A tiny glowing star, warm in your hand."
+    },
+    {
+      "id": "wand-stick",
+      "name": "Dragon-wood stick",
+      "description": "Long and thin, with a hollow tip."
+    },
+    {
+      "id": "wand",
+      "name": "Wand",
+      "description": "Dragon-wood with a star in the tip. It sparkles when you wave it."
+    },
+    {
+      "id": "star-map",
+      "name": "Star map",
+      "description": "A rolled-up map of the night sky. The stars on it twinkle."
+    },
+    {
+      "id": "floppy-hat",
+      "name": "Floppy wizard hat",
+      "description": "Very pointy. Very floppy. Not magic at all."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "moon-glass",
+        "lens-frame"
+      ],
+      "makes": "moon-lens",
+      "text": "The moon glass clicks into the frame. A moon lens!"
+    },
+    {
+      "items": [
+        "wand-core",
+        "wand-stick"
+      ],
+      "makes": "wand",
+      "text": "The star slides into the stick's tip and the whole wand glows."
+    }
   ]
 }

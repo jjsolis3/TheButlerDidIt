@@ -8,7 +8,12 @@
   "minPlayers": 2,
   "maxPlayers": 8,
   "timeLimitMinutes": 45,
-  "lengths": [30, 45, 60],
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "edition": 2,
   "hintPenaltySeconds": 90,
   "soundscape": "sea",
   "intro": "Ahoy, stowaways! Captain Salty Sal here, and this is MY ship. You want to go ashore? Then earn it, me hearties! Every hatch is locked, every chest is sealed, and the gangplank key is hidden. Work together like a proper crew, and be quick about it before the tide turns. Yo ho!",
@@ -17,27 +22,393 @@
   "gameMaster": {
     "name": "Captain Salty Sal",
     "persona": "A jolly, booming pirate captain who loves riddles, treasure and terrible sea puns. Teases the crew when they're stuck and roars with delight when they solve something. Never scary: all bark and no bite.",
-    "voice": { "accent": "en-GB", "pitch": 1.05, "rate": 1.0, "style": "booming, jolly, piratey" }
+    "voice": {
+      "accent": "en-GB",
+      "pitch": 1.05,
+      "rate": 1.0,
+      "style": "booming, jolly, piratey"
+    }
   },
   "stages": [
     {
       "id": "galley",
       "soundscape": "workshop",
       "title": "The Galley",
-      "description": "Pots and pans swing from hooks, barrels of apples are stacked by the stove, and hammocks sway in the corner. The hatch up to the captain's cabin is padlocked, and the cook's spice chest has a lock of its own.",
-      "puzzles": ["apple-barrel", "spice-chest", "galley-hatch"]
+      "description": "Pots and pans swing from hooks, barrels of apples are stacked by the stove, a stew pot bubbles, and bunks sway in the corner. Through a far porthole something bobs out at sea. The hatch up to the captain's cabin is padlocked, and the cook's spice rack has a lock of its own.",
+      "puzzles": [
+        "apple-barrel",
+        "galley-search",
+        "cooking-pots",
+        "spice-chest",
+        "sea-shanty",
+        "galley-hatch"
+      ],
+      "scene": {
+        "backdrop": "sea",
+        "objects": [
+          {
+            "id": "stew-pot",
+            "prop": "barrel",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "bubbling stew pot",
+            "look": "You fish about with the ladle. Clonk! Out comes a big iron key with a little anchor on it, dripping stew.",
+            "gives": "galley-key",
+            "requires": "ladle",
+            "lockedText": "Something clonks at the bottom of the stew pot. It's far too hot to put your hand in."
+          },
+          {
+            "id": "far-porthole",
+            "prop": "window",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "far porthole",
+            "look": "Through the spyglass, you read words painted on a buoy far out at sea: 'Sea shanty code: slide back {key:sea-shanty}.'",
+            "requires": "spyglass",
+            "lockedText": "There's something bobbing far out at sea, much too far to read."
+          },
+          {
+            "id": "hatch-spot",
+            "prop": "door",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "galley hatch",
+            "look": "The hatch up to the captain's cabin, with a big padlock with an anchor carved on it."
+          },
+          {
+            "id": "stove",
+            "prop": "machine",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "stove",
+            "look": "A big iron stove, still warm. It smells of toast and seaweed."
+          },
+          {
+            "id": "apple-barrels",
+            "prop": "crate",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "apple barrels",
+            "look": "Apples, apples and more apples. Under the last one: the brass tube of a spyglass, with no glass in it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "pot-hooks",
+            "prop": "shelf",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "pots and pans",
+            "look": "Pots and pans clank together every time the ship rocks.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bunks",
+            "prop": "rug",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "sailors’ bunks",
+            "look": "Swaying canvas bunks. One has a sock in it. Just one.",
+            "hidesPieces": true
+          },
+          {
+            "id": "sack",
+            "prop": "box",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "vegetable sack",
+            "look": "Carrots, onions and a lot of very knobbly lumps.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cook-table",
+            "prop": "desk",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "cook's table",
+            "look": "Flour everywhere, and a recipe for sea biscuits with a big jam thumbprint on it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "spice-rack",
+            "prop": "cabinet",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "spice rack",
+            "look": "Tiny jars of pepper, salt and something labelled 'DRAGON DUST'.",
+            "hidesPieces": true
+          },
+          {
+            "id": "rope-coil",
+            "prop": "drawer",
+            "x": 520,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "coil of rope",
+            "look": "A big coil of rope. You untangle it, then tangle it back up.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mop-bucket",
+            "prop": "statue",
+            "x": 770,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "mop and bucket",
+            "look": "A mop with a face drawn on it. The crew call it Mopsy.",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "cabin",
       "title": "The Captain's Cabin",
-      "description": "Charts and letters cover the walls, a treasure chest sits under the round portholes, the captain's desk is piled with odds and ends, and a big wooden ship's wheel stands by the window, locked in place.",
-      "puzzles": ["treasure-chest", "captains-desk", "ships-wheel"]
+      "description": "Letters cover the walls, a treasure chest sits under the round portholes, the captain's desk is piled with odds and ends, a row of lanterns hangs dark, and a big wooden ship's wheel stands by the window, locked in place.",
+      "puzzles": [
+        "treasure-chest",
+        "captains-letters",
+        "lanterns",
+        "captains-desk",
+        "ships-wheel"
+      ],
+      "scene": {
+        "backdrop": "sea",
+        "objects": [
+          {
+            "id": "chest-spot",
+            "prop": "chest",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "treasure chest",
+            "look": "A treasure chest with a 3-digit lock, sitting under the round portholes."
+          },
+          {
+            "id": "wheel",
+            "prop": "machine",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "ship's wheel",
+            "look": "A big wooden wheel, locked in place. A brass plate asks for a navigator."
+          },
+          {
+            "id": "letters-wall",
+            "prop": "poster",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "letters on the wall",
+            "look": "Letters to the captain, all written in numbers."
+          },
+          {
+            "id": "lantern-hooks",
+            "prop": "lamp",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "lanterns",
+            "look": "A row of lanterns on hooks, all dark."
+          },
+          {
+            "id": "map-table",
+            "prop": "painting",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "treasure map",
+            "look": "A map covered in X's. Every X says 'NOT HERE' next to it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "parrot-perch",
+            "prop": "statue",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "parrot perch",
+            "look": "A wooden parrot on a perch. It's painted to look cross.",
+            "hidesPieces": true
+          },
+          {
+            "id": "sea-chest",
+            "prop": "box",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "captain's sea chest",
+            "look": "Big hats, a spare eye patch and a lot of stripy socks.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bookcase",
+            "prop": "bookshelf",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "logbooks",
+            "look": "Logbooks of every voyage. Most entries say 'Sunny. Found no treasure.'",
+            "hidesPieces": true
+          }
+        ]
+      }
     },
     {
       "id": "deck",
       "title": "The Deck",
-      "description": "Sea spray and sunshine! Flags flap from the mast, seagulls squawk overhead, and the gangplank is pulled up tight, with a lock and a three-digit keypad.",
-      "puzzles": ["flag-locker", "gangplank"]
+      "description": "Sea spray and sunshine! Flags flap from the mast, seagulls squawk overhead, a message in a bottle is wedged in the rail, and the gangplank is pulled up tight, with a lock and a three-digit keypad.",
+      "puzzles": [
+        "knots-log",
+        "flag-locker",
+        "bottle-message",
+        "lighthouse",
+        "gangplank"
+      ],
+      "scene": {
+        "backdrop": "sea",
+        "objects": [
+          {
+            "id": "gangplank-spot",
+            "prop": "door",
+            "x": 20,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "gangplank",
+            "look": "Pulled up tight, with a lock and a three-digit keypad."
+          },
+          {
+            "id": "knot-board",
+            "prop": "sign",
+            "x": 270,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "knot board",
+            "look": "Knots tied in rows, each row with more knots than the last."
+          },
+          {
+            "id": "bottle-rail",
+            "prop": "shelf",
+            "x": 520,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "message in a bottle",
+            "look": "A bottle wedged in the rail, with a message in the captain's back-to-front alphabet."
+          },
+          {
+            "id": "mast",
+            "prop": "statue",
+            "x": 770,
+            "y": 20,
+            "w": 210,
+            "h": 160,
+            "label": "mast",
+            "look": "Flags flap high above. Seagulls squawk at you from the top.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cannon",
+            "prop": "barrel",
+            "x": 20,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "cannon",
+            "look": "A cannon full of sand and one very surprised crab.",
+            "hidesPieces": true
+          },
+          {
+            "id": "lifeboat",
+            "prop": "crate",
+            "x": 270,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "lifeboat",
+            "look": "A little lifeboat with two oars and a bucket.",
+            "hidesPieces": true
+          },
+          {
+            "id": "net",
+            "prop": "rug",
+            "x": 520,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "fishing net",
+            "look": "A tangled net full of seaweed and one old boot.",
+            "hidesPieces": true
+          },
+          {
+            "id": "anchor-chain",
+            "prop": "pipe",
+            "x": 770,
+            "y": 220,
+            "w": 210,
+            "h": 160,
+            "label": "anchor chain",
+            "look": "Heavy, rusty and very, very long.",
+            "hidesPieces": true
+          },
+          {
+            "id": "crows-nest",
+            "prop": "window",
+            "x": 20,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "crow's nest",
+            "look": "Through the spyglass, you spot a lighthouse. Painted on its wall is a table of dots and dashes: {key:lighthouse}",
+            "requires": "spyglass",
+            "lockedText": "Up in the crow's nest, you can see a lighthouse far away. Too far to make anything out.",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "fish-box",
+            "prop": "box",
+            "x": 270,
+            "y": 420,
+            "w": 210,
+            "h": 160,
+            "label": "fish box",
+            "look": "Something squeaks in there. It's a rubber fish.",
+            "gives": "rubber-fish",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
     }
   ],
   "puzzles": [
@@ -46,18 +417,29 @@
       "title": "The Riddle Barrel",
       "kind": "text",
       "prompt": "One barrel has a word lock, and the cook has carved a riddle into the lid: 'I have lots of eyes but I can't see a thing. What am I?'",
-      "answers": ["potato", "a potato", "potatoes"],
-      "rewards": ["galley-key"],
+      "answers": [
+        "potato",
+        "a potato",
+        "potatoes"
+      ],
+      "rewards": [
+        "ladle"
+      ],
       "hints": [
         "Look in the cook's vegetable sack.",
         "You can mash it, roast it, or make chips from it."
       ],
-      "solvedText": "The lid pops open. Under the apples: a big iron key with a little anchor on it!",
+      "solvedText": "The lid pops open. Under the apples: the cook's long ladle, the kind for fishing about in deep pots!",
       "variants": [
         {},
         {
           "prompt": "One barrel has a word lock, and the cook has carved a riddle into the lid: 'I have a head and a foot, but no body at all, and you climb into me when night starts to fall.'",
-          "answers": ["bed", "a bed", "hammock", "a hammock"],
+          "answers": [
+            "bed",
+            "a bed",
+            "hammock",
+            "a hammock"
+          ],
           "hints": [
             "Where do pirates sleep?",
             "You sleep in it every night."
@@ -65,13 +447,63 @@
         },
         {
           "prompt": "One barrel has a word lock, and the cook has carved a riddle into the lid: 'I'm full of teeth but I never bite, I keep your hair looking just right.'",
-          "answers": ["comb", "a comb", "brush", "hairbrush"],
+          "answers": [
+            "comb",
+            "a comb",
+            "brush",
+            "hairbrush"
+          ],
           "hints": [
             "Think about what the captain uses before she puts her hat on.",
             "You pull it through your hair."
           ]
         }
       ]
+    },
+    {
+      "id": "galley-search",
+      "title": "The Spyglass Tube",
+      "kind": "search",
+      "prompt": "The captain's spyglass is missing its tube! Search the apple barrels, the vegetable sack and the cook's table.",
+      "finds": [
+        "apple-barrels",
+        "sack",
+        "cook-table"
+      ],
+      "rewards": [
+        "spyglass-tube"
+      ],
+      "hints": [
+        "Three spots in the galley each hide a clue.",
+        "Look under the apples, in the vegetable sack and on the cook's table."
+      ],
+      "solvedText": "You put it all together: the spyglass tube was under the apples all along, and its eyepiece was in the sack!"
+    },
+    {
+      "id": "cooking-pots",
+      "title": "The Cook's Pots",
+      "kind": "code",
+      "prompt": "Five pots hang over the stove: {items}. The cook's cupboard has a keypad: 'Each pot's place, far left is 1, in the order I list them!'",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "copper pot",
+          "iron pot",
+          "silver pot",
+          "big pot",
+          "little pot"
+        ],
+        "pieceTemplate": "Scratched on a pot lid: {clue}"
+      },
+      "rewards": [
+        "spyglass-lens"
+      ],
+      "hints": [
+        "Every phone has a clue. Share them all out loud.",
+        "Start with the one you're surest about, and try each place.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The cupboard swings open. Inside, wrapped in a hanky: a round glass lens."
     },
     {
       "id": "spice-chest",
@@ -91,14 +523,41 @@
       }
     },
     {
+      "id": "sea-shanty",
+      "minMinutes": 45,
+      "title": "The Sea Shanty",
+      "kind": "text",
+      "prompt": "The cook's favourite shanty is written in code on the wall: {cipher}. The spice rack's lock wants the missing word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "barnacle",
+          "octopus",
+          "shrimp",
+          "lobster",
+          "jellyfish",
+          "walrus"
+        ]
+      },
+      "hints": [
+        "How far to slide the letters is written somewhere. Look far out to sea through the right thing.",
+        "Slide every letter back along the alphabet by that many places.",
+        "It says {answer}."
+      ],
+      "solvedText": "You sing the word and the spice rack springs open. The cook would be proud!"
+    },
+    {
       "id": "galley-hatch",
       "title": "The Galley Hatch",
       "kind": "use",
       "prompt": "The hatch up to the captain's cabin has a big padlock with an anchor carved on it.",
-      "requires": ["galley-key"],
+      "requires": [
+        "galley-key"
+      ],
       "hints": [
-        "Something with an anchor on it came out of a barrel.",
-        "Use the iron key on the galley hatch."
+        "Something clonked at the bottom of the stew pot.",
+        "Fish in the stew pot with the ladle, then use the iron key on the hatch."
       ],
       "solvedText": "Clunk! The padlock falls off and you climb up the ladder into the captain's cabin."
     },
@@ -107,18 +566,66 @@
       "title": "The Treasure Chest",
       "kind": "code",
       "prompt": "The captain's treasure chest has a 3-digit lock. Carved on it: '{order}, or no treasure for you!'",
-      "rewards": ["compass"],
+      "rewards": [
+        "compass-case"
+      ],
       "hints": [
         "Each phone found one colour of gem, and how many there were.",
         "Read them in the order carved on the chest: {order}."
       ],
-      "solvedText": "The chest creaks open and gold coins spill everywhere! On top of the pile sits a shiny brass compass.",
+      "solvedText": "The chest creaks open and gold coins spill everywhere! On top of the pile sits a little brass box that rattles.",
       "generator": {
         "type": "colorDigits",
         "count": 3,
-        "colors": ["red", "blue", "green", "purple", "yellow", "white"],
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "purple",
+          "yellow",
+          "white"
+        ],
         "pieceTemplate": "You counted the {color} gems in your pouch: there were {digit} of them."
       }
+    },
+    {
+      "id": "captains-letters",
+      "title": "The Captain's Letters",
+      "kind": "text",
+      "prompt": "The captain signs her letters in numbers. The newest one ends: {cipher}. The letter box lock wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "cutlass",
+          "doubloon",
+          "galleon",
+          "bosun",
+          "scurvy",
+          "squid"
+        ]
+      },
+      "hints": [
+        "Each number is a letter.",
+        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "It says {answer}."
+      ],
+      "solvedText": "The letter box opens. Inside: a lot more letters, and a biscuit."
+    },
+    {
+      "id": "lanterns",
+      "minMinutes": 45,
+      "title": "The Lanterns",
+      "kind": "switches",
+      "prompt": "The lanterns flicker. Tap one and it lights, and flips the ones beside it. Light every lantern!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the buttons in the row below it.",
+        "Press {answer}."
+      ],
+      "solvedText": "Every lantern glows and the cabin fills with warm light. Captain Sal roars: 'Now THAT'S a cabin!'"
     },
     {
       "id": "captains-desk",
@@ -126,7 +633,10 @@
       "title": "The Captain's Desk",
       "kind": "text",
       "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I start with T, I end with T, and I'm full of T.'",
-      "answers": ["teapot", "a teapot"],
+      "answers": [
+        "teapot",
+        "a teapot"
+      ],
       "hints": [
         "Look at the captain's breakfast tray.",
         "You pour tea out of it."
@@ -136,7 +646,10 @@
         {},
         {
           "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I'm full of holes, but I still hold water.'",
-          "answers": ["sponge", "a sponge"],
+          "answers": [
+            "sponge",
+            "a sponge"
+          ],
           "hints": [
             "Think about scrubbing the deck.",
             "It soaks up water when you squeeze it."
@@ -144,7 +657,10 @@
         },
         {
           "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I begin with E, I end with E, and I usually hold just one letter.'",
-          "answers": ["envelope", "an envelope"],
+          "answers": [
+            "envelope",
+            "an envelope"
+          ],
           "hints": [
             "Look at the captain's post.",
             "You put a letter inside it before you send it."
@@ -157,13 +673,31 @@
       "title": "The Ship's Wheel",
       "kind": "use",
       "prompt": "The ship's wheel is locked in place. A brass plate on it says: 'Only a true navigator may steer. Show me which way is north!'",
-      "requires": ["compass"],
-      "rewards": ["gangplank-key"],
+      "requires": [
+        "compass"
+      ],
+      "rewards": [
+        "gangplank-key"
+      ],
       "hints": [
-        "You found something that always points north.",
-        "Use the compass on the ship's wheel."
+        "You found something that always points north, but it's tucked away.",
+        "Look closely at the brass box, then use the compass on the ship's wheel."
       ],
       "solvedText": "The compass needle spins and the wheel unlocks! You turn it, and a secret drawer in the wheel pops out with the gangplank key inside."
+    },
+    {
+      "id": "knots-log",
+      "title": "The Knot Board",
+      "kind": "code",
+      "prompt": "The knots on the board go: {sequence}. The keypad by the mast wants the next row's number.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "Beep! The keypad lights up and the seagulls cheer. Or squawk. Hard to tell."
     },
     {
       "id": "flag-locker",
@@ -179,17 +713,80 @@
       "generator": {
         "type": "wordSequence",
         "count": 3,
-        "words": ["anchor", "cannon", "parrot", "jewel", "lagoon", "seagull", "lantern", "barrel", "island", "mermaid", "starfish", "dolphin"],
+        "words": [
+          "anchor",
+          "cannon",
+          "parrot",
+          "jewel",
+          "lagoon",
+          "seagull",
+          "lantern",
+          "barrel",
+          "island",
+          "mermaid",
+          "starfish",
+          "dolphin"
+        ],
         "pieceTemplate": "The lookout shouted it from the crow's nest: the {ordinal} flag word was '{word}'."
       }
+    },
+    {
+      "id": "bottle-message",
+      "minMinutes": 60,
+      "title": "The Message in a Bottle",
+      "kind": "text",
+      "prompt": "The message in the bottle is in the captain's back-to-front alphabet: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "shipwreck",
+          "coral",
+          "pearl",
+          "conch",
+          "reef"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A is Z, B is Y, C is X… Swap every letter.",
+        "It says {answer}."
+      ],
+      "solvedText": "You read it out and Captain Sal laughs: 'Aye, that's my secret word!'"
+    },
+    {
+      "id": "lighthouse",
+      "minDifficulty": "hard",
+      "title": "The Lighthouse Signal",
+      "kind": "text",
+      "prompt": "The lighthouse flashes, long and short, over and over: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "tugboat",
+          "harbor",
+          "sailor",
+          "mainsail"
+        ]
+      },
+      "hints": [
+        "These need a key. Something far away needs a spyglass to read.",
+        "Swap each one for its letter, one at a time."
+      ],
+      "solvedText": "The lighthouse flashes back a big bright YES. Captain Sal whistles: 'A proper signaller!'"
     },
     {
       "id": "gangplank",
       "title": "The Gangplank",
       "kind": "code",
       "prompt": "The gangplank needs its key AND a 3-digit code. Captain Sal's note: 'Hammocks in the galley, then portholes in my cabin, then seagulls on the mast!'",
-      "answers": ["685"],
-      "requires": ["gangplank-key"],
+      "answers": [
+        "685"
+      ],
+      "requires": [
+        "gangplank-key"
+      ],
       "pieces": [
         "You counted the hammocks in the galley: 6.",
         "You counted the portholes in the captain's cabin: 8.",
@@ -203,7 +800,9 @@
       "variants": [
         {},
         {
-          "answers": ["342"],
+          "answers": [
+            "342"
+          ],
           "pieces": [
             "You counted the hammocks in the galley: 3.",
             "You counted the portholes in the captain's cabin: 4.",
@@ -211,7 +810,9 @@
           ]
         },
         {
-          "answers": ["974"],
+          "answers": [
+            "974"
+          ],
           "pieces": [
             "You counted the hammocks in the galley: 9.",
             "You counted the portholes in the captain's cabin: 7.",
@@ -222,8 +823,62 @@
     }
   ],
   "items": [
-    { "id": "galley-key", "name": "Iron anchor key", "description": "Big and heavy, with a little anchor on the handle." },
-    { "id": "compass", "name": "Brass compass", "description": "Shiny and new. The needle always points north." },
-    { "id": "gangplank-key", "name": "Gangplank key", "description": "Salty and a bit sandy. The tag says: GO ASHORE." }
+    {
+      "id": "ladle",
+      "name": "Long ladle",
+      "description": "The cook's longest ladle, for fishing about in deep pots."
+    },
+    {
+      "id": "galley-key",
+      "name": "Iron anchor key",
+      "description": "Big and heavy, with a little anchor on the handle. It smells of stew."
+    },
+    {
+      "id": "spyglass-lens",
+      "name": "Glass lens",
+      "description": "A round glass lens, wrapped in a hanky."
+    },
+    {
+      "id": "spyglass-tube",
+      "name": "Spyglass tube",
+      "description": "A brass tube with an eyepiece, but no lens at the far end."
+    },
+    {
+      "id": "spyglass",
+      "name": "Spyglass",
+      "description": "Lens and tube together. You can see a long, long way."
+    },
+    {
+      "id": "compass-case",
+      "name": "Little brass box",
+      "description": "It rattles when you shake it.",
+      "inspect": "You open the little brass box. Inside, a compass! Its needle spins, then points north.",
+      "inspectGives": "compass"
+    },
+    {
+      "id": "compass",
+      "name": "Brass compass",
+      "description": "Shiny and new. The needle always points north."
+    },
+    {
+      "id": "gangplank-key",
+      "name": "Gangplank key",
+      "description": "Salty and a bit sandy. The tag says: GO ASHORE."
+    },
+    {
+      "id": "rubber-fish",
+      "name": "Rubber fish",
+      "description": "It squeaks. The seagulls look very interested."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "spyglass-lens",
+        "spyglass-tube"
+      ],
+      "makes": "spyglass",
+      "text": "The lens screws into the end of the tube. A spyglass!"
+    }
   ]
 }

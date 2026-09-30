@@ -9,14 +9,18 @@ namespace ButlerDidIt.Escape.Tests;
 /// </summary>
 public class ContentBarTests
 {
-    /// <summary>The rooms rebuilt so far. Each rebuilt room is edition 2 or later.</summary>
+    /// <summary>The rebuilt rooms: edition 2 or later. Every shipped room has been rebuilt (#85).</summary>
     public static TheoryData<string> RebuiltRooms() => new(Rooms.Library.Where(r => r.Edition >= 2).Select(r => r.Id));
 
     private static readonly Dictionary<int, int> MinPuzzles = new() { [30] = 7, [45] = 10, [60] = 13 };
 
     [Fact]
-    public void The_adults_rooms_are_rebuilt() =>
-        Assert.All(new[] { "the-workshop", "the-asylum", "the-bunker" }, id => Assert.True(Rooms.Get(id).Edition >= 2, $"{id} is rebuilt"));
+    public void Every_shipped_room_is_rebuilt() =>
+        Assert.All(Rooms.Library, r => Assert.True(r.Edition >= 2, $"{r.Id} is rebuilt"));
+
+    [Fact]
+    public void Every_shipped_room_offers_every_length() =>
+        Assert.All(Rooms.Library, r => Assert.Equal([30, 45, 60], r.PlayableLengths));
 
     [Theory]
     [MemberData(nameof(RebuiltRooms))]

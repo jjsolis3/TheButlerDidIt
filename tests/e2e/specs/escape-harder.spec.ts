@@ -6,6 +6,7 @@ import { SHOTS, loadRoom, playThrough } from './escape-play'
 // Escape__TestRoomsRoot) uses every newer kind of puzzle: spots to search, items to look at and put
 // together, a shift cipher and a Morse cipher whose keys must be found, a number pattern, a logic
 // puzzle and a light panel. It's played through the real screens, solo on Hard and with three phones.
+// A rebuilt Family room (the Pirate Ship) is played solo on Easy, the way a young family would.
 
 mkdirSync(SHOTS, { recursive: true })
 const phone = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
@@ -13,8 +14,9 @@ const phone = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch:
 test.use({ actionTimeout: 15_000 })
 
 const lab = loadRoom('../ButlerDidIt.Escape.Tests/Fixtures/the-laboratory.json')
+const pirateShip = loadRoom('../../content/escape/the-pirate-ship.json')
 
-async function hostTv(browser: Browser, difficulty: RegExp) {
+async function hostTv(browser: Browser, difficulty: RegExp, room = /The Laboratory/) {
   const tv = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage()
   tv.on('dialog', (d) => d.accept())
   await tv.goto('/login')
@@ -26,7 +28,7 @@ async function hostTv(browser: Browser, difficulty: RegExp) {
   await tv.waitForURL('**/host/new')
   await tv.getByRole('tab', { name: /Escape room/ }).click()
   await tv.getByRole('tab', { name: /Family/ }).click()
-  await tv.getByRole('button', { name: /The Laboratory/ }).click()
+  await tv.getByRole('button', { name: room }).click()
   // Normal is picked by default; each difficulty has its own leaderboard.
   await expect(tv.getByRole('radio', { name: /Normal/ })).toBeChecked()
   await tv.getByText(difficulty).click()
@@ -43,8 +45,6 @@ async function joinAs(browser: Browser, code: string, name: string) {
   await expect(page.getByText(`You're in, ${name}.`)).toBeVisible()
   return page
 }
-
-/** A card's text, or null once it's gone (solving a stage's last puzzle replaces the cards). Never waits for a card to come back. */
 
 test('harder rooms: a solo player searches, decodes and reasons their way out of the Laboratory on Hard', async ({ browser }) => {
   test.setTimeout(180_000)
@@ -104,4 +104,29 @@ test('harder rooms: three phones share the search and the clues on Normal', asyn
   await playThrough(tv, phones, lab, answers, '99-escape-group')
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
   await expect(tv.getByRole('region', { name: 'Leaderboard' })).toContainText('Normal')
+})
+
+test('harder rooms: a young family escapes the rebuilt Pirate Ship solo on Easy', async ({ browser }) => {
+  test.setTimeout(180_000)
+  const tv = await hostTv(browser, /🙂 Easy/, /The Pirate Ship/)
+  await expect(tv.getByRole('radio', { name: /Easy/ })).toBeChecked()
+  await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
+  await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
+  const code = tv.url().split('/').pop()!
+  await expect(tv.getByText(/🙂 Easy/)).toBeVisible()
+
+  const kid = await joinAs(browser, code, 'Pip')
+  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  await expect(tv.getByRole('heading', { name: 'The Galley', exact: true })).toBeVisible()
+  const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
+
+  // Every stage has a scene now; the stew pot needs the ladle, and says so in the room's own words.
+  await expect(kid.getByTestId('scene')).toBeVisible()
+  await kid.getByRole('button', { name: 'Search the bubbling stew pot' }).click()
+  await expect(kid.getByRole('status').filter({ hasText: 'far too hot' })).toBeVisible()
+
+  await playThrough(tv, [kid], pirateShip, answers, '94-escape-family')
+
+  await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
+  await expect(tv.getByRole('region', { name: 'Leaderboard' })).toContainText('Easy')
 })
