@@ -65,6 +65,7 @@ public static class EscapePrompts
         CueKind.Escaped => $"They escaped! {cue.PlayerName} solved the last puzzle, {cue.PuzzleTitle}. Concede, in character.",
         CueKind.Failed => "Time ran out before they escaped. Gloat, in character, but invite them to try again.",
         CueKind.Found => $"{cue.PlayerName} searched and found something useful: {cue.Thing}. Don't say what it's for.",
+        CueKind.Decoy => $"{cue.PlayerName} searched the {cue.Thing} and found nothing at all, and on Hard that cost them time. Tease them for it, without hinting where to look instead.",
         _ => "",
     };
 
@@ -92,15 +93,21 @@ public static class EscapePrompts
         sb.AppendLine(GameJson.Serialize(new
         {
             puzzle.Title,
-            Kind = puzzle.Kind switch
+            // A built puzzle no longer says which generator made it; the room as written does.
+            Kind = (template.FindPuzzle(puzzle.Id)?.Generator?.Type, puzzle.Kind) switch
             {
-                PuzzleKind.Code => "a number keypad",
-                PuzzleKind.Text => "a word or phrase to type",
-                PuzzleKind.Search => "opens once the right spots in the room have been searched",
-                PuzzleKind.Switches => "a grid of lights; pressing one flips it and its neighbours; every light must be on",
+                (GeneratorType.Cipher, _) => "a coded word: decode it with its key, then type the word",
+                (GeneratorType.Sequence, _) => "a number pattern: type the number that comes next",
+                (GeneratorType.Deduction, _) => "a logic puzzle: line the things up so every clue is true; the code is each one's place, in the order listed",
+                (_, PuzzleKind.Code) => "a number keypad",
+                (_, PuzzleKind.Text) => "a word or phrase to type",
+                (_, PuzzleKind.Search) => "opens once the right spots in the room have been searched",
+                (_, PuzzleKind.Switches) => "a grid of lights; pressing one flips it and its neighbours; every light must be on",
                 _ => "a lock opened with the right item",
             },
             puzzle.Prompt,
+            // Whether they've found the cipher's key yet (never the key itself: if they have it, it's in their notebook).
+            CipherKeyFound = puzzle.Decoder is null ? (bool?)null : EscapeEngine.KeyFound(state, puzzle),
             Needs = puzzle.Requires.Select(Item),
             // What a close look at each item showed, only for the ones someone has looked at.
             Holding = state.Inventory.Select(id => room.FindItem(id)).OfType<EscapeItem>()
@@ -129,6 +136,8 @@ public static class EscapePrompts
         sb.AppendLine("- Give ONE nudge that fits where they seem stuck (look at their wrong tries), without solving it for them.");
         sb.AppendLine("- Never write a code, a number from a code, a password or an answer, not even as a guess.");
         sb.AppendLine("- One or two sentences, under 50 words, in character. No lists or markdown.");
+        if (state.Level == EscapeDifficulty.Hard)
+            sb.AppendLine("- They chose Hard: only nudge. Don't name the spot to search, the item to use, or who holds which clue.");
         sb.AppendLine(ContentGuidance.For(room.ContentRating));
         return sb.ToString();
     }

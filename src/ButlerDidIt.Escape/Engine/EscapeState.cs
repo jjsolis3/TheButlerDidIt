@@ -140,6 +140,9 @@ public enum CueKind
     Failed,
     /// <summary>Someone found something by searching or looking closely.</summary>
     Found,
+
+    /// <summary>On Hard, someone searched a decoy: nothing there, and it cost time.</summary>
+    Decoy,
 }
 
 /// <summary>Something the game master may react to. Its line (and recording) arrive later, from the AI.</summary>

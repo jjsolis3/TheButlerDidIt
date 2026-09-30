@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
-import { loadRoom, playThrough } from './escape-play'
+import { loadRoom, playThrough, type RoomFile } from './escape-play'
 
 // An escape-room night: the host opens The Workshop on the TV, three phones join, and the group
 // works through every room, with clues split across their phones, until they escape.
@@ -123,7 +123,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
 })
 
 test('an escape room written by AI from a theme lands on the host shelf, ready to play', async ({ browser }) => {
-  test.setTimeout(60_000)
+  test.setTimeout(150_000)
   const tv = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage()
   await tv.goto('/login')
   await tv.getByRole('button', { name: 'Create an account' }).click()
@@ -148,4 +148,18 @@ test('an escape room written by AI from a theme lands on the host shelf, ready t
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   await expect(tv.getByRole('heading', { name: 'The Fake Lighthouse' })).toBeVisible()
+
+  // It plays like a hand-written room: scenes to search, a lantern to put together, a cipher, a logic puzzle and a light panel.
+  // The saved room renames the puzzles ("puzzle-1"…, in the order written), so the fake's file is renamed to match.
+  const code = tv.url().split('/').pop()!
+  const ada = await joinAs(browser, code, 'Ada')
+  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  await expect(tv.getByRole('heading', { name: 'The Spiral Stairs' })).toBeVisible()
+  await expect(ada.getByTestId('scene')).toBeVisible()
+  const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
+  await playThrough(tv, [ada], aiRoom, answers, '95-escape-ai')
+  await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
 })
+
+const fake = loadRoom('../../src/ButlerDidIt.Ai/Fake/FakeEscapeRoom.json')
+const aiRoom: RoomFile = { ...fake, puzzles: fake.puzzles.map((p, i) => ({ ...p, id: `puzzle-${i + 1}` })) }
