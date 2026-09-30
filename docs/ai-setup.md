@@ -25,7 +25,9 @@ The game works with any mix of providers.
 | Google | `Gemini` | Yes | Gemini models, through Google's OpenAI-compatible endpoint. |
 | Ollama | `Ollama` | No | Runs open models on your own hardware for free. Set the base URL, e.g. `http://ollama:11434`. |
 
-**Voices and pictures need OpenAI** for now: the Voice role uses OpenAI text-to-speech (`tts-1`, or `tts-1-hd` for higher quality) and the Illustrator role uses `dall-e-3`. You can still use Claude, Gemini or Ollama for the text roles and add OpenAI just for media.
+**Voices and pictures need OpenAI or Gemini.** Claude and Ollama don't make audio or images, so you can use them for the text roles and add OpenAI or Gemini just for media:
+- **OpenAI:** text-to-speech (`tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`) for the Voice role, and `gpt-image-1` or `dall-e-3` for the Illustrator.
+- **Gemini:** a TTS model (`gemini-2.5-flash-preview-tts`, `gemini-2.5-pro-preview-tts`) for the Voice role, and a Nano Banana image model (`gemini-2.5-flash-image`, `gemini-3.1-flash-image`, `gemini-3.1-flash-lite-image`, `gemini-3-pro-image`) for the Illustrator. One Gemini provider and key covers the text roles, voices and pictures. Characters get Gemini voices (Charon, Kore, Puck…) matched to their pitch, the same way they would with OpenAI.
 
 **A sensible starting point:** a strong model as the **Storyteller**, since it runs once per mystery and quality matters most. A faster, cheaper model as the **Actor**, since it runs every time a guest asks a question. The Inspector sits in between.
 
@@ -38,7 +40,7 @@ Small local models (Ollama) are fine for the Actor. They often struggle to write
 2. Open **AI settings** from the home page (`/admin/ai`).
 3. **Providers → Add provider.** Pick the type and paste the API key. Keys are encrypted before they are stored and are never shown again.
 4. **Test connection** with a model name to confirm the key works.
-5. **Who does what:** pick a provider and model for Storyteller, Actor and Inspector, then Save. Optionally pick an OpenAI provider for Voice (`tts-1`) and Illustrator (`dall-e-3`).
+5. **Who does what:** pick a provider and model for Storyteller, Actor and Inspector, then Save. Optionally pick an OpenAI or Gemini provider for Voice (e.g. `tts-1` or `gemini-2.5-flash-preview-tts`) and Illustrator (e.g. `dall-e-3` or `gemini-2.5-flash-image`).
 6. **Prices:** add prices for any non-Claude models (US$ per million tokens, from the provider's pricing page) so costs are tracked correctly.
    - **Voices** are charged per character, which the usage log records as input tokens. For `tts-1` enter the price per million characters in *In $/1M* (check OpenAI's pricing page).
    - **Pictures** are charged per image: enter it in *Per call $* (for example the price of one `dall-e-3` 1024×1792 image).
@@ -55,8 +57,9 @@ AI_ACTOR_MODEL=claude-sonnet-5
 AI_INSPECTOR_MODEL=claude-sonnet-5
 AI_MONTHLY_BUDGET_USD=25
 
-# Optional: voices and pictures (OpenAI only for now)
+# Optional: voices and pictures (OpenAI or Gemini)
 AI_MEDIA_PROVIDER_NAME=OpenAI
+AI_MEDIA_PROVIDER_KIND=OpenAI   # or Gemini, with e.g. gemini-2.5-flash-preview-tts and gemini-2.5-flash-image
 AI_MEDIA_API_KEY=sk-...
 AI_VOICE_MODEL=tts-1
 AI_IMAGE_MODEL=dall-e-3
@@ -92,5 +95,6 @@ Environment settings are applied at every start-up and overwrite the same-named 
 | Test connection fails with 401/403 | Wrong or revoked API key. |
 | Test connection fails with 404 / "model not found" | Check the model name on the provider's model list. |
 | Generation fails repeatedly | Try a stronger Storyteller model; small models often produce invalid mysteries. |
-| "The Voice role needs an OpenAI provider" (or Illustrator) | Those roles only work with OpenAI for now. Add an OpenAI provider for them. |
+| "The Voice role needs an OpenAI or Gemini provider" (or Illustrator) | Claude and Ollama can't make voices or pictures. Add an OpenAI or Gemini provider for those roles. |
+| "Gemini returned no image" / "no voice clip" | The model name isn't an image or speech model: use a `…-image` model for the Illustrator and a `…-tts` model for the Voice. |
 | Lobby says some items "couldn't be made" | Usually a picture refused by the provider's safety filter. Press *Fill in anything missing* to retry; the rest of the mystery is unaffected. |

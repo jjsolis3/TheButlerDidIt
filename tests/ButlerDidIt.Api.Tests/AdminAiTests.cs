@@ -43,8 +43,21 @@ public class AdminAiTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.BadRequest, bad.StatusCode);
         Assert.Contains("Unknown role", await bad.Content.ReadAsStringAsync());
 
+        // Gemini makes voices and pictures too (its TTS and Nano Banana image models).
+        foreach (var (role, model) in new[] { ("voice", "gemini-2.5-flash-preview-tts"), ("illustrator", "gemini-2.5-flash-image") })
+        {
+            var media = await admin.PutAsync($"/api/admin/ai/roles/{role}",
+                Json($$"""{"providerId":"{{providerId}}","model":"{{model}}","maxOutputTokens":null,"temperature":null}"""));
+            Assert.True(media.StatusCode == HttpStatusCode.NoContent, $"{role}: {(int)media.StatusCode} {await media.Content.ReadAsStringAsync()}");
+        }
+
+        // A provider with no voice or image API is still refused, with a reason.
+        var local = await admin.PostAsync("/api/admin/ai/providers",
+            Json("""{"name":"Local","kind":"ollama","baseUrl":"http://localhost:11434","apiKey":null}"""));
+        var localId = JsonDocument.Parse(await local.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetString();
         var voice = await admin.PutAsync("/api/admin/ai/roles/voice",
-            Json($$"""{"providerId":"{{providerId}}","model":"tts-1","maxOutputTokens":null,"temperature":null}"""));
-        Assert.Contains("needs an OpenAI provider", await voice.Content.ReadAsStringAsync());
+            Json($$"""{"providerId":"{{localId}}","model":"tts-1","maxOutputTokens":null,"temperature":null}"""));
+        Assert.Equal(HttpStatusCode.BadRequest, voice.StatusCode);
+        Assert.Contains("needs an OpenAI or Gemini provider", await voice.Content.ReadAsStringAsync());
     }
 }
