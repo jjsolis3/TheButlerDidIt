@@ -568,7 +568,9 @@ export interface VersionOption {
 // ---------------------------------------------------------------- escape rooms (mirror ButlerDidIt.Escape/Engine/EscapeViews.cs)
 
 export type EscapePhase = 'lobby' | 'playing' | 'escaped' | 'failed'
-export type PuzzleKind = 'code' | 'text' | 'use'
+export type PuzzleKind = 'code' | 'text' | 'use' | 'search' | 'switches'
+/** How hard a game is; each has its own leaderboard */
+export type EscapeDifficulty = 'easy' | 'normal' | 'hard'
 
 /** A room on the create-party shelf. */
 export interface EscapeRoomSummary {
@@ -623,6 +625,8 @@ export interface Leaderboard {
   daily: boolean
   /** Each game length has its own board */
   minutes: number
+  /** …and so does each difficulty */
+  difficulty: EscapeDifficulty
   top: LeaderboardEntry[]
   thisParty: LeaderboardEntry | null
   myBest: LeaderboardEntry[]
@@ -652,12 +656,49 @@ export interface EscapePuzzleView {
   lockedUntil: string | null
   /** How many phones hold a piece of this puzzle */
   pieceCount: number
+  /** Pieces of this puzzle still hidden somewhere in the room */
+  piecesHidden: number
+  /** Search puzzles: how many of the spots it needs have been searched */
+  finds: { found: number; total: number } | null
+  /** Switches puzzles: the grid as it is now (cells numbered row by row from 0) */
+  switches: { size: number; lit: number[] } | null
 }
 
 export interface EscapeItemView {
   id: string
   name: string
   description: string
+  /** There's more to see with a closer look, and nobody has looked yet */
+  inspectable: boolean
+  /** What the closer look showed, once someone has looked */
+  inspectText: string | null
+}
+
+/** The part of the room in front of the group, on a width × height canvas. */
+export interface EscapeSceneView {
+  width: number
+  height: number
+  backdrop: string
+  objects: EscapeSpotView[]
+}
+
+/** A spot to search. What's there only once someone has searched it. */
+export interface EscapeSpotView {
+  id: string
+  prop: string
+  x: number
+  y: number
+  w: number
+  h: number
+  label: string
+  examined: boolean
+  look: string | null
+}
+
+export interface EscapeNoteView {
+  source: string
+  text: string
+  at: string
 }
 
 export interface EscapePlayerSummary {
@@ -707,6 +748,11 @@ export interface EscapeStageView {
   soundscape: Soundscape
   /** A generated picture of the stage in front of the group (the room's cover in the lobby and at the end), or null */
   artUrl: string | null
+  difficulty: EscapeDifficulty
+  /** The spots to search in the stage in front of the group, or null when it has none */
+  scene: EscapeSceneView | null
+  /** What the group has found out, oldest first */
+  notebook: EscapeNoteView[]
 }
 
 /** Background sound presets, synthesised in the browser by escape/sound.ts. */
@@ -734,6 +780,8 @@ export interface EscapePieceView {
   puzzleId: string
   puzzleTitle: string
   text: string
+  /** Where this player found it, for a piece that was hidden in the room */
+  foundIn: string | null
 }
 
 /** One phone: the TV's view plus this player's own clue pieces. */

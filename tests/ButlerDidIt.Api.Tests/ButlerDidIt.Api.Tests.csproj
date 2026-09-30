@@ -25,4 +25,9 @@
     <ProjectReference Include="..\..\src\ButlerDidIt.Api\ButlerDidIt.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The escape tests' Laboratory, which uses every kind of puzzle, played here through the hub. -->
+    <None Include="..\ButlerDidIt.Escape.Tests\Fixtures\**" Link="Fixtures\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

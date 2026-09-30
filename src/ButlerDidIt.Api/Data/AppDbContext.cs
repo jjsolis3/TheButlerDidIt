@@ -32,6 +32,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         // Leaderboards read one room's escapes, best score first.
         b.Entity<EscapeResult>().HasIndex(r => new { r.RoomId, r.Escaped, r.Score });
         b.Entity<EscapeResult>().HasIndex(r => r.PartyId).IsUnique(); // one result per party
+        b.Entity<EscapeResult>().Property(r => r.Difficulty).HasConversion<string>().HasMaxLength(20);
         b.Entity<EscapeRoomEntity>().HasIndex(r => r.OwnerUserId);
         b.Entity<EscapeRoomEntity>().Property(r => r.Document).HasColumnType("jsonb");
         b.Entity<EscapeRoomEntity>().Property(r => r.ContentRating).HasConversion<string>().HasMaxLength(20);

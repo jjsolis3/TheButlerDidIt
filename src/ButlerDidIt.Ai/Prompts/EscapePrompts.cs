@@ -9,8 +9,9 @@ namespace ButlerDidIt.Ai.Prompts;
 /// Prompts for an escape room's AI game master: its lines on the TV, and its hints.
 ///
 /// Neither prompt ever holds an answer. The narration is built only from the TV's public view,
-/// and the hint only from what the group has in front of it (the puzzle, its clue pieces, the
-/// items, their wrong tries). The engine checks every hint again before showing it (EscapeHintGuard).
+/// and the hint only from what the group has in front of it (the puzzle, the clue pieces on their
+/// phones, the items, the spots they've searched and what they've written in their notebook, their
+/// wrong tries): never what's in a spot nobody has searched, or a clue piece still hidden. The engine checks every hint again before showing it (EscapeHintGuard).
 /// </summary>
 public static class EscapePrompts
 {
@@ -63,6 +64,7 @@ public static class EscapePrompts
         CueKind.LowTime => "Only five minutes are left on the clock. Turn up the pressure.",
         CueKind.Escaped => $"They escaped! {cue.PlayerName} solved the last puzzle, {cue.PuzzleTitle}. Concede, in character.",
         CueKind.Failed => "Time ran out before they escaped. Gloat, in character, but invite them to try again.",
+        CueKind.Found => $"{cue.PlayerName} searched and found something useful: {cue.Thing}. Don't say what it's for.",
         _ => "",
     };
 
@@ -78,7 +80,8 @@ public static class EscapePrompts
         var puzzle = room.FindPuzzle(puzzleId) ?? throw new ArgumentException($"Unknown puzzle '{puzzleId}'.", nameof(puzzleId));
         var host = room.Host;
         string Item(string id) => room.FindItem(id)?.Name ?? id;
-        string Holder(Guid seat) => state.FindPlayer(seat)?.Name ?? "someone";
+        string Holder(Guid? seat) => seat is { } s ? state.FindPlayer(s)?.Name ?? "someone" : "someone";
+        var stage = room.Stages[Math.Min(state.StageIndex, room.Stages.Count - 1)];
 
         var sb = new StringBuilder();
         sb.AppendLine($"TASK: {HintTask}");
@@ -93,13 +96,24 @@ public static class EscapePrompts
             {
                 PuzzleKind.Code => "a number keypad",
                 PuzzleKind.Text => "a word or phrase to type",
+                PuzzleKind.Search => "opens once the right spots in the room have been searched",
+                PuzzleKind.Switches => "a grid of lights; pressing one flips it and its neighbours; every light must be on",
                 _ => "a lock opened with the right item",
             },
             puzzle.Prompt,
             Needs = puzzle.Requires.Select(Item),
-            Holding = state.Inventory.Select(Item),
+            // What a close look at each item showed, only for the ones someone has looked at.
+            Holding = state.Inventory.Select(id => room.FindItem(id)).OfType<EscapeItem>()
+                .Select(i => new { i.Name, CloseLook = state.Inspected.Contains(i.Id) ? i.Inspect : null }),
             // Pieces are already on the group's phones: who holds which, so the hint can send them to the right person.
-            CluePieces = state.Pieces.Where(p => p.PuzzleId == puzzle.Id).Select(p => new { HeldBy = Holder(p.SeatId), Text = puzzle.Pieces[p.Index] }),
+            // A piece still hidden in the room is only counted: nobody has read it yet.
+            CluePieces = state.Pieces.Where(p => p.PuzzleId == puzzle.Id && !p.IsHidden).Select(p => new { HeldBy = Holder(p.SeatId), Text = puzzle.Pieces[p.Index] }),
+            CluePiecesStillHidden = state.Pieces.Count(p => p.PuzzleId == puzzle.Id && p.IsHidden),
+            // The room in front of them: every spot, but what was there only for the ones someone searched.
+            Spots = (stage.Scene?.Objects ?? []).Select(o => new { o.Label, Searched = state.Examined.Contains(o.Id), Found = state.Examined.Contains(o.Id) ? o.Look : null }),
+            SpotsThisPuzzleNeeds = puzzle.Finds.Count == 0 ? null : new { Searched = puzzle.Finds.Count(state.Examined.Contains), Of = puzzle.Finds.Count },
+            LightsOn = puzzle.Grid is { } grid ? $"{EscapeEngine.LitNow(state, puzzle).Count} of {grid.Size * grid.Size}" : null,
+            Notebook = state.Notebook.Select(n => $"{n.Source}: {n.Text}"),
             WrongTries = state.RecentWrong.GetValueOrDefault(puzzle.Id) ?? [],
             HintsAlreadyGiven = EscapeProjector.Stage(state, template, now).Puzzles
                 .FirstOrDefault(p => p.Id == puzzle.Id)?.Hints ?? [],

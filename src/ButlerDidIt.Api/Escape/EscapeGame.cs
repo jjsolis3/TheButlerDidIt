@@ -124,6 +124,12 @@ public static class EscapeResults
     /// <summary>A room's results at one length. Results from before lengths existed count as the room's own length.</summary>
     public static IQueryable<EscapeResult> AtLength(this IQueryable<EscapeResult> results, EscapeRoom room, int minutes) =>
         minutes == room.TimeLimitMinutes ? results.Where(r => r.Minutes == minutes || r.Minutes == null) : results.Where(r => r.Minutes == minutes);
+
+    /// <summary>A room's results at one difficulty. Results from before difficulties existed count as Normal.</summary>
+    public static IQueryable<EscapeResult> AtDifficulty(this IQueryable<EscapeResult> results, EscapeDifficulty difficulty) =>
+        difficulty == EscapeDifficulty.Normal
+            ? results.Where(r => r.Difficulty == EscapeDifficulty.Normal || r.Difficulty == null)
+            : results.Where(r => r.Difficulty == difficulty);
 }
 
 /// <summary>Escape rooms as a game module: the escape engine behind the platform's interface.</summary>
@@ -203,11 +209,13 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
             Seed = State.Seed,
             Daily = State.Daily,
             Minutes = State.Minutes ?? Room.TimeLimitMinutes,
+            Difficulty = State.Level,
             Escaped = State.Phase == EscapePhase.Escaped,
             ElapsedSeconds = elapsed,
             HintsUsed = State.HintsUsed,
             WrongAttempts = State.WrongAttempts,
-            Score = elapsed + State.HintsUsed * Room.HintPenaltySeconds,
+            // The penalty as played: Easy halves it.
+            Score = elapsed + State.HintsUsed * EscapeEngine.RoomFor(State, Room).HintPenaltySeconds,
             PlayerCount = State.Players.Count,
             Team = team.Length <= 400 ? team : team[..400],
             FinishedAt = State.EndedAt!.Value,

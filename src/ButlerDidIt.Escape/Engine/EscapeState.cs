@@ -1,3 +1,5 @@
+using ButlerDidIt.Escape.Rooms;
+
 namespace ButlerDidIt.Escape.Engine;
 
 public enum EscapePhase
@@ -30,6 +32,11 @@ public sealed class EscapeState
 
     /// <summary>The game's length in minutes, chosen when the party was made. Null (and in parties from before lengths) is the room's own time limit.</summary>
     public int? Minutes { get; set; }
+
+    /// <summary>How hard the game is, chosen when the party was made. Null (and in parties from before difficulties) is Normal.</summary>
+    public EscapeDifficulty? Difficulty { get; set; }
+    public EscapeDifficulty Level => Difficulty ?? EscapeDifficulty.Normal;
+
     public List<EscapePlayer> Players { get; set; } = [];
 
     public DateTimeOffset? StartedAt { get; set; }
@@ -51,8 +58,20 @@ public sealed class EscapeState
     /// <summary>A wrong answer locks that puzzle for a few seconds, so a code can't be guessed by a script.</summary>
     public Dictionary<string, DateTimeOffset> LockedUntil { get; set; } = [];
 
-    /// <summary>Which phone holds each clue piece, dealt when the clock starts.</summary>
+    /// <summary>Which phone holds each clue piece, dealt when the clock starts. Pieces for missing players wait in hiding spots.</summary>
     public List<PieceHolder> Pieces { get; set; } = [];
+
+    /// <summary>Scene objects someone has searched.</summary>
+    public List<string> Examined { get; set; } = [];
+
+    /// <summary>Items someone has looked at closely.</summary>
+    public List<string> Inspected { get; set; } = [];
+
+    /// <summary>What the group has found out, oldest first, shared by everyone.</summary>
+    public List<NotebookEntry> Notebook { get; set; } = [];
+
+    /// <summary>The lights that are on in each Switches puzzle that has been touched (the others are as the room starts them).</summary>
+    public Dictionary<string, List<int>> Switches { get; set; } = [];
 
     /// <summary>The latest events, newest last, for the TV's ticker.</summary>
     public List<EscapeFeedEntry> Feed { get; set; } = [];
@@ -116,6 +135,8 @@ public enum CueKind
     LowTime,
     Escaped,
     Failed,
+    /// <summary>Someone found something by searching or looking closely.</summary>
+    Found,
 }
 
 /// <summary>Something the game master may react to. Its line (and recording) arrive later, from the AI.</summary>
@@ -127,6 +148,9 @@ public sealed class EscapeCue
     public string? PuzzleTitle { get; set; }
     public string? PlayerName { get; set; }
     public string? StageTitle { get; set; }
+
+    /// <summary>For <see cref="CueKind.Found"/>: what was found or searched (public: the ticker says it too).</summary>
+    public string? Thing { get; set; }
     public string? Text { get; set; }
     public string? AudioUrl { get; set; }
 
@@ -151,5 +175,15 @@ public sealed class AiHint
 }
 
 public sealed record SolvedPuzzle(string PuzzleId, string SolvedBy, DateTimeOffset At);
-public sealed record PieceHolder(string PuzzleId, int Index, Guid SeatId);
+/// <summary>
+/// Who holds a clue piece. A piece meant for a player who didn't join waits in a hiding spot
+/// (<see cref="SpotId"/>, with no seat) until someone searches there.
+/// </summary>
+public sealed record PieceHolder(string PuzzleId, int Index, Guid? SeatId, string? SpotId = null)
+{
+    public bool IsHidden => SeatId is null;
+}
+
+/// <summary>A line in the group's notebook: where it came from ("The rug") and what it says.</summary>
+public sealed record NotebookEntry(DateTimeOffset At, string Source, string Text);
 public sealed record EscapeFeedEntry(DateTimeOffset At, string Text);

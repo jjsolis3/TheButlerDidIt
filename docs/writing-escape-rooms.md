@@ -33,7 +33,7 @@ A stage opens when every puzzle in the stage before it is solved. Solving the la
 
 | Field | Meaning |
 |---|---|
-| `kind` | `code` (digits only), `text` (a word or phrase) or `use` (no answer: use the items it needs). |
+| `kind` | `code` (digits only), `text` (a word or phrase), `use` (no answer: use the items it needs), `search` (no answer: solved by itself once every spot in `finds` has been searched) or `switches` (a light panel, set by a `switches` generator). |
 | `prompt` | What everyone sees on the TV and the phones. |
 | `answers` | Accepted answers, for `code` and `text`. Matching ignores case, spaces, punctuation and a leading "a", "an" or "the", so list real alternatives ("footsteps", "footprints"), not spellings. |
 | `requires` | Items the group must hold first. They're used up when the puzzle is solved. |
@@ -41,6 +41,54 @@ A stage opens when every puzzle in the stage before it is solved. Solving the la
 | `pieces` | Clue pieces dealt round the table when the clock starts. Each phone sees only its own, so the group has to talk. |
 | `hints` | Revealed one at a time, each costing time. Every puzzle needs at least one. |
 | `solvedText` | Shown when it's solved. Good for pointing at what just appeared. |
+| `finds` | For `search` puzzles: the ids of the scene spots, in the same stage, that must all be searched. |
+| `minMinutes`, `minDifficulty` | Only played in games at least this long, or at least this hard (see below). |
+
+## Scenes: spots to search, items to look at, things to put together
+
+A real escape room is searched, not just solved. A stage can have a **scene**: a picture on a 1000 × 600 canvas with spots on it that players tap to search. What a spot holds stays on the server until someone searches it.
+
+```jsonc
+"scene": {
+  "backdrop": "workshop",
+  "objects": [
+    { "id": "crate", "prop": "crate", "x": 40, "y": 380, "w": 160, "h": 160, "label": "crate",
+      "look": "Straw, and a glass bulb.", "gives": "bulb" },
+    { "id": "poster", "prop": "poster", "x": 440, "y": 60, "w": 160, "h": 220, "label": "poster",
+      "look": "Glowing letters appear!", "clue": "On the poster, in UV ink: LOOK TWICE.",
+      "requires": "uv-lamp", "lockedText": "Just a faded poster. Maybe in a different light?" },
+    { "id": "plant", "prop": "plant", "x": 880, "y": 380, "w": 100, "h": 180, "label": "plant", "look": "A thirsty plant." },
+    { "id": "rug", "prop": "rug", "x": 420, "y": 500, "w": 260, "h": 90, "label": "rug", "look": "Dust.", "hidesPieces": true }
+  ]
+}
+```
+
+| Spot field | Meaning |
+|---|---|
+| `id` | Unique in the whole room. |
+| `prop` | What the screens draw: rug, painting, crate, pipe, bookshelf, clock, chest, barrel, lamp, window, desk, vent, poster, door, safe, plant, mirror, shelf, box, table, cabinet, statue, drawer, bed, sign or machine. |
+| `x`, `y`, `w`, `h` | Where it is on the canvas. It must fit inside. |
+| `label` | What everyone sees ("the rug"). |
+| `look` | What the searcher finds. Only shown once searched. |
+| `gives` | An item found there. |
+| `clue` | A line written into the group's shared **notebook**. |
+| `requires` | A tool needed to find anything (the UV lamp). Without it, the player sees `lockedText` and can come back later. Tools are never used up. |
+| `hidesPieces` | A hiding place for clue pieces (see *Playing solo* below). |
+
+A spot with only a `look` is a **decoy**. It's harmless on Easy and Normal, but on Hard searching it costs 10 seconds. So put anything useful in `gives` or `clue`, not only in the look.
+
+**Items** can hide more:
+- `inspect` is what a closer look shows ("Numbers are scratched inside the lid"). It goes into the notebook.
+- `inspectRequires` is a tool needed for the closer look (a magnifying glass).
+- `inspectGives` is an item found that way (the photo inside the locket).
+
+**Recipes** (on the room) put two items together, and both are used up:
+
+```jsonc
+"recipes": [ { "items": ["bulb", "lamp-body"], "makes": "uv-lamp", "text": "The bulb screws in and the lamp glows violet." } ]
+```
+
+Each item comes from exactly one place: a puzzle's rewards, a spot, a closer look or a recipe. An item is either **used up**, by one puzzle or one recipe, or it's a **tool**, needed to search a spot or look at an item. It can't be both. That way no order of play can leave the group stuck, and the validator's play-through is exact.
 
 ## Replays: variants and generators
 
@@ -60,20 +108,46 @@ There are two ways to make a puzzle vary:
 ]
 ```
 
-**Generators** build the clue pieces and the answer from the seed. The prompt, the hints and the solved text can use `{order}`, `{facts}` and `{answer}`.
+**Generators** build the clue pieces and the answer from the seed. The prompt, the hints and the solved text can use `{order}`, `{facts}` and `{answer}`, and the newer generators add their own placeholders.
 
-| `type` | Makes | Piece template must use |
-|---|---|---|
-| `digitFacts` | A code whose digits are everyday facts ("the number of days in a week"), one fact per phone. The facts come from `FactBank`. | `{ordinal}`, `{fact}` |
-| `colorDigits` | A code read from coloured objects in the order a sign gives (`{order}`). | `{color}`, `{digit}` |
-| `wordSequence` | A password of words in order, one word per phone. It needs a `words` list. | `{ordinal}`, `{word}` |
+| `type` | Kind | Makes | Needs |
+|---|---|---|---|
+| `digitFacts` | code | A code whose digits are everyday facts ("the number of days in a week"), one fact per phone. The facts come from `FactBank`. | A piece template with `{ordinal}` and `{fact}` |
+| `colorDigits` | code | A code read from coloured objects in the order a sign gives (`{order}`). | A piece template with `{color}` and `{digit}` |
+| `wordSequence` | text | A password of words in order, one word per phone. | `words`, and a piece template with `{ordinal}` and `{word}` |
+| `cipher` | text | A word from `words` in code, shown with `{cipher}` in the prompt. `cipher` is `shift`, `symbols`, `morse`, `numbers` (A=1…Z=26) or `mirror` (A↔Z). | For `shift`, `symbols` and `morse`, write `{key:<puzzle id>}` somewhere the group has to find it: a spot's look or clue, an item's description or closer look, or another puzzle's prompt or piece. The validator checks it can be found in time. |
+| `sequence` | code | A number pattern, shown with `{sequence}` ("3, 7, 11, 15, 19, ?"). The code is the next number. | Nothing else |
+| `deduction` | code | A logic puzzle: the things in `words` stand in a row, and each clue piece says something about where they are ("The red jar is right next to the gold jar"). There's exactly one arrangement, and every clue is needed. The code is each thing's spot (1 = far left), in the order `{items}` lists them. | `{items}` in the prompt, at least 3 `words`, and a piece template with `{clue}` (optional) |
+| `switches` | switches | A light panel: pressing a light flips it and its neighbours, and every light must be on. It's made by pressing lights from all-on, so it can always be solved. `{answer}` names the lights to press, for a last hint. | Nothing else |
 
 ```jsonc
 "generator": { "type": "digitFacts", "count": 4, "pieceTemplate": "Written on your palm: the {ordinal} digit is {fact}." },
 "hints": ["Every phone holds one digit. Read them out in order.", "In order: {facts}."]
 ```
 
-The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more.
+The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more, and prove every generator fair over 1,000 seeds: each cipher decodes with its key as written, each pattern follows its rule, each logic puzzle has exactly one answer, and each light panel can be solved.
+
+## Difficulty
+
+A host picks **Easy, Normal or Hard**, and each has its own leaderboard. **Normal plays the room exactly as written.**
+
+| | Easy | Hard |
+|---|---|---|
+| `digitFacts`, `colorDigits`, `wordSequence` | One piece fewer (never below 2) | One piece more (while there's enough to choose from) |
+| `cipher` | The shorter half of `words` | The longer half of `words` |
+| `sequence` | Steady steps | Growing steps, two patterns woven together, or each term the sum of the two before |
+| `deduction` | 3 things | 5 things (Normal: 4) |
+| `switches` | 3 × 3, two presses away | 4 × 4, six presses away (Normal: 3 × 3, four) |
+| Hints | Cost half the time | The last step of every ladder with two or more is dropped, so hints only nudge |
+| Decoy spots | Free | Cost 10 seconds |
+
+**`minDifficulty`** on a puzzle keeps it only at that difficulty or harder: `"hard"` makes it an extra for experts. The validator plays every length at every difficulty.
+
+## Playing solo: hiding spots
+
+With fewer players than a puzzle has pieces, pieces used to double up on phones: a solo player held them all. Now, if the puzzle's stage has spots marked `hidesPieces`, the pieces nobody would have held are **hidden in those spots** instead, one piece per spot, and the seed picks which. Whoever searches the spot gets the piece on their phone, and the TV shows how many are still hidden.
+
+The validator checks there are enough hiding spots for a solo player: at least one per piece beyond the first, for every puzzle in the stage (remember Hard adds a piece). A stage with no hiding spots deals every piece to a phone, as before.
 
 ## Lengths and seasons
 
@@ -93,13 +167,13 @@ The validator builds a templated room from 200 puzzle sets and checks each one, 
 
 When the host keeps **Use the AI game master** on (and an admin has set up the AI), the room's `gameMaster` comes alive:
 - It **reacts out loud on the TV** to the start, solves, new rooms, a run of wrong answers, the last five minutes, and the ending. It speaks in its own voice if a Voice model is set up; otherwise the TV's browser reads the line.
-- It **writes the hints**. It sees the puzzle, the clue pieces and the group's wrong tries, plus your written hint for that step as the direction to nudge in. It never sees the answer. The app also checks every AI hint, and shows your written hint instead if the AI's one gives the answer away or doesn't arrive. So keep writing a good hint ladder: it is both the AI's guide and the fallback.
+- It **writes the hints**. It sees the puzzle, the clue pieces on the group's phones, the spots they've searched and what they found, the items they've looked at closely, their notebook and their wrong tries (never an unsearched spot or a hidden piece), plus your written hint for that step as the direction to nudge in. It never sees the answer. The app also checks every AI hint, and shows your written hint instead if the AI's one gives the answer away or doesn't arrive. So keep writing a good hint ladder: it is both the AI's guide and the fallback.
 
 The AI only writes words. It never changes a puzzle, an answer or the clock.
 
 ## Rooms written by AI
 
-With a Storyteller model set up, a host can type a theme on the escape shelf ("a haunted lighthouse") and get a new room in this same format, on their own shelf only. The AI writes the story, the riddles and the villain, and it picks which generators fill the codes and passwords. So every code comes from the same proven templates as yours, and nothing it writes is saved unless the validator passes. A tester AI also has to crack each riddle from its prompt and pieces alone. A good hand-written room is still the best model: the AI is shown this format and follows the same rules.
+With a Storyteller model set up, a host can type a theme on the escape shelf ("a haunted lighthouse") and get a new room in this same format, on their own shelf only. The AI writes the story, the riddles and the villain, and it picks which generators fill the codes and passwords. So every code comes from the same proven templates as yours, and nothing it writes is saved unless the validator passes. A tester AI also has to crack each riddle from its prompt and pieces alone. A good hand-written room is still the best model: the AI is shown this format and follows the same rules. For now the AI writes only codes, riddles and use puzzles; scenes, ciphers, patterns, logic puzzles and light panels are hand-written until it's taught them (#86).
 
 ## Leaderboards
 
@@ -107,6 +181,7 @@ When a game ends, its result is saved in the same step that ends the game. The *
 
 ## Tips
 
+- **Make them search.** A scene with a few decoys, a tool that reveals something, and a key written somewhere unexpected feels like a real room. Codes the group has to work out (a cipher, a pattern, a logic puzzle) beat codes read off a phone.
 - **Make the phones matter.** Put at least one puzzle with 3–4 `pieces` in each room. Write every piece so it only makes sense together with the others, for example "the SECOND digit is…".
 - **Chain the rooms with items.** A key found in stage 1 opens something in stage 2 or 3. The validator proves no item is needed before it can be found.
 - **Keep riddles fair.** They should have one clear answer. List every sensible alternative in `answers`.

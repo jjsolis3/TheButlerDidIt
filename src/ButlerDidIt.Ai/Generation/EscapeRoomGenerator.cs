@@ -103,6 +103,11 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         if (!room.Puzzles.Any(p => p.Kind == PuzzleKind.Use)) errors.Add("At least one puzzle must be kind \"use\", opened with an item another puzzle gives.");
         foreach (var p in room.Puzzles)
         {
+            // Scenes, ciphers, patterns, logic grids and switches are hand-written only until the AI is taught them (#86).
+            if (p.Kind is PuzzleKind.Search or PuzzleKind.Switches)
+                errors.Add($"Puzzle '{p.Id}' is kind \"{JsonNamingPolicy.CamelCase.ConvertName(p.Kind.ToString())}\"; use code, text or use.");
+            if (p.Generator is { Type: not (GeneratorType.DigitFacts or GeneratorType.ColorDigits or GeneratorType.WordSequence) } g)
+                errors.Add($"Puzzle '{p.Id}' uses a {JsonNamingPolicy.CamelCase.ConvertName(g.Type.ToString())} generator; use digitFacts, colorDigits or wordSequence.");
             if (p.Kind == PuzzleKind.Code && p.Generator is null)
                 errors.Add($"Puzzle '{p.Id}' is a code: codes must use a digitFacts or colorDigits \"generator\", never fixed answers.");
             if (p.Generator?.Type == GeneratorType.ColorDigits && !p.Hints.Prepend(p.Prompt).Any(t => t.Contains("{order}")))
@@ -136,10 +141,16 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         // One fixed version: the generators already make every play different.
         // …and one length, the clock the host asked for: the model doesn't pick which puzzles a shorter game skips.
         node.Remove("lengths");
+        node.Remove("recipes");
+        foreach (var stage in node["stages"]?.AsArray() ?? []) stage?.AsObject().Remove("scene");
+        foreach (var item in node["items"]?.AsArray() ?? [])
+            foreach (var field in new[] { "inspect", "inspectRequires", "inspectGives" }) item?.AsObject().Remove(field);
         foreach (var puzzle in node["puzzles"]!.AsArray())
         {
             puzzle!.AsObject().Remove("variants");
             puzzle.AsObject().Remove("minMinutes");
+            // Nor the parts only hand-written rooms use for now (#86): difficulty-only puzzles, spots, grids.
+            foreach (var field in new[] { "minDifficulty", "finds", "grid", "keyAt" }) puzzle.AsObject().Remove(field);
         }
         return node.Deserialize<EscapeRoom>(GameJson.Options)!;
     }

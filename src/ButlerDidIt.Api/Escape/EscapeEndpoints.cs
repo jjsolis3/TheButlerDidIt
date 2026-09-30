@@ -15,7 +15,7 @@ namespace ButlerDidIt.Api.Escape;
 /// <summary>One line of a leaderboard. Team names appear only on the host's own escapes.</summary>
 public sealed record LeaderboardEntry(int Rank, int Score, int ElapsedSeconds, int HintsUsed, int PlayerCount, DateTimeOffset FinishedAt, bool Mine, string? Team, bool ThisParty);
 
-public sealed record Leaderboard(string RoomId, bool Daily, int Minutes, IReadOnlyList<LeaderboardEntry> Top, LeaderboardEntry? ThisParty, IReadOnlyList<LeaderboardEntry> MyBest);
+public sealed record Leaderboard(string RoomId, bool Daily, int Minutes, EscapeDifficulty Difficulty, IReadOnlyList<LeaderboardEntry> Top, LeaderboardEntry? ThisParty, IReadOnlyList<LeaderboardEntry> MyBest);
 
 /// <param name="Minutes">The clock: 30, 45 or 60.</param>
 public sealed record EscapeRoomGenerateRequest(string? Theme, ButlerDidIt.Game.Scenarios.ContentRating ContentRating, int Minutes);
@@ -33,9 +33,9 @@ public static class EscapeEndpoints
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var mine = hostId is null ? [] : await rooms.OwnedAsync(db, hostId, ct);
             var ids = mine.Concat(rooms.Rooms).Select(r => r.Id).ToList();
-            var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).GroupBy(r => new { r.RoomId, r.Minutes })
+            var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).AtDifficulty(EscapeDifficulty.Normal).GroupBy(r => new { r.RoomId, r.Minutes })
                 .Select(g => new { g.Key.RoomId, g.Key.Minutes, Best = g.Min(r => r.Score) }).ToListAsync(ct);
-            // The card's best escape is at the room's own length; shorter and longer games are ranked on their own.
+            // The card's best escape is at the room's own length on Normal; other lengths and difficulties are ranked on their own.
             int? Best(EscapeRoom r) => best.Where(b => b.RoomId == r.Id && (b.Minutes ?? r.TimeLimitMinutes) == r.TimeLimitMinutes).Min(b => (int?)b.Best);
             return Results.Ok(mine.Select(r => EscapeRoomSummary.For(r, Best(r), generated: true))
                 .Concat(rooms.Rooms.Select(r => EscapeRoomSummary.For(r, Best(r)))));
@@ -81,15 +81,19 @@ public static class EscapeEndpoints
 
         // A room's leaderboard: all time, or today's challenge. Anyone can see times; a signed-in host
         // also sees the names on their own escapes and where a given party of theirs ranked.
-        // Games of different lengths play different puzzles, so each length has its own board (the room's own by default).
-        app.MapGet("/api/escape-rooms/{id}/leaderboard", async (string id, bool? daily, string? party, int? minutes, ClaimsPrincipal user,
+        // Games of different lengths and difficulties play different puzzles, so each has its own board
+        // (the room's own length on Normal by default).
+        app.MapGet("/api/escape-rooms/{id}/leaderboard", async (string id, bool? daily, string? party, int? minutes, string? difficulty, ClaimsPrincipal user,
             EscapeCatalog rooms, AppDbContext db, PartyService parties, CancellationToken ct) =>
         {
             if (await rooms.FindAsync(db, id, ct) is not { } room) return Results.NotFound();
+            var level = EscapeDifficulty.Normal;
+            if (difficulty is not null && (!Enum.TryParse(difficulty, ignoreCase: true, out level) || !Enum.IsDefined(level) || int.TryParse(difficulty, out _)))
+                return Results.Problem("The difficulty is easy, normal or hard.", statusCode: 400);
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var today = PuzzleSets.For(PuzzleChoice.Daily, null, parties.Now).Seed;
 
-            var results = db.EscapeResults.AsNoTracking().Where(r => r.RoomId == id && r.Escaped).AtLength(room, minutes ?? room.TimeLimitMinutes);
+            var results = db.EscapeResults.AsNoTracking().Where(r => r.RoomId == id && r.Escaped).AtLength(room, minutes ?? room.TimeLimitMinutes).AtDifficulty(level);
             if (daily == true) results = results.Where(r => r.Daily && r.Seed == today);
             var ranked = results.OrderBy(r => r.Score).ThenBy(r => r.FinishedAt);
 
@@ -112,7 +116,7 @@ public static class EscapeEndpoints
 
             var myBest = hostId is null ? [] : (await results.Where(r => r.HostUserId == hostId).OrderBy(r => r.Score).Take(5).ToListAsync(ct))
                 .Select(r => Entry(r, 0)).ToList();
-            return Results.Ok(new Leaderboard(id, daily == true, minutes ?? room.TimeLimitMinutes, top, mine, myBest));
+            return Results.Ok(new Leaderboard(id, daily == true, minutes ?? room.TimeLimitMinutes, level, top, mine, myBest));
         });
 
         // For the end-to-end tests only (Escape:ExposeAnswersForTests): the answers of a party's puzzle set,

@@ -28,15 +28,20 @@ public static class EscapeEngine
     /// <summary>How long an AI hint may take before the written one is shown instead.</summary>
     public static readonly TimeSpan AiHintTimeout = TimeSpan.FromSeconds(60);
 
+    /// <summary>On Hard, searching a spot with nothing in it costs this much time.</summary>
+    public const int DecoyPenaltySeconds = 10;
+
     /// <param name="minutes">The game's length, one of the room's lengths; null plays the room's own time limit.</param>
-    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null, int? minutes = null) =>
-        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures(), Minutes = minutes };
+    /// <param name="difficulty">Null plays Normal.</param>
+    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null, int? minutes = null, EscapeDifficulty? difficulty = null) =>
+        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures(), Minutes = minutes, Difficulty = difficulty };
 
     /// <summary>
-    /// The room as this attempt plays it: its variants and generated codes picked from the state's seed,
-    /// then cut to the game's length.
+    /// The room as this attempt plays it: its variants and generated codes picked from the state's seed
+    /// at its difficulty, then cut to the game's length.
     /// </summary>
-    public static EscapeRoom RoomFor(EscapeState s, EscapeRoom room) => RoomLengths.Cut(RoomVariants.Build(room, s.Seed), s.Minutes);
+    public static EscapeRoom RoomFor(EscapeState s, EscapeRoom room) =>
+        RoomLengths.Cut(RoomVariants.Build(room, s.Seed, s.Level), s.Minutes, s.Level);
 
     /// <summary>When the ticker should look again: the deadline, or the "five minutes left" warning before it.</summary>
     public static DateTimeOffset? NextDueAt(EscapeState s)
@@ -61,6 +66,10 @@ public static class EscapeEngine
             case StartEscape c: Start(s, room, c.Now); break;
             case SubmitAnswer c: Answer(s, room, c); break;
             case UseItems c: Use(s, room, c); break;
+            case ExamineSpot c: Examine(s, room, c); break;
+            case InspectItem c: Inspect(s, room, c); break;
+            case CombineItems c: Combine(s, room, c); break;
+            case PressSwitch c: Press(s, room, c); break;
             case RequestEscapeHint c: Hint(s, room, c.Now, c.SeatId, c.PuzzleId); break;
             case BeginEscapeHint c: BeginAiHint(s, room, c); break;
             case CompleteEscapeHint c: CompleteAiHint(s, room, c); break;
@@ -115,7 +124,8 @@ public static class EscapeEngine
     {
         s.Players.RemoveAll(p => p.SeatId == c.SeatId);
         // Their clue pieces go to someone still playing, so no puzzle becomes unsolvable.
-        if (s.Players.Count == 0) { s.Pieces.Clear(); return; }
+        // Pieces still hidden in the room stay where they are.
+        if (s.Players.Count == 0) { s.Pieces.RemoveAll(p => !p.IsHidden); return; }
         s.Pieces = s.Pieces.Select((p, i) => p.SeatId == c.SeatId ? p with { SeatId = s.Players[i % s.Players.Count].SeatId } : p).ToList();
     }
 
@@ -124,15 +134,7 @@ public static class EscapeEngine
         if (s.Phase != EscapePhase.Lobby) throw new GameRuleException("The clock is already running.");
         if (s.Players.Count == 0) throw new GameRuleException("Someone has to join before the clock can start.");
 
-        // Deal each puzzle's pieces round the table, starting one seat further along each time,
-        // so everyone ends up holding something and nobody holds a whole puzzle.
-        var offset = 0;
-        foreach (var puzzle in room.Puzzles)
-        {
-            for (var i = 0; i < puzzle.Pieces.Count; i++)
-                s.Pieces.Add(new PieceHolder(puzzle.Id, i, s.Players[(offset + i) % s.Players.Count].SeatId));
-            offset += puzzle.Pieces.Count;
-        }
+        Deal(s, room);
 
         s.Phase = EscapePhase.Playing;
         s.StartedAt = now;
@@ -144,10 +146,42 @@ public static class EscapeEngine
         Cue(s, CueKind.Start, now, stage: room.Stages[0].Title);
     }
 
+    /// <summary>
+    /// Deals each puzzle's pieces round the table, starting one seat further along each time, so
+    /// everyone ends up holding something and nobody holds a whole puzzle. When a puzzle has more
+    /// pieces than there are players and its part of the room has hiding spots, the pieces nobody
+    /// would have held go into those spots instead of doubling up on a phone: a solo player has to
+    /// search for them. Which spots is picked from the seed, one piece per spot.
+    /// </summary>
+    private static void Deal(EscapeState s, EscapeRoom room)
+    {
+        var free = room.Stages.ToDictionary(
+            st => st.Id,
+            st => new Queue<string>(new SeededRandom(s.Seed ^ SeededRandom.StableHash(st.Id)).Pick(
+                (st.Scene?.Objects ?? []).Where(o => o.HidesPieces).Select(o => o.Id).ToList(), int.MaxValue)));
+        var offset = 0;
+        foreach (var puzzle in room.Puzzles)
+        {
+            var spots = room.StageOf(puzzle.Id) is { } stage ? free[stage.Id] : new Queue<string>();
+            for (var i = 0; i < puzzle.Pieces.Count; i++)
+            {
+                s.Pieces.Add(i >= s.Players.Count && spots.TryDequeue(out var spot)
+                    ? new PieceHolder(puzzle.Id, i, null, spot)
+                    : new PieceHolder(puzzle.Id, i, s.Players[(offset + i) % s.Players.Count].SeatId));
+            }
+            offset += puzzle.Pieces.Count;
+        }
+    }
+
     private static void Answer(EscapeState s, EscapeRoom room, SubmitAnswer c)
     {
         var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId);
-        if (puzzle.Kind == PuzzleKind.Use) throw new GameRuleException("This one isn't opened with an answer: use the items it needs.");
+        if (puzzle.Kind != PuzzleKind.Code && puzzle.Kind != PuzzleKind.Text) throw new GameRuleException(puzzle.Kind switch
+        {
+            PuzzleKind.Use => "This one isn't opened with an answer: use the items it needs.",
+            PuzzleKind.Search => "This one isn't opened with an answer: search the room.",
+            _ => "This one isn't opened with an answer: work the switches.",
+        });
         if (s.LockedUntil.TryGetValue(puzzle.Id, out var until) && c.Now < until)
             throw new GameRuleException("The lock is resetting. Try again in a moment.");
 
@@ -173,8 +207,153 @@ public static class EscapeEngine
     private static void Use(EscapeState s, EscapeRoom room, UseItems c)
     {
         var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId);
-        if (puzzle.Kind != PuzzleKind.Use) throw new GameRuleException("This one needs an answer.");
+        if (puzzle.Kind != PuzzleKind.Use) throw new GameRuleException(puzzle.Kind switch
+        {
+            PuzzleKind.Search => "This one opens once you've searched the right places.",
+            PuzzleKind.Switches => "This one needs the switches worked.",
+            _ => "This one needs an answer.",
+        });
         Solve(s, room, puzzle, player.Name, c.Now);
+    }
+
+    /// <summary>
+    /// Searching a spot: the searcher sees what's there, the group gets whatever it holds (an item, a clue
+    /// for the notebook, hidden clue pieces for the searcher's phone), and Search puzzles finish themselves.
+    /// A spot that needs a tool (the UV lamp) shows nothing without it and can be searched again later.
+    /// </summary>
+    private static void Examine(EscapeState s, EscapeRoom room, ExamineSpot c)
+    {
+        var player = Playing(s, c.SeatId);
+        var spot = room.Stages[s.StageIndex].Scene?.Objects.FirstOrDefault(o => o.Id == c.ObjectId)
+            ?? throw new GameRuleException("That isn't in this part of the room.");
+        if (s.Examined.Contains(spot.Id)) throw new GameRuleException($"Someone has already searched the {spot.Label}.");
+        if (spot.Requires is { } tool && !s.Inventory.Contains(tool))
+            throw new GameRuleException(spot.LockedText ?? $"You can't make anything out at the {spot.Label}. Not yet, anyway.");
+
+        s.Examined.Add(spot.Id);
+        var found = false;
+        if (spot.Gives is { } item && !s.Inventory.Contains(item))
+        {
+            s.Inventory.Add(item);
+            Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label} and found {room.FindItem(item)!.Name}.");
+            found = true;
+        }
+        if (spot.Clue is { } clue)
+        {
+            s.Notebook.Add(new NotebookEntry(c.Now, Capitalise(spot.Label), clue));
+            found = true;
+        }
+        var hidden = s.Pieces.Where(p => p.SpotId == spot.Id && p.IsHidden).ToList();
+        foreach (var piece in hidden)
+            s.Pieces[s.Pieces.IndexOf(piece)] = piece with { SeatId = player.SeatId };
+        if (hidden.Count > 0)
+        {
+            Log(s, c.Now, $"🧩 {player.Name} found a clue piece in the {spot.Label}.");
+            found = true;
+        }
+        if (!found)
+        {
+            if (s.Level == EscapeDifficulty.Hard && IsDecoy(room, spot))
+            {
+                s.Deadline = s.Deadline!.Value.AddSeconds(-DecoyPenaltySeconds);
+                Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label}. Nothing there (−{FormatPenalty(DecoyPenaltySeconds)}).");
+                if (s.Deadline <= c.Now) { End(s, EscapePhase.Failed, c.Now, "⏰ That search cost the last of your time."); return; }
+            }
+            else
+            {
+                Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label}.");
+            }
+        }
+
+        if (!SolveSearches(s, room, player.Name, c.Now) && found)
+            Cue(s, CueKind.Found, c.Now, by: player.Name, thing: spot.Label);
+    }
+
+    /// <summary>A spot with nothing to find, and no part in any puzzle.</summary>
+    private static bool IsDecoy(EscapeRoom room, SceneObject spot) =>
+        spot is { Gives: null, Clue: null, HidesPieces: false }
+        && !room.Puzzles.Any(p => p.Finds.Contains(spot.Id) || p.KeyAt.Contains($"object:{spot.Id}"));
+
+    /// <summary>Finishes every Search puzzle in the current stage whose spots have all been searched. True if any was.</summary>
+    private static bool SolveSearches(EscapeState s, EscapeRoom room, string by, DateTimeOffset now)
+    {
+        var any = false;
+        while (s.Phase == EscapePhase.Playing
+            && room.Stages[s.StageIndex].Puzzles.Select(id => room.FindPuzzle(id)!)
+                .FirstOrDefault(p => p.Kind == PuzzleKind.Search && !s.IsSolved(p.Id) && p.Finds.All(s.Examined.Contains)) is { } done)
+        {
+            Solve(s, room, done, by, now);
+            any = true;
+        }
+        return any;
+    }
+
+    /// <summary>A closer look at an item: its hidden detail goes into the notebook, and it may give up another item.</summary>
+    private static void Inspect(EscapeState s, EscapeRoom room, InspectItem c)
+    {
+        var player = Playing(s, c.SeatId);
+        if (!s.Inventory.Contains(c.ItemId) || room.FindItem(c.ItemId) is not { } item) throw new GameRuleException("The group isn't holding that.");
+        if (item.Inspect is null) throw new GameRuleException($"There's nothing more to see on {item.Name}.");
+        if (s.Inspected.Contains(item.Id)) throw new GameRuleException($"Someone has already had a close look at {item.Name}.");
+        if (item.InspectRequires is { } tool && !s.Inventory.Contains(tool))
+            throw new GameRuleException($"You'd need {room.FindItem(tool)!.Name} to see more.");
+
+        s.Inspected.Add(item.Id);
+        s.Notebook.Add(new NotebookEntry(c.Now, item.Name, item.Inspect));
+        if (item.InspectGives is { } gives && !s.Inventory.Contains(gives))
+        {
+            s.Inventory.Add(gives);
+            Log(s, c.Now, $"🔍 {player.Name} looked closely at {item.Name} and found {room.FindItem(gives)!.Name}.");
+        }
+        else
+        {
+            Log(s, c.Now, $"🔍 {player.Name} looked closely at {item.Name}.");
+        }
+        Cue(s, CueKind.Found, c.Now, by: player.Name, thing: item.Name);
+    }
+
+    /// <summary>Two items tried together. A pair that fits makes a new item (both are used up); any other pair is just logged.</summary>
+    private static void Combine(EscapeState s, EscapeRoom room, CombineItems c)
+    {
+        var player = Playing(s, c.SeatId);
+        if (c.First == c.Second) throw new GameRuleException("Pick two different items.");
+        if (!s.Inventory.Contains(c.First) || !s.Inventory.Contains(c.Second)) throw new GameRuleException("The group isn't holding both of those.");
+        string first = room.FindItem(c.First)!.Name, second = room.FindItem(c.Second)!.Name;
+
+        var recipe = room.Recipes.FirstOrDefault(r => r.Items.Count == 2 && r.Items.Contains(c.First) && r.Items.Contains(c.Second));
+        if (recipe is null)
+        {
+            Log(s, c.Now, $"🔧 {player.Name} tried {first} with {second}. They don't fit together.");
+            return;
+        }
+        s.Inventory.RemoveAll(recipe.Items.Contains);
+        if (!s.Inventory.Contains(recipe.Makes)) s.Inventory.Add(recipe.Makes);
+        var made = room.FindItem(recipe.Makes)!.Name;
+        if (recipe.Text.Length > 0) s.Notebook.Add(new NotebookEntry(c.Now, made, recipe.Text));
+        Log(s, c.Now, $"🔧 {player.Name} put {first} and {second} together: {made}.");
+        Cue(s, CueKind.Found, c.Now, by: player.Name, thing: made);
+    }
+
+    /// <summary>A press flips that light and the ones next to it. All on solves the puzzle.</summary>
+    private static void Press(EscapeState s, EscapeRoom room, PressSwitch c)
+    {
+        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId);
+        if (puzzle is not { Kind: PuzzleKind.Switches, Grid: { } grid }) throw new GameRuleException("There are no switches on this one.");
+        if (c.Cell < 0 || c.Cell >= grid.Size * grid.Size) throw new GameRuleException("There's no switch there.");
+
+        var lit = PuzzleGenerators.Press(grid.Size, LitNow(s, puzzle), c.Cell);
+        s.Switches[puzzle.Id] = lit;
+        if (lit.Count == grid.Size * grid.Size) Solve(s, room, puzzle, player.Name, c.Now);
+    }
+
+    /// <summary>The lights on in a Switches puzzle right now.</summary>
+    public static IReadOnlyList<int> LitNow(EscapeState s, EscapePuzzle puzzle) =>
+        s.Switches.TryGetValue(puzzle.Id, out var lit) ? lit : puzzle.Grid?.Lit ?? [];
+
+    private static EscapePlayer Playing(EscapeState s, Guid seatId)
+    {
+        if (s.Phase != EscapePhase.Playing) throw new GameRuleException(s.Phase == EscapePhase.Lobby ? "The clock hasn't started yet." : "The game is over.");
+        return RequirePlayer(s, seatId);
     }
 
     /// <summary>Pays for the puzzle's next hint step and returns its index. The written hint for it is the fallback for an AI one.</summary>
@@ -216,8 +395,7 @@ public static class EscapeEngine
     /// <summary>The checks every attempt shares: the game is on, the person is playing, the puzzle is open and its items are in hand.</summary>
     private static (EscapePlayer Player, EscapePuzzle Puzzle) Attempt(EscapeState s, EscapeRoom room, Guid seatId, string puzzleId)
     {
-        if (s.Phase != EscapePhase.Playing) throw new GameRuleException(s.Phase == EscapePhase.Lobby ? "The clock hasn't started yet." : "The game is over.");
-        var player = RequirePlayer(s, seatId);
+        var player = Playing(s, seatId);
         var puzzle = OpenPuzzle(s, room, puzzleId);
         var missing = puzzle.Requires.Where(i => !s.Inventory.Contains(i)).Select(i => room.FindItem(i)?.Name ?? i).ToList();
         if (missing.Count > 0) throw new GameRuleException($"You need {string.Join(" and ", missing)} first.");
@@ -274,10 +452,10 @@ public static class EscapeEngine
     }
 
     /// <summary>Records a moment for the game master, when it's on. The engine only notes it; the AI writes the line later.</summary>
-    private static void Cue(EscapeState s, CueKind kind, DateTimeOffset at, string? puzzle = null, string? by = null, string? stage = null)
+    private static void Cue(EscapeState s, CueKind kind, DateTimeOffset at, string? puzzle = null, string? by = null, string? stage = null, string? thing = null)
     {
         if (!s.Ai.GameMaster) return;
-        s.Cues.Add(new EscapeCue { Id = s.NextCueId++, Kind = kind, At = at, PuzzleTitle = puzzle, PlayerName = by, StageTitle = stage });
+        s.Cues.Add(new EscapeCue { Id = s.NextCueId++, Kind = kind, At = at, PuzzleTitle = puzzle, PlayerName = by, StageTitle = stage, Thing = thing });
         if (s.Cues.Count > CueLength) s.Cues.RemoveRange(0, s.Cues.Count - CueLength);
     }
 
@@ -303,6 +481,8 @@ public static class EscapeEngine
         var t = text.Trim();
         return t.Length <= 24 ? t : t[..24] + "…";
     }
+
+    private static string Capitalise(string text) => text.Length == 0 ? text : char.ToUpperInvariant(text[0]) + text[1..];
 
     public static string FormatPenalty(int seconds) => seconds % 60 == 0 ? $"{seconds / 60} min" : $"{seconds} s";
 
