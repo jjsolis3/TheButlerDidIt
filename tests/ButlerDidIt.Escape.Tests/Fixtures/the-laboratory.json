@@ -1,0 +1,169 @@
+{
+  "id": "the-laboratory",
+  "title": "The Laboratory",
+  "synopsis": "A test room that uses every kind of puzzle: spots to search, items to look at and put together, ciphers, number patterns, a logic puzzle and a panel of lights.",
+  "contentRating": "family",
+  "theme": "escape",
+  "artStyle": "bright cartoon science lab",
+  "minPlayers": 1,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45],
+  "hintPenaltySeconds": 120,
+  "intro": "The professor has locked you in the lab. Search everything.",
+  "escapedText": "You're out!",
+  "failedText": "The professor wins this time.",
+  "stages": [
+    {
+      "id": "bench",
+      "title": "The Bench",
+      "description": "A cluttered bench, a crate, a drawer and a portrait of the professor.",
+      "scene": {
+        "width": 1000,
+        "height": 600,
+        "backdrop": "workshop",
+        "objects": [
+          { "id": "crate", "prop": "crate", "x": 40, "y": 380, "w": 160, "h": 160, "label": "crate", "look": "Straw, and a glass bulb.", "gives": "bulb" },
+          { "id": "drawer", "prop": "drawer", "x": 260, "y": 400, "w": 140, "h": 80, "label": "bench drawer", "look": "An empty lamp with no bulb.", "gives": "lamp-body" },
+          { "id": "poster", "prop": "poster", "x": 440, "y": 60, "w": 160, "h": 220, "label": "poster", "look": "Glowing letters appear: THE PROFESSOR LOOKS TWICE.", "clue": "Glowing letters on the poster: THE PROFESSOR LOOKS TWICE.", "requires": "uv-lamp", "lockedText": "Just a faded poster. Maybe in a different light?" },
+          { "id": "painting", "prop": "painting", "x": 660, "y": 60, "w": 180, "h": 200, "label": "portrait", "look": "The professor, holding a dial set to {key:formula}." },
+          { "id": "plant", "prop": "plant", "x": 880, "y": 380, "w": 100, "h": 180, "label": "plant", "look": "A thirsty plant. Nothing else." },
+          { "id": "rug", "prop": "rug", "x": 420, "y": 500, "w": 260, "h": 90, "label": "rug", "look": "Dust under the rug.", "hidesPieces": true },
+          { "id": "clock", "prop": "clock", "x": 60, "y": 60, "w": 100, "h": 100, "label": "clock", "look": "The clock has stopped.", "hidesPieces": true },
+          { "id": "vent", "prop": "vent", "x": 200, "y": 60, "w": 120, "h": 80, "label": "vent", "look": "Cold air from the vent.", "hidesPieces": true }
+        ]
+      },
+      "puzzles": ["gather", "formula", "sequence", "digits"]
+    },
+    {
+      "id": "cabinet",
+      "title": "The Cabinet",
+      "description": "Shelves of jars, a panel of lights and an empty picture frame.",
+      "scene": {
+        "width": 1000,
+        "height": 600,
+        "backdrop": "workshop",
+        "objects": [
+          { "id": "bookshelf", "prop": "bookshelf", "x": 20, "y": 40, "w": 200, "h": 400, "label": "bookshelf", "look": "A lab manual with blank pages.", "gives": "manual" },
+          { "id": "window", "prop": "window", "x": 760, "y": 40, "w": 200, "h": 200, "label": "window", "look": "Rain on the glass. Nothing else." },
+          { "id": "shelf", "prop": "shelf", "x": 260, "y": 40, "w": 200, "h": 80, "label": "top shelf", "look": "Empty jars.", "hidesPieces": true },
+          { "id": "barrel", "prop": "barrel", "x": 260, "y": 420, "w": 120, "h": 160, "label": "barrel", "look": "A barrel of sand.", "hidesPieces": true },
+          { "id": "lamp", "prop": "lamp", "x": 420, "y": 300, "w": 80, "h": 160, "label": "lamp", "look": "A desk lamp.", "hidesPieces": true },
+          { "id": "box", "prop": "box", "x": 540, "y": 460, "w": 120, "h": 100, "label": "box", "look": "Packing peanuts.", "hidesPieces": true },
+          { "id": "chest", "prop": "chest", "x": 700, "y": 440, "w": 160, "h": 120, "label": "chest", "look": "Old lab coats.", "hidesPieces": true },
+          { "id": "sink", "prop": "table", "x": 520, "y": 200, "w": 200, "h": 120, "label": "sink", "look": "A dripping tap.", "hidesPieces": true },
+          { "id": "cabinet-door", "prop": "cabinet", "x": 880, "y": 300, "w": 100, "h": 260, "label": "cabinet", "look": "Beakers.", "hidesPieces": true }
+        ]
+      },
+      "puzzles": ["jars", "frame", "lights", "signal"]
+    },
+    {
+      "id": "exit",
+      "title": "The Door",
+      "description": "The lab door, with a keyhole.",
+      "puzzles": ["door"]
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "gather",
+      "title": "The Professor's Bench",
+      "kind": "search",
+      "prompt": "Search the crate, the drawer and the poster.",
+      "finds": ["crate", "drawer", "poster"],
+      "rewards": ["cabinet-key"],
+      "hints": ["The bulb fits the lamp.", "Shine the lamp on the poster."],
+      "solvedText": "A small key drops out of the poster frame."
+    },
+    {
+      "id": "formula",
+      "title": "The Blackboard",
+      "kind": "text",
+      "prompt": "Scrawled on the blackboard: {cipher}",
+      "generator": { "type": "cipher", "cipher": "shift", "words": ["atom", "flask", "spark", "magnet", "crystal", "science"] },
+      "hints": ["The portrait holds a number.", "Move every letter back along the alphabet by that number.", "It spells {answer}."],
+      "solvedText": "The blackboard wipes itself clean."
+    },
+    {
+      "id": "sequence",
+      "title": "The Safe",
+      "kind": "code",
+      "prompt": "The safe's display flashes: {sequence}",
+      "requires": ["cabinet-key"],
+      "rewards": ["locket"],
+      "generator": { "type": "sequence" },
+      "hints": ["Look at how each number changes.", "The next number is {answer}."],
+      "solvedText": "The safe clicks open. Inside: a locket."
+    },
+    {
+      "id": "digits",
+      "title": "The Counter",
+      "kind": "code",
+      "prompt": "A counter with three dials.",
+      "minMinutes": 45,
+      "generator": { "type": "digitFacts", "count": 3, "pieceTemplate": "The {ordinal} digit is {fact}." },
+      "hints": ["Each of you knows one digit.", "Put them in order."],
+      "solvedText": "The counter rolls over."
+    },
+    {
+      "id": "jars",
+      "title": "The Jars",
+      "kind": "code",
+      "prompt": "Line up {items}. The code is each jar's spot, 1 on the far left, in that order.",
+      "generator": { "type": "deduction", "words": ["red jar", "blue jar", "green jar", "gold jar", "silver jar"], "pieceTemplate": "A note: {clue}" },
+      "hints": ["Start with the jar you know most about.", "Write the spots down in a row."],
+      "solvedText": "The jars glow in order."
+    },
+    {
+      "id": "frame",
+      "title": "The Empty Frame",
+      "kind": "use",
+      "prompt": "An empty picture frame on the wall.",
+      "requires": ["photo"],
+      "rewards": ["exit-key"],
+      "hints": ["Look closely at the locket."],
+      "solvedText": "The photo slides in and a key falls out."
+    },
+    {
+      "id": "lights",
+      "title": "The Light Panel",
+      "kind": "switches",
+      "prompt": "Press a light and it flips, with its neighbours. Turn them all on.",
+      "generator": { "type": "switches" },
+      "hints": ["Work from the top row down.", "Press {answer}."],
+      "solvedText": "Every light glows."
+    },
+    {
+      "id": "signal",
+      "title": "The Telegraph",
+      "kind": "text",
+      "prompt": "The telegraph taps: {cipher}",
+      "minDifficulty": "hard",
+      "generator": { "type": "cipher", "cipher": "morse", "words": ["beaker", "quartz", "oxygen", "helium"] },
+      "hints": ["The manual has a table in invisible ink.", "Read it letter by letter."],
+      "solvedText": "The telegraph falls silent."
+    },
+    {
+      "id": "door",
+      "title": "The Lab Door",
+      "kind": "use",
+      "prompt": "The lab door is locked.",
+      "requires": ["exit-key"],
+      "hints": ["You need a key."],
+      "solvedText": "The door swings open."
+    }
+  ],
+  "items": [
+    { "id": "bulb", "name": "a glass bulb" },
+    { "id": "lamp-body", "name": "an empty lamp" },
+    { "id": "uv-lamp", "name": "a UV lamp", "description": "It glows violet." },
+    { "id": "cabinet-key", "name": "a small key" },
+    { "id": "locket", "name": "a locket", "inspect": "Something is tucked behind the picture inside.", "inspectGives": "photo" },
+    { "id": "photo", "name": "a photo of the professor" },
+    { "id": "manual", "name": "a lab manual", "inspect": "Under the UV light, a table appears: {key:signal}", "inspectRequires": "uv-lamp" },
+    { "id": "exit-key", "name": "a brass key" }
+  ],
+  "recipes": [
+    { "items": ["bulb", "lamp-body"], "makes": "uv-lamp", "text": "The bulb screws in and the lamp glows violet." }
+  ]
+}

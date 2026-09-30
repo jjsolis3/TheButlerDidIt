@@ -34,6 +34,34 @@ public sealed partial class PartyHub
         await escape.ExecuteAsync(partyId, (_, now) => new UseItems(now, seatId, puzzleId));
     }
 
+    /// <summary>Search a spot in the scene.</summary>
+    public async Task EscapeExamine(string objectId)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new ExamineSpot(now, seatId, objectId));
+    }
+
+    /// <summary>Look closely at an item the group holds.</summary>
+    public async Task EscapeInspect(string itemId)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new InspectItem(now, seatId, itemId));
+    }
+
+    /// <summary>Try two items together.</summary>
+    public async Task EscapeCombine(string first, string second)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new CombineItems(now, seatId, first, second));
+    }
+
+    /// <summary>Press one light of a Switches puzzle.</summary>
+    public async Task EscapePress(string puzzleId, int cell)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new PressSwitch(now, seatId, puzzleId, cell));
+    }
+
     /// <summary>A hint from a player's phone: written by the AI game master when the party has one.</summary>
     public async Task EscapeHint(string puzzleId)
     {

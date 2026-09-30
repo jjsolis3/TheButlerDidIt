@@ -4,7 +4,9 @@ namespace ButlerDidIt.Escape.Engine;
 
 /// <summary>
 /// Turns the state into what each screen may see. Deliberately never copied: puzzle answers,
-/// hints nobody has paid for, other players' clue pieces, and puzzles in stages not yet reached.
+/// hints nobody has paid for, other players' clue pieces, and puzzles in stages not yet reached;
+/// what's in a spot nobody has searched (and where the hidden pieces are); an item's detail nobody
+/// has looked at closely; the recipes; and the cipher keys, except where the group has found them.
 /// </summary>
 public static class EscapeProjector
 {
@@ -29,7 +31,7 @@ public static class EscapeProjector
             StageCount: room.Stages.Count,
             stage is null ? null : new EscapeStageInfo(stage.Id, stage.Title, stage.Description),
             puzzles,
-            s.Inventory.Select(id => room.FindItem(id)!).Select(i => new EscapeItemView(i.Id, i.Name, i.Description)).ToList(),
+            s.Inventory.Select(id => room.FindItem(id)!).Select(i => Item(s, i)).ToList(),
             s.Players.Select(p => new EscapePlayerSummary(p.SeatId, p.Name, p.IsHost, p.PhotoUrl)).ToList(),
             s.StartedAt, s.Deadline, s.EndedAt, now,
             s.Feed,
@@ -44,7 +46,24 @@ public static class EscapeProjector
             Narration: s.Cues.Where(c => c.Text is not null).TakeLast(3).Select(c => new EscapeNarrationView(c.Id, c.Text!, c.AudioUrl, c.At)).ToList(),
             Soundscape: stage?.Soundscape ?? room.Soundscape,
             // The stage's own picture while playing, falling back to the cover; the cover before and after.
-            ArtUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.Stage(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Cover));
+            ArtUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.Stage(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Cover),
+            Difficulty: s.Level,
+            Scene: stage?.Scene is { } scene ? Scene(s, scene) : null,
+            Notebook: s.Notebook.Select(n => new EscapeNoteView(n.Source, n.Text, n.At)).ToList());
+    }
+
+    private static EscapeSceneView Scene(EscapeState s, EscapeScene scene) => new(
+        scene.Width, scene.Height, scene.Backdrop,
+        scene.Objects.Select(o =>
+        {
+            var examined = s.Examined.Contains(o.Id);
+            return new EscapeSpotView(o.Id, o.Prop, o.X, o.Y, o.W, o.H, o.Label, examined, examined ? o.Look : null);
+        }).ToList());
+
+    private static EscapeItemView Item(EscapeState s, EscapeItem i)
+    {
+        var inspected = s.Inspected.Contains(i.Id);
+        return new EscapeItemView(i.Id, i.Name, i.Description, Inspectable: i.Inspect is not null && !inspected, InspectText: inspected ? i.Inspect : null);
     }
 
     public static EscapePlayerView Player(EscapeState s, EscapeRoom template, Guid seatId, DateTimeOffset now, IReadOnlyDictionary<string, string>? art = null)
@@ -57,7 +76,7 @@ public static class EscapeProjector
         var pieces = s.Pieces
             .Where(p => p.SeatId == seatId && open.Contains(p.PuzzleId))
             .Select(p => (Piece: p, Puzzle: room.FindPuzzle(p.PuzzleId)!))
-            .Select(x => new EscapePieceView(x.Puzzle.Id, x.Puzzle.Title, x.Puzzle.Pieces[x.Piece.Index]))
+            .Select(x => new EscapePieceView(x.Puzzle.Id, x.Puzzle.Title, x.Puzzle.Pieces[x.Piece.Index], x.Piece.SpotId is { } spot ? room.FindObject(spot)?.Label : null))
             .ToList();
         return new EscapePlayerView(s.Version, stage, me.SeatId, me.Name, me.IsHost, pieces);
     }
@@ -83,6 +102,9 @@ public static class EscapeProjector
             HintsLeft: p.Hints.Count - shown,
             HintPending: hints.Count < shown,
             LockedUntil: s.LockedUntil.TryGetValue(p.Id, out var until) ? until : null,
-            PieceCount: s.Pieces.Where(x => x.PuzzleId == p.Id).Select(x => x.SeatId).Distinct().Count());
+            PieceCount: s.Pieces.Where(x => x.PuzzleId == p.Id && !x.IsHidden).Select(x => x.SeatId).Distinct().Count(),
+            PiecesHidden: s.Pieces.Count(x => x.PuzzleId == p.Id && x.IsHidden),
+            Finds: p.Kind == PuzzleKind.Search ? new EscapeFindsView(p.Finds.Count(s.Examined.Contains), p.Finds.Count) : null,
+            Switches: p.Grid is { } grid ? new EscapeSwitchesView(grid.Size, EscapeEngine.LitNow(s, p)) : null);
     }
 }

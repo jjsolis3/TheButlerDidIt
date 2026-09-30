@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The escape tests' Laboratory, which uses every kind of puzzle, for the prompt-privacy tests. -->
+    <None Include="..\ButlerDidIt.Escape.Tests\Fixtures\**" Link="Fixtures\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ButlerDidIt.Ai\ButlerDidIt.Ai.csproj" />
   </ItemGroup>
 

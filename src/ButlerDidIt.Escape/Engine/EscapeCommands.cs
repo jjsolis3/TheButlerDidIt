@@ -19,6 +19,18 @@ public sealed record SubmitAnswer(DateTimeOffset Now, Guid SeatId, string Puzzle
 /// <summary>A player uses the items a Use puzzle needs (the key in the lock).</summary>
 public sealed record UseItems(DateTimeOffset Now, Guid SeatId, string PuzzleId) : EscapeCommand(Now);
 
+/// <summary>A player searches a spot in the scene: under the rug, behind the painting.</summary>
+public sealed record ExamineSpot(DateTimeOffset Now, Guid SeatId, string ObjectId) : EscapeCommand(Now);
+
+/// <summary>A player looks closely at an item the group holds.</summary>
+public sealed record InspectItem(DateTimeOffset Now, Guid SeatId, string ItemId) : EscapeCommand(Now);
+
+/// <summary>A player tries two items together.</summary>
+public sealed record CombineItems(DateTimeOffset Now, Guid SeatId, string First, string Second) : EscapeCommand(Now);
+
+/// <summary>A player presses one light in a Switches puzzle (cells numbered row by row from 0).</summary>
+public sealed record PressSwitch(DateTimeOffset Now, Guid SeatId, string PuzzleId, int Cell) : EscapeCommand(Now);
+
 /// <summary>Reveal a puzzle's next hint, at the cost of time. <paramref name="SeatId"/> is null when the host asks from the TV.</summary>
 public sealed record RequestEscapeHint(DateTimeOffset Now, Guid? SeatId, string PuzzleId) : EscapeCommand(Now);
 

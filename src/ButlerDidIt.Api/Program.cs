@@ -256,6 +256,8 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async ctx =>
         GameRuleException e => (StatusCodes.Status400BadRequest, e.Message),
         AiException e => (StatusCodes.Status400BadRequest, e.Message),
         KeyNotFoundException e => (StatusCodes.Status404NotFound, e.Message),
+        // A body that can't be read (a difficulty that doesn't exist, say): the client's mistake, not ours.
+        BadHttpRequestException e => (e.StatusCode, "That request couldn't be read."),
         _ => (StatusCodes.Status500InternalServerError, "Something went wrong."),
     };
     ctx.Response.StatusCode = status;

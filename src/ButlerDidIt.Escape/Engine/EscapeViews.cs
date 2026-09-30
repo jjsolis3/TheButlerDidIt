@@ -44,7 +44,19 @@ public sealed record EscapeStageView(
     /// <summary>The background sound to play now: the current stage's, or the room's.</summary>
     Soundscape Soundscape,
     /// <summary>A generated picture of the stage in front of the group (the room's cover in the lobby and at the end), or null.</summary>
-    string? ArtUrl);
+    string? ArtUrl,
+    EscapeDifficulty Difficulty,
+    /// <summary>The spots to search in the stage in front of the group, or null when it has none.</summary>
+    EscapeSceneView? Scene,
+    /// <summary>What the group has found out, oldest first.</summary>
+    IReadOnlyList<EscapeNoteView> Notebook);
+
+public sealed record EscapeSceneView(int Width, int Height, string Backdrop, IReadOnlyList<EscapeSpotView> Objects);
+
+/// <summary>A spot in the scene. What's there (<see cref="Look"/>) only once someone has searched it.</summary>
+public sealed record EscapeSpotView(string Id, string Prop, int X, int Y, int W, int H, string Label, bool Examined, string? Look);
+
+public sealed record EscapeNoteView(string Source, string Text, DateTimeOffset At);
 
 public sealed record EscapeGameMasterView(
     string Name,
@@ -77,9 +89,19 @@ public sealed record EscapePuzzleView(
     bool HintPending,
     DateTimeOffset? LockedUntil,
     /// <summary>How many phones hold a piece of this puzzle.</summary>
-    int PieceCount);
+    int PieceCount,
+    /// <summary>Pieces of this puzzle still hidden somewhere in the room.</summary>
+    int PiecesHidden,
+    /// <summary>For Search puzzles: how many of the spots it needs have been searched, of how many.</summary>
+    EscapeFindsView? Finds,
+    /// <summary>For Switches puzzles: the grid as it is now.</summary>
+    EscapeSwitchesView? Switches);
 
-public sealed record EscapeItemView(string Id, string Name, string Description);
+public sealed record EscapeFindsView(int Found, int Total);
+public sealed record EscapeSwitchesView(int Size, IReadOnlyList<int> Lit);
+
+/// <summary>An item the group holds. <see cref="InspectText"/> only once someone has looked at it closely.</summary>
+public sealed record EscapeItemView(string Id, string Name, string Description, bool Inspectable, string? InspectText);
 public sealed record EscapePlayerSummary(Guid SeatId, string Name, bool IsHost, string? PhotoUrl);
 
 /// <summary>One phone: the public view plus that player's own clue pieces.</summary>
@@ -91,4 +113,5 @@ public sealed record EscapePlayerView(
     bool IsHost,
     IReadOnlyList<EscapePieceView> Pieces);
 
-public sealed record EscapePieceView(string PuzzleId, string PuzzleTitle, string Text);
+/// <param name="FoundIn">Where this phone's player found it, for a piece that was hidden in the room.</param>
+public sealed record EscapePieceView(string PuzzleId, string PuzzleTitle, string Text, string? FoundIn);
