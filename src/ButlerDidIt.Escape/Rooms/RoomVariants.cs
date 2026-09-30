@@ -31,12 +31,15 @@ public static partial class RoomVariants
 
     private static EscapeRoom Make(EscapeRoom room, long seed, EscapeDifficulty difficulty)
     {
-        var keys = new Dictionary<string, string>();
+        // Where each cipher's key is written: one place is real, the rest get decoys (see WithKeys).
+        var places = KeyPlaces(room);
+        var made = new Dictionary<string, PuzzleGenerators.CipherMade>();
         var built = room with
         {
-            Puzzles = room.Puzzles.Select(p => Concrete(p, new SeededRandom(seed ^ SeededRandom.StableHash(p.Id)), difficulty, keys)).ToList(),
+            Puzzles = room.Puzzles.Select(p => Concrete(p, new SeededRandom(seed ^ SeededRandom.StableHash(p.Id)), difficulty,
+                Math.Max(0, places.GetValueOrDefault(p.Id)?.Count - 1 ?? 0), made)).ToList(),
         };
-        if (keys.Count > 0) built = WithKeys(built, keys);
+        if (made.Count > 0) built = WithKeys(built, places, made, seed, difficulty);
         return difficulty switch
         {
             EscapeDifficulty.Easy => built with { HintPenaltySeconds = built.HintPenaltySeconds / 2 },
@@ -46,7 +49,7 @@ public static partial class RoomVariants
         };
     }
 
-    private static EscapePuzzle Concrete(EscapePuzzle p, SeededRandom rng, EscapeDifficulty difficulty, Dictionary<string, string> keys)
+    private static EscapePuzzle Concrete(EscapePuzzle p, SeededRandom rng, EscapeDifficulty difficulty, int decoys, Dictionary<string, PuzzleGenerators.CipherMade> ciphers)
     {
         if (p.Variants.Count == 0 && p.Generator is null) return p;
 
@@ -59,15 +62,16 @@ public static partial class RoomVariants
 
         if (p.Generator is { } g)
         {
-            var made = Generate(g, rng, difficulty);
+            var made = Generate(g, rng, difficulty, decoys);
             answers = made.Grid is null ? [made.Answer] : [];
             pieces = made.Pieces;
             grid = made.Grid;
             lineup = made.Lineup ?? [];
-            if (made.Key is { } key)
+            if (made.Cipher is { } cipher)
             {
-                keys[p.Id] = key;
-                decoder = new CipherDecoder(g.Cipher, key);
+                // Mirror and numbers need no key, but still get a decoder: the phone shows their alphabet strip.
+                if (g.Cipher is CipherType.Shift or CipherType.Symbols or CipherType.Morse) ciphers[p.Id] = cipher;
+                decoder = new CipherDecoder(g.Cipher, cipher.Key, cipher.Encoded);
             }
             prompt = Fill(prompt, made);
             solved = Fill(solved, made);
@@ -79,10 +83,10 @@ public static partial class RoomVariants
     }
 
     /// <param name="Fills">Placeholders for the prompt, hints and solved text, besides {answer}.</param>
-    /// <param name="Key">For ciphers: what {key:&lt;puzzle id&gt;} becomes.</param>
-    private sealed record Made(string Answer, List<string> Pieces, Dictionary<string, string> Fills, SwitchGrid? Grid = null, string? Key = null, List<string>? Lineup = null);
+    /// <param name="Cipher">For ciphers: the real key and the decoys, written where the room says {key:&lt;puzzle id&gt;}.</param>
+    private sealed record Made(string Answer, List<string> Pieces, Dictionary<string, string> Fills, SwitchGrid? Grid = null, PuzzleGenerators.CipherMade? Cipher = null, List<string>? Lineup = null);
 
-    private static Made Generate(PuzzleGenerator g, SeededRandom rng, EscapeDifficulty difficulty)
+    private static Made Generate(PuzzleGenerator g, SeededRandom rng, EscapeDifficulty difficulty, int decoys = 0)
     {
         var count = PieceCount(g, difficulty);
         switch (g.Type)
@@ -116,8 +120,9 @@ public static partial class RoomVariants
             }
             case GeneratorType.Cipher:
             {
-                var c = PuzzleGenerators.Cipher(g.Cipher, g.Words, difficulty, rng);
-                return new Made(c.Word, [], New(("{cipher}", c.Encoded)), Key: c.Key);
+                var c = PuzzleGenerators.Cipher(g.Cipher, g.Words, difficulty, rng, g.DecoyWords, decoys);
+                // Only the ciphers that need a key have one to write in the room; numbers and mirror read without.
+                return new Made(c.Word, [], New(("{cipher}", c.Encoded)), Cipher: c);
             }
             case GeneratorType.Sequence:
             {
@@ -170,10 +175,11 @@ public static partial class RoomVariants
     }
 
     /// <summary>
-    /// Writes each cipher's key wherever the room says {key:&lt;puzzle id&gt;}, and notes on the cipher
-    /// where that is, so the validator can check the group can reach the key before they need it.
+    /// Every place a room writes {key:&lt;puzzle id&gt;}, per cipher, in room order: "puzzle:&lt;id&gt;" (its prompt or
+    /// pieces), "object:&lt;id&gt;" (a spot's look or clue), "item:&lt;id&gt;" (an item's description), "inspect:&lt;id&gt;"
+    /// (what a close look at it shows).
     /// </summary>
-    private static EscapeRoom WithKeys(EscapeRoom room, Dictionary<string, string> keys)
+    public static Dictionary<string, List<string>> KeyPlaces(EscapeRoom room)
     {
         var at = new Dictionary<string, List<string>>();
         void Note(string place, params string?[] texts)
@@ -191,26 +197,82 @@ public static partial class RoomVariants
         foreach (var p in room.Puzzles) Note($"puzzle:{p.Id}", [p.Prompt, .. p.Pieces]);
         foreach (var o in room.SceneObjects) Note($"object:{o.Id}", o.Look, o.Clue);
         foreach (var i in room.Items) { Note($"item:{i.Id}", i.Description); Note($"inspect:{i.Id}", i.Inspect); }
+        return at;
+    }
 
-        // An unknown puzzle id is left as it is: the validator reports it.
-        string K(string text) => KeyPlaceholder().Replace(text, m => keys.TryGetValue(m.Groups[1].Value, out var key) ? key : m.Value);
-        string? KN(string? text) => text is null ? null : K(text);
+    /// <summary>
+    /// Writes each cipher's keys into the room. When the room writes a cipher's key in several places, the seed picks
+    /// which of the places shown at this difficulty holds the real key; every other place gets a decoy, so the group
+    /// has to find them all and work out which one reads right. The cipher notes every place (<see cref="EscapePuzzle.KeyAt"/>),
+    /// so the validator can check the group can reach them all before they need them. Hints show the real key.
+    /// </summary>
+    private static EscapeRoom WithKeys(EscapeRoom room, Dictionary<string, List<string>> places, Dictionary<string, PuzzleGenerators.CipherMade> ciphers,
+        long seed, EscapeDifficulty difficulty)
+    {
+        var shown = room.SceneObjects.ToDictionary(o => o.Id, o => RoomLengths.Shows(o, difficulty));
+        bool Visible(string place) => !place.StartsWith("object:") || shown.GetValueOrDefault(place["object:".Length..], true);
+
+        // (cipher, place) → the key written there.
+        var written = new Dictionary<(string, string), string>();
+        var candidates = new Dictionary<string, List<KeyCandidate>>();
+        foreach (var (id, c) in ciphers)
+        {
+            var at = places.GetValueOrDefault(id) ?? [];
+            if (at.Count == 0) continue;
+            var visible = at.Where(Visible).ToList();
+            var real = visible.Count == 0 ? at[0] : visible[new SeededRandom(seed ^ SeededRandom.StableHash(id + "#key")).Next(visible.Count)];
+            var decoys = new Queue<PuzzleGenerators.DecoyKey>(c.Decoys);
+            var list = new List<KeyCandidate>();
+            foreach (var place in at)
+            {
+                if (place == real)
+                {
+                    written[(id, place)] = c.Key;
+                    list.Add(new KeyCandidate(place, c.Key, true, c.Word, false));
+                }
+                else
+                {
+                    var d = decoys.Dequeue();
+                    written[(id, place)] = d.Key;
+                    list.Add(new KeyCandidate(place, d.Key, false, d.Decodes, d.FromDecoyWords));
+                }
+            }
+            candidates[id] = list;
+        }
+
+        // An unknown puzzle id is left as it is: the validator reports it. Text outside any place (hints) gets the real key.
+        string K(string text, string? place) => KeyPlaceholder().Replace(text, m =>
+        {
+            var id = m.Groups[1].Value;
+            if (place is not null && written.TryGetValue((id, place), out var there)) return there;
+            return ciphers.TryGetValue(id, out var c) ? c.Key : m.Value;
+        });
+        string? KN(string? text, string place) => text is null ? null : K(text, place);
 
         return room with
         {
             Puzzles = room.Puzzles.Select(p => p with
             {
-                Prompt = K(p.Prompt),
-                Pieces = p.Pieces.Select(K).ToList(),
-                Hints = p.Hints.Select(K).ToList(),
-                SolvedText = K(p.SolvedText),
-                KeyAt = keys.ContainsKey(p.Id) ? at.GetValueOrDefault(p.Id) ?? [] : p.KeyAt,
+                Prompt = K(p.Prompt, $"puzzle:{p.Id}"),
+                Pieces = p.Pieces.Select(x => K(x, $"puzzle:{p.Id}")).ToList(),
+                Hints = p.Hints.Select(x => K(x, null)).ToList(),
+                SolvedText = K(p.SolvedText, null),
+                KeyAt = ciphers.ContainsKey(p.Id) ? places.GetValueOrDefault(p.Id) ?? [] : p.KeyAt,
+                Decoder = p.Decoder is { } d && candidates.TryGetValue(p.Id, out var list) ? d with { Candidates = list } : p.Decoder,
             }).ToList(),
             Stages = room.Stages.Select(s => s.Scene is null ? s : s with
             {
-                Scene = s.Scene with { Objects = s.Scene.Objects.Select(o => o with { Look = K(o.Look), Clue = KN(o.Clue), LockedText = KN(o.LockedText) }).ToList() },
+                Scene = s.Scene with
+                {
+                    Objects = s.Scene.Objects.Select(o => o with
+                    {
+                        Look = K(o.Look, $"object:{o.Id}"),
+                        Clue = KN(o.Clue, $"object:{o.Id}"),
+                        LockedText = KN(o.LockedText, $"object:{o.Id}"),
+                    }).ToList(),
+                },
             }).ToList(),
-            Items = room.Items.Select(i => i with { Description = K(i.Description), Inspect = KN(i.Inspect) }).ToList(),
+            Items = room.Items.Select(i => i with { Description = K(i.Description, $"item:{i.Id}"), Inspect = KN(i.Inspect, $"inspect:{i.Id}") }).ToList(),
         };
     }
 

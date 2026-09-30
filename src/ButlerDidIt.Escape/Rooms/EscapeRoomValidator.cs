@@ -56,6 +56,21 @@ public static class EscapeRoomValidator
         return [];
     }
 
+    /// <summary>
+    /// Every problem with one puzzle set, checked the way games play it: built and cut at each length and
+    /// difficulty together. (A set built for Normal and then cut for Easy is never played, and can hide its
+    /// only real cipher key on a spot Easy leaves out.)
+    /// </summary>
+    public static List<string> ValidateGame(EscapeRoom room, long seed)
+    {
+        var errors = new List<string>();
+        foreach (var minutes in room.PlayableLengths)
+            foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
+                errors.AddRange(ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty))
+                    .Select(e => $"At {minutes} minutes on {difficulty}: {e}"));
+        return errors;
+    }
+
     /// <summary>The lengths a host can pick, and the shortest one still being a real game.</summary>
     public const int MinPuzzlesInShortestGame = 4;
     private static readonly int[] AllowedLengths = [30, 45, 60];
@@ -124,6 +139,10 @@ public static class EscapeRoomValidator
                     Needs("{cipher}");
                     if (g.Words.Count == 0 || g.Words.Any(w => w.Length is 0 or > 12 || !w.All(char.IsAsciiLetter)))
                         errors.Add($"Puzzle '{p.Id}': a cipher needs words of 1 to 12 plain letters (A to Z).");
+                    if (g.DecoyWords.Any(w => w.Length is 0 or > 12 || !w.All(char.IsAsciiLetter)))
+                        errors.Add($"Puzzle '{p.Id}': decoy words are 1 to 12 plain letters (A to Z).");
+                    foreach (var w in g.DecoyWords.Where(w => g.Words.Contains(w, StringComparer.OrdinalIgnoreCase)))
+                        errors.Add($"Puzzle '{p.Id}': \"{w}\" is one of its words, so it can't be a decoy too.");
                     if (g.Cipher is CipherType.Shift or CipherType.Symbols or CipherType.Morse && !RoomTexts(room).Any(t => t.Contains($"{{key:{p.Id}}}")))
                         errors.Add($"Puzzle '{p.Id}': write its key somewhere the group can find it, with {{key:{p.Id}}}.");
                     break;
@@ -206,6 +225,7 @@ public static class EscapeRoomValidator
 
         var itemIds = room.Items.Select(i => i.Id).ToHashSet();
         SceneErrors(room, itemIds, errors);
+        DecoyKeyErrors(room, errors);
         var staged = room.Stages.SelectMany(s => s.Puzzles).ToList();
         foreach (var id in staged.Where(id => room.FindPuzzle(id) is null)) errors.Add($"A stage lists puzzle '{id}', which doesn't exist.");
         foreach (var p in room.Puzzles)
@@ -353,7 +373,8 @@ public static class EscapeRoomValidator
             bool Solvable(EscapePuzzle p) =>
                 p.Requires.All(inventory.Contains)
                 && p.Finds.All(examined.Contains)
-                && (p.KeyAt.Count == 0 || p.KeyAt.Any(KeySeen))
+                // With a real key and decoys, the group needs every key it can find, to compare them.
+                && VisibleKeyPlaces(room, p).All(KeySeen)
                 // Its pieces might be hidden in any hiding spot of the stage: all of them may need searching.
                 && (p.Pieces.Count < 2 || hidingSpots.All(examined.Contains));
             void Gain(string? item)
@@ -401,9 +422,46 @@ public static class EscapeRoomValidator
             if (missing.Count > 0) why.Add($"needs {string.Join(", ", missing)}, which nothing earlier gives out");
             var unsearched = stuck.Finds.Concat(stuck.Pieces.Count >= 2 ? hidingSpots : []).Where(id => !examined.Contains(id)).Distinct().Select(id => $"'{id}'").ToList();
             if (unsearched.Count > 0) why.Add($"needs {string.Join(", ", unsearched)} searched, which can't be reached");
-            if (stuck.KeyAt.Count > 0 && !stuck.KeyAt.Any(KeySeen)) why.Add("has its key somewhere the group can't reach in time");
+            if (!VisibleKeyPlaces(room, stuck).All(KeySeen)) why.Add("has a key somewhere the group can't reach in time");
             yield return $"Stage '{stage.Id}' can't be finished: puzzle '{stuck.Id}' {string.Join(" and ", why)}.";
             yield break;
+        }
+    }
+
+    /// <summary>The key places a group can find in this game: a spot left out at this difficulty holds no key for it.</summary>
+    public static List<string> VisibleKeyPlaces(EscapeRoom room, EscapePuzzle p)
+    {
+        var spots = room.SceneObjects.Select(o => o.Id).ToHashSet();
+        return p.KeyAt.Where(place => !place.StartsWith("object:") || spots.Contains(place["object:".Length..])).ToList();
+    }
+
+    /// <summary>
+    /// A cipher whose key is written in several places (a real key and decoys): at most three in one game, the real
+    /// key reads the answer, no decoy does, and a symbols or Morse decoy reads as one of the room's decoy words, a real
+    /// word, so the group has to reason about which key is right instead of spotting gibberish.
+    /// </summary>
+    private static void DecoyKeyErrors(EscapeRoom room, List<string> errors)
+    {
+        // A key written only on spots left out at this difficulty (a Hard-only spot, say) can't be found in this game at all.
+        foreach (var p in room.Puzzles.Where(p => p.Decoder is not null && p.KeyAt.Count > 0 && VisibleKeyPlaces(room, p).Count == 0))
+            errors.Add($"Puzzle '{p.Id}': its key is written only on spots this game leaves out; write {{key:{p.Id}}} on a spot every difficulty has.");
+        foreach (var p in room.Puzzles.Where(p => p.Decoder?.Candidates is { Count: > 1 }))
+        {
+            var d = p.Decoder!;
+            var visible = VisibleKeyPlaces(room, p).ToHashSet();
+            var shown = d.Candidates!.Where(c => visible.Contains(c.Place)).ToList();
+            if (shown.Count > 3) errors.Add($"Puzzle '{p.Id}': {shown.Count} keys in one game is too many to compare; use at most 3.");
+            if (shown.Count(c => c.Real) != 1) { errors.Add($"Puzzle '{p.Id}': exactly one of its keys must be the real one."); continue; }
+            foreach (var c in shown)
+            {
+                var reads = PuzzleGenerators.Decode(d.Type, d.Encoded, c.Key);
+                if (c.Real && !p.Answers.Any(a => string.Equals(a, reads, StringComparison.OrdinalIgnoreCase)))
+                    errors.Add($"Puzzle '{p.Id}': the real key reads \"{reads}\", not the answer.");
+                if (!c.Real && p.Answers.Any(a => string.Equals(a, reads, StringComparison.OrdinalIgnoreCase)))
+                    errors.Add($"Puzzle '{p.Id}': a decoy key also reads the answer.");
+                if (!c.Real && d.Type is CipherType.Symbols or CipherType.Morse && !c.FromDecoyWords)
+                    errors.Add($"Puzzle '{p.Id}': add more \"decoyWords\" shaped like {p.Answers[0].ToUpperInvariant()} (same length and repeated letters), so every wrong key reads a real word.");
+            }
         }
     }
 

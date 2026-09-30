@@ -16,7 +16,37 @@ public class ContentBarTests
 
     [Fact]
     public void Every_shipped_room_is_rebuilt() =>
-        Assert.All(Rooms.Library, r => Assert.True(r.Edition >= 2, $"{r.Id} is rebuilt"));
+        // Edition 3: decoy cipher keys (the times before them don't compare).
+        Assert.All(Rooms.Library, r => Assert.True(r.Edition >= 3, $"{r.Id} is on edition 3"));
+
+    /// <summary>
+    /// A cipher that needs a key has one place to find it on Easy, two on Normal and three on Hard: one real, the rest
+    /// decoys, so the group has to find them all and work out which reads right.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(RebuiltRooms))]
+    public void Keyed_ciphers_have_one_key_on_easy_two_on_normal_and_three_on_hard(string id)
+    {
+        var room = Rooms.Get(id);
+        var longest = room.PlayableLengths.Max();
+        foreach (var (difficulty, expected) in new[] { (EscapeDifficulty.Easy, 1), (EscapeDifficulty.Normal, 2), (EscapeDifficulty.Hard, 3) })
+        {
+            var played = RoomLengths.Cut(RoomVariants.Build(room, 1, difficulty), longest, difficulty);
+            foreach (var p in played.Puzzles.Where(p => p.Decoder is { Type: CipherType.Shift or CipherType.Symbols or CipherType.Morse }))
+                Assert.True(EscapeRoomValidator.VisibleKeyPlaces(played, p).Count == expected,
+                    $"{p.Id} on {difficulty}: {EscapeRoomValidator.VisibleKeyPlaces(played, p).Count} keys to find; aim for {expected}");
+        }
+    }
+
+    /// <summary>Real-word decoys need a key card: every room plays a symbols or Morse cipher on Normal.</summary>
+    [Theory]
+    [MemberData(nameof(RebuiltRooms))]
+    public void Every_room_has_a_key_card_cipher_on_normal(string id)
+    {
+        var room = Rooms.Get(id);
+        Assert.Contains(RoomLengths.Cut(room, room.PlayableLengths.Max(), EscapeDifficulty.Normal).Puzzles,
+            p => p.Generator is { Type: GeneratorType.Cipher, Cipher: CipherType.Symbols or CipherType.Morse });
+    }
 
     [Fact]
     public void Every_shipped_room_offers_every_length() =>

@@ -361,6 +361,9 @@ public static class EscapeEngine
         }
     }
 
+    /// <summary>True once the group can read what's written at a key place (see <see cref="RoomVariants.KeyPlaces"/>).</summary>
+    public static bool PlaceSeen(EscapeState s, EscapeRoom room, string place) => place.Contains(':') && Seen(s, room, place);
+
     private static bool Seen(EscapeState s, EscapeRoom room, string place)
     {
         var split = place.IndexOf(':');

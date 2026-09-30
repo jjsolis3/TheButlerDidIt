@@ -101,9 +101,17 @@ public sealed record EscapePuzzleView(
     /// <summary>For deductions: the things to line up, for the phones' logic grid.</summary>
     EscapeDeductionView? Deduction);
 
-/// <param name="Unlocked">The group has found the key (numbers and mirror need none).</param>
-/// <param name="Table">For symbols and Morse: the key card, only once unlocked. Never the shift amount: finding it is the puzzle.</param>
-public sealed record EscapeCipherView(CipherType Type, bool Unlocked, IReadOnlyList<EscapeKeyEntry>? Table);
+/// <param name="Unlocked">The group has found a key for it (numbers and mirror need none).</param>
+/// <param name="Keys">
+/// Every key found so far, labelled with where it was found. A cipher can have a real key and decoys written in
+/// different places; these never say which is which (working that out is the puzzle), and keys not yet found are never sent.
+/// </param>
+public sealed record EscapeCipherView(CipherType Type, bool Unlocked, IReadOnlyList<EscapeFoundKey> Keys);
+
+/// <param name="From">Where it was found: the spot's label ("barred window"), an item's name, or a puzzle's title.</param>
+/// <param name="Shift">For a shift cipher: the amount written there (the group has read it already).</param>
+/// <param name="Table">For symbols and Morse: the key card written there.</param>
+public sealed record EscapeFoundKey(string From, int? Shift, IReadOnlyList<EscapeKeyEntry>? Table);
 public sealed record EscapeKeyEntry(string Code, string Letter);
 public sealed record EscapeDeductionView(IReadOnlyList<string> Items, int Spots);
 

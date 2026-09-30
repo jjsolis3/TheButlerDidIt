@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 2,
+  "edition": 3,
   "hintPenaltySeconds": 120,
   "soundscape": "workshop",
   "intro": "Hello. You don't know me, but I know all of you. You have wasted every hour you were given, so tonight I will teach you what an hour is worth. You are chained in my workshop. Everything you need to leave is in this room: keys, tools, and each other. Nobody escapes alone. The clock on the wall is yours. Let the game begin.",
@@ -142,6 +142,28 @@
             "label": "mirror shard",
             "look": "A shard of mirror. Your own face, tired and scared. Nothing else.",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "paint-tin",
+            "prop": "barrel",
+            "x": 630,
+            "y": 10,
+            "w": 140,
+            "h": 100,
+            "label": "paint tin",
+            "look": "Scratched on the lid: back {key:rewind}.",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "chalk-marks",
+            "prop": "painting",
+            "x": 630,
+            "y": 110,
+            "w": 140,
+            "h": 100,
+            "label": "chalk marks",
+            "look": "Chalk on the wall: back {key:rewind}.",
+            "minDifficulty": "hard"
           }
         ]
       }
@@ -235,6 +257,28 @@
             "h": 130,
             "label": "steel toolbox",
             "look": "Heavy, cold, and locked with four dials."
+          },
+          {
+            "id": "tool-rack",
+            "prop": "shelf",
+            "x": 570,
+            "y": 10,
+            "w": 140,
+            "h": 100,
+            "label": "tool rack",
+            "look": "A symbol key taped to the rack: {key:blueprint}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "sawdust",
+            "prop": "rug",
+            "x": 710,
+            "y": 10,
+            "w": 140,
+            "h": 100,
+            "label": "sawdust pile",
+            "look": "A symbol key half-buried in the sawdust: {key:blueprint}",
+            "minDifficulty": "hard"
           }
         ]
       }
@@ -355,6 +399,28 @@
             "look": "A broken key hangs on the hook. It doesn't look like it fits anything.",
             "gives": "broken-key",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "warning-sign",
+            "prop": "sign",
+            "x": 820,
+            "y": 10,
+            "w": 140,
+            "h": 100,
+            "label": "warning sign",
+            "look": "A code sheet behind the sign: {key:message}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "step-crate",
+            "prop": "crate",
+            "x": 820,
+            "y": 110,
+            "w": 140,
+            "h": 100,
+            "label": "crate by the steps",
+            "look": "A code sheet in the crate: {key:message}",
+            "minDifficulty": "hard"
           }
         ]
       }
@@ -467,9 +533,9 @@
         ]
       },
       "hints": [
+        "There's more than one number around the room. Only one of them turns this into a real word.",
         "The recorder itself tells you how far to wind it back.",
-        "Move every letter back along the alphabet by that many.",
-        "It says {answer}."
+        "Move every letter back along the alphabet by that many."
       ],
       "solvedText": "The recorder clicks. 'Good. You're learning to listen.' The tape whirs on."
     },
@@ -564,23 +630,29 @@
       "minMinutes": 45,
       "title": "The Blueprint",
       "kind": "text",
-      "prompt": "A blueprint is pinned above the bench. Its title is written in symbols: {cipher}. A letter lock below wants the word.",
+      "prompt": "A blueprint is pinned above the bench. Its title is written in symbols, and it names a tool: {cipher}. A letter lock below wants the word.",
       "generator": {
         "type": "cipher",
         "cipher": "symbols",
         "words": [
           "hinges",
-          "spanner",
           "pliers",
           "chisel",
-          "crowbar",
-          "wrench"
+          "wrench",
+          "jigsaw"
+        ],
+        "decoyWords": [
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "Somewhere there's a key to these symbols. Something you can only see in the right light.",
-        "Put the torn photo back together and look at it under the UV torch.",
-        "The title reads {answer}."
+        "Put the torn photo back together and look at it under the UV torch."
       ],
       "solvedText": "The lock drops open. The blueprint is a plan of this very room, with a cross drawn on the stairs."
     },
@@ -679,18 +751,35 @@
       "minDifficulty": "hard",
       "title": "The Tinkerer's Telegraph",
       "kind": "text",
-      "prompt": "A telegraph key taps by itself, over and over: {cipher}",
+      "prompt": "A telegraph key taps by itself, over and over, the one thing the Tinkerer wants from you: {cipher}",
       "generator": {
         "type": "cipher",
         "cipher": "morse",
         "words": [
           "forgive",
-          "goodbye",
-          "regret",
-          "farewell"
+          "mercy",
+          "atone",
+          "pardon"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop",
+          "blanket",
+          "chimney",
+          "cabinet",
+          "dolphin"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "The dots and dashes need a key. It's written where only UV light can find it.",
         "Shine the torch on the notebook by the stairs, then read the taps letter by letter."
       ],

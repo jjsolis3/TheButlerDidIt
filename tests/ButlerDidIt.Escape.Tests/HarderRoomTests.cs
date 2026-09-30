@@ -283,28 +283,36 @@ public class LaboratoryTests
     }
 
     [Fact]
-    public void Cipher_tools_unlock_once_the_key_is_found_and_never_give_the_shift_away()
+    public void Cipher_tools_unlock_once_a_key_is_found_and_show_only_the_keys_found()
     {
         var s = Lab.Started(EscapeDifficulty.Hard, 21);
         EscapeCipherView Tool(EscapeState x, string id) => EscapeProjector.Stage(x, Room, T0).Puzzles.Single(p => p.Id == id).Cipher!;
 
-        Assert.Equal(new EscapeCipherView(CipherType.Shift, false, null), Tool(s, "formula"));
+        Assert.False(Tool(s, "formula").Unlocked);
+        Assert.Empty(Tool(s, "formula").Keys);
         s = s.Do(new ExamineSpot(T0, Ada, "painting")); // the dial's number is on the portrait
-        Assert.Equal(new EscapeCipherView(CipherType.Shift, true, null), Tool(s, "formula")); // the number itself is only in the look
+        var formula = Tool(s, "formula");
+        Assert.True(formula.Unlocked);
+        // The amount the group has just read, labelled with where they read it: nothing about keys still to find.
+        var found = Assert.Single(formula.Keys);
+        Assert.Equal("portrait", found.From);
+        Assert.NotNull(found.Shift);
+        Assert.Null(found.Table);
 
         s = Lab.PlayToStage(1, seed: 21, difficulty: EscapeDifficulty.Hard);
         var room = EscapeEngine.RoomFor(s, Room);
         Assert.False(Tool(s, "signal").Unlocked);
-        Assert.Null(Tool(s, "signal").Table);
+        Assert.Empty(Tool(s, "signal").Keys);
         s = s.Do(new ExamineSpot(T0, Ada, "bookshelf")); // the manual…
         Assert.False(Tool(s, "signal").Unlocked);
         s = s.Do(new InspectItem(T0, Ada, "manual")); // …under the UV lamp
         var tool = Tool(s, "signal");
         Assert.True(tool.Unlocked);
-        // The key card decodes the telegraph's message, letter by letter.
-        var encoded = room.FindPuzzle("signal")!.Prompt["The telegraph taps: ".Length..];
-        var decoded = string.Concat(encoded.Split(' ').Select(code => tool.Table!.Single(e => e.Code == code).Letter));
-        Assert.Equal(room.FindPuzzle("signal")!.Answers[0], decoded);
+        // The key card reads the telegraph's message, letter by letter: as the answer if it's the real card, or as one
+        // of the decoy words if it's a decoy (on Hard the key is written in three places; see DecoyKeyTests).
+        var signal = room.FindPuzzle("signal")!;
+        var decoded = string.Concat(signal.Decoder!.Encoded.Split(' ').Select(code => Assert.Single(tool.Keys).Table!.Single(e => e.Code == code).Letter));
+        Assert.Contains(decoded, new[] { signal.Answers[0], "PLANET", "CASTLE", "GARDEN", "WINTER", "LEADER", "HEATER" });
     }
 
     [Fact]
@@ -378,7 +386,12 @@ public class HarderPrivacyTests
                 {
                     var puzzle = room.FindPuzzle(p.Id)!;
                     Assert.Equal(EscapeEngine.KeyFound(s, puzzle), p.Cipher!.Unlocked);
-                    if (!p.Cipher.Unlocked || p.Cipher.Type == CipherType.Shift) Assert.Null(p.Cipher.Table);
+                    // Only keys already found, each from a place the group has read; the view can't say which is real.
+                    var seen = (puzzle.Decoder!.Candidates ?? []).Count(c => EscapeEngine.PlaceSeen(s, room, c.Place));
+                    // Mirror and numbers need no key, so they list none.
+                    var expected = !p.Cipher.Unlocked || puzzle.KeyAt.Count == 0 ? 0 : puzzle.Decoder.Candidates is null ? 1 : seen;
+                    Assert.Equal(expected, p.Cipher.Keys.Count);
+                    if (p.Cipher.Type == CipherType.Shift) Assert.All(p.Cipher.Keys, k => Assert.Null(k.Table));
                 }
                 foreach (var hidden in s.Pieces.Where(p => p.IsHidden))
                     Assert.All(views, v => Assert.DoesNotContain(room.FindPuzzle(hidden.PuzzleId)!.Pieces[hidden.Index], v));
@@ -522,8 +535,14 @@ public class HarderValidatorTests
 
     [Fact]
     public void A_cipher_whose_key_is_nowhere_is_caught() =>
-        Assert.Contains(EscapeRoomValidator.Validate(Lab2(r => WithObject(r, "painting", o => o with { Look = "The professor." }))),
+        Assert.Contains(EscapeRoomValidator.Validate(Lab2(r => new[] { "painting", "ledge", "notebook" }.Aggregate(r, (x, id) => WithObject(x, id, o => o with { Look = "Nothing." })))),
             e => e.Contains("{key:formula}"));
+
+    [Fact]
+    public void A_key_only_on_spots_an_easier_game_leaves_out_is_caught() =>
+        // Without the portrait, the key is only on the Normal and Hard spots: an Easy game has none to find.
+        Assert.Contains(EscapeRoomValidator.Validate(Lab2(r => WithObject(r, "painting", o => o with { Look = "The professor." }))),
+            e => e.Contains("On Easy") && e.Contains("'formula'") && e.Contains("spots this game leaves out"));
 
     [Fact]
     public void A_key_the_group_can_only_find_later_is_caught()

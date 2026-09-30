@@ -188,6 +188,28 @@ The AI only writes words. It never changes a puzzle, an answer or the clock.
 
 With a Storyteller model set up, a host can type a theme on the escape shelf ("a haunted lighthouse") and get a new room in this same format, on their own shelf only. The AI writes the story, the riddles and the villain, and it picks which generators fill the codes and passwords. So every code comes from the same proven templates as yours, and nothing it writes is saved unless the validator passes. A tester AI also has to crack each riddle from its prompt and pieces alone. A good hand-written room is still the best model: the AI is shown this format and follows the same rules, and every kind of puzzle here. Its rooms must have a scene in every stage, a search, something to look at or put together, a cipher, a logic puzzle, something for Hard, and few one-tap steps, and it never places the spots itself: the server lays them out. The tester also has to crack each logic puzzle from its clues, and each riddle from everything its part of the room shows. AI rooms come in one length, the one the host asked for.
 
+## Decoy keys
+
+A cipher with only one key has nothing to figure out: find the key, read the word. To make the group think, write the same `{key:<puzzle id>}` in two or three places. Each game picks one place for the real key, and a different one each puzzle set, so "the sill is always right" can't be learned. The other places get **decoy keys**:
+- **Symbols and Morse:** a key card that maps the same symbols (or codes) to the letters of a *decoy word* of the same shape: the same length, with repeated letters in the same places. Every card reads as a real word, and only one fits the clue. The decoy words come from the generator's `decoyWords`: real words that the prompt's clue rules out.
+- **Shift:** a different amount, which reads as gibberish. A shifted real word almost never lands on another real word, so shift decoys don't use `decoyWords`.
+
+Put one place in every game and the others at `"minDifficulty": "normal"` and `"hard"`: Easy then has 1 key, Normal 2 and Hard 3. Phones list each key found, labelled by where it was found ("From the barred window"), and never say which one is real. Answering with a decoy's word is simply a wrong answer.
+
+```jsonc
+"prompt": "A card on the wall reads {cipher}. It names the one thing every patient here is made to swallow.",
+"generator": { "type": "cipher", "cipher": "symbols", "words": ["tonic", "pills"], "decoyWords": ["laugh", "dream", "bread", "stars"] }
+// …and {key:orders} in the looks of three spots: one plain, one with "minDifficulty": "normal", one with "hard".
+```
+
+The validator checks, at every length and difficulty:
+- the group can reach every key before the cipher is needed, so it can compare them;
+- a game shows at most 3 keys;
+- exactly one key reads the answer;
+- every symbols or Morse decoy reads a word from `decoyWords`.
+
+If none of your `decoyWords` fits a cipher word's shape, it says so ("add more decoyWords shaped like X"). Decoy words mustn't also be in `words`.
+
 ## Editions
 
 `edition` (default 1) says which version of the room this is. When you rebuild a room so that old times no longer compare (new puzzles, a different number of them), bump it: each edition gets its own leaderboards. Old results stay in the database; they just drop off the boards and the shelf's best time. Small fixes (a typo, a better hint) don't need a new edition.

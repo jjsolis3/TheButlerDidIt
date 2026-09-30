@@ -154,19 +154,43 @@ export function DeductionHelper({ puzzle, scratchKey, onUseCode }: { puzzle: Esc
 
 const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-/** The longest run of capital letters in a prompt: most likely the coded word, to start the decoder with. */
-const codedWord = (prompt: string) => (prompt.match(/[A-Z]{3,}/g) ?? []).sort((a, b) => b.length - a.length)[0] ?? ''
-
-/** A decoding tool for a cipher, once the group has found its key. The key itself stays in the room: the tool only helps read it. */
-export function CipherTool({ cipher, prompt }: { cipher: EscapeCipherView; prompt: string }) {
+/**
+ * A decoding tool for a cipher, once the group has found a key for it. A cipher can have its key written in more
+ * than one place, and only one of them is right: the tool offers each key found (labelled with where), and the
+ * group works out which one reads a word that fits the puzzle. It never says which key is real.
+ */
+export function CipherTool({ cipher }: { cipher: EscapeCipherView }) {
+  const [picked, setPicked] = useState(0)
   if (!cipher.unlocked) return <p className="mt-2 text-xs text-muted">🔒 A decoder unlocks once you find this code's key somewhere in the room.</p>
+  const keys = cipher.keys
+  const key = keys[Math.min(picked, keys.length - 1)]
   return (
     <details className="mt-3 rounded-lg border border-line p-2" data-testid="cipher-tool">
       <summary className="cursor-pointer text-sm text-accent">🔑 Decoder</summary>
-      {cipher.type === 'shift' && <ShiftWheel start={codedWord(prompt)} />}
-      {(cipher.type === 'symbols' || cipher.type === 'morse') && cipher.table && (
-        <dl className="mt-2 grid grid-cols-3 gap-1 text-sm" aria-label="Key card">
-          {cipher.table.map((e) => (
+      {keys.length > 1 && (
+        <>
+          <p className="mt-2 text-xs text-muted" data-testid="key-count">
+            You've found {keys.length} keys. Only one is right: try each, and see which word fits the clue.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-1" role="group" aria-label="Keys found">
+            {keys.map((k, i) => (
+              <button
+                key={`${k.from}-${i}`}
+                onClick={() => setPicked(i)}
+                aria-pressed={i === picked}
+                className={`min-h-9 rounded-full border px-3 text-xs ${i === picked ? 'border-accent bg-accent/10' : 'border-line'}`}
+              >
+                From the {k.from}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      {keys.length === 1 && key && <p className="mt-2 text-xs text-muted">Found at the {key.from}.</p>}
+      {cipher.type === 'shift' && key?.shift != null && <ShiftWheel key={`${picked}:${key.shift}`} shift={key.shift} />}
+      {(cipher.type === 'symbols' || cipher.type === 'morse') && key?.table && (
+        <dl className="mt-2 grid grid-cols-3 gap-1 text-sm" aria-label={`Key card from the ${key.from}`}>
+          {key.table.map((e) => (
             <div key={e.code} className="rounded bg-bg/60 px-2 py-1 text-center">
               <dt className="font-mono text-base">{e.code}</dt>
               <dd className="font-semibold">{e.letter}</dd>
@@ -180,27 +204,20 @@ export function CipherTool({ cipher, prompt }: { cipher: EscapeCipherView; promp
   )
 }
 
-/** A letter wheel: choose how far to turn it back, and read the word as it decodes. The amount is for the group to find. */
-function ShiftWheel({ start }: { start: string }) {
-  const [shift, setShift] = useState(0)
-  const [text, setText] = useState(start)
-  const turn = (by: number) => setShift((s) => (s + by + 26) % 26)
+/**
+ * A letter wheel turned back by a key the group has found: type the coded letters in, and read what they say with
+ * this key. It only turns by the amounts found in the room, so the answer can't be found by spinning through all 26.
+ */
+function ShiftWheel({ shift }: { shift: number }) {
+  const [text, setText] = useState('')
   const decoded = text
     .toUpperCase()
     .replace(/[A-Z]/g, (c) => ABC[(c.charCodeAt(0) - 65 - shift + 26) % 26])
   return (
     <div className="mt-2 space-y-2 text-sm">
-      <div className="flex items-center gap-2">
-        <button className="min-h-9 min-w-9 rounded border border-line" onClick={() => turn(-1)} aria-label="Turn back one fewer">
-          −
-        </button>
-        <span className="w-28 text-center" aria-live="polite">
-          Back {shift} letter{shift === 1 ? '' : 's'}
-        </span>
-        <button className="min-h-9 min-w-9 rounded border border-line" onClick={() => turn(1)} aria-label="Turn back one more">
-          +
-        </button>
-      </div>
+      <p className="text-center" aria-live="polite">
+        Back {shift} letter{shift === 1 ? '' : 's'}
+      </p>
       <p className="font-mono text-xs text-muted" aria-hidden>
         {ABC}
         <br />
@@ -208,11 +225,19 @@ function ShiftWheel({ start }: { start: string }) {
       </p>
       <label className="block text-xs text-muted">
         Coded letters
-        <input value={text} onChange={(e) => setText(e.target.value)} className="mt-1 w-full rounded border border-line bg-bg px-2 py-1 font-mono text-ink" autoComplete="off" />
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Type the coded letters"
+          className="mt-1 w-full rounded border border-line bg-bg px-2 py-1 font-mono text-ink"
+          autoComplete="off"
+        />
       </label>
-      <p>
-        Reads: <span className="font-mono font-semibold tracking-widest">{decoded}</span>
-      </p>
+      {text && (
+        <p>
+          Reads: <span className="font-mono font-semibold tracking-widest">{decoded}</span>
+        </p>
+      )}
     </div>
   )
 }

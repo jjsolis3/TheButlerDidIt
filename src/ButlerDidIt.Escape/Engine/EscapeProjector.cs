@@ -106,16 +106,37 @@ public static class EscapeProjector
             PiecesHidden: s.Pieces.Count(x => x.PuzzleId == p.Id && x.IsHidden),
             Finds: p.Kind == PuzzleKind.Search ? new EscapeFindsView(p.Finds.Count(s.Examined.Contains), p.Finds.Count) : null,
             Switches: p.Grid is { } grid ? new EscapeSwitchesView(grid.Size, EscapeEngine.LitNow(s, p)) : null,
-            Cipher: p.Decoder is { } d ? Cipher(s, p, d) : null,
+            Cipher: p.Decoder is { } d ? Cipher(s, room, p, d) : null,
             Deduction: p.Lineup.Count > 0 ? new EscapeDeductionView(p.Lineup, p.Lineup.Count) : null);
     }
 
-    private static EscapeCipherView Cipher(EscapeState s, EscapePuzzle p, CipherDecoder d)
+    private static EscapeCipherView Cipher(EscapeState s, EscapeRoom room, EscapePuzzle p, CipherDecoder d)
     {
         var unlocked = EscapeEngine.KeyFound(s, p);
-        var table = unlocked && d.Type is CipherType.Symbols or CipherType.Morse
-            ? PuzzleGenerators.KeyTable(d.Type, d.Key).Select(e => new EscapeKeyEntry(e.Code, e.Letter)).ToList()
-            : null;
-        return new EscapeCipherView(d.Type, unlocked, table);
+        // In the room's order, not with the real one first: the list mustn't say which key is real.
+        var found = unlocked
+            ? (d.Candidates ?? [new KeyCandidate(p.KeyAt.FirstOrDefault() ?? "", d.Key, true, "", false)])
+                .Where(c => EscapeEngine.PlaceSeen(s, room, c.Place))
+                .Select(c => new EscapeFoundKey(
+                    PlaceLabel(room, c.Place),
+                    d.Type == CipherType.Shift && int.TryParse(c.Key, out var n) ? n : null,
+                    d.Type is CipherType.Symbols or CipherType.Morse ? PuzzleGenerators.KeyTable(d.Type, c.Key).Select(e => new EscapeKeyEntry(e.Code, e.Letter)).ToList() : null))
+                .ToList()
+            : [];
+        return new EscapeCipherView(d.Type, unlocked, found);
+    }
+
+    /// <summary>What the phones call a place a key was found: the spot, item or puzzle's own public name.</summary>
+    private static string PlaceLabel(EscapeRoom room, string place)
+    {
+        var split = place.IndexOf(':');
+        if (split < 0) return "";
+        var id = place[(split + 1)..];
+        return place[..split] switch
+        {
+            "object" => room.SceneObjects.FirstOrDefault(o => o.Id == id)?.Label ?? "",
+            "item" or "inspect" => room.FindItem(id)?.Name ?? "",
+            _ => room.FindPuzzle(id)?.Title ?? "",
+        };
     }
 }

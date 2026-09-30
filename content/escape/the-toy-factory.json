@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 2,
+  "edition": 3,
   "hintPenaltySeconds": 90,
   "soundscape": "workshop",
   "intro": "Beep. Boop. INTRUDERS! The Tick-Tock Toy Factory is CLOSED, and I, Sprocket, Foreman of the Night Shift, have locked every door. Want to go home? Then fix my factory! Work together, share what you find, and get out before the morning whistle. Clank!",
@@ -47,9 +47,9 @@
           {
             "id": "giant-robot-spot",
             "prop": "statue",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "giant robot",
             "look": "A toy robot as big as a fridge, frozen mid-step. There's a keyhole in its back."
@@ -57,9 +57,9 @@
           {
             "id": "panel",
             "prop": "machine",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "control panel",
             "look": "Blinking buttons and a word lock. Sprocket's sticky note is on it."
@@ -67,9 +67,9 @@
           {
             "id": "teddy-pile",
             "prop": "box",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "pile of teddies",
             "look": "Half-stuffed teddy bears. One of them has a curly metal rod stuffed inside instead of fluff.",
@@ -78,9 +78,9 @@
           {
             "id": "conveyor",
             "prop": "machine",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "conveyor belt",
             "look": "Tin soldiers ride past in a line. Stuck in the belt's rollers: nothing but fluff.",
@@ -89,9 +89,9 @@
           {
             "id": "spare-parts",
             "prop": "drawer",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "spare parts drawer",
             "look": "Springs, buttons and googly eyes, all sorted into tiny tubs.",
@@ -100,9 +100,9 @@
           {
             "id": "toy-chest",
             "prop": "chest",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "toy chest",
             "look": "Wooden blocks and a spinning top. At the bottom, a little brass pin.",
@@ -111,9 +111,9 @@
           {
             "id": "robot-parts",
             "prop": "crate",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "crate of robot arms",
             "look": "Dozens of little robot arms, waving at nothing.",
@@ -122,9 +122,9 @@
           {
             "id": "stool",
             "prop": "desk",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "foreman's stool",
             "look": "Sprocket's stool, with a cushion that says BOSS. Under it: a greasy oil can with no oil.",
@@ -133,9 +133,9 @@
           {
             "id": "tool-board",
             "prop": "shelf",
-            "x": 20,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "tool board",
             "look": "Tiny screwdrivers, each hung in its place, all bolted down.",
@@ -144,9 +144,9 @@
           {
             "id": "bin",
             "prop": "barrel",
-            "x": 270,
+            "x": 265,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "scrap bin",
             "look": "Wonky teddy ears and a very sad jack-in-the-box.",
@@ -173,9 +173,9 @@
           {
             "id": "paint-pots",
             "prop": "shelf",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "paint pots",
             "look": "Rows and rows of pots. Some are red, some are blue, some are every colour at once."
@@ -183,9 +183,9 @@
           {
             "id": "mixer",
             "prop": "machine",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "paint mixer",
             "look": "It rumbles and wobbles. A 3-digit lock holds its hatch shut."
@@ -193,9 +193,9 @@
           {
             "id": "gearbox-spot",
             "prop": "cabinet",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "gearbox",
             "look": "A big box of spinning gears, with one empty space in the middle."
@@ -203,9 +203,9 @@
           {
             "id": "colour-panel",
             "prop": "sign",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "colour panel",
             "look": "A panel of little coloured bulbs, all dark. The code chart beside it is written in numbers."
@@ -213,9 +213,9 @@
           {
             "id": "splat-rug",
             "prop": "rug",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "splattered rug",
             "look": "It was white once. Now it's every colour there is.",
@@ -224,9 +224,9 @@
           {
             "id": "smock-rack",
             "prop": "lamp",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "coat rack",
             "look": "Painters' smocks with deep pockets, all full of old paint rags.",
@@ -235,9 +235,9 @@
           {
             "id": "paint-bucket",
             "prop": "barrel",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "paint bucket",
             "look": "A bucket of sparkly purple. You dip a finger in. Now you have a sparkly purple finger.",
@@ -246,13 +246,45 @@
           {
             "id": "easel",
             "prop": "painting",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "easel",
             "look": "A half-finished painting of Sprocket, looking very handsome.",
             "hidesPieces": true
+          },
+          {
+            "id": "colour-chart",
+            "prop": "poster",
+            "label": "colour chart",
+            "look": "A symbol card clipped to the chart: {key:paint-codes}",
+            "x": 15,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "brush-jar",
+            "prop": "barrel",
+            "label": "brush jar",
+            "look": "A symbol card rolled up in the jar: {key:paint-codes}",
+            "minDifficulty": "normal",
+            "x": 265,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "drop-cloth",
+            "prop": "rug",
+            "label": "drop cloth",
+            "look": "A symbol card under the cloth: {key:paint-codes}",
+            "minDifficulty": "hard",
+            "x": 515,
+            "y": 420,
+            "w": 220,
+            "h": 160
           }
         ]
       }
@@ -274,9 +306,9 @@
           {
             "id": "loading-door-spot",
             "prop": "door",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "loading door",
             "look": "A big roll-up door with a label slot and a keypad."
@@ -284,9 +316,9 @@
           {
             "id": "clipboard",
             "prop": "sign",
-            "x": 270,
+            "x": 215,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "clipboard",
             "look": "The delivery driver's clipboard. Scrawled at the bottom: 'Delivery code: slide back {key:delivery-note}.'"
@@ -294,9 +326,9 @@
           {
             "id": "parrot-box",
             "prop": "crate",
-            "x": 520,
+            "x": 415,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "squawking crate",
             "look": "A toy parrot peeks through the slats and says 'Squawk!'"
@@ -304,9 +336,9 @@
           {
             "id": "crate-stack",
             "prop": "box",
-            "x": 770,
+            "x": 615,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "stacked crates",
             "look": "Crates of toys, stacked taller than you. Labels everywhere.",
@@ -315,9 +347,9 @@
           {
             "id": "trolley",
             "prop": "crate",
-            "x": 20,
-            "y": 220,
-            "w": 210,
+            "x": 815,
+            "y": 20,
+            "w": 170,
             "h": 160,
             "label": "trolley",
             "look": "A trolley with one wobbly wheel. It goes round in circles.",
@@ -326,9 +358,9 @@
           {
             "id": "mail-sack",
             "prop": "barrel",
-            "x": 270,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "mail sack",
             "look": "Letters to Sprocket, mostly complaints about squeaky teddies.",
@@ -337,9 +369,9 @@
           {
             "id": "pallet",
             "prop": "rug",
-            "x": 520,
+            "x": 215,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "wooden pallet",
             "look": "Splinters, and a lost badge with a smiling sun on it.",
@@ -348,9 +380,9 @@
           {
             "id": "dock-lockers",
             "prop": "cabinet",
-            "x": 770,
+            "x": 415,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "drivers’ lockers",
             "look": "Hats, flasks and a map of every town the trucks go to.",
@@ -359,9 +391,9 @@
           {
             "id": "radio-shelf",
             "prop": "shelf",
-            "x": 20,
-            "y": 420,
-            "w": 210,
+            "x": 615,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "radio shelf",
             "look": "Under the magnifier, tiny writing shows up on the radio's back: {key:beep-signal}",
@@ -372,14 +404,58 @@
           {
             "id": "sock-basket",
             "prop": "box",
-            "x": 270,
-            "y": 420,
-            "w": 210,
+            "x": 815,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "lost socks basket",
             "look": "Hundreds of odd socks. You take one stripy one, just in case.",
             "gives": "odd-sock",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "tape-gun",
+            "prop": "box",
+            "label": "tape gun",
+            "look": "Scribbled on the tape roll: back {key:delivery-note}.",
+            "minDifficulty": "normal",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "forklift",
+            "prop": "machine",
+            "label": "forklift",
+            "look": "Scratched on the seat: back {key:delivery-note}.",
+            "minDifficulty": "hard",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "antenna",
+            "prop": "lamp",
+            "label": "radio antenna",
+            "look": "A code card taped to the antenna: {key:beep-signal}",
+            "minDifficulty": "hard",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "parts-bin",
+            "prop": "box",
+            "label": "parts bin",
+            "look": "A code card among the bolts: {key:beep-signal}",
+            "minDifficulty": "hard",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160
           }
         ]
       }
@@ -540,22 +616,37 @@
       "id": "paint-codes",
       "title": "The Paint Code Chart",
       "kind": "text",
-      "prompt": "Sprocket labels his paint pots in numbers so nobody else can read them. The newest one says: {cipher}. The chart's lock wants the colour's name.",
+      "prompt": "Sprocket labels his paint pots in secret symbols so nobody else can read them. The newest one names a paint: {cipher}. The chart's lock wants the name.",
       "generator": {
         "type": "cipher",
-        "cipher": "numbers",
+        "cipher": "symbols",
         "words": [
           "rainbow",
           "sparkle",
-          "brush",
-          "glitter",
-          "stripes",
-          "polka"
+          "polka",
+          "violet",
+          "crayon"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop",
+          "blanket",
+          "chimney",
+          "cabinet",
+          "dolphin"
         ]
       },
       "hints": [
-        "Each number is a letter.",
-        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "There's more than one symbol card in the paint shop. Only one is Sprocket's real one.",
+        "Try each card: only one turns the symbols into the name of a paint.",
         "It says {answer}."
       ],
       "solvedText": "Correct! The chart flips over. On the back: 'Paint shop rules: NO FUN. Signed, Sprocket.'"
@@ -697,9 +788,9 @@
         ]
       },
       "hints": [
+        "There's more than one number around the room. Only one of them turns this into a real word.",
         "How far to slide the letters is written somewhere. Check the driver's clipboard.",
-        "Slide every letter back along the alphabet by that many places.",
-        "It says {answer}."
+        "Slide every letter back along the alphabet by that many places."
       ],
       "solvedText": "The lock clicks. The note is a list of toys, all ready to be delivered to children."
     },
@@ -708,18 +799,35 @@
       "minDifficulty": "hard",
       "title": "The Beeping Radio",
       "kind": "text",
-      "prompt": "The dock radio beeps in dots and dashes: {cipher}",
+      "prompt": "The dock radio beeps in dots and dashes, a toy or a toy part: {cipher}",
       "generator": {
         "type": "cipher",
         "cipher": "morse",
         "words": [
           "widget",
-          "gadget",
           "gizmo",
-          "doodad"
+          "spring",
+          "bolt"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "coat",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "These need a key. Sprocket wrote it too small to read without a magnifier.",
         "Swap each one for its letter, one at a time."
       ],

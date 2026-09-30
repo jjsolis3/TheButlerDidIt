@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 2,
+  "edition": 3,
   "hintPenaltySeconds": 90,
   "soundscape": "carnival",
   "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out. Ha-ha-HONK!",
@@ -51,9 +51,9 @@
           {
             "id": "tallest-mirror",
             "prop": "mirror",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "tallest mirror",
             "look": "Something silver glints on top of the tallest mirror. With the grabber you pinch it down: a little silver key!",
@@ -64,9 +64,9 @@
           {
             "id": "popcorn-cart",
             "prop": "box",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "popcorn cart",
             "look": "Stale popcorn everywhere. Under the scoop: the shiny body of a flashlight, with nothing inside it.",
@@ -75,9 +75,9 @@
           {
             "id": "prize-shelf",
             "prop": "shelf",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "prize shelf",
             "look": "Teddy bears, rubber snakes and a plastic crown. Tucked behind them: a flashlight's glass lens.",
@@ -86,9 +86,9 @@
           {
             "id": "bench",
             "prop": "table",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "bench",
             "look": "A squishy bench for tired feet. Under the cushion: a flashlight's on-off switch.",
@@ -97,9 +97,9 @@
           {
             "id": "dark-corner",
             "prop": "vent",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "dark corner",
             "look": "In the torch beam, a note glows on the wall: 'Giggle code! Slide every letter back {key:giggle-note}. Honk!'",
@@ -109,9 +109,9 @@
           {
             "id": "wobbly-mirror",
             "prop": "mirror",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "wobbly mirror",
             "look": "You look like a string of spaghetti with a tiny head. Mister Giggles would love that."
@@ -119,9 +119,9 @@
           {
             "id": "lost-property",
             "prop": "crate",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "lost property box",
             "look": "One flip-flop, a yo-yo and a lot of odd mittens.",
@@ -130,9 +130,9 @@
           {
             "id": "clown-head",
             "prop": "statue",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "giant clown head",
             "look": "A giant grinning clown head with its mouth wide open. Nothing in there but a sweet wrapper.",
@@ -141,9 +141,9 @@
           {
             "id": "little-door-spot",
             "prop": "door",
-            "x": 20,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "little door",
             "look": "A door just big enough to crawl through, with a tiny silver lock."
@@ -151,13 +151,35 @@
           {
             "id": "squeaky-floor",
             "prop": "rug",
-            "x": 270,
+            "x": 265,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "squeaky floorboard",
             "look": "It squeaks. Loudly. That's all it does.",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "ticket-stubs",
+            "prop": "box",
+            "label": "ticket stubs",
+            "look": "One stub is scribbled on: back {key:giggle-note}!",
+            "minDifficulty": "normal",
+            "x": 515,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "gold-frame",
+            "prop": "mirror",
+            "label": "gold mirror frame",
+            "look": "Scratched on the frame: back {key:giggle-note}!",
+            "minDifficulty": "hard",
+            "x": 765,
+            "y": 420,
+            "w": 220,
+            "h": 160
           }
         ]
       }
@@ -180,9 +202,9 @@
           {
             "id": "duck-tank",
             "prop": "barrel",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "duck pond",
             "look": "Plastic ducks bob round and round. The fishing rods are all tangled up."
@@ -190,9 +212,9 @@
           {
             "id": "hammer-rack",
             "prop": "shelf",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "hammer rack",
             "look": "Among the toy hammers: one long, heavy wooden handle with no head.",
@@ -201,9 +223,9 @@
           {
             "id": "strongman-tower",
             "prop": "sign",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "strongman tower",
             "look": "A tall red tower with a shiny bell on top. 'Ring me if you can!'"
@@ -211,9 +233,9 @@
           {
             "id": "candy-floss",
             "prop": "machine",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "candy floss machine",
             "look": "Sticky pink fluff on everything. Your fingers will never be the same.",
@@ -222,9 +244,9 @@
           {
             "id": "ring-toss",
             "prop": "table",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "ring toss",
             "look": "Wooden bottles and a pile of hoops, all missing their bottles.",
@@ -233,9 +255,9 @@
           {
             "id": "hoopla-stall",
             "prop": "crate",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "hoopla stall",
             "look": "Cardboard boxes of prizes nobody ever won.",
@@ -244,9 +266,9 @@
           {
             "id": "prize-bins",
             "prop": "chest",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "prize bins",
             "look": "Whistles, stickers and a hundred bouncy balls.",
@@ -255,9 +277,9 @@
           {
             "id": "fortune-booth",
             "prop": "cabinet",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "fortune machine",
             "look": "A mechanical fortune teller in a glass box. Its crystal ball flickers when you walk past."
@@ -265,9 +287,9 @@
           {
             "id": "balloon-wall",
             "prop": "poster",
-            "x": 20,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "balloon wall",
             "look": "Rows of balloons, each with a number painted on it."
@@ -291,9 +313,9 @@
           {
             "id": "big-gate",
             "prop": "door",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "big gate",
             "look": "Tall striped bars and two locks: one for a key, one for a password."
@@ -301,9 +323,9 @@
           {
             "id": "guard-chair",
             "prop": "desk",
-            "x": 270,
+            "x": 215,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "guard's chair",
             "look": "The clown guard's chair, still warm. A newspaper full of doodles.",
@@ -312,9 +334,9 @@
           {
             "id": "carousel",
             "prop": "statue",
-            "x": 520,
+            "x": 415,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "carousel",
             "look": "The painted animals are frozen mid-gallop. One of them winks at you. Probably."
@@ -322,9 +344,9 @@
           {
             "id": "ticket-bin",
             "prop": "barrel",
-            "x": 770,
+            "x": 615,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "ticket bin",
             "look": "Hundreds of torn tickets. Admit one, admit one, admit one…",
@@ -333,9 +355,9 @@
           {
             "id": "clown-poster-wall",
             "prop": "poster",
-            "x": 20,
-            "y": 220,
-            "w": 210,
+            "x": 815,
+            "y": 20,
+            "w": 170,
             "h": 160,
             "label": "clown poster",
             "look": "Mister Giggles, grinning, with a big red nose. Letters are scribbled across the bottom."
@@ -343,9 +365,9 @@
           {
             "id": "lamp-post",
             "prop": "lamp",
-            "x": 270,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "lamp post",
             "look": "A striped lamp post covered in stickers.",
@@ -354,9 +376,9 @@
           {
             "id": "costume-trunk",
             "prop": "chest",
-            "x": 520,
+            "x": 215,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "costume trunk",
             "look": "Floppy shoes, a curly wig and a polka-dot bow tie.",
@@ -365,9 +387,9 @@
           {
             "id": "tent-flap",
             "prop": "window",
-            "x": 770,
+            "x": 415,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "dark tent flap",
             "look": "Your torch lights up the inside of the tent flap. Painted there is a table of silly symbols: {key:juggling-code}",
@@ -378,14 +400,68 @@
           {
             "id": "joke-box",
             "prop": "box",
-            "x": 20,
-            "y": 420,
-            "w": 210,
+            "x": 615,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "joke box",
             "look": "A box of tricks. Inside: a squeaky red nose.",
             "gives": "squeaky-nose",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "popcorn-box",
+            "prop": "box",
+            "label": "popcorn box",
+            "look": "A symbol card stuck to the box: {key:clown-poster}",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "balloon-stand",
+            "prop": "statue",
+            "label": "balloon stand",
+            "look": "A symbol card tied to a balloon: {key:clown-poster}",
+            "minDifficulty": "normal",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "prize-wheel",
+            "prop": "machine",
+            "label": "prize wheel",
+            "look": "A symbol card taped to the wheel: {key:clown-poster}",
+            "minDifficulty": "hard",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "ringmaster-hat",
+            "prop": "box",
+            "label": "ringmaster's hat",
+            "look": "A symbol card inside the hat: {key:juggling-code}",
+            "minDifficulty": "hard",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "stilts",
+            "prop": "statue",
+            "label": "pair of stilts",
+            "look": "A symbol card on the stilts: {key:juggling-code}",
+            "minDifficulty": "hard",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160
           }
         ]
       }
@@ -499,9 +575,9 @@
         ]
       },
       "hints": [
+        "There's more than one number around the room. Only one of them turns this into a real word.",
         "Mister Giggles wrote how far to slide the letters somewhere dark.",
-        "Shine the torch into the dark corner, then slide every letter back that many places.",
-        "It says {answer}."
+        "Shine the torch into the dark corner, then slide every letter back that many places."
       ],
       "solvedText": "The note curls up and blows a raspberry. The mirrors stop wobbling for a moment."
     },
@@ -683,22 +759,32 @@
       "id": "clown-poster",
       "title": "The Clown Poster",
       "kind": "text",
-      "prompt": "Scribbled across the bottom of the clown poster, in Mister Giggles' back-to-front alphabet: {cipher}",
+      "prompt": "Scribbled across the bottom of the clown poster in silly symbols is something Mister Giggles loves: {cipher}",
       "generator": {
         "type": "cipher",
-        "cipher": "mirror",
+        "cipher": "symbols",
         "words": [
           "wacky",
           "bounce",
           "prank",
-          "confetti",
-          "noodle",
-          "bubbles"
+          "joker"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
-        "Fold the alphabet in half: the first letter swaps with the last.",
-        "A is Z, B is Y, C is X… Swap every letter.",
+        "There's more than one symbol card around the gate. Only one is Mister Giggles' real one.",
+        "Try each card: only one turns the symbols into something a clown would love.",
         "It says {answer}."
       ],
       "solvedText": "The poster's eyes roll and it honks. One of the gate's bars wiggles loose."
@@ -732,18 +818,30 @@
       "minDifficulty": "hard",
       "title": "The Juggling Code",
       "kind": "text",
-      "prompt": "A juggling pin hangs over the gate, painted with silly symbols: {cipher}",
+      "prompt": "A juggling pin hangs over the gate, painted with silly symbols, something from the big top: {cipher}",
       "generator": {
         "type": "cipher",
         "cipher": "symbols",
         "words": [
-          "juggler",
-          "acrobat",
-          "unicycle",
-          "trapeze"
+          "tumble",
+          "tamer",
+          "baton"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "The symbols need a key. It's painted somewhere dark.",
         "Shine the torch on the dark tent flap, then swap each symbol for its letter."
       ],

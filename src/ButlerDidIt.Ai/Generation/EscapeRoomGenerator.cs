@@ -329,6 +329,9 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
           numbers (A=1…Z=26) or mirror (A↔Z): no key needed; shift, symbols or morse: write "{key:<this puzzle's id>}" in a spot's "look"
           or an item's "inspect" where the group will find it (ideally a spot that needs a tool). {{{(r.ContentRating == ContentRating.Family ? "This is a family room: use numbers, mirror or shift with short words; symbols and morse only on a Hard-only puzzle." : "Symbols and morse make good Hard-only puzzles.")}}}
           Cipher words must not appear anywhere else in the room's text.
+          Optional decoy keys: write the same {key:<id>} in 2 or 3 places (give the extra spots "minDifficulty": "normal" or "hard");
+          each game makes one of them the real key and the others wrong ones. For symbols or morse, then add "decoyWords": real words
+          shaped like your "words" (same length) that a clue in the prompt rules out, e.g. the prompt says "a word every sailor fears".
         - "sequence": a number pattern shown where the prompt says {sequence}; the group types the next number. "kind": "code".
         - "deduction": a logic puzzle. "words" are 5 different things to line up; the prompt shows them with {items}; each clue piece
           is the pieceTemplate with {clue}. "kind": "code". The code is each thing's place, in the order listed.
