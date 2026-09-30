@@ -17,9 +17,60 @@
     "voice": { "accent": "en-GB", "pitch": 0.9, "rate": 0.95, "style": "gruff, jolly, salty" }
   },
   "stages": [
-    { "id": "stairs", "title": "The Spiral Stairs", "description": "Round and round the stairs go. A chest sits on the first landing.", "puzzles": ["echo-riddle", "stair-chest"] },
-    { "id": "study", "title": "The Keeper's Study", "description": "Old sea papers cover the walls and a lockbox sits on the desk.", "puzzles": ["lockbox", "map-riddle"] },
-    { "id": "lamp", "title": "The Lamp Room", "description": "The great lamp waits under a glass dome, and a password panel blinks beside it.", "puzzles": ["buoys", "lamp-panel"] }
+    {
+      "id": "stairs",
+      "title": "The Spiral Stairs",
+      "description": "Round and round the stairs go, past coils of rope, an old barrel, a fishing net and a dark alcove the moonlight doesn't reach.",
+      "puzzles": ["echo-riddle", "stair-search", "tide-note"],
+      "scene": {
+        "objects": [
+          { "id": "whispering-wall", "prop": "painting", "label": "whispering wall", "look": "Painted words, cracked with age. Your voice comes back to you when you speak." },
+          { "id": "rope-coil", "prop": "barrel", "label": "coil of rope", "look": "Salty rope, coiled tight. Tucked inside: a lantern's glass chimney.", "hidesPieces": true },
+          { "id": "old-barrel", "prop": "crate", "label": "old barrel", "look": "Empty, apart from a few pebbles and a crab shell.", "hidesPieces": true },
+          { "id": "fishing-net", "prop": "rug", "label": "fishing net", "look": "A tangle of net and seaweed. Nothing tangled in it but a cork float.", "hidesPieces": true },
+          { "id": "dark-alcove", "prop": "window", "label": "dark alcove", "look": "In the lantern light, chalk on the wall: 'Keeper's code: slide every letter back {key:tide-note}.'", "requires": "lantern", "lockedText": "Too dark to see anything in there." },
+          { "id": "stair-window", "prop": "window", "label": "round window", "look": "Rain streaks the glass. Far below, the waves crash on the rocks." }
+        ]
+      }
+    },
+    {
+      "id": "study",
+      "title": "The Keeper's Study",
+      "description": "Old sea papers cover the walls, a lockbox sits on the desk, and five bottles stand on a shelf by the study door.",
+      "puzzles": ["lockbox", "map-riddle", "bottle-shelf", "study-door"],
+      "scene": {
+        "objects": [
+          { "id": "keepers-desk", "prop": "desk", "label": "keeper's desk", "look": "Logbooks and a pot of ink. A lockbox with a 3-digit dial.", "hidesPieces": true },
+          { "id": "sea-papers", "prop": "poster", "label": "sea papers", "look": "Old papers about the coast, pinned up in a hurry.", "hidesPieces": true },
+          { "id": "armchair", "prop": "bed", "label": "armchair", "look": "A squashy armchair with a blanket. Down the side: a biscuit crumb.", "hidesPieces": true },
+          { "id": "coat-stand", "prop": "lamp", "label": "coat stand", "look": "A heavy oilskin coat, still dripping.", "hidesPieces": true },
+          { "id": "sea-chest", "prop": "chest", "label": "sea chest", "look": "Spare boots, spare socks and a spare hat.", "hidesPieces": true },
+          { "id": "bookcase", "prop": "bookshelf", "label": "bookcase", "look": "Books about knots, tides and the stars.", "hidesPieces": true },
+          { "id": "rug", "prop": "rug", "label": "rag rug", "look": "A rug made of old sails. Sand in every stitch.", "hidesPieces": true },
+          { "id": "stove", "prop": "machine", "label": "little stove", "look": "A kettle, still warm.", "hidesPieces": true },
+          { "id": "ship-in-bottle", "prop": "shelf", "label": "ship in a bottle", "look": "A tiny ship inside a bottle. How did it get in there?" }
+        ]
+      }
+    },
+    {
+      "id": "lamp",
+      "title": "The Lamp Room",
+      "description": "The great lamp waits under a glass dome. Buoys bob outside the windows, a panel of lights blinks by the door, and a foghorn sits on the rail.",
+      "puzzles": ["buoys", "tide-marks", "lamp-lights", "gull-signal", "lamp-panel"],
+      "scene": {
+        "objects": [
+          { "id": "great-lamp", "prop": "lamp", "label": "great lamp", "look": "A huge lamp with an empty space where its lens should be." },
+          { "id": "tool-box", "prop": "box", "label": "tool box", "look": "Spanners and oily rags.", "hidesPieces": true },
+          { "id": "rail", "prop": "pipe", "label": "iron rail", "look": "Cold and wet. A seagull has been sitting here.", "hidesPieces": true },
+          { "id": "logbook-stand", "prop": "table", "label": "logbook stand", "look": "The lamp's logbook: every night the lamp was lit, for forty years.", "hidesPieces": true },
+          { "id": "oil-drum", "prop": "barrel", "label": "oil drum", "look": "Lamp oil, sloshing and full.", "hidesPieces": true },
+          { "id": "signal-flags", "prop": "sign", "label": "signal flags", "look": "Flags in every colour, folded neatly.", "hidesPieces": true },
+          { "id": "clockwork", "prop": "machine", "label": "clockwork", "look": "Brass gears that turn the lamp.", "hidesPieces": true },
+          { "id": "foghorn", "prop": "statue", "label": "foghorn", "look": "In the lantern light, letters scratched inside the horn: {key:gull-signal}", "requires": "lantern", "lockedText": "Something is scratched inside the horn, but it's too dark to read.", "minDifficulty": "hard" },
+          { "id": "gull-nest", "prop": "plant", "label": "gull's nest", "look": "A messy nest. You take a feather, just in case.", "gives": "gull-feather", "minDifficulty": "hard" }
+        ]
+      }
+    }
   ],
   "puzzles": [
     {
@@ -29,18 +80,27 @@
       "prompt": "Painted on the wall: 'I speak without a mouth and hear without ears. What am I?'",
       "answers": ["echo", "an echo"],
       "hints": ["Shout up the stairs and listen.", "It repeats whatever you say."],
-      "rewards": ["chest-key"],
-      "solvedText": "The wall answers back: 'Echo… echo…' A little key drops from a crack."
+      "rewards": ["wick"],
+      "solvedText": "The wall answers back, and a little tin box drops from a crack. Inside: a lantern wick."
     },
     {
-      "id": "stair-chest",
-      "title": "The Landing Chest",
-      "kind": "use",
-      "prompt": "A sea chest with a small keyhole.",
-      "requires": ["chest-key"],
-      "hints": ["You found a small key.", "Use the small key on the chest."],
-      "rewards": ["oil-can"],
-      "solvedText": "Inside the chest: a can of lamp oil."
+      "id": "stair-search",
+      "title": "The Lantern's Glass",
+      "kind": "search",
+      "prompt": "The keeper hid his lantern's glass on the stairs. Search the coil of rope, the old barrel and the fishing net.",
+      "finds": ["rope-coil", "old-barrel", "fishing-net"],
+      "rewards": ["lantern-glass"],
+      "hints": ["Three things on the stairs each need a look.", "Look inside the rope, the barrel and the net."],
+      "solvedText": "There it is, tucked in the rope: the lantern's glass chimney, not even cracked."
+    },
+    {
+      "id": "tide-note",
+      "title": "The Keeper's Note",
+      "kind": "text",
+      "prompt": "A note pinned by the stairs, in the keeper's code: {cipher}",
+      "generator": { "type": "cipher", "cipher": "shift", "words": ["kelp", "walrus", "plankton", "mackerel", "cormorant", "herring"] },
+      "hints": ["The keeper wrote how far to slide the letters somewhere dark.", "Shine the lantern into the alcove, then slide every letter back that many places.", "It says {answer}."],
+      "solvedText": "That's the word! The door to the study clicks open."
     },
     {
       "id": "lockbox",
@@ -48,8 +108,8 @@
       "kind": "code",
       "prompt": "A lockbox with a 3-digit dial. Each of you remembers one fact from the keeper's logbook.",
       "hints": ["Each phone holds one digit as a fact.", "Put the digits in order: first, second, third."],
-      "rewards": ["lamp-lens"],
-      "solvedText": "The lockbox opens. Inside: a polished lamp lens.",
+      "rewards": ["locket"],
+      "solvedText": "The lockbox opens. Inside: a silver locket on a chain.",
       "generator": { "type": "digitFacts", "count": 3, "pieceTemplate": "The logbook says the {ordinal} digit is {fact}." }
     },
     {
@@ -62,28 +122,82 @@
       "solvedText": "The table drawer slides open with a click."
     },
     {
+      "id": "bottle-shelf",
+      "title": "The Bottle Shelf",
+      "kind": "code",
+      "prompt": "Five bottles stand in a row on the shelf: {items}. The shelf's lock wants each bottle's place, far left is 1, in the order listed.",
+      "generator": { "type": "deduction", "words": ["red bottle", "blue bottle", "green bottle", "gold bottle", "white bottle"], "pieceTemplate": "Scratched on the shelf: {clue}" },
+      "hints": ["Every phone has a clue about the bottles.", "Start with the bottle you're surest about.", "The code is {answer}."],
+      "solvedText": "The shelf swings back like a door. The keeper's secret cupboard!"
+    },
+    {
+      "id": "study-door",
+      "title": "The Study Door",
+      "kind": "use",
+      "prompt": "The door up to the lamp room has a tiny keyhole.",
+      "requires": ["study-key"],
+      "hints": ["Something small is hidden in something you're carrying.", "Look closely at the locket, then use the key on the door."],
+      "solvedText": "The tiny key turns. Up the last stairs to the lamp!"
+    },
+    {
       "id": "buoys",
       "title": "The Buoy Lights",
       "kind": "code",
       "prompt": "Through the window, buoys bob in the dark. The sign reads: '{order}!'",
       "hints": ["Each phone sees one buoy's colour and number.", "Read them in this order: {order}."],
-      "solvedText": "The buoys flash in answer, and the glass dome over the lamp lifts.",
+      "rewards": ["lamp-lens"],
+      "solvedText": "The buoys flash in answer, and a drawer under the window pops open. Inside: the lamp's lens.",
       "generator": { "type": "colorDigits", "count": 3, "colors": ["red", "green", "yellow", "blue", "white"], "pieceTemplate": "You spotted the {color} buoy. It flashes {digit} times." }
+    },
+    {
+      "id": "tide-marks",
+      "title": "The Tide Marks",
+      "kind": "code",
+      "prompt": "Tide marks are painted up the wall: {sequence}. The keypad wants the next one.",
+      "generator": { "type": "sequence" },
+      "hints": ["Look at how each number changes.", "The next number is {answer}."],
+      "solvedText": "The keypad beeps and the glass dome over the lamp lifts."
+    },
+    {
+      "id": "lamp-lights",
+      "title": "The Lamp Panel",
+      "kind": "switches",
+      "prompt": "A panel of lights by the door: each one flips itself and its neighbours. Turn them all on.",
+      "generator": { "type": "switches" },
+      "hints": ["Work from the top row down.", "Press {answer}."],
+      "solvedText": "Every light glows. The clockwork starts to tick."
+    },
+    {
+      "id": "gull-signal",
+      "minDifficulty": "hard",
+      "title": "The Gull Signal",
+      "kind": "text",
+      "prompt": "A lighthouse across the bay flashes long and short: {cipher}",
+      "generator": { "type": "cipher", "cipher": "morse", "words": ["gannet", "puffin", "osprey", "pelican"] },
+      "hints": ["The dots and dashes need a key, somewhere dark.", "Shine the lantern into the foghorn, then read the flashes letter by letter."],
+      "solvedText": "The far lighthouse flashes back: well done!"
     },
     {
       "id": "lamp-panel",
       "title": "The Lamp Password",
       "kind": "text",
-      "prompt": "The panel beside the lamp asks for the keeper's three favourite sea words, first to last. You also need oil and the lens.",
-      "requires": ["oil-can", "lamp-lens"],
+      "prompt": "The panel beside the lamp asks for the keeper's three favourite sea words, first to last. The lens has to be in first.",
+      "requires": ["lamp-lens"],
       "hints": ["Three phones each remember one sea word.", "Say them in order, first to last."],
-      "solvedText": "You fill the oil, fit the lens and say the words: {answer}! The lamp blazes into life.",
+      "solvedText": "You fit the lens and say the words: {answer}! The lamp blazes into life.",
       "generator": { "type": "wordSequence", "count": 3, "words": ["anchor", "wave", "gull", "tide", "sail", "shell", "harbour", "compass", "rope", "starfish"], "pieceTemplate": "The keeper hummed a shanty: the {ordinal} word was {word}." }
     }
   ],
   "items": [
-    { "id": "chest-key", "name": "Small key", "description": "It fell from a crack in the whispering wall." },
-    { "id": "oil-can", "name": "Lamp oil", "description": "A heavy can, sloshing and full." },
-    { "id": "lamp-lens", "name": "Lamp lens", "description": "Polished glass for the great lamp." }
+    { "id": "wick", "name": "Lantern wick", "description": "It fell from a crack in the whispering wall." },
+    { "id": "lantern-glass", "name": "Glass chimney", "description": "A lantern's glass, not even cracked." },
+    { "id": "lantern", "name": "Lantern", "description": "Wick and glass together, burning bright. It lights up dark corners." },
+    { "id": "locket", "name": "Silver locket", "description": "It rattles when you shake it.", "inspect": "You open the locket. Inside, instead of a picture: a tiny key!", "inspectGives": "study-key" },
+    { "id": "study-key", "name": "Tiny key", "description": "From inside the locket." },
+    { "id": "lamp-lens", "name": "Lamp lens", "description": "Polished glass for the great lamp." },
+    { "id": "gull-feather", "name": "Gull feather", "description": "A white feather. It fits nothing at all." }
+  ],
+  "recipes": [
+    { "items": ["wick", "lantern-glass"], "makes": "lantern", "text": "The wick slides into the glass and catches light. A lantern!" }
   ]
 }

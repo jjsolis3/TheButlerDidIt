@@ -75,6 +75,38 @@ public class EscapeScenePromptTests
         Assert.Contains("crate", prompt);
     }
 
+    [Fact]
+    public void On_hard_a_decoy_is_teased_and_hints_only_nudge()
+    {
+        var template = Lab.Value;
+        var s = EscapeEngine.NewGame(1, ai: new EscapeAiFeatures { GameMaster = true, Hints = true }, difficulty: EscapeDifficulty.Hard);
+        s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, Ada, "Ada", true, false));
+        s = EscapeEngine.Apply(s, template, new StartEscape(T0));
+        s = EscapeEngine.Apply(s, template, new ExamineSpot(T0, Ada, "plant"));
+        var cue = s.Cues[^1];
+        Assert.Equal(CueKind.Decoy, cue.Kind);
+        var line = EscapePrompts.Narration(template, s, cue, T0);
+        Assert.Contains("MOMENT: Decoy", line);
+        Assert.Contains("plant", line);
+
+        var hint = EscapePrompts.Hint(template, s, "formula", 0, T0);
+        Assert.Contains("a coded word", hint);
+        Assert.Contains("\"cipherKeyFound\":false", hint);
+        Assert.Contains("They chose Hard: only nudge.", hint);
+    }
+
+    [Fact]
+    public void On_normal_a_decoy_is_just_a_search()
+    {
+        var template = Lab.Value;
+        var s = EscapeEngine.NewGame(1, ai: new EscapeAiFeatures { GameMaster = true, Hints = true });
+        s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, Ada, "Ada", true, false));
+        s = EscapeEngine.Apply(s, template, new StartEscape(T0));
+        s = EscapeEngine.Apply(s, template, new ExamineSpot(T0, Ada, "plant"));
+        Assert.DoesNotContain(s.Cues, c => c.Kind == CueKind.Decoy);
+        Assert.DoesNotContain("only nudge", EscapePrompts.Hint(template, s, "formula", 0, T0));
+    }
+
     private static EscapeCommand Move(EscapeState s, EscapeRoom room, EscapeStage stage, DateTimeOffset now)
     {
         if (stage.Scene?.Objects.FirstOrDefault(o => !s.Examined.Contains(o.Id) && (o.Requires is null || s.Inventory.Contains(o.Requires))) is { } spot)
@@ -106,45 +138,123 @@ public class EscapeScenePromptTests
     }
 }
 
-/// <summary>Until the AI is taught the newer puzzles (#86), a room it writes keeps to the kinds it knows.</summary>
+/// <summary>The shape an AI-written room must have (#86): every newer kind of puzzle, in scenes the server lays out.</summary>
 public class EscapeGeneratorShapeTests
 {
     private static readonly EscapeRoomRequest Request = new("a haunted lighthouse", ContentRating.Family, 30);
 
-    private static EscapeRoom FakeRoom(Action<JsonObject> change)
+    private static EscapeRoom FakeRoom(Action<JsonObject>? change = null)
     {
         var json = new StreamReader(typeof(EscapeRoomGenerator).Assembly.GetManifestResourceStream("ButlerDidIt.Ai.Fake.FakeEscapeRoom.json")!).ReadToEnd();
         var node = JsonNode.Parse(json)!.AsObject();
-        change(node);
+        change?.Invoke(node);
         return GameJson.Deserialize<EscapeRoom>(node.ToJsonString());
     }
 
+    private static JsonObject Puzzle(JsonObject room, string id) => room["puzzles"]!.AsArray().Single(p => p!["id"]!.GetValue<string>() == id)!.AsObject();
+
     [Fact]
-    public void Scenes_recipes_and_closer_looks_are_stripped_from_an_ai_room()
+    public void The_fake_room_has_the_whole_shape()
     {
-        var room = EscapeRoomGenerator.Normalize(FakeRoom(n =>
-        {
-            n["stages"]![0]!["scene"] = JsonNode.Parse("""{"objects":[{"id":"rug","prop":"rug","label":"rug","look":"Dust."}]}""");
-            n["recipes"] = JsonNode.Parse("""[{"items":["a","b"],"makes":"c"}]""");
-            n["items"]![0]!["inspect"] = "Tiny writing.";
-            n["puzzles"]![0]!["minDifficulty"] = "hard";
-        }), Request);
-        Assert.All(room.Stages, s => Assert.Null(s.Scene));
-        Assert.Empty(room.Recipes);
-        Assert.All(room.Items, i => Assert.Null(i.Inspect));
-        Assert.All(room.Puzzles, p => Assert.Null(p.MinDifficulty));
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(), Request);
+        Assert.Empty(EscapeRoomGenerator.ShapeErrors(room));
+        Assert.Empty(EscapeRoomValidator.Validate(room));
     }
 
     [Fact]
-    public void Newer_puzzle_kinds_and_generators_are_refused_with_a_reason_the_model_can_act_on()
+    public void Scenes_recipes_closer_looks_and_hard_parts_are_kept_but_positions_and_built_parts_are_the_servers()
     {
-        var room = FakeRoom(n =>
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(n =>
         {
-            n["puzzles"]![0]!["kind"] = "switches";
-            n["puzzles"]![1]!["generator"] = JsonNode.Parse("""{"type":"cipher","cipher":"shift","words":["echo"]}""");
-        });
+            // Positions the model made up (overlapping), and parts only a build or a hand-written room has.
+            foreach (var spot in n["stages"]![0]!["scene"]!["objects"]!.AsArray()) { spot!["x"] = 5; spot["y"] = 5; spot["w"] = 900; spot["h"] = 500; }
+            n["lengths"] = new JsonArray(30, 45);
+            Puzzle(n, "lamp-lights")["grid"] = JsonNode.Parse("""{"size":3,"lit":[0]}""");
+            Puzzle(n, "tide-note")["keyAt"] = new JsonArray("object:nowhere");
+            Puzzle(n, "tide-note")["minMinutes"] = 45;
+        }), Request);
+
+        Assert.All(room.Stages, s => Assert.NotNull(s.Scene));
+        Assert.NotEmpty(room.Recipes);
+        Assert.Contains(room.Items, i => i.Inspect is not null);
+        Assert.Contains(room.Puzzles, p => p.MinDifficulty == EscapeDifficulty.Hard);
+        Assert.Contains(room.SceneObjects, o => o.MinDifficulty == EscapeDifficulty.Hard);
+        Assert.Empty(room.Lengths);
+        Assert.All(room.Puzzles, p => { Assert.Null(p.Grid); Assert.Empty(p.KeyAt); Assert.Null(p.MinMinutes); });
+        // Laid out on a grid: inside the canvas, and no two spots overlap.
+        foreach (var spots in room.Stages.Select(s => s.Scene!.Objects))
+        {
+            Assert.All(spots, o => Assert.True(o.X >= 0 && o.Y >= 0 && o.X + o.W <= 1000 && o.Y + o.H <= 600, $"{o.Id} is on the canvas"));
+            for (var i = 0; i < spots.Count; i++)
+                for (var j = i + 1; j < spots.Count; j++)
+                    Assert.True(spots[i].X + spots[i].W <= spots[j].X || spots[j].X + spots[j].W <= spots[i].X || spots[i].Y + spots[i].H <= spots[j].Y || spots[j].Y + spots[j].H <= spots[i].Y);
+        }
+    }
+
+    [Fact]
+    public void Missing_variety_is_refused_with_a_reason_the_model_can_act_on()
+    {
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(n =>
+        {
+            n["stages"]![0]!.AsObject().Remove("scene");
+            foreach (var id in new[] { "tide-note", "gull-signal" }) Puzzle(n, id).Remove("generator");
+            Puzzle(n, "bottle-shelf")["generator"] = JsonNode.Parse("""{"type":"digitFacts","count":3}""");
+            Puzzle(n, "lamp-lights")["kind"] = "code";
+            Puzzle(n, "lamp-lights")["generator"] = JsonNode.Parse("""{"type":"sequence"}""");
+        }), Request);
         var errors = EscapeRoomGenerator.ShapeErrors(room);
-        Assert.Contains(errors, e => e.Contains("\"switches\"") && e.Contains("use code, text or use"));
-        Assert.Contains(errors, e => e.Contains("cipher generator"));
+        Assert.Contains(errors, e => e.Contains("Stage 'stairs' needs a \"scene\""));
+        Assert.Contains(errors, e => e.Contains("\"cipher\" generator"));
+        Assert.Contains(errors, e => e.Contains("logic puzzle"));
+    }
+
+    [Fact]
+    public void Too_few_puzzles_for_the_clock_are_refused()
+    {
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(), Request with { Minutes = 60 });
+        Assert.Empty(EscapeRoomGenerator.ShapeErrors(room)); // 11 on Normal: just enough for 60 minutes
+        var shorter = EscapeRoomGenerator.Normalize(FakeRoom(n =>
+        {
+            // Two puzzles fewer: 9 on Normal.
+            n["stages"]![2]!["puzzles"] = new JsonArray("buoys", "gull-signal", "lamp-panel");
+            foreach (var id in new[] { "tide-marks", "lamp-lights" })
+                n["puzzles"]!.AsArray().Remove(n["puzzles"]!.AsArray().Single(p => p!["id"]!.GetValue<string>() == id));
+        }), Request with { Minutes = 60 });
+        Assert.Contains(EscapeRoomGenerator.ShapeErrors(shorter), e => e.Contains("60-minute room needs 11"));
+    }
+
+    [Fact]
+    public void One_tap_steps_must_be_few_and_need_something_found()
+    {
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(n =>
+        {
+            // The lamp panel becomes a one-tap step opened with a puzzle's reward: not something found.
+            var panel = Puzzle(n, "lamp-panel");
+            panel.Remove("generator");
+            panel["kind"] = "use";
+        }), Request);
+        Assert.Contains(EscapeRoomGenerator.ShapeErrors(room), e => e.Contains("'lamp-panel' is a \"use\" step"));
+    }
+
+    [Fact]
+    public void Family_rooms_keep_symbols_and_morse_for_hard()
+    {
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(n => Puzzle(n, "gull-signal").Remove("minDifficulty")), Request);
+        Assert.Contains(EscapeRoomGenerator.ShapeErrors(room), e => e.Contains("'gull-signal'") && e.Contains("Hard only"));
+        var mature = EscapeRoomGenerator.Normalize(FakeRoom(n => Puzzle(n, "gull-signal").Remove("minDifficulty")), Request with { ContentRating = ContentRating.Mature });
+        Assert.DoesNotContain(EscapeRoomGenerator.ShapeErrors(mature), e => e.Contains("'gull-signal'"));
+    }
+
+    [Fact]
+    public void Answers_already_on_screen_are_refused()
+    {
+        var room = EscapeRoomGenerator.Normalize(FakeRoom(n =>
+        {
+            n["intro"] = n["intro"]!.GetValue<string>() + " Beware the walrus!";
+            n["stages"]![1]!["scene"]!["objects"]![0]!["label"] = "map";
+        }), Request);
+        var errors = EscapeRoomGenerator.ShapeErrors(room);
+        Assert.Contains(errors, e => e.Contains("'tide-note'") && e.Contains("\"walrus\""));
+        Assert.Contains(errors, e => e.Contains("'map-riddle'") && e.Contains("\"map\""));
     }
 }

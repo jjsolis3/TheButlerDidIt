@@ -9,7 +9,8 @@ namespace ButlerDidIt.Ai.Tests;
 public class EscapeRoomGeneratorTests
 {
     private static readonly EscapeRoomRequest Request = new("a haunted lighthouse", ContentRating.Family, 30);
-    private const string SolvedBoth = """{"answers":{"1":"echo","2":"a map"}}""";
+    // The two riddles, then the logic puzzle's code as the solver's fixed seed builds it.
+    private const string SolvedAll = """{"answers":{"1":"echo","2":"a map","3":"1423"}}""";
 
     private static string FakeRoom() =>
         new StreamReader(typeof(EscapeRoomGenerator).Assembly.GetManifestResourceStream("ButlerDidIt.Ai.Fake.FakeEscapeRoom.json")!).ReadToEnd();
@@ -40,9 +41,15 @@ public class EscapeRoomGeneratorTests
         Assert.Equal(90, room.HintPenaltySeconds);
         Assert.Equal("ai", room.Theme);
         Assert.Equal("Keeper Barnacle", room.GameMaster?.Name);
-        // Puzzle ids reach the browsers, so the model's own names ("echo-riddle") are replaced.
-        Assert.Equal(["puzzle-1", "puzzle-2"], room.Stages[0].Puzzles);
-        Assert.All(room.Puzzles, p => Assert.Matches(@"^puzzle-\d$", p.Id));
+        // Puzzle and spot ids reach the browsers, so the model's own names ("echo-riddle", "dark-alcove") are replaced,
+        // and so is the puzzle id in "{key:…}", where a cipher's key is written.
+        Assert.Equal(["puzzle-1", "puzzle-2", "puzzle-3"], room.Stages[0].Puzzles);
+        Assert.All(room.Puzzles, p => Assert.Matches(@"^puzzle-\d+$", p.Id));
+        Assert.All(room.SceneObjects, o => Assert.Matches(@"^spot-\d+$", o.Id));
+        Assert.Equal(["spot-2", "spot-3", "spot-4"], room.FindPuzzle("puzzle-2")!.Finds);
+        Assert.Contains("{key:puzzle-3}", room.SceneObjects.Single(o => o.Label == "dark alcove").Look);
+        // Every stage is a scene, laid out by the server.
+        Assert.All(room.Stages, s => Assert.Equal("sea", s.Scene!.Backdrop));
         Assert.Contains(ai.Usage, u => u.Context.Purpose == "escape-room-solve");
     }
 
@@ -57,7 +64,7 @@ public class EscapeRoomGeneratorTests
             n["maxPlayers"] = 50;
             n["puzzles"]![0]!["variants"] = JsonNode.Parse("""[{}, {"answers": ["other"]}]""");
         });
-        var ai = new TestAi { Client = new ScriptedChatClient(mature, SolvedBoth) };
+        var ai = new TestAi { Client = new ScriptedChatClient(mature, SolvedAll) };
         var room = (await new EscapeRoomGenerator(ai.Gateway()).GenerateAsync(new("a spaceship", ContentRating.Family, 60), TestAi.Context, null, CancellationToken.None)).Room;
 
         Assert.Equal(ContentRating.Family, room.ContentRating);
@@ -71,7 +78,7 @@ public class EscapeRoomGeneratorTests
     public async Task Validation_errors_are_sent_back_and_fixed()
     {
         var broken = Edit(n => n["puzzles"]![1]!["requires"] = new JsonArray("no-such-key"));
-        var client = new ScriptedChatClient(broken, FakeRoom(), SolvedBoth);
+        var client = new ScriptedChatClient(broken, FakeRoom(), SolvedAll);
         var result = await Generate(new TestAi { Client = client });
 
         Assert.Empty(EscapeRoomValidator.Validate(result.Room));
@@ -86,11 +93,11 @@ public class EscapeRoomGeneratorTests
     {
         var madeUpCode = Edit(n =>
         {
-            var lockbox = n["puzzles"]![2]!.AsObject();
+            var lockbox = n["puzzles"]!.AsArray().Single(p => p!["id"]!.GetValue<string>() == "lockbox")!.AsObject();
             lockbox.Remove("generator");
             lockbox["answers"] = new JsonArray("123");
         });
-        var client = new ScriptedChatClient(madeUpCode, FakeRoom(), SolvedBoth);
+        var client = new ScriptedChatClient(madeUpCode, FakeRoom(), SolvedAll);
         await Generate(new TestAi { Client = client });
 
         Assert.Contains("codes must use", client.Calls[1].Last().Text);
@@ -132,7 +139,7 @@ public class EscapeRoomGeneratorTests
     [Fact]
     public void The_tester_sees_riddles_and_their_pieces_but_never_answers_or_hints()
     {
-        var room = GameJson.Deserialize<EscapeRoom>(Edit(n => n["puzzles"]![3]!["pieces"] = new JsonArray("The paper has a blue edge.")));
+        var room = GameJson.Deserialize<EscapeRoom>(Edit(n => n["puzzles"]!.AsArray().Single(p => p!["id"]!.GetValue<string>() == "map-riddle")!["pieces"] = new JsonArray("The paper has a blue edge.")));
         var prompt = EscapeRoomSolver.Prompt(room);
 
         Assert.StartsWith($"TASK: {EscapeRoomGenerator.SolveTask}", prompt);
@@ -144,7 +151,25 @@ public class EscapeRoomGeneratorTests
             Assert.All(riddle.Answers, a => Assert.DoesNotContain(a, prompt, StringComparison.OrdinalIgnoreCase));
             Assert.All(riddle.Hints, h => Assert.DoesNotContain(h, prompt));
         }
-        // Codes and passwords come from generators and aren't the tester's job.
-        Assert.DoesNotContain("lockbox", prompt);
+        // What the riddle's part of the room shows is there: a scene riddle's clue can be on a spot.
+        Assert.Contains("Searching the whispering wall shows: Painted words", prompt);
+        // The logic puzzle is there, with its line-up and clues as one game builds them; its code isn't.
+        Assert.Contains("## Logic puzzle 3: The Bottle Shelf", prompt);
+        Assert.Contains("Scratched on the shelf:", prompt);
+        // Codes, passwords and ciphers come from generators and aren't the tester's job.
+        Assert.DoesNotContain("Each of you remembers one fact", prompt);
+        Assert.DoesNotContain("The Keeper's Note", prompt);
+    }
+
+    [Fact]
+    public async Task A_logic_puzzle_the_tester_cant_crack_asks_for_plainer_clues()
+    {
+        var wrongCode = """{"answers":{"1":"echo","2":"map","3":"9999"}}""";
+        var client = new ScriptedChatClient(FakeRoom(), wrongCode, FakeRoom(), SolvedAll);
+        var result = await Generate(new TestAi { Client = client });
+
+        Assert.Contains("logic puzzle 'bottle-shelf'", client.Calls[2].Last().Text);
+        Assert.Contains("pieceTemplate", client.Calls[2].Last().Text);
+        Assert.Empty(result.Warnings);
     }
 }

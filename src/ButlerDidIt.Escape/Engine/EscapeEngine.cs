@@ -259,6 +259,7 @@ public static class EscapeEngine
                 s.Deadline = s.Deadline!.Value.AddSeconds(-DecoyPenaltySeconds);
                 Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label}. Nothing there (−{FormatPenalty(DecoyPenaltySeconds)}).");
                 if (s.Deadline <= c.Now) { End(s, EscapePhase.Failed, c.Now, "⏰ That search cost the last of your time."); return; }
+                Cue(s, CueKind.Decoy, c.Now, by: player.Name, thing: spot.Label);
             }
             else
             {
