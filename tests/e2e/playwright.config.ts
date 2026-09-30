@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+import { fileURLToPath } from 'node:url'
 
 // End-to-end tests drive real browsers against the real app: the built React
 // front end served by ASP.NET Core, talking to PostgreSQL.
@@ -55,6 +56,8 @@ export default defineConfig({
       RateLimits__RegisterPerHour: '500',
       // Escape rooms shuffle their codes for every game; this lets the test ask the server for them.
       Escape__ExposeAnswersForTests: 'true',
+      // …and puts the test-only Laboratory (every kind of puzzle) on the shelf, for escape-harder.spec.ts.
+      Escape__TestRoomsRoot: fileURLToPath(new URL('../ButlerDidIt.Escape.Tests/Fixtures', import.meta.url)),
       // Keep this run's generated files out of the developer's own media folder.
       Media__Root: process.env.E2E_MEDIA_ROOT ?? `${process.env.TMPDIR ?? '/tmp'}/butler-e2e-media-${Date.now()}`,
     },

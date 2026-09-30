@@ -46,6 +46,7 @@ export function ItemInspector({ items, invoke }: { items: EscapeItemView[]; invo
                 setError(null)
               }}
               aria-expanded={openId === i.id}
+              aria-label={`${i.name}${i.inspectable ? ', more to see' : ''}`}
               draggable
               onDragStart={() => setDragging(i.id)}
               onDragEnd={() => setDragging(null)}
@@ -55,7 +56,7 @@ export function ItemInspector({ items, invoke }: { items: EscapeItemView[]; invo
               data-testid={`item-${i.id}`}
             >
               🎒 {i.name}
-              {i.inspectable && <span aria-label=", more to see"> 🔍</span>}
+              {i.inspectable && <span aria-hidden> 🔍</span>}
             </button>
           </li>
         ))}
