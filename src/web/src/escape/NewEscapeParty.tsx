@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Button, ErrorText, FilterChip, inputClass } from '../components/ui'
 import { api } from '../lib/api'
-import type { AiStatus, ContentRating, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
+import type { AiStatus, ContentRating, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
 import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { formatDuration } from './time'
 
@@ -19,6 +19,7 @@ export function NewEscapeParty() {
   const [spookySeason] = useState(() => new Date().getMonth() === 9) // October; read once, not on every render
   // The game's length. Only kept while the chosen room offers it (worked out during render below).
   const [chosenMinutes, setChosenMinutes] = useState<number>()
+  const [difficulty, setDifficulty] = useState<EscapeDifficulty>('normal')
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
   // Fresh puzzles every time by default; today's challenge races every other group; a puzzle set
   // number (shown at the end of every game) replays exactly the same puzzles.
@@ -74,7 +75,7 @@ export function NewEscapeParty() {
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi, minutes ?? null)
+      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi, minutes ?? null, difficulty)
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -162,6 +163,27 @@ export function NewEscapeParty() {
               ))}
             </div>
             <p className="text-xs text-muted">Each length has its own leaderboard.</p>
+          </div>
+        )}
+        {room && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">How hard?</h3>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {(
+                [
+                  ['easy', '🙂 Easy', 'Fewer clues to gather, and hints cost half the time.'],
+                  ['normal', '😐 Normal', 'The room as it was written.'],
+                  ['hard', '😈 Hard', 'More clues, tougher codes, hints that only nudge, and empty hiding places cost time.'],
+                ] as const
+              ).map(([value, label, text]) => (
+                <label key={value} className={`cursor-pointer rounded-xl border p-3 ${difficulty === value ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}>
+                  <input type="radio" name="escape-difficulty" className="sr-only" checked={difficulty === value} onChange={() => setDifficulty(value)} />
+                  <span className="font-semibold">{label}</span>
+                  <span className="mt-1 block text-xs text-muted">{text}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-muted">Each difficulty has its own leaderboard too.</p>
           </div>
         )}
       </section>

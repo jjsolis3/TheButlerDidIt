@@ -127,6 +127,18 @@ There are two ways to make a puzzle vary:
 
 The validator builds a templated room from 200 puzzle sets and checks each one, including that it can be escaped. The tests check 1,000 more, and prove every generator fair over 1,000 seeds: each cipher decodes with its key as written, each pattern follows its rule, each logic puzzle has exactly one answer, and each light panel can be solved.
 
+## How it plays
+
+What players see and tap for each of the newer pieces:
+- **A scene** is the stage's picture on the TV and on every phone, with each spot drawn from its `prop` over the stage's painted art (or a backdrop for `backdrop`). On a phone, tapping a spot searches it, and the phone says what was there. A spot that needs a tool shows the room's `lockedText`, and a decoy on Hard shows the 10-second penalty. Phones can zoom the picture 2× or 3×. The TV lists what has been found under the picture.
+- **Items** are buttons in "The group is carrying". Tap one to read it, **Look closer** (when there's more to see), or try it with each of the other items. Dragging one item onto another does the same.
+- **The notebook** shows on the TV and the phones, newest first.
+- **Search** puzzles show how many of their spots have been searched. **Light panels** are a grid of buttons on the phones, and the TV shows the lights as they are.
+- **Ciphers** get a decoder on the phones once their key has been found: a letter wheel for `shift` (turn it by the number the group found), a key card for `symbols` and `morse`, and an alphabet strip for `mirror` and `numbers`. The shift amount itself is never sent: finding it is the puzzle.
+- **Logic puzzles** get a grid to mark ✓ and ✗, and a line-up that turns an order into the code. Both are a scratch pad on that phone only.
+- **Number patterns** show their terms large above the keypad.
+- **Hidden clue pieces:** the TV counts the ones still hidden, and a found piece says where it was found.
+
 ## Difficulty
 
 A host picks **Easy, Normal or Hard**, and each has its own leaderboard. **Normal plays the room exactly as written.**

@@ -78,6 +78,17 @@ public static class PuzzleGenerators
         }
     }
 
+    /// <summary>
+    /// A symbols or Morse key as (code, letter) pairs, read back from the key as written, for the phone's key card.
+    /// Other ciphers have no table: the shift amount is the puzzle, and numbers and mirror need none.
+    /// </summary>
+    public static List<(string Code, string Letter)> KeyTable(CipherType type, string key) => type switch
+    {
+        CipherType.Symbols => key.Split(KeySeparator).Select(e => e.Split(" = ")).Select(e => (e[0], e[1])).ToList(),
+        CipherType.Morse => key.Split(KeySeparator).Select(e => e.Split(" = ")).Select(e => (e[1], e[0])).ToList(),
+        _ => [],
+    };
+
     /// <summary>The letters of the word plus two it doesn't use, shuffled, so the table doesn't simply spell the answer.</summary>
     private static List<char> KeyLetters(string word, SeededRandom rng)
     {

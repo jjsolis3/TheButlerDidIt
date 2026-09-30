@@ -79,6 +79,7 @@ public static class EscapeEngine
             case SkipCues c: foreach (var cue in s.Cues.Where(x => x.Id < c.BeforeCueId && x.Text is null)) cue.Skipped = true; break;
             default: throw new GameRuleException($"Unknown command {command.GetType().Name}.");
         }
+        NoteKeys(s, room);
         s.Version++;
         return s;
     }
@@ -345,6 +346,35 @@ public static class EscapeEngine
         s.Switches[puzzle.Id] = lit;
         if (lit.Count == grid.Size * grid.Size) Solve(s, room, puzzle, player.Name, c.Now);
     }
+
+    /// <summary>
+    /// Records every cipher key the group can now read: on a spot it has searched, an item it holds or has
+    /// looked at, or a puzzle in front of it or behind it (the validator's rule). Once found, a key stays found.
+    /// </summary>
+    private static void NoteKeys(EscapeState s, EscapeRoom room)
+    {
+        if (s.Phase == EscapePhase.Lobby) return;
+        foreach (var p in room.Puzzles.Where(p => p.Decoder is not null && p.KeyAt.Count > 0 && !s.KeysFound.Contains(p.Id)))
+        {
+            if (p.KeyAt.Any(place => Seen(s, room, place))) s.KeysFound.Add(p.Id);
+        }
+    }
+
+    private static bool Seen(EscapeState s, EscapeRoom room, string place)
+    {
+        var split = place.IndexOf(':');
+        var (kind, id) = (place[..split], place[(split + 1)..]);
+        return kind switch
+        {
+            "object" => s.Examined.Contains(id),
+            "item" => s.Inventory.Contains(id),
+            "inspect" => s.Inspected.Contains(id),
+            _ => room.Stages.FindIndex(st => st.Puzzles.Contains(id)) is var at and >= 0 && at <= s.StageIndex,
+        };
+    }
+
+    /// <summary>True once the group can read this cipher's key (or it needs none).</summary>
+    public static bool KeyFound(EscapeState s, EscapePuzzle puzzle) => puzzle.KeyAt.Count == 0 || s.KeysFound.Contains(puzzle.Id);
 
     /// <summary>The lights on in a Switches puzzle right now.</summary>
     public static IReadOnlyList<int> LitNow(EscapeState s, EscapePuzzle puzzle) =>

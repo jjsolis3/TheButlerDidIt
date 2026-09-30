@@ -1,4 +1,5 @@
 import type {
+  EscapeDifficulty,
   AiProviderKind,
   AiRole,
   AiStatus,
@@ -92,12 +93,19 @@ export const api = {
   generateEscapeRoom: (theme: string, contentRating: ContentRating, minutes: number) =>
     request<GenerationJob>('POST', '/api/escape-rooms/generate', { theme, contentRating, minutes }),
   deleteEscapeRoom: (id: string) => request<void>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}`),
-  createEscapeParty: (roomId: string, mode: PartyMode, puzzles: PuzzleChoice, puzzleSet: number | null, useAi: boolean, minutes: number | null) =>
-    request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi, minutes }),
-  leaderboard: (roomId: string, daily: boolean, minutes: number, party?: string) =>
+  createEscapeParty: (
+    roomId: string,
+    mode: PartyMode,
+    puzzles: PuzzleChoice,
+    puzzleSet: number | null,
+    useAi: boolean,
+    minutes: number | null,
+    difficulty: EscapeDifficulty = 'normal',
+  ) => request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi, minutes, difficulty }),
+  leaderboard: (roomId: string, daily: boolean, minutes: number, party?: string, difficulty: EscapeDifficulty = 'normal') =>
     request<Leaderboard>(
       'GET',
-      `/api/escape-rooms/${encodeURIComponent(roomId)}/leaderboard?daily=${daily}&minutes=${minutes}${party ? `&party=${encodeURIComponent(party)}` : ''}`,
+      `/api/escape-rooms/${encodeURIComponent(roomId)}/leaderboard?daily=${daily}&minutes=${minutes}&difficulty=${difficulty}${party ? `&party=${encodeURIComponent(party)}` : ''}`,
     ),
 
   myParties: () => request<PartyInfo[]>('GET', '/api/parties'),

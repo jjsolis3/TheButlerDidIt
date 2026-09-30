@@ -3,13 +3,18 @@ import { Button, ErrorText, StatusPill, inputClass } from '../components/ui'
 import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
+import { ItemInspector } from './ItemInspector'
+import { Notebook } from './Notebook'
+import { CipherTool, DeductionHelper, SequenceTerms, SwitchGrid } from './PuzzleWidgets'
+import { SceneView } from './SceneView'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
 /**
- * A player's phone in an escape room: their own clue pieces (nobody else sees them), the
- * puzzles in front of the group with an answer pad for each, and what the group is carrying.
+ * A player's phone in an escape room: their own clue pieces (nobody else sees them), the part of the
+ * room to search, the puzzles in front of the group with the right controls for each, what the group
+ * is carrying (to look at closely or put together), and the group's notebook.
  */
 export function EscapePhone({ code, token, onLeave }: { code: string; token: string; onLeave: () => void }) {
   const [removed, setRemoved] = useState(false)
@@ -62,7 +67,10 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
               <ul className="mt-2 space-y-2">
                 {player.pieces.map((p) => (
                   <li key={p.puzzleId + p.text} className="rounded-xl border border-accent/70 bg-accent/5 p-3 text-sm" data-testid="my-clue">
-                    <span className="text-xs text-accent">🧩 {p.puzzleTitle}</span>
+                    <span className="text-xs text-accent">
+                      🧩 {p.puzzleTitle}
+                      {p.foundIn && <span className="text-muted"> · found in the {p.foundIn}</span>}
+                    </span>
                     <p className="mt-1 text-ink">{p.text}</p>
                   </li>
                 ))}
@@ -70,25 +78,17 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
             )}
           </section>
 
+          {stage.scene && <SceneView scene={stage.scene} artUrl={stage.artUrl} feed={stage.feed} onExamine={(id) => invoke('EscapeExamine', id)} />}
+
           <section className="space-y-3">
             <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">In front of you</h2>
             {stage.puzzles.map((p) => (
-              <PuzzleCard key={p.id} puzzle={p} penalty={stage.hintPenaltySeconds} gameMaster={stage.gameMaster?.name ?? null} invoke={invoke} />
+              <PuzzleCard key={p.id} code={code} puzzle={p} penalty={stage.hintPenaltySeconds} gameMaster={stage.gameMaster?.name ?? null} invoke={invoke} />
             ))}
           </section>
 
-          {stage.inventory.length > 0 && (
-            <section>
-              <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">The group is carrying</h2>
-              <ul className="mt-2 flex flex-wrap gap-2 text-sm">
-                {stage.inventory.map((i) => (
-                  <li key={i.id} className="rounded-full border border-line bg-surface px-3 py-1" title={i.description}>
-                    🎒 {i.name}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <ItemInspector items={stage.inventory} invoke={invoke} />
+          <Notebook notes={stage.notebook} />
         </>
       )}
 
@@ -109,7 +109,7 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
   )
 }
 
-function PuzzleCard({ puzzle: p, penalty, gameMaster, invoke }: { puzzle: EscapePuzzleView; penalty: number; gameMaster: string | null; invoke: Invoke }) {
+function PuzzleCard({ code, puzzle: p, penalty, gameMaster, invoke }: { code: string; puzzle: EscapePuzzleView; penalty: number; gameMaster: string | null; invoke: Invoke }) {
   const [answer, setAnswer] = useState('')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<string | null>(null)
@@ -154,6 +154,11 @@ function PuzzleCard({ puzzle: p, penalty, gameMaster, invoke }: { puzzle: Escape
         {p.title}
       </p>
       <p className="mt-1 text-sm text-ink/90">{p.prompt}</p>
+      {!p.solved && p.piecesHidden > 0 && (
+        <p className="mt-1 text-xs text-accent">
+          🧩 {p.piecesHidden} clue piece{p.piecesHidden === 1 ? '' : 's'} still hidden in the room
+        </p>
+      )}
       {p.solved ? (
         <p className="mt-2 text-sm text-green-300">{p.solvedText}</p>
       ) : p.needs.length > 0 ? (
@@ -162,7 +167,17 @@ function PuzzleCard({ puzzle: p, penalty, gameMaster, invoke }: { puzzle: Escape
         <Button className="mt-3 w-full" disabled={busy} onClick={use}>
           Use it
         </Button>
+      ) : p.kind === 'search' ? (
+        <p className="mt-2 text-sm text-muted">
+          🔎 Search the room: {p.finds?.found ?? 0} of {p.finds?.total ?? 0} found
+        </p>
+      ) : p.kind === 'switches' ? (
+        <SwitchGrid puzzle={p} invoke={invoke} />
       ) : (
+        <>
+        {p.kind === 'code' && <SequenceTerms prompt={p.prompt} />}
+        {p.cipher && <CipherTool cipher={p.cipher} prompt={p.prompt} />}
+        {p.deduction && <DeductionHelper puzzle={p} scratchKey={`escape:${code}:${p.id}`} onUseCode={setAnswer} />}
         <form
           className="mt-3 flex gap-2"
           onSubmit={(e) => {
@@ -184,6 +199,7 @@ function PuzzleCard({ puzzle: p, penalty, gameMaster, invoke }: { puzzle: Escape
             Try
           </Button>
         </form>
+        </>
       )}
       {!p.solved &&
         p.hints.map((h, i) => (

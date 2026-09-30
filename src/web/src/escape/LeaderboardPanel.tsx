@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
-import type { Leaderboard, LeaderboardEntry } from '../lib/types'
+import type { EscapeDifficulty, Leaderboard, LeaderboardEntry } from '../lib/types'
 import { formatDuration } from './time'
 
 /**
  * The end-of-game leaderboard: where this group ranked and the room's best escapes, all time
  * or today's challenge, at this game's length (a 30-minute game plays fewer puzzles, so it has
- * its own board). Times are public; names only appear on the host's own escapes.
+ * its own board, and so does each difficulty). Times are public; names only appear on the host's own escapes.
  */
-export function LeaderboardPanel({ roomId, code, daily, minutes }: { roomId: string; code: string; daily: boolean; minutes: number }) {
+export function LeaderboardPanel({ roomId, code, daily, minutes, difficulty }: { roomId: string; code: string; daily: boolean; minutes: number; difficulty: EscapeDifficulty }) {
   const [board, setBoard] = useState<Leaderboard | null>(null)
   useEffect(() => {
     // The result is saved with the game's last move, so it's already there when this appears.
-    api.leaderboard(roomId, daily, minutes, code).then(setBoard, () => setBoard(null))
-  }, [roomId, code, daily, minutes])
+    api.leaderboard(roomId, daily, minutes, code, difficulty).then(setBoard, () => setBoard(null))
+  }, [roomId, code, daily, minutes, difficulty])
   if (!board) return null
 
   return (
     <section className="mt-8 rounded-xl border border-line bg-surface p-4 text-left" aria-label="Leaderboard">
       <h2 className="font-display text-2xl">
-        {daily ? "🏆 Today's challenge" : '🏆 Best escapes'} <span className="text-base text-muted">· {minutes}-minute game</span>
+        {daily ? "🏆 Today's challenge" : '🏆 Best escapes'} <span className="text-base text-muted">
+          · {minutes}-minute game · {difficulty[0].toUpperCase() + difficulty.slice(1)}
+        </span>
       </h2>
       {board.thisParty && (
         <p className="mt-1 text-accent" data-testid="your-rank">

@@ -333,6 +333,42 @@ public class LaboratoryTests
     }
 
     [Fact]
+    public void Cipher_tools_unlock_once_the_key_is_found_and_never_give_the_shift_away()
+    {
+        var s = Lab.Started(EscapeDifficulty.Hard, 21);
+        EscapeCipherView Tool(EscapeState x, string id) => EscapeProjector.Stage(x, Room, T0).Puzzles.Single(p => p.Id == id).Cipher!;
+
+        Assert.Equal(new EscapeCipherView(CipherType.Shift, false, null), Tool(s, "formula"));
+        s = s.Do(new ExamineSpot(T0, Ada, "painting")); // the dial's number is on the portrait
+        Assert.Equal(new EscapeCipherView(CipherType.Shift, true, null), Tool(s, "formula")); // the number itself is only in the look
+
+        s = Lab.PlayToStage(1, seed: 21, difficulty: EscapeDifficulty.Hard);
+        var room = EscapeEngine.RoomFor(s, Room);
+        Assert.False(Tool(s, "signal").Unlocked);
+        Assert.Null(Tool(s, "signal").Table);
+        s = s.Do(new ExamineSpot(T0, Ada, "bookshelf")); // the manual…
+        Assert.False(Tool(s, "signal").Unlocked);
+        s = s.Do(new InspectItem(T0, Ada, "manual")); // …under the UV lamp
+        var tool = Tool(s, "signal");
+        Assert.True(tool.Unlocked);
+        // The key card decodes the telegraph's message, letter by letter.
+        var encoded = room.FindPuzzle("signal")!.Prompt["The telegraph taps: ".Length..];
+        var decoded = string.Concat(encoded.Split(' ').Select(code => tool.Table!.Single(e => e.Code == code).Letter));
+        Assert.Equal(room.FindPuzzle("signal")!.Answers[0], decoded);
+    }
+
+    [Fact]
+    public void A_logic_puzzle_lists_its_row_for_the_phones_grid()
+    {
+        var s = Lab.PlayToStage(1, seed: 8);
+        var room = EscapeEngine.RoomFor(s, Room);
+        var view = EscapeProjector.Stage(s, Room, T0).Puzzles.Single(p => p.Id == "jars").Deduction!;
+        Assert.Equal(4, view.Spots);
+        Assert.Equal(room.FindPuzzle("jars")!.Lineup, view.Items);
+        Assert.All(view.Items, i => Assert.Contains(i.ToUpperInvariant(), room.FindPuzzle("jars")!.Prompt)); // nothing the prompt doesn't say
+    }
+
+    [Fact]
     public void The_game_master_hears_about_finds()
     {
         var s = EscapeEngine.NewGame(7, ai: new EscapeAiFeatures { GameMaster = true });
@@ -382,6 +418,12 @@ public class HarderPrivacyTests
                     Assert.All(views, v => Assert.DoesNotContain(i.Inspect!, v));
                 foreach (var r in room.Recipes.Where(r => !s.Notebook.Any(n => n.Text == r.Text)))
                     Assert.All(views, v => Assert.DoesNotContain(r.Text, v));
+                foreach (var p in EscapeProjector.Stage(s, template, Lab.T0).Puzzles.Where(p => p.Cipher is not null))
+                {
+                    var puzzle = room.FindPuzzle(p.Id)!;
+                    Assert.Equal(EscapeEngine.KeyFound(s, puzzle), p.Cipher!.Unlocked);
+                    if (!p.Cipher.Unlocked || p.Cipher.Type == CipherType.Shift) Assert.Null(p.Cipher.Table);
+                }
                 foreach (var hidden in s.Pieces.Where(p => p.IsHidden))
                     Assert.All(views, v => Assert.DoesNotContain(room.FindPuzzle(hidden.PuzzleId)!.Pieces[hidden.Index], v));
                 if (s.Phase == EscapePhase.Playing)

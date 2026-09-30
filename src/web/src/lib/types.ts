@@ -662,6 +662,20 @@ export interface EscapePuzzleView {
   finds: { found: number; total: number } | null
   /** Switches puzzles: the grid as it is now (cells numbered row by row from 0) */
   switches: { size: number; lit: number[] } | null
+  /** Ciphers: which decoding tool to offer, once the key has been found */
+  cipher: EscapeCipherView | null
+  /** Deductions: the things to line up, for the logic grid */
+  deduction: { items: string[]; spots: number } | null
+}
+
+export type CipherType = 'shift' | 'symbols' | 'morse' | 'numbers' | 'mirror'
+
+export interface EscapeCipherView {
+  type: CipherType
+  /** The group has found the key (numbers and mirror need none) */
+  unlocked: boolean
+  /** Symbols and Morse: the key card, once unlocked. Never the shift amount. */
+  table: { code: string; letter: string }[] | null
 }
 
 export interface EscapeItemView {

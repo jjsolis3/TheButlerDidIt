@@ -70,6 +70,9 @@ public sealed class EscapeState
     /// <summary>What the group has found out, oldest first, shared by everyone.</summary>
     public List<NotebookEntry> Notebook { get; set; } = [];
 
+    /// <summary>Ciphers whose key the group has found (it stays found, even once the item it was written on is used up).</summary>
+    public List<string> KeysFound { get; set; } = [];
+
     /// <summary>The lights that are on in each Switches puzzle that has been touched (the others are as the room starts them).</summary>
     public Dictionary<string, List<int>> Switches { get; set; } = [];
 

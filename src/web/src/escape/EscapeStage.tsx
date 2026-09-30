@@ -6,6 +6,9 @@ import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } f
 import { EscapeClock } from './EscapeClock'
 import { GameMasterPanel } from './GameMasterPanel'
 import { LeaderboardPanel } from './LeaderboardPanel'
+import { Notebook } from './Notebook'
+import { SwitchGrid } from './PuzzleWidgets'
+import { SceneView } from './SceneView'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 import { useAtmosphere } from './useAtmosphere'
 
@@ -54,6 +57,9 @@ function Art({ url, className = '' }: { url: string | null; className?: string }
   return <img src={url} alt="" data-testid="room-art" className={`fade-in w-full rounded-xl object-cover ${className}`} />
 }
 
+const KIND_ICON: Record<EscapePuzzleView['kind'], string> = { code: '🔢', text: '🔤', use: '🗝️', search: '🔎', switches: '💡' }
+const DIFFICULTY: Record<EscapeStageView['difficulty'], string> = { easy: '🙂 Easy', normal: '😐 Normal', hard: '😈 Hard' }
+
 function Centered({ children }: { children: React.ReactNode }) {
   return <div className="grid min-h-dvh place-items-center p-6 text-center text-muted">{children}</div>
 }
@@ -65,7 +71,7 @@ function Lobby({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInf
     <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
       <div>
         <p className="text-xs tracking-[0.3em] text-accent uppercase">
-          🔐 Escape room · {stage.timeLimitMinutes} minutes · {stage.daily ? "📅 Today's challenge" : '🎲 Shuffled puzzles'}
+          🔐 Escape room · {stage.timeLimitMinutes} minutes · {DIFFICULTY[stage.difficulty]} · {stage.daily ? "📅 Today's challenge" : '🎲 Shuffled puzzles'}
         </p>
         <h1 className="font-display mt-2 text-5xl">{stage.roomTitle}</h1>
         <Art url={stage.artUrl} className="mt-4 aspect-[21/9] max-w-3xl" />
@@ -128,8 +134,12 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
           </p>
         </div>
       </header>
-      {/* Keyed on the stage, so the new room's picture fades in as the door opens. */}
-      <Art key={stage.stage?.id} url={stage.artUrl} className="aspect-[21/7] max-h-72" />
+      {/* Keyed on the stage, so the new room's picture fades in as the door opens. A stage with spots to search shows them on the picture instead. */}
+      {stage.scene ? (
+        <SceneView key={stage.stage?.id} scene={stage.scene} artUrl={stage.artUrl} feed={stage.feed} />
+      ) : (
+        <Art key={stage.stage?.id} url={stage.artUrl} className="aspect-[21/7] max-h-72" />
+      )}
       {stage.stageNumber === 1 && (
         // The villain's welcome, read out as the clock starts.
         <blockquote className="max-w-3xl border-l-2 border-accent pl-4 text-lg text-ink/80 italic">{stage.intro}</blockquote>
@@ -147,7 +157,7 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
             <div className="flex items-start justify-between gap-2">
               <h2 className="font-display text-xl">{p.title}</h2>
               <span className="shrink-0 text-lg" aria-hidden>
-                {p.solved ? '✅' : p.needs.length ? '🔒' : p.kind === 'code' ? '🔢' : p.kind === 'text' ? '🔤' : '🗝️'}
+                {p.solved ? '✅' : p.needs.length ? '🔒' : KIND_ICON[p.kind]}
               </span>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-ink/90">{p.prompt}</p>
@@ -159,6 +169,17 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
               <>
                 {p.needs.length > 0 && <p className="mt-3 text-xs text-muted">Needs: {p.needs.join(', ')}</p>}
                 {p.pieceCount > 0 && <p className="mt-3 text-xs text-accent">🧩 Clues on {p.pieceCount} phones: read them out!</p>}
+                {p.piecesHidden > 0 && (
+                  <p className="mt-1 text-xs text-accent">
+                    🔎 {p.piecesHidden} more clue piece{p.piecesHidden === 1 ? '' : 's'} hidden somewhere in the room
+                  </p>
+                )}
+                {p.finds && (
+                  <p className="mt-3 text-sm text-muted">
+                    Searched {p.finds.found} of {p.finds.total}
+                  </p>
+                )}
+                {p.switches && <SwitchGrid puzzle={p} readOnly />}
                 {p.hints.map((h, i) => (
                   <p key={i} className="mt-2 rounded-lg bg-bg/60 p-2 text-sm">
                     💡 {h}
@@ -193,7 +214,8 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
           )}
         </section>
         <section aria-live="polite">
-          <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">What's happened</h2>
+          <Notebook notes={stage.notebook} limit={5} />
+          <h2 className="mt-4 text-xs font-semibold tracking-widest text-accent uppercase first:mt-0">What's happened</h2>
           <ul className="mt-2 space-y-1 text-sm text-muted">
             {[...stage.feed].reverse().slice(0, 6).map((f) => (
               <li key={f.at + f.text}>{f.text}</li>
@@ -256,7 +278,7 @@ function Ending({ stage, code }: { stage: EscapeStageView; code: string }) {
           {stage.daily ? '' : ': share it to challenge friends with the same puzzles.'}
         </p>
       )}
-      <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} minutes={stage.timeLimitMinutes} />
+      <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} minutes={stage.timeLimitMinutes} difficulty={stage.difficulty} />
     </div>
   )
 }

@@ -21,13 +21,19 @@ namespace ButlerDidIt.Api.Escape;
 ///
 /// Rooms written by AI live in the database (<see cref="EscapeRoomEntity"/>), one host's each. They
 /// were validated before they were saved and never change, so each is parsed once and cached.
+///
+/// For the end-to-end tests only, Escape:TestRoomsRoot adds the rooms in another folder (the test-only
+/// Laboratory, which uses every kind of puzzle). It's ignored unless Escape:ExposeAnswersForTests is on,
+/// which is never the case in production.
 /// </summary>
-public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvironment env)
+public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvironment env, IConfiguration config)
 {
     private readonly Lazy<IReadOnlyList<EscapeRoom>> _rooms = new(() =>
     {
         var root = Path.Combine(env.ContentRootPath, options.Value.Root, "escape");
         var rooms = EscapeLibrary.Load(root);
+        if (config.GetValue<bool>("Escape:ExposeAnswersForTests") && config["Escape:TestRoomsRoot"] is { Length: > 0 } testRoot)
+            rooms.AddRange(EscapeLibrary.Load(testRoot));
         var problems = rooms.SelectMany(r => EscapeRoomValidator.Validate(r).Select(e => $"{r.Id}: {e}")).ToList();
         if (problems.Count > 0) throw new InvalidOperationException("Invalid escape rooms:\n" + string.Join("\n", problems));
         return rooms;

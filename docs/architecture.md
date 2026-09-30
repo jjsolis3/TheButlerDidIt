@@ -301,6 +301,13 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **Difficulty:** `EscapeState.Difficulty` (null is Normal, so parties saved before it are unchanged). `RoomFor` is `RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty)`. `Build` sizes the generators, picks cipher words, halves the hint penalty (Easy) or drops the last hint step (Hard); `Cut` drops puzzles above their `minDifficulty`. Normal takes exactly the path it always did, so every existing room builds byte-for-byte the same puzzles. Results record their difficulty, and the leaderboard ranks each one apart (`?difficulty=`, with old results as Normal).
 - **Hiding pieces:** at the start, a puzzle's pieces beyond the player count go into its stage's `hidesPieces` spots, chosen from the seed (`PieceHolder` with a `SpotId` and no seat). Searching the spot hands the piece to the searcher. A room without hiding spots deals exactly as before.
 - **The validator's play-through** is a fixed point per stage: search every spot it can, look at every item, put together every pair, solve every puzzle it can, and repeat until nothing changes. It's exact because an item is either used up (by one puzzle or recipe) or a tool (never used up), never both, so no order of play can strand the group. It runs for every length × difficulty × 200 puzzle sets.
+- **Screens** (`src/web/src/escape/`):
+  - `SceneView` draws a scene as HTML buttons placed over the picture, by percentage of the canvas, so every spot works by keyboard and screen reader; `props.tsx` draws each prop as a small SVG.
+  - `ItemInspector` holds, inspects and combines items; `Notebook` shows the notebook.
+  - `PuzzleWidgets` has the light grid, the logic grid and line-up, the cipher decoders and the pattern display.
+  - A cipher's view (`EscapeCipherView`) says which decoder to show and is `unlocked` only once `EscapeState.KeysFound` has it. The engine records a key as found after any command that makes one of its `KeyAt` places visible, and it stays found. The symbols or Morse key card is sent only once unlocked, and the shift amount never.
+  - The logic helpers keep their marks in the phone's `sessionStorage` and never send them.
+  - The e2e tests play the test-only Laboratory, which `Escape:TestRoomsRoot` adds to the shelf only when `Escape:ExposeAnswersForTests` is on.
 - **AI:** the hint prompt includes only searched spots, looked-at items, found pieces and the notebook (`EscapeScenePromptTests`). Rooms written by AI keep to codes, riddles and use puzzles until #86: `Normalize` strips scenes, recipes and closer looks, and `ShapeErrors` refuses the newer kinds.
 
 **Atmosphere** (the TV only; phones stay quiet):
