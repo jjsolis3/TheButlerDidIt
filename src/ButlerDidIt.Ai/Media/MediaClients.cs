@@ -38,23 +38,36 @@ public interface IMediaClientFactory
 /// <summary>
 /// Builds voice and image clients. Media APIs aren't standardised the way chat is
 /// (there's no IChatClient equivalent), so each provider needs its own adapter.
-/// OpenAI (or an OpenAI-compatible server) is supported now; more can be added here.
+/// OpenAI (or an OpenAI-compatible server) and Google Gemini are supported; more can be added here.
 /// </summary>
-public sealed class MediaClientFactory(bool allowFake) : IMediaClientFactory
+/// <param name="http">For Gemini's HTTP calls; tests pass one with a stub handler.</param>
+public sealed class MediaClientFactory(bool allowFake, HttpClient? http = null) : IMediaClientFactory
 {
+    /// <summary>The providers that can make voices and pictures. The admin screen only offers these for those roles.</summary>
+    public static bool SupportsMedia(AiProviderKind kind) => kind is AiProviderKind.OpenAI or AiProviderKind.Gemini or AiProviderKind.Fake;
+
+    // One shared client for the app's lifetime (the usual .NET advice): pictures can take a minute to paint.
+    private static readonly HttpClient SharedHttp = new() { Timeout = TimeSpan.FromMinutes(3) };
+    private HttpClient Http => http ?? SharedHttp;
+
     public ITextToSpeech CreateSpeech(AiProviderSettings provider, string model) => provider.Kind switch
     {
         AiProviderKind.OpenAI => new OpenAiSpeech(OpenAi(provider).GetAudioClient(model)),
+        AiProviderKind.Gemini => new GeminiSpeech(Http, Key(provider), model),
         AiProviderKind.Fake when allowFake => new FakeSpeech(),
-        _ => throw new AiUnavailableException($"Voices need an OpenAI provider; '{provider.Name}' is {provider.Kind}."),
+        _ => throw new AiUnavailableException($"Voices need an OpenAI or Gemini provider; '{provider.Name}' is {provider.Kind}."),
     };
 
     public IImageGenerator CreateImages(AiProviderSettings provider, string model) => provider.Kind switch
     {
         AiProviderKind.OpenAI => new OpenAiImages(OpenAi(provider).GetImageClient(model), model),
+        AiProviderKind.Gemini => new GeminiImages(Http, Key(provider), model),
         AiProviderKind.Fake when allowFake => new FakeImages(),
-        _ => throw new AiUnavailableException($"Images need an OpenAI provider; '{provider.Name}' is {provider.Kind}."),
+        _ => throw new AiUnavailableException($"Images need an OpenAI or Gemini provider; '{provider.Name}' is {provider.Kind}."),
     };
+
+    private static string Key(AiProviderSettings p) =>
+        string.IsNullOrWhiteSpace(p.ApiKey) ? throw new AiUnavailableException($"The AI provider '{p.Name}' has no API key.") : p.ApiKey;
 
     private static OpenAIClient OpenAi(AiProviderSettings p)
     {
@@ -118,15 +131,8 @@ public sealed class FakeSpeech : ITextToSpeech
     public Task<MediaFile> SpeakAsync(string text, string voice, CancellationToken ct)
     {
         const int sampleRate = 8000;
-        var samples = sampleRate / 4; // a quarter of a second
-        using var ms = new MemoryStream();
-        using var w = new BinaryWriter(ms);
-        w.Write("RIFF"u8); w.Write(36 + samples); w.Write("WAVE"u8);
-        w.Write("fmt "u8); w.Write(16); w.Write((short)1); w.Write((short)1); w.Write(sampleRate); w.Write(sampleRate); w.Write((short)1); w.Write((short)8);
-        w.Write("data"u8); w.Write(samples);
-        for (var i = 0; i < samples; i++) w.Write((byte)128); // 128 = silence in 8-bit PCM
-        w.Flush();
-        return Task.FromResult(new MediaFile(ms.ToArray(), "audio/wav", "wav"));
+        var silence = Enumerable.Repeat((byte)128, sampleRate / 4).ToArray(); // a quarter of a second; 128 = silence in 8-bit PCM
+        return Task.FromResult(new MediaFile(Wav.Build(silence, sampleRate, channels: 1, bitsPerSample: 8), "audio/wav", "wav"));
     }
 }
 

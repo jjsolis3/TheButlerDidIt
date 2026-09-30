@@ -127,9 +127,9 @@ public static class AiAdminEndpoints
             if (string.IsNullOrWhiteSpace(req.Model)) return Results.Problem("Enter a model name, e.g. claude-opus-5 or gpt-5.", statusCode: 400);
             var provider = await db.AiProviders.AsNoTracking().FirstOrDefaultAsync(p => p.Id == req.ProviderId, ct);
             if (provider is null) return Results.Problem("Unknown provider.", statusCode: 400);
-            // Voices and pictures use media APIs that only OpenAI (or compatible servers) offer so far.
-            if (role is AiRole.Voice or AiRole.Illustrator && provider.Kind is not (AiProviderKind.OpenAI or AiProviderKind.Fake))
-                return Results.Problem($"The {role} role needs an OpenAI provider (other voice and image providers can be added later).", statusCode: 400);
+            // Voices and pictures need a media API; only some providers have one (see MediaClientFactory).
+            if (role is AiRole.Voice or AiRole.Illustrator && !ButlerDidIt.Ai.Media.MediaClientFactory.SupportsMedia(provider.Kind))
+                return Results.Problem($"The {role} role needs an OpenAI or Gemini provider ({provider.Kind} doesn't make {(role == AiRole.Voice ? "voices" : "pictures")}).", statusCode: 400);
             var row = await db.AiRoles.FindAsync([role], ct);
             if (row is null)
             {

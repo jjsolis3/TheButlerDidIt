@@ -16,8 +16,18 @@ const ROLES: { id: AiRole; title: string; body: string; tokens: number }[] = [
   { id: 'storyteller', title: 'Storyteller', body: 'Writes whole new mysteries. Use your strongest model; it runs once per mystery.', tokens: 32000 },
   { id: 'actor', title: 'Actor', body: 'Plays NPC characters when guests question them. Runs often, so a fast model helps.', tokens: 400 },
   { id: 'inspector', title: 'Inspector', body: 'Gives hints, checks generated mysteries are solvable, and delivers the closing verdicts.', tokens: 2000 },
-  { id: 'voice', title: 'Voice', body: 'Speaks narration, NPC lines and answers aloud. Needs an OpenAI provider (a text-to-speech model).', tokens: 0 },
-  { id: 'illustrator', title: 'Illustrator', body: "Paints character portraits and scene art in each theme's style. Needs an OpenAI provider (an image model).", tokens: 0 },
+  {
+    id: 'voice',
+    title: 'Voice',
+    body: 'Speaks narration, NPC lines and answers aloud. Needs an OpenAI or Gemini provider with a text-to-speech model, e.g. gpt-4o-mini-tts or gemini-2.5-flash-preview-tts.',
+    tokens: 0,
+  },
+  {
+    id: 'illustrator',
+    title: 'Illustrator',
+    body: "Paints character portraits and scene art in each theme's style. Needs an OpenAI or Gemini provider with an image model, e.g. gpt-image-1 or gemini-2.5-flash-image (Nano Banana).",
+    tokens: 0,
+  },
 ]
 
 const MODEL_SUGGESTIONS: Record<string, string[]> = {
