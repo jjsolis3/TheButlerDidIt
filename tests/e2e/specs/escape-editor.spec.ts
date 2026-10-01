@@ -1,11 +1,16 @@
 import { expect, test } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { SHOTS } from './escape-play'
 
 // The escape room editor (#113): a host makes their own copy of a built-in room, rewords it, adds an answer to a
-// riddle (a new edition), sees a broken change refused, and plays their version.
+// riddle (a new edition), sees a broken change refused, gives it their own cover, intro video and background
+// sound (#110 step 2), and plays their version.
 
 mkdirSync(SHOTS, { recursive: true })
+
+/** Tiny files made with ffmpeg: a 2-second WebM (which Playwright's Chromium can play, unlike H.264), a sound and a picture. */
+const fixture = (name: string) => fileURLToPath(new URL(`../fixtures/${name}`, import.meta.url))
 
 test('a host copies a built-in room, edits it, and plays their own version', async ({ browser }) => {
   test.setTimeout(150_000)
@@ -57,6 +62,25 @@ test('a host copies a built-in room, edits it, and plays their own version', asy
   await page.getByLabel('Kind').selectOption('text')
   await expect(check).toContainText('✓ Ready to play')
 
+  // ---- Their own cover, intro video and background sound. Each applies at once: there's nothing to save.
+  await page.getByRole('button', { name: '🎬 Pictures, video & sound' }).click()
+  const media = page.getByTestId('room-media')
+  const cover = media.getByRole('group', { name: 'Cover picture', exact: true })
+  await page.getByLabel('Upload Cover picture', { exact: true }).setInputFiles(fixture('cover.png'))
+  await expect(cover).toContainText('Your upload')
+  await expect(cover.getByRole('img')).toHaveAttribute('src', /^\/media\/assets\//)
+  const intro = media.getByRole('group', { name: 'Intro video', exact: true })
+  await page.getByLabel('Upload Intro video', { exact: true }).setInputFiles(fixture('intro.webm'))
+  await expect(intro).toContainText('Your upload')
+  const sound = media.getByRole('group', { name: 'Background sound', exact: true })
+  await page.getByLabel('Upload Background sound', { exact: true }).setInputFiles(fixture('ambience.ogg'))
+  await expect(sound).toContainText('Your upload')
+  await expect(sound.locator('audio')).toHaveAttribute('src', /^\/media\/assets\//)
+  // A file that won't play is caught before it's sent, with what to do about it.
+  await page.getByLabel('Upload Intro video', { exact: true }).setInputFiles({ name: 'holiday.mp4', mimeType: 'video/mp4', buffer: Buffer.from('not really a video') })
+  await expect(intro).toContainText("can't play that video")
+  await page.screenshot({ path: `${SHOTS}/112-escape-editor-media.png`, fullPage: true })
+
   // ---- The copy is on the host's own shelf, and plays as edited.
   await page.getByRole('link', { name: 'Back to the rooms' }).click()
   await page.waitForURL(/\/host\/new\?game=escape/)
@@ -67,6 +91,23 @@ test('a host copies a built-in room, edits it, and plays their own version', asy
   await page.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await page.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   await expect(page.getByRole('heading', { name: "Grandpa's Workshop" })).toBeVisible()
+  await expect(page.getByTestId('room-art')).toHaveAttribute('src', /^\/media\/assets\//) // the uploaded cover
+
+  // ---- Start: the intro video plays instead of the cover and the read-out intro, and the clock starts when it ends.
+  const code = page.url().split('/').pop()!
+  const player = await (await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage()
+  await player.goto(`/join/${code}`)
+  await player.getByLabel('Your name').fill('Grandkid')
+  await player.getByRole('button', { name: 'Take my seat' }).click()
+  await expect(player.getByText("You're in, Grandkid.")).toBeVisible()
+  await page.getByRole('button', { name: /Start the clock/ }).click()
+  const reveal = page.getByTestId('room-reveal')
+  const video = reveal.locator('video')
+  await expect(video).toHaveAttribute('src', /^\/media\/assets\//)
+  await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime), { message: 'the intro video plays' }).toBeGreaterThan(0)
+  await page.screenshot({ path: `${SHOTS}/113-escape-intro-video.png` })
+  await expect(reveal).toHaveCount(0, { timeout: 20_000 }) // it ends by itself
+  await expect(page.getByTestId('tv-room')).toBeVisible()
 
   // The editor at phone width.
   const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, storageState: await page.context().storageState() })).newPage()

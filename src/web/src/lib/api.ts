@@ -14,6 +14,7 @@ import type {
   ValidationResult,
   RecapPage,
   RecapSharing,
+  RoomMediaView,
   EscapeRecapPage,
   EscapeRecapSharing,
   SpectatorList,
@@ -57,6 +58,30 @@ export class ApiError extends Error {
     super(message)
     this.status = status
   }
+}
+
+/**
+ * Sends a file as the request body, reporting how much has gone so far (0 to 1). `fetch` can't report upload
+ * progress, so this uses the older XMLHttpRequest, wrapped in a Promise so callers can `await` it like the rest.
+ */
+function upload<T>(url: string, file: File, onProgress?: (fraction: number) => void): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', url)
+    xhr.responseType = 'json' // problem details on failure, the result on success
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress?.(e.loaded / e.total)
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(xhr.response as T)
+      const problem = xhr.response as { detail?: string; title?: string } | null
+      const fallback = xhr.status === 401 ? 'Please sign in.' : xhr.status === 413 ? 'That file is too big.' : `Upload failed (${xhr.status}).`
+      reject(new ApiError(xhr.status, problem?.detail ?? problem?.title ?? fallback))
+    }
+    xhr.onerror = () => reject(new ApiError(0, 'The upload was cut off. Check the connection and try again.'))
+    // The file itself is the body (not a form): the browser streams it from disk and sets its type.
+    xhr.send(file)
+  })
 }
 
 async function request<T>(method: string, url: string, body?: unknown): Promise<T> {
@@ -165,6 +190,12 @@ export const api = {
   myMysteries: () => request<MyMystery[]>('GET', '/api/scenarios/mine'),
   scenario: (id: string) => request<{ id: string; source: MyMystery['source']; canEdit: boolean; document: ScenarioDoc }>('GET', `/api/scenarios/${encodeURIComponent(id)}`),
   validateScenario: (document: ScenarioDoc) => request<ValidationResult>('POST', '/api/scenarios/validate', { document }),
+  // A room's own pictures, videos and sounds (#110 step 2). Each change applies at once and returns the room's media again.
+  roomMedia: (id: string) => request<RoomMediaView>('GET', `/api/escape-rooms/${encodeURIComponent(id)}/media`),
+  uploadRoomMedia: (id: string, key: string, file: File, onProgress?: (fraction: number) => void) =>
+    upload<RoomMediaView>(`/api/escape-rooms/${encodeURIComponent(id)}/media/${encodeURIComponent(key)}`, file, onProgress),
+  removeRoomMedia: (id: string, key: string) =>
+    request<RoomMediaView>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}/media/${encodeURIComponent(key)}`),
   saveScenario: (id: string, document: ScenarioDoc) => request<ValidationResult>('PUT', `/api/scenarios/${encodeURIComponent(id)}`, { document }),
   duplicateScenario: (id: string) => request<{ id: string }>('POST', `/api/scenarios/${encodeURIComponent(id)}/duplicate`),
   deleteScenario: (id: string) => request<void>('DELETE', `/api/scenarios/${encodeURIComponent(id)}`),

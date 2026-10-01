@@ -64,17 +64,38 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, IMediaStor
     }
 
     /// <summary>Stores an uploaded file (e.g. a selfie) as-is, without generation or caching.</summary>
-    public async Task<Guid> SaveUploadAsync(MediaKind kind, byte[] bytes, string contentType, string extension, Guid? partyId, CancellationToken ct)
+    public Task<Guid> SaveUploadAsync(MediaKind kind, byte[] bytes, string contentType, string extension, Guid? partyId, CancellationToken ct) =>
+        SaveUploadAsync(kind, new MemoryStream(bytes, writable: false), bytes.Length, contentType, extension, partyId, ownerUserId: null, ct);
+
+    /// <summary>Stores an uploaded file from a stream (e.g. a room's video), copied as it's read.</summary>
+    /// <param name="ownerUserId">The host who uploaded it, for their upload allowance; null for guests' selfies.</param>
+    public async Task<Guid> SaveUploadAsync(MediaKind kind, Stream content, long sizeBytes, string contentType, string extension, Guid? partyId,
+        string? ownerUserId, CancellationToken ct)
     {
         var asset = new MediaAsset
         {
-            Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(bytes, extension, contentType, ct),
-            ContentHash = Convert.ToHexString(SHA256.HashData(Guid.NewGuid().ToByteArray())), Provider = "upload",
-            ContentType = contentType, SizeBytes = bytes.Length, CreatedAt = clock.GetUtcNow(), PartyId = partyId,
+            Id = Guid.NewGuid(), Kind = kind, Path = await store.SaveAsync(content, extension, contentType, ct),
+            ContentHash = Convert.ToHexString(SHA256.HashData(Guid.NewGuid().ToByteArray())), Provider = Upload,
+            ContentType = contentType, SizeBytes = sizeBytes, CreatedAt = clock.GetUtcNow(), PartyId = partyId, OwnerUserId = ownerUserId,
         };
         db.MediaAssets.Add(asset);
         await db.SaveChangesAsync(ct);
         return asset.Id;
+    }
+
+    /// <summary>The <see cref="MediaAsset.Provider"/> of everything people upload, as opposed to what the AI makes.</summary>
+    public const string Upload = "upload";
+
+    /// <summary>
+    /// Deletes the uploads among these that no room's media points at any more. A copy of a room shares its files
+    /// with the original, so a file goes only when the last room using it lets go. Generated media is always kept.
+    /// </summary>
+    public async Task DeleteUnusedUploadsAsync(IEnumerable<Guid> assetIds, CancellationToken ct)
+    {
+        var ids = assetIds.Distinct().ToList();
+        if (ids.Count == 0) return;
+        var used = await db.ScenarioMedia.Where(m => ids.Contains(m.AssetId)).Select(m => m.AssetId).Distinct().ToListAsync(ct);
+        await DeleteUploadsAsync(ids.Except(used), ct);
     }
 
     /// <summary>Deletes uploaded files (row and bytes). Generated media is shared between parties, so it is never deleted here.</summary>
@@ -82,7 +103,7 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, IMediaStor
     {
         var ids = assetIds.ToList();
         if (ids.Count == 0) return;
-        var assets = await db.MediaAssets.Where(a => ids.Contains(a.Id) && a.Provider == "upload").ToListAsync(ct);
+        var assets = await db.MediaAssets.Where(a => ids.Contains(a.Id) && a.Provider == Upload).ToListAsync(ct);
         db.MediaAssets.RemoveRange(assets);
         await db.SaveChangesAsync(ct);
         // Delete the files only after the rows are gone: a crash in between leaves an
@@ -209,15 +230,7 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         // New art and voices: refresh every screen of every party using this scenario (or room).
         if (roomId is null) catalog.Invalidate(job.ScenarioId);
         else sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().ForgetArt(roomId);
-        var runtime = sp.GetRequiredService<PartyRuntime>();
-        var contentId = roomId ?? job.ScenarioId;
-        var partyIds = await db.Parties.AsNoTracking()
-            .Where(p => p.ScenarioId == contentId && p.Status != PartyStatus.Finished).Select(p => p.Id).ToListAsync(ct);
-        foreach (var id in partyIds)
-        {
-            var (_, session) = await runtime.LoadAsync(id, ct);
-            await runtime.BroadcastAsync(id, session, clock.GetUtcNow());
-        }
+        await sp.GetRequiredService<PartyRuntime>().RefreshAsync(roomId ?? job.ScenarioId, ct);
     }
 
     /// <summary>Queues preparation for a scenario unless one is already waiting or running.</summary>

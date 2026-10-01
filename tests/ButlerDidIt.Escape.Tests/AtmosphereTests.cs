@@ -61,6 +61,37 @@ public class AtmosphereTests
     }
 
     [Fact]
+    public void Uploaded_videos_and_sounds_play_for_the_stage_in_front_of_the_group()
+    {
+        var room = Workshop;
+        var (first, second) = (room.Stages[0].Id, room.Stages[1].Id);
+        var media = new Dictionary<string, string>
+        {
+            [EscapeArt.IntroVideo] = "/media/intro",
+            [EscapeArt.Ambience] = "/media/room-sound",
+            [EscapeArt.StageVideo(first)] = "/media/stage-1-video",
+            [EscapeArt.StageAmbience(second)] = "/media/stage-2-sound",
+        };
+        var lobby = EscapeProjector.Stage(EscapeEngine.NewGame(7), room, T0, media);
+        Assert.Equal("/media/intro", lobby.IntroVideoUrl); // public, like the intro itself
+        Assert.Null(lobby.StageVideoUrl);
+        Assert.Equal("/media/room-sound", lobby.AmbienceUrl);
+
+        var s = Started(room);
+        var one = EscapeProjector.Stage(s, room, T0, media);
+        Assert.Equal("/media/stage-1-video", one.StageVideoUrl);
+        Assert.Equal("/media/room-sound", one.AmbienceUrl); // the first stage has no sound of its own: the room's plays
+
+        var two = EscapeProjector.Stage(ToStage(s, room, 1), room, T0, media);
+        Assert.Null(two.StageVideoUrl);
+        Assert.Equal("/media/stage-2-sound", two.AmbienceUrl);
+        // Nothing uploaded: the made-up sound, and no videos.
+        var plain = EscapeProjector.Stage(s, room, T0);
+        Assert.Null(plain.IntroVideoUrl);
+        Assert.Null(plain.AmbienceUrl);
+    }
+
+    [Fact]
     public void A_built_puzzle_set_keeps_everything_about_the_room_except_its_puzzles()
     {
         // RoomVariants copies a room's settings by hand, so a new setting (like Soundscape) could be forgotten there.

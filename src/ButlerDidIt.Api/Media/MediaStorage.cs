@@ -14,8 +14,11 @@ namespace ButlerDidIt.Api.Media;
 /// </summary>
 public interface IMediaStore
 {
-    /// <summary>Saves the file and returns its path, like "2026-09/3f2a….png".</summary>
-    Task<string> SaveAsync(byte[] bytes, string extension, string contentType, CancellationToken ct);
+    /// <summary>
+    /// Saves the file and returns its path, like "2026-09/3f2a….png". The content is copied as it's read,
+    /// so a large video never sits in memory. (A byte array goes through <see cref="MediaStore.SaveAsync"/>.)
+    /// </summary>
+    Task<string> SaveAsync(Stream content, string extension, string contentType, CancellationToken ct);
 
     /// <summary>The file's contents, or null if it isn't there. The stream is seekable, so audio can be served in ranges.</summary>
     Task<Stream?> OpenReadAsync(string path, CancellationToken ct);
@@ -34,6 +37,10 @@ public static class MediaStore
 
     /// <summary>A new, unguessable path in a folder per month.</summary>
     internal static string NewPath(string extension) => $"{DateTime.UtcNow:yyyy-MM}/{Guid.NewGuid():N}.{extension}";
+
+    /// <summary>Saves a file already in memory (a generated picture or voice clip, a resized photo).</summary>
+    public static Task<string> SaveAsync(this IMediaStore store, byte[] bytes, string extension, string contentType, CancellationToken ct) =>
+        store.SaveAsync(new MemoryStream(bytes, writable: false), extension, contentType, ct);
 }
 
 public sealed class MediaOptions
@@ -45,6 +52,12 @@ public sealed class MediaOptions
     public string Root { get; set; } = "data/media";
 
     public S3MediaOptions S3 { get; set; } = new();
+
+    /// <summary>The largest video a host can upload for an escape room, in MB.</summary>
+    public int MaxVideoMb { get; set; } = 100;
+
+    /// <summary>How much a host (other than the admin) can upload in all, in MB.</summary>
+    public int UploadQuotaMb { get; set; } = 2048;
 }
 
 public sealed class S3MediaOptions
@@ -62,12 +75,22 @@ public sealed class LocalMediaStore(IOptions<MediaOptions> options, IWebHostEnvi
 {
     private string Root => Path.GetFullPath(Path.Combine(env.ContentRootPath, options.Value.Root));
 
-    public async Task<string> SaveAsync(byte[] bytes, string extension, string contentType, CancellationToken ct)
+    public async Task<string> SaveAsync(Stream content, string extension, string contentType, CancellationToken ct)
     {
         var relative = MediaStore.NewPath(extension);
         var full = Path.Combine(Root, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(full)!);
-        await File.WriteAllBytesAsync(full, bytes, ct);
+        try
+        {
+            await using var file = new FileStream(full, FileMode.CreateNew, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
+            await content.CopyToAsync(file, ct);
+        }
+        catch
+        {
+            // Half a file is worse than none: nothing points at it, and it would never be cleaned up.
+            File.Delete(full);
+            throw;
+        }
         return relative;
     }
 
@@ -122,12 +145,13 @@ public sealed class S3MediaStore : IMediaStore, IDisposable
         _client = new AmazonS3Client(new BasicAWSCredentials(o.AccessKey, o.SecretKey), config);
     }
 
-    public async Task<string> SaveAsync(byte[] bytes, string extension, string contentType, CancellationToken ct)
+    public async Task<string> SaveAsync(Stream content, string extension, string contentType, CancellationToken ct)
     {
         var key = MediaStore.NewPath(extension);
         await _client.PutObjectAsync(new PutObjectRequest
         {
-            BucketName = _bucket, Key = key, ContentType = contentType, InputStream = new MemoryStream(bytes),
+            // The caller's stream is left open: it owns it (an upload's temporary file, say).
+            BucketName = _bucket, Key = key, ContentType = contentType, InputStream = content, AutoCloseStream = false,
         }, ct);
         return key;
     }
@@ -137,8 +161,8 @@ public sealed class S3MediaStore : IMediaStore, IDisposable
         try
         {
             using var response = await _client.GetObjectAsync(_bucket, path, ct);
-            // Files are small (a picture or a voice clip), so buffer them: the copy is seekable,
-            // which lets the endpoint serve byte ranges for audio scrubbing.
+            // Buffered, so the copy is seekable and the endpoint can serve byte ranges for audio scrubbing. Fine for
+            // pictures and voice clips; an uploaded video can be large, so ranged reads from the bucket are a follow-up (#119).
             var copy = new MemoryStream();
             await response.ResponseStream.CopyToAsync(copy, ct);
             copy.Position = 0;

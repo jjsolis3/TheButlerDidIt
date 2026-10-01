@@ -77,12 +77,16 @@ public static class EscapeEndpoints
 
         // Delete one of this host's own rooms. Its results stay (they hold only times and first names),
         // and a party still playing it is told the room is no longer available.
-        app.MapDelete("/api/escape-rooms/{id}", async (string id, ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db, CancellationToken ct) =>
+        app.MapDelete("/api/escape-rooms/{id}", async (string id, ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db,
+            ButlerDidIt.Api.Media.MediaService media, CancellationToken ct) =>
         {
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var deleted = await db.EscapeRooms.Where(r => r.Id == id && r.OwnerUserId == hostId).ExecuteDeleteAsync(ct);
             if (deleted == 0) return Results.NotFound();
+            // Its pictures, videos and sounds go too (files a copy still uses stay for the copy).
+            await EscapeMediaEndpoints.ForgetRoomAsync(db, media, [id], ct);
             rooms.Forget(id);
+            rooms.ForgetArt(id);
             return Results.NoContent();
         }).RequireAuthorization(AuthPolicies.Host);
 

@@ -66,10 +66,14 @@ export function useAtmosphere(stage: EscapeStageView) {
     }
   }, [on, atmosphere])
 
-  // The background: the current stage's sound while playing, the room's in the lobby, silence after.
+  // The background: the current stage's sound while playing, the room's in the lobby, silence after. A recording the
+  // host uploaded plays instead of the made-up one.
   useEffect(() => {
     atmosphere.soundscape(stage.phase === 'escaped' || stage.phase === 'failed' ? 'silence' : stage.soundscape)
   }, [atmosphere, stage.phase, stage.soundscape])
+  useEffect(() => {
+    atmosphere.ambience(stage.ambienceUrl)
+  }, [atmosphere, stage.ambienceUrl])
 
   // Stingers, from what changed since the last view.
   useEffect(() => {
@@ -112,5 +116,8 @@ export function useAtmosphere(stage: EscapeStageView) {
     }
   }, [atmosphere, deadline, serverNow, phase])
 
-  return { on, playing, toggle }
+  // Stable, so a component can call it from an effect without re-running it on every view.
+  const duck = useCallback((down: boolean) => atmosphere.duck(down), [atmosphere])
+
+  return { on, playing, toggle, duck }
 }

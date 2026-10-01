@@ -281,13 +281,31 @@ public class PrivacyTests
         var played = EscapeEngine.RoomFor(s, template);
         for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, seats[i], $"P{i}", i == 0, false));
         s = EscapeEngine.Apply(s, template, new StartEscape(T0));
+        // A picture, a video and a sound for every stage, each with its own address: a later stage's must never be sent.
+        var art = new Dictionary<string, string>
+        {
+            [EscapeArt.Cover] = $"/media/{Guid.NewGuid()}",
+            [EscapeArt.IntroVideo] = $"/media/{Guid.NewGuid()}",
+            [EscapeArt.Ambience] = $"/media/{Guid.NewGuid()}",
+        };
+        foreach (var key in template.Stages.SelectMany(st => new[] { EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id) }))
+            art[key] = $"/media/{Guid.NewGuid()}";
 
         for (var step = 0; s.Phase == EscapePhase.Playing; step++)
         {
+            var current = played.Stages[s.StageIndex];
+            var shown = EscapeProjector.Stage(s, template, T0, art);
+            Assert.Equal(art[EscapeArt.StageVideo(current.Id)], shown.StageVideoUrl);
+            Assert.Equal(art[EscapeArt.StageAmbience(current.Id)], shown.AmbienceUrl);
+            var hidden = template.Stages.Where(st => st.Id != current.Id)
+                .SelectMany(st => new[] { EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id) })
+                .Select(key => art[key]).ToList();
+            foreach (var raw in seats.Select(seat => GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0, art))).Prepend(GameJson.Serialize(shown)))
+                foreach (var url in hidden) Assert.DoesNotContain(url, raw);
+
             var stageRaw = GameJson.Serialize(EscapeProjector.Stage(s, template, T0));
             Assert.DoesNotContain(seed.ToString(), stageRaw); // the puzzle set would let someone work out the answers (a number, so the raw JSON)
             var stageJson = ViewText.Decoded(stageRaw);
-            var current = played.Stages[s.StageIndex];
             foreach (var p in room.Puzzles)
             {
                 foreach (var answer in p.Answers.Where(a => a.Length >= 3))

@@ -900,6 +900,48 @@ export interface EscapeStageView {
   scene: EscapeSceneView | null
   /** What the group has found out, oldest first */
   notebook: EscapeNoteView[]
+  /** A video the host uploaded to play when the clock starts, or null. Public, like the intro */
+  introVideoUrl: string | null
+  /** A video the host uploaded for the stage in front of the group (never a later one), or null */
+  stageVideoUrl: string | null
+  /** A recorded background sound to loop now (the current stage's, or the room's), or null for the made-up one */
+  ambienceUrl: string | null
+}
+
+/** What a room's media place holds (C# MediaKind; a room never holds a "photo", which is a guest's selfie). */
+export type RoomMediaKind = 'image' | 'video' | 'audio'
+
+/** One place in a room for a picture, a video or a sound (#110 step 2). */
+export interface RoomMediaSlot {
+  key: string
+  kind: RoomMediaKind
+  /** The stage it belongs to, or null for the whole room (the cover, the intro video, the room's sound) */
+  stageId: string | null
+  stageTitle: string | null
+  /** What's there now, or null when it's empty */
+  url: string | null
+  /** Someone uploaded it, rather than the AI painting it */
+  uploaded: boolean
+  sizeBytes: number | null
+}
+
+export interface RoomMediaLimits {
+  imageBytes: number
+  videoBytes: number
+  audioBytes: number
+  /** How much this host can upload in all, or null for no limit (the admin) */
+  allowanceBytes: number | null
+  /** How much they've uploaded so far, across all their rooms */
+  usedBytes: number
+}
+
+export interface RoomMediaView {
+  roomId: string
+  /** The owner or the admin; for a built-in room, only the admin */
+  canEdit: boolean
+  builtIn: boolean
+  slots: RoomMediaSlot[]
+  limits: RoomMediaLimits
 }
 
 /** Background sound presets, synthesised in the browser by escape/sound.ts. */

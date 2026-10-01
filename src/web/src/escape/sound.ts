@@ -8,15 +8,19 @@ export type Sting = 'unlock' | 'stage' | 'wrong' | 'hint' | 'minute' | 'escaped'
  * "stingers" when something happens, and a heartbeat in the final minute.
  *
  * Everything is synthesised live with the Web Audio API rather than played from files: there's
- * nothing to download, host or license, and a new room only has to name a preset. Browsers only
- * allow sound after the person has clicked or tapped, so the context is created (or resumed)
- * from a click; until then every call quietly does nothing.
+ * nothing to download, host or license, and a new room only has to name a preset. A host can upload
+ * a recorded background instead (#110 step 2): it loops through the same volume, and the stingers
+ * still play on top. Browsers only allow sound after the person has clicked or tapped, so the
+ * context is created (or resumed) from a click; until then every call quietly does nothing.
  */
 export class Atmosphere {
   private ctx: AudioContext | null = null
   private master: GainNode | null = null
   private layer: Layer | null = null
   private current: Soundscape = 'silence'
+  private recording: string | null = null
+  /** What `layer` is playing: a recording's URL or a soundscape's name. */
+  private layerFor: string | null = null
   private heartbeatTimer: ReturnType<typeof setTimeout> | null = null
   private heartbeatEvery = 0
 
@@ -48,9 +52,24 @@ export class Atmosphere {
   soundscape(name: Soundscape) {
     if (name === this.current) return
     this.current = name
-    this.layer?.stop()
-    this.layer = null
-    this.startLayer()
+    this.restartLayer()
+  }
+
+  /** A recorded background to loop instead of the made-up one, or null to go back to it. */
+  ambience(url: string | null) {
+    if (url === this.recording) return
+    this.recording = url
+    this.restartLayer()
+  }
+
+  /** Quieter while a video plays its own sound over the room, then back up. */
+  duck(on: boolean) {
+    const ctx = this.ctx
+    if (!ctx || !this.master) return
+    const t = ctx.currentTime
+    this.master.gain.cancelScheduledValues(t)
+    this.master.gain.setValueAtTime(this.master.gain.value, t)
+    this.master.gain.linearRampToValueAtTime(on ? 0.15 : 0.7, t + 0.8)
   }
 
   sting(kind: Sting) {
@@ -127,14 +146,55 @@ export class Atmosphere {
     this.ctx = null
   }
 
+  /** Changes the background, unless it's already the right one: a room-wide recording carries on from stage to stage. */
+  private restartLayer() {
+    const wanted = this.current === 'silence' ? null : (this.recording ?? this.current)
+    if (this.layer && wanted === this.layerFor) return
+    this.layer?.stop()
+    this.layer = null
+    this.startLayer()
+  }
+
   private startLayer() {
+    // 'silence' (the game is over) wins over a recording too.
     if (!this.ctx || !this.master || this.layer || this.current === 'silence') return
-    this.layer = startSoundscape(this.ctx, this.master, this.current)
+    this.layerFor = this.recording ?? this.current
+    this.layer = this.recording ? startRecording(this.ctx, this.master, this.recording) : startSoundscape(this.ctx, this.master, this.current)
   }
 }
 
 interface Layer {
   stop(): void
+}
+
+/**
+ * Loops an uploaded recording. An <audio> element streams it (a long file is never decoded into memory all at once),
+ * and routing it into the audio graph puts it under the same volume and sound switch as everything else.
+ */
+function startRecording(ctx: AudioContext, out: AudioNode, url: string): Layer {
+  const audio = new Audio(url)
+  audio.loop = true
+  const source = ctx.createMediaElementSource(audio)
+  const bus = ctx.createGain()
+  bus.gain.setValueAtTime(0, ctx.currentTime)
+  bus.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 2) // a background: under the stingers and the voice
+  source.connect(bus).connect(out)
+  void audio.play().catch(() => {}) // a file that won't play leaves the room quiet, never broken
+  return {
+    stop() {
+      const t = ctx.currentTime
+      bus.gain.cancelScheduledValues(t)
+      bus.gain.setValueAtTime(bus.gain.value, t)
+      bus.gain.linearRampToValueAtTime(0, t + 1)
+      setTimeout(() => {
+        audio.pause()
+        audio.removeAttribute('src') // stop downloading it
+        audio.load()
+        source.disconnect()
+        bus.disconnect()
+      }, 1200)
+    },
+  }
 }
 
 /** Builds a looping background. Each is a few quiet layers: a bed of noise or drone plus sparse, randomised details. */
