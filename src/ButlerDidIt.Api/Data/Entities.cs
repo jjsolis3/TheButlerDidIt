@@ -12,6 +12,39 @@ public sealed class AppUser : IdentityUser
     public bool IsAdmin { get; set; }
 }
 
+/// <summary>
+/// A one-time link the admin sends so someone can create a host account while sign-ups are
+/// closed. Like a seat token, only a hash of the token is kept, so a copy of the database
+/// can't be used to sign up.
+/// </summary>
+public sealed class InviteEntity
+{
+    public Guid Id { get; set; }
+
+    [MaxLength(64)]
+    public required string TokenHash { get; set; }
+
+    /// <summary>When set, only this email address can use the invite.</summary>
+    [MaxLength(256)]
+    public string? Email { get; set; }
+
+    /// <summary>Who it's for, so the admin's list makes sense ("Ana, my sister").</summary>
+    [MaxLength(80)]
+    public string? Note { get; set; }
+
+    [MaxLength(450)]
+    public required string CreatedByUserId { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+
+    /// <summary>Set in the same transaction that creates the account, so an invite makes exactly one.</summary>
+    [MaxLength(450)]
+    public string? UsedByUserId { get; set; }
+
+    public DateTimeOffset? UsedAt { get; set; }
+}
+
 public sealed class ThemeEntity
 {
     [Key, MaxLength(80)]

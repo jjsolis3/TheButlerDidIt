@@ -273,6 +273,7 @@ app.UseAuthorization();
 app.MapHealthChecks("/healthz");
 app.MapAuthEndpoints();
 app.MapAdminHostEndpoints();
+app.MapInviteEndpoints();
 app.MapRecapEndpoints();
 app.MapScenarioEditorEndpoints();
 app.MapThemeEndpoints();

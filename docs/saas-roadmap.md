@@ -50,12 +50,14 @@ They're ordered so each is useful on its own and later steps build on earlier on
 
 **Do this today if you don't want strangers signing up:** in Coolify, set `ALLOW_REGISTRATION=false` and redeploy.
 
-### 2. Invite-only sign-ups (#97)
+### 2. Invite-only sign-ups (#97, done)
 
-Turn the on/off switch into a mode: `Open`, `InviteOnly` or `Closed`. The admin creates an invite link and sends it by text or email. The link works once, expires, can be locked to one email address, and can carry a plan grant ("Both games, free for a year").
+With `ALLOW_REGISTRATION=false` the site is invite-only. The admin makes an invite link on the Hosts page and sends it by text or chat, or has the site email it. The link works once, expires after 1 to 30 days, and can be limited to one email address.
 
-- **Store invites like seat tokens:** only a SHA-256 hash of the token is kept, so a database leak doesn't leak working invites.
-- **Use up the invite and create the user in one transaction**, so one link can't make two accounts if it's clicked twice.
+- **Stored like seat tokens:** only a SHA-256 hash of the token is kept, so a database leak doesn't leak working invites.
+- **Used up in the same transaction that creates the user**, so one link can't make two accounts if it's clicked twice.
+- **Two modes, not three.** The plan was `Open`, `InviteOnly` and `Closed`. But "closed even to invites" only blocks an admin from their own invites, so the existing switch stays: open, or invite-only.
+- **Plan grants come with plans** (step 5): an invite will be able to carry "Both games, free for a year".
 
 ### 3. Account hub (#98)
 

@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record RegisterRequest(string Email, string Password, string DisplayName);
+/// <param name="Invite">The token from an invite link (<see cref="InviteEndpoints"/>). Needed while registration is closed.</param>
+public sealed record RegisterRequest(string Email, string Password, string DisplayName, string? Invite = null);
 public sealed record LoginRequest(string Email, string Password);
 public sealed record MeResponse(string Id, string Email, string DisplayName, bool IsAdmin, bool EmailConfirmed);
 public sealed record AuthOptionsView(bool AllowRegistration, bool EmailEnabled, bool RequireConfirmedEmail);
@@ -16,7 +17,10 @@ public sealed record ConfirmRequest(string UserId, string Token);
 
 public sealed class AuthOptions
 {
-    /// <summary>Set Auth__AllowRegistration=false after creating your account to make the server invite-only.</summary>
+    /// <summary>
+    /// Set Auth__AllowRegistration=false after creating your account to make the server invite-only:
+    /// new hosts then need an invite link from the admin (Admin → Hosts).
+    /// </summary>
     public bool AllowRegistration { get; set; } = true;
 
     /// <summary>
@@ -30,7 +34,7 @@ public sealed class AuthOptions
 /// <summary>
 /// Host accounts. We use ASP.NET Core Identity for password hashing and lockout,
 /// but write our own small endpoints so the rules are easy to read: the first
-/// account becomes the admin, and registration can be switched off.
+/// account becomes the admin, and registration can be limited to invites.
 /// </summary>
 public static class AuthEndpoints
 {
@@ -58,26 +62,43 @@ public static class AuthEndpoints
 
         group.MapPost("/register", async (
             RegisterRequest req,
+            AppDbContext db,
             UserManager<AppUser> users,
             SignInManager<AppUser> signIn,
             Microsoft.Extensions.Options.IOptions<AuthOptions> options,
             IEmailSender email,
             Microsoft.Extensions.Options.IOptions<AppOptions> app,
             ILogger<AuthOptions> log,
+            TimeProvider clock,
             CancellationToken ct) =>
         {
             var isFirstUser = !await users.Users.AnyAsync();
-            if (!isFirstUser && !options.Value.AllowRegistration)
-                return Results.Problem("Registration is closed on this server.", statusCode: StatusCodes.Status403Forbidden);
+            InviteEntity? invite = null;
+            if (!string.IsNullOrWhiteSpace(req.Invite))
+            {
+                // An invite works whether or not registration is open, but it has to be a usable one.
+                (invite, var problem) = await InviteEndpoints.FindUsableAsync(db, req.Invite, clock.GetUtcNow(), ct);
+                if (invite is null) return Results.Problem(problem, statusCode: StatusCodes.Status400BadRequest);
+                if (invite.Email is not null && users.NormalizeEmail(invite.Email) != users.NormalizeEmail(req.Email.Trim()))
+                    return Results.Problem($"This invite is for {invite.Email}. Sign up with that address, or ask for a new invite.", statusCode: StatusCodes.Status400BadRequest);
+            }
+            else if (!isFirstUser && !options.Value.AllowRegistration)
+                return Results.Problem("New host accounts need an invite. Ask the admin of this site for a link.", statusCode: StatusCodes.Status403Forbidden);
 
             var displayName = req.DisplayName.Trim();
             if (displayName.Length is < 1 or > 60)
                 return Results.Problem("Display name must be 1 to 60 characters.", statusCode: StatusCodes.Status400BadRequest);
 
             var user = new AppUser { UserName = req.Email.Trim(), Email = req.Email.Trim(), DisplayName = displayName, IsAdmin = isFirstUser };
+            // One transaction: the invite is used up only if the account is created (a weak password or a
+            // taken email leaves it unused), and two people can't both use one link (see ClaimAsync).
+            await using var transaction = await db.Database.BeginTransactionAsync(ct);
+            if (invite is not null && !await InviteEndpoints.ClaimAsync(db, invite.Id, user.Id, clock.GetUtcNow(), ct))
+                return Results.Problem(InviteEndpoints.UsedMessage, statusCode: StatusCodes.Status400BadRequest);
             var result = await users.CreateAsync(user, req.Password);
             if (!result.Succeeded)
                 return Results.Problem(string.Join(" ", result.Errors.Select(e => e.Description)), statusCode: StatusCodes.Status400BadRequest);
+            await transaction.CommitAsync(ct);
 
             await SendConfirmationAsync(user, users, email, app, log, ct);
             await signIn.SignInAsync(user, isPersistent: true);

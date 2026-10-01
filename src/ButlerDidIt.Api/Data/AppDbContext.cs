@@ -24,6 +24,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<MediaJobEntity> MediaJobs => Set<MediaJobEntity>();
     public DbSet<EscapeResult> EscapeResults => Set<EscapeResult>();
     public DbSet<EscapeRoomEntity> EscapeRooms => Set<EscapeRoomEntity>();
+    public DbSet<InviteEntity> Invites => Set<InviteEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -60,6 +61,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         });
 
         b.Entity<Seat>().HasIndex(s => s.TokenHash).IsUnique();
+        b.Entity<InviteEntity>().HasIndex(i => i.TokenHash).IsUnique();
         b.Entity<MediaAsset>().HasIndex(m => m.ContentHash).IsUnique();
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<MediaAsset>().HasIndex(m => m.PartyId);

@@ -41,7 +41,8 @@ public static class AdminHostEndpoints
         });
     }
 
-    private static async ValueTask<object?> RequireAdmin(EndpointFilterInvocationContext ctx, EndpointFilterDelegate next)
+    /// <summary>Endpoint filter: only the admin. Also guards the invites (<see cref="InviteEndpoints"/>).</summary>
+    internal static async ValueTask<object?> RequireAdmin(EndpointFilterInvocationContext ctx, EndpointFilterDelegate next)
     {
         var users = ctx.HttpContext.RequestServices.GetRequiredService<UserManager<AppUser>>();
         var user = await users.GetUserAsync(ctx.HttpContext.User);

@@ -4,10 +4,12 @@ import { Button, ErrorText, Eyebrow, Heading, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import type { HostView } from '../lib/types'
 import { useMe } from '../lib/useMe'
+import { InvitesPanel } from './AdminInvites'
 
 /**
- * Admin: the host accounts on this server. Without email set up, this is how a host
- * who forgot their password gets back in: the admin makes a one-time link and sends it.
+ * Admin: the host accounts on this server, and invites for new ones. Without email set up,
+ * this is also how a host who forgot their password gets back in: the admin makes a
+ * one-time link and sends it.
  */
 export default function AdminHosts() {
   const { me } = useMe()
@@ -43,13 +45,20 @@ export default function AdminHosts() {
   return (
     <Shell wide>
       <Eyebrow>Admin</Eyebrow>
-      <Heading className="mt-2 mb-2">Hosts</Heading>
-      <p className="mb-6 max-w-2xl text-muted">
-        Everyone with a host account on this server. If someone forgets their password and email isn't set up, make them a reset link and
-        send it to them. It works once, for 3 hours.
-      </p>
+      <Heading className="mt-2 mb-6">Hosts</Heading>
       <ErrorText>{me && !me.isAdmin ? 'Only the admin can manage host accounts.' : error}</ErrorText>
 
+      {me?.isAdmin && <InvitesPanel />}
+
+      {hosts && (
+        <>
+          <h2 className="font-display mb-1 text-2xl">Accounts</h2>
+          <p className="mb-4 max-w-2xl text-sm text-muted">
+            Everyone with a host account on this server. If someone forgets their password and email isn't set up, make them a reset link and
+            send it to them. It works once, for 3 hours.
+          </p>
+        </>
+      )}
       {hosts && (
         <div className="space-y-3">
           {hosts.map((h) => (
