@@ -15,7 +15,10 @@ import type {
   RecapPage,
   RecapSharing,
   AuthOptions,
+  CreatedInvite,
   HostView,
+  InviteInfo,
+  InviteView,
   MysteryLength,
   PartyInfo,
   PartyMode,
@@ -79,8 +82,10 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
 export const api = {
   me: () => request<Me>('GET', '/api/auth/me'),
   login: (email: string, password: string) => request<Me>('POST', '/api/auth/login', { email, password }),
-  register: (email: string, password: string, displayName: string) =>
-    request<Me>('POST', '/api/auth/register', { email, password, displayName }),
+  /** `invite` is the token from an invite link, needed while sign-ups are closed. */
+  register: (email: string, password: string, displayName: string, invite?: string) =>
+    request<Me>('POST', '/api/auth/register', { email, password, displayName, invite }),
+  checkInvite: (token: string) => request<InviteInfo>('POST', '/api/auth/invite', { token }),
   logout: () => request<void>('POST', '/api/auth/logout'),
   authOptions: () => request<AuthOptions>('GET', '/api/auth/options'),
   forgotPassword: (email: string) => request<{ message: string }>('POST', '/api/auth/forgot', { email }),
@@ -163,6 +168,9 @@ export const api = {
   admin: {
     hosts: () => request<HostView[]>('GET', '/api/admin/hosts'),
     resetLink: (id: string) => request<{ link: string; validForHours: number }>('POST', `/api/admin/hosts/${encodeURIComponent(id)}/reset-link`),
+    invites: () => request<InviteView[]>('GET', '/api/admin/invites'),
+    createInvite: (i: { email: string | null; note: string | null; days: number; send: boolean }) => request<CreatedInvite>('POST', '/api/admin/invites', i),
+    deleteInvite: (id: string) => request<void>('DELETE', `/api/admin/invites/${encodeURIComponent(id)}`),
     providers: () => request<ProviderView[]>('GET', '/api/admin/ai/providers'),
     createProvider: (p: { name: string; kind: AiProviderKind; baseUrl: string | null; apiKey: string | null }) =>
       request<ProviderView>('POST', '/api/admin/ai/providers', p),

@@ -99,6 +99,12 @@ SignalR sends the token as `Authorization: Bearer …`. For WebSockets, browsers
 
 The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the host's device can be the stage *and* a pass-and-play seat.
 
+**Invites** (`InviteEndpoints.cs`, #97). With `Auth:AllowRegistration=false`, a new host needs an invite link from the admin (`/login?invite=…`):
+- **Stored like seat tokens.** The link carries a random 256-bit token, and the database keeps only its SHA-256 hash. The admin's list never shows a link again, and a copy of the database can't be used to sign up.
+- **Used once, in the sign-up's own transaction.** `POST /api/auth/register` claims the invite with one `UPDATE … WHERE UsedAt IS NULL` inside the transaction that creates the account. The UPDATE locks the row, so if two people use one link at the same moment, the second waits, then finds it used. If creating the account fails (a weak password, an email already taken), the rollback leaves the invite unused.
+- **Optional limits:** an invite can be for one email address only (compared the way Identity normalises emails), and it expires after 1 to 30 days.
+- **No separate "closed" mode.** An invite works whether or not sign-ups are open. An admin who wants no new hosts simply makes no invites.
+
 ## 7. Content: themes and scenarios
 
 `content/themes/<slug>/` holds `theme.json` (palette, era, art style), `scenarios/*.json` (the mysteries) and `media/` (images, audio, video). On startup, `ContentCatalog.SeedAsync` validates every scenario (`ScenarioValidator`) and upserts them into the database. A broken mystery fails the deploy, not a party.

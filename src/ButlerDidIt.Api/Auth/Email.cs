@@ -71,6 +71,21 @@ public static class AccountLinks
     public static string Confirm(string baseUrl, string userId, string token) =>
         $"{baseUrl.TrimEnd('/')}/confirm-email?user={WebUtility.UrlEncode(userId)}&token={WebUtility.UrlEncode(token)}";
 
+    /// <summary>An invite opens the sign-up form with the token filled in.</summary>
+    public static string Invite(string baseUrl, string token) =>
+        $"{baseUrl.TrimEnd('/')}/login?invite={WebUtility.UrlEncode(token)}";
+
+    public static string InviteEmail(string from, string link, int days) => $"""
+        Hello,
+
+        {from} has invited you to host murder mysteries and escape rooms on The Butler Did It.
+        Create your host account here:
+
+        {link}
+
+        The link works once, for {days} day{(days == 1 ? "" : "s")}. If you weren't expecting this, you can ignore this email.
+        """;
+
     public static string ResetEmail(string name, string link) => $"""
         Hello {name},
 

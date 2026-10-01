@@ -33,7 +33,7 @@ In **Environment Variables**, add:
 | Variable | Value | Notes |
 |---|---|---|
 | `POSTGRES_PASSWORD` | a long random string | Used by both containers. Mark it as a secret. |
-| `ALLOW_REGISTRATION` | `true` at first | Set to `false` once your host account exists, so strangers can't sign up. The sign-in page then stops offering "Create an account". |
+| `ALLOW_REGISTRATION` | `true` at first | Set to `false` once your host account exists, so strangers can't sign up. New hosts then need an invite link from you (**Hosts → Invites**). |
 
 The compose file already sets `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`. This tells ASP.NET Core to trust the `X-Forwarded-Proto` header from the proxy, so the app knows visitors arrived over HTTPS. Secure cookies and correct QR code links depend on it.
 
@@ -71,8 +71,9 @@ Optionally, in the app service's health check settings, use path `/healthz` on p
 ## 5. First run
 
 1. Visit your domain, choose **Sign in to host → Create an account**. The first account becomes the admin.
-2. Set `ALLOW_REGISTRATION=false` and redeploy to stop anyone else signing up. (There's no way to invite more hosts yet; invite links are planned in [saas-roadmap.md](saas-roadmap.md), #97.)
-3. Create a party. Put the stage on a TV and have guests scan the QR code.
+2. Set `ALLOW_REGISTRATION=false` and redeploy to make the site invite-only.
+3. To add a host, sign in, open **Hosts** (linked on the home page) and make an invite under **Invites**. Send them the link by text or chat. With email set up, the site can email it for you. Each link makes one account, and you choose how long it works (a day, a week or 30 days). Add their email address and only that address can use it.
+4. Create a party. Put the stage on a TV and have guests scan the QR code.
 
 ## Data and backups
 

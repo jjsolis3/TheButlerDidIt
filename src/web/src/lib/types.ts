@@ -400,6 +400,35 @@ export interface AuthOptions {
   requireConfirmedEmail: boolean
 }
 
+// ---- Invites (InviteEndpoints.cs)
+export type InviteStatus = 'pending' | 'used' | 'expired'
+
+/** An invite on the admin's list. Never includes the link: the server keeps only a hash of it. */
+export interface InviteView {
+  id: string
+  email: string | null
+  note: string | null
+  createdAt: string
+  expiresAt: string
+  status: InviteStatus
+  usedBy: string | null
+  usedAt: string | null
+}
+
+/** A new invite and its link: the only time the server hands the link out. */
+export interface CreatedInvite {
+  invite: InviteView
+  link: string
+  emailed: boolean
+}
+
+/** What the sign-up page shows someone holding a usable invite. */
+export interface InviteInfo {
+  email: string | null
+  invitedBy: string
+  expiresAt: string
+}
+
 export interface HostView {
   id: string
   displayName: string
