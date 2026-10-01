@@ -116,10 +116,7 @@ public static class EscapeEndpoints
 
             LeaderboardEntry? mine = null;
             if (partyId is not null && await results.FirstOrDefaultAsync(r => r.PartyId == partyId, ct) is { } own)
-            {
-                var better = await results.CountAsync(r => r.Score < own.Score || (r.Score == own.Score && r.FinishedAt < own.FinishedAt), ct);
-                mine = Entry(own, better + 1);
-            }
+                mine = Entry(own, await results.RankInAsync(own, ct));
 
             var myBest = hostId is null ? [] : (await results.Where(r => r.HostUserId == hostId).OrderBy(r => r.Score).Take(5).ToListAsync(ct))
                 .Select(r => Entry(r, 0)).ToList();

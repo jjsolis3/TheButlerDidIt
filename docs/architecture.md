@@ -135,7 +135,7 @@ Only `media/` folders are served over HTTP (`MediaEndpoints.cs`), with a path ch
 
 ## 8. The front end
 
-- **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `PassAndPlay`.
+- **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
 - **Front doors** (#99): `/` (`Home`) offers both games, with a card for each in that game's colours, plus "Your parties". Each game has its own page for visitors who haven't signed in: `/mystery` (`MysteryLanding`: the themes) and `/escape` (`EscapeLanding`: how it works, then the room shelf with filters and each room's leaderboards). Each also has a printable how-to-play sheet, `/how-to-play` and `/how-to-play/escape`. "Host" links go through sign-in with `?next=`, so a visitor lands on the host page with the room they picked.
 - **`PlayerScreen`** is the whole phone experience. Pass-and-play reuses it for each local seat.
 - **`CuePlayer`** plays cinematics: a list of cues (image, narration, NPC line, music, sound, video). Narration uses an audio file when the cue has one, otherwise the browser's built-in speech synthesis. Browsers block sound until the user interacts, which is why the stage starts with a "Tap to begin the evening" button.
@@ -354,6 +354,28 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - An escape party created with the AI on queues a `MediaJob` whose id is `escape:{room id}`, so it never mixes with a mystery's. `MediaWorker` paints the pictures once per room, `MediaService` caches them, and every party of the room reuses them.
   - `EscapeCatalog.ArtAsync` loads them into the session, cached for 30 seconds so pictures from another server show up soon. `EscapeProjector` picks the current stage's picture, or the cover.
 - **Finale:** doors swing open on an escape, and bars drop when the group is trapped. It uses movement only, never flashing, and nothing moves under `prefers-reduced-motion`. The results, the ranking and the game master's captioned last line stay on screen.
+
+**The recap and share card** (#111):
+- **What it holds.** `EscapeProjector.Recap` builds an `EscapeRecapView` from the saved state once the game is over:
+  - the result: time, time to spare, hints and score;
+  - the team with their photos, and each player's count of puzzles opened;
+  - the timeline, worked out from `Solved` (`PuzzleId`, `SolvedBy`, `At`): a stage opens when the stage before it is cleared, and is cleared by its last puzzle;
+  - a few highlights: most puzzles opened, first breakthrough, fastest stage, no hints, a photo finish;
+  - the game master's latest lines.
+- **It never spoils the room.** A shared recap can reach friends who will play the room next. So it carries no answers, prompts, hints, solved texts (a generated puzzle writes its answer into those) or clue pieces, and only the stages the group reached. Puzzle titles are fine: the TV listed them.
+  - **Tested:** `RecapTests` finishes every room at every length, once escaped with a hint taken and once trapped, and searches the recap's decoded text for all of those.
+  - **Why decoded:** the JSON writer escapes characters such as a curly apostrophe, so searching the raw JSON could miss a leak. `ViewText.Decoded` does this, and the live screens' `PrivacyTests` now use it too.
+- **Sharing works like the mystery's** (`RecapEndpoints.cs`). Share and unshare only set `Party.RecapSlug`, for either game, and the link depends on the game: `/escape/recap/{slug}`. Other details:
+  - The host previews it at `GET /api/parties/{code}/escape-recap`.
+  - The public page reads `GET /api/escape-recap/{slug}`, sent with `noindex`.
+  - **Rank:** the leaderboard place is counted when the page opens, on the board the game was played on: room, length, difficulty and edition, plus the day for a daily challenge. It uses `EscapeResults.RankOfPartyAsync`, and the leaderboard shares its counting rule (`RankInAsync`).
+  - **Scoring:** time and score come from `EscapeEngine.ElapsedSeconds`/`Score`, the same functions that record the leaderboard row, so the two can't disagree.
+  - **A deleted room** (an AI room its host deleted) has no recap, because the state alone doesn't hold the room's text.
+- **Link previews.** Chat apps read a page's Open Graph tags and never run its JavaScript. So `GET /escape/recap/{slug}` serves `index.html` with the tags written in: the result as the title, the team as the description, the cover as the picture. Every value is HTML-encoded, since guests type their own names. An unknown link gets the plain app, which says the recap isn't available.
+- **The share card** (`escape/shareCard.ts`) is a 1080×1350 PNG drawn on a `<canvas>` **in the browser**:
+  - **Why the browser:** it already has the site's fonts, which the server's image lacks, and a phone's share sheet takes a picture file directly (`navigator.share({ files })`). Where files can't be shared (most computers), it downloads instead.
+  - **Why the canvas can be saved:** the cover comes from the same site, so the canvas isn't "tainted" and can be exported.
+  - **Where it appears:** the host's recap panel on the TV (`RecapShare`, shared with the mystery), and the public recap page, so players can share it too.
 
 **Rooms written by AI** (`EscapeRoomGenerator` in `ButlerDidIt.Ai`, run as a `GenerationKind.EscapeRoom` job by `GenerationWorker`):
 - **Writing.** The Storyteller (`TASK: escape-room-write`) writes the whole room as JSON in the same format as `content/escape/`. It writes the story, the riddles, the items and the game master, and it chooses which proven templates (`digitFacts`, `colorDigits`, `wordSequence`) fill the code and password slots. **It never writes a code:** those come from the generator and the seed, so they're correct by construction and shuffled every game like any other room.

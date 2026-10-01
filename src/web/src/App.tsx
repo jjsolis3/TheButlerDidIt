@@ -4,6 +4,7 @@ import AdminAi from './pages/AdminAi'
 import AdminHosts from './pages/AdminHosts'
 import EscapeHowToPlay from './pages/EscapeHowToPlay'
 import EscapeLanding from './pages/EscapeLanding'
+import EscapeRecap from './pages/EscapeRecap'
 import Home from './pages/Home'
 import HowToPlay from './pages/HowToPlay'
 import Join from './pages/Join'
@@ -38,6 +39,7 @@ export default function App() {
       <Route path="/account" element={<MyAccount />} />
       <Route path="/account/confirm-email" element={<ConfirmEmailChange />} />
       <Route path="/recap/:slug" element={<Recap />} />
+      <Route path="/escape/recap/:slug" element={<EscapeRecap />} />
       <Route path="/mysteries" element={<MyMysteries />} />
       <Route path="/how-to-play" element={<HowToPlay />} />
       <Route path="/how-to-play/escape" element={<EscapeHowToPlay />} />

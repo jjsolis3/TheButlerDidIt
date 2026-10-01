@@ -133,3 +133,62 @@ public sealed record EscapePlayerView(
 
 /// <param name="FoundIn">Where this phone's player found it, for a piece that was hidden in the room.</param>
 public sealed record EscapePieceView(string PuzzleId, string PuzzleTitle, string Text, string? FoundIn);
+
+// ---------------------------------------------------------------------- the recap
+
+/// <summary>
+/// The page after the game (#111): how it went, for the group to look back on and share. A shared recap
+/// can reach people who haven't played the room yet, so it never spoils it: no answers, prompts, hints,
+/// solved texts (a generated puzzle writes its answer into those) or clue pieces, and only the stages the
+/// group reached. Built by <see cref="EscapeProjector.Recap"/> once the game is over.
+/// </summary>
+public sealed record EscapeRecapView(
+    string RoomId,
+    string RoomTitle,
+    string Synopsis,
+    string Theme,
+    ButlerDidIt.Game.Scenarios.ContentRating ContentRating,
+    /// <summary>The room's cover picture, if one has been painted.</summary>
+    string? CoverUrl,
+    bool Escaped,
+    string EndText,
+    DateTimeOffset StartedAt,
+    int ElapsedSeconds,
+    /// <summary>What was left on the clock at the end: 0 when time ran out.</summary>
+    int SecondsLeft,
+    int TimeLimitMinutes,
+    EscapeDifficulty Difficulty,
+    int HintsUsed,
+    int HintPenaltySeconds,
+    int WrongAttempts,
+    /// <summary>What the leaderboard sorts by: the time plus what the hints cost.</summary>
+    int Score,
+    int SolvedCount,
+    int PuzzleCount,
+    int StageCount,
+    bool Daily,
+    /// <summary>The puzzle set played, so friends can try the same puzzles (the ending already shows it).</summary>
+    long PuzzleSet,
+    IReadOnlyList<EscapeRecapPlayer> Team,
+    /// <summary>The stages the group reached, in order: never one they didn't get to.</summary>
+    IReadOnlyList<EscapeRecapStage> Stages,
+    IReadOnlyList<EscapeRecapHighlight> Highlights,
+    /// <summary>The game master's name, when it spoke during the game.</summary>
+    string? GameMasterName,
+    /// <summary>The game master's latest lines, oldest first (the state keeps the last few moments of a game).</summary>
+    IReadOnlyList<string> GameMasterLines);
+
+/// <param name="Solved">How many puzzles this player opened.</param>
+public sealed record EscapeRecapPlayer(string Name, string? PhotoUrl, int Solved);
+
+/// <param name="OpenedAt">Seconds from the start when the group got into it.</param>
+/// <param name="ClearedAt">Seconds from the start when its last puzzle opened; null when time ran out first.</param>
+/// <param name="Hints">Hints taken on its puzzles.</param>
+public sealed record EscapeRecapStage(int Number, string Title, int OpenedAt, int? ClearedAt, int Hints, IReadOnlyList<EscapeRecapPuzzle> Puzzles);
+
+/// <param name="SolvedBy">Who opened it; null when it was still locked at the end.</param>
+/// <param name="SolvedAt">Seconds from the start.</param>
+public sealed record EscapeRecapPuzzle(string Title, PuzzleKind Kind, string? SolvedBy, int? SolvedAt, int Hints);
+
+/// <summary>Something worth a cheer: "🧠 Most puzzles opened: Ana (4)".</summary>
+public sealed record EscapeRecapHighlight(string Icon, string Title, string Detail);

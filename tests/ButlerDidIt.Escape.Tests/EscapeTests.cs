@@ -284,13 +284,14 @@ public class PrivacyTests
 
         for (var step = 0; s.Phase == EscapePhase.Playing; step++)
         {
-            var stageJson = GameJson.Serialize(EscapeProjector.Stage(s, template, T0));
-            Assert.DoesNotContain(seed.ToString(), stageJson); // the puzzle set would let someone work out the answers
+            var stageRaw = GameJson.Serialize(EscapeProjector.Stage(s, template, T0));
+            Assert.DoesNotContain(seed.ToString(), stageRaw); // the puzzle set would let someone work out the answers (a number, so the raw JSON)
+            var stageJson = ViewText.Decoded(stageRaw);
             var current = played.Stages[s.StageIndex];
             foreach (var p in room.Puzzles)
             {
                 foreach (var answer in p.Answers.Where(a => a.Length >= 3))
-                    Assert.False(stageJson.Contains($"\"{answer}\"", StringComparison.OrdinalIgnoreCase), $"answer of {p.Id} leaked");
+                    Assert.False(stageJson.Contains($"\n{answer}\n", StringComparison.OrdinalIgnoreCase), $"answer of {p.Id} leaked");
                 foreach (var hint in p.Hints) Assert.DoesNotContain(hint, stageJson); // nobody paid for any
                 foreach (var piece in p.Pieces) Assert.DoesNotContain(piece, stageJson);
                 if (!current.Puzzles.Contains(p.Id)) Assert.DoesNotContain(p.Prompt, stageJson);
@@ -299,8 +300,9 @@ public class PrivacyTests
             foreach (var seat in seats)
             {
                 var mine = s.Pieces.Where(h => h.SeatId == seat).Select(h => room.FindPuzzle(h.PuzzleId)!.Pieces[h.Index]).ToHashSet();
-                var phoneJson = GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0));
-                Assert.DoesNotContain(seed.ToString(), phoneJson);
+                var phoneRaw = GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0));
+                Assert.DoesNotContain(seed.ToString(), phoneRaw);
+                var phoneJson = ViewText.Decoded(phoneRaw);
                 foreach (var piece in room.Puzzles.SelectMany(p => p.Pieces).Where(piece => !mine.Contains(piece)))
                     Assert.DoesNotContain(piece, phoneJson);
             }
