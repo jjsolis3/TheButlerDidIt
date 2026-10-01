@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { api } from './api'
 import type { ThemeCard, ThemePalette } from './types'
 
@@ -29,15 +29,30 @@ export function useThemes() {
   return { themes, error, reload }
 }
 
-const DEFAULT: ThemePalette = { background: '#0f0d0b', surface: '#1c1814', accent: '#c8a45a', ink: '#f3ead8' }
+/** The site's own colours, and the murder mysteries': candlelight gold on near-black. */
+export const DEFAULT_PALETTE: ThemePalette = { background: '#0f0d0b', surface: '#1c1814', accent: '#c8a45a', ink: '#f3ead8' }
 
-export function applyPalette(p: ThemePalette = DEFAULT) {
+/** The escape rooms' colours: cold steel and exit-sign green, so the two games feel different. */
+export const ESCAPE_PALETTE: ThemePalette = { background: '#0a0f0f', surface: '#131b1b', accent: '#5fd3a8', ink: '#e6f0ec' }
+
+export function applyPalette(p: ThemePalette = DEFAULT_PALETTE) {
   const root = document.documentElement.style
   root.setProperty('--theme-bg', p.background)
   root.setProperty('--theme-surface', p.surface)
   root.setProperty('--theme-accent', p.accent)
   root.setProperty('--theme-ink', p.ink)
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', p.background)
+}
+
+/**
+ * Recolours the app with a fixed palette while the component is mounted, e.g. the escape rooms'
+ * pages. A layout effect, so the page never flashes in the default colours first.
+ */
+export function usePalette(palette: ThemePalette) {
+  useLayoutEffect(() => {
+    applyPalette(palette)
+    return () => applyPalette()
+  }, [palette])
 }
 
 /** Recolours the app for the party's theme while the component is mounted. */

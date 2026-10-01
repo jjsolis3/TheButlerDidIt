@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import { Button, ErrorText, FilterChip, inputClass } from '../components/ui'
+import { Button, ErrorText, inputClass } from '../components/ui'
 import { api } from '../lib/api'
-import type { AiStatus, ContentRating, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
+import type { AiStatus, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
 import { GenerateEscapeRoom } from './GenerateEscapeRoom'
-import { formatDuration } from './time'
-
-const isHalloween = (room: EscapeRoomSummary) => room.seasons.includes('halloween')
+import { RoomCardBody, ShelfControls } from './RoomShelf'
+import { useRoomShelf } from './useRoomShelf'
 
 /** The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby. */
 export function NewEscapeParty() {
@@ -17,9 +16,8 @@ export function NewEscapeParty() {
   const askedRoom = params.get('room')
   const [chosen, setChosen] = useState<string | undefined>(askedRoom ?? undefined)
   // Adults and Family shelves, and a Halloween filter within them, like the mystery shelf.
-  const [shelf, setShelf] = useState<ContentRating>('mature')
-  const [halloweenOnly, setHalloweenOnly] = useState(false)
-  const [spookySeason] = useState(() => new Date().getMonth() === 9) // October; read once, not on every render
+  const shelfState = useRoomShelf(rooms)
+  const { shelf, setShelf, setHalloweenOnly, onShelf } = shelfState
   // The game's length. Only kept while the chosen room offers it (worked out during render below).
   const [chosenMinutes, setChosenMinutes] = useState<number | undefined>(() => Number(params.get('minutes')) || undefined)
   const [difficulty, setDifficulty] = useState<EscapeDifficulty>(() => {
@@ -45,7 +43,7 @@ export function NewEscapeParty() {
       if (asked) setShelf(asked.contentRating)
     }, (e: Error) => setError(e.message))
     api.aiStatus().then(setAi, () => setAi(null))
-  }, [askedRoom])
+  }, [askedRoom, setShelf])
 
   // A room written by AI goes to the top of the shelf, selected, ready to play.
   const onWritten = async (job: GenerationJob) => {
@@ -70,10 +68,6 @@ export function NewEscapeParty() {
     }
   }
 
-  const byRating = rooms?.filter((r) => r.contentRating === shelf) ?? []
-  const halloweenCount = byRating.filter(isHalloween).length
-  // The filter only applies while this shelf has Halloween rooms, so switching shelves never leaves it empty.
-  const onShelf = halloweenOnly && halloweenCount > 0 ? byRating.filter(isHalloween) : byRating
   // The host's pick if it's on this shelf, otherwise the shelf's first room: worked out during render,
   // so switching shelves can never leave a room from the other shelf selected.
   const room = onShelf.find((r) => r.id === chosen) ?? onShelf[0]
@@ -101,33 +95,7 @@ export function NewEscapeParty() {
         <p className="text-xs text-muted">
           Work together against the clock: every phone holds different clues, so talk! Hints help, but each one costs time.
         </p>
-        <div className="grid grid-cols-2 gap-2 rounded-xl border border-line bg-surface p-1" role="tablist" aria-label="Escape room catalog">
-          {(['mature', 'family'] as const).map((s) => (
-            <button
-              key={s}
-              role="tab"
-              aria-selected={shelf === s}
-              onClick={() => setShelf(s)}
-              className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${shelf === s ? 'bg-accent text-bg' : 'text-muted hover:text-ink'}`}
-            >
-              {s === 'mature' ? '🍷 Adults' : '🧸 Family'} <span className="font-normal opacity-80">({rooms?.filter((r) => r.contentRating === s).length ?? 0})</span>
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-muted">
-          {shelf === 'mature' ? 'For grown-ups: horror in the style of the Saw films. Tense and creepy, never graphic.' : 'For all ages: spooky or silly, never scary. Great with kids.'}
-        </p>
-        {halloweenCount > 0 && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter rooms">
-            <FilterChip on={!halloweenOnly} onClick={() => setHalloweenOnly(false)}>
-              All rooms
-            </FilterChip>
-            <FilterChip on={halloweenOnly} glow={spookySeason && !halloweenOnly} onClick={() => setHalloweenOnly(true)}>
-              🎃 Halloween <span className="font-normal opacity-80">({halloweenCount})</span>
-              {spookySeason && <span className="font-normal"> · It's spooky season!</span>}
-            </FilterChip>
-          </div>
-        )}
+        <ShelfControls shelf={shelfState} />
         {!rooms && !error && <p className="text-muted">Loading rooms…</p>}
         {rooms && onShelf.length === 0 && (
           <p className="text-sm text-muted">No {shelf === 'family' ? 'Family' : 'Adult'} rooms yet.{ai?.storyteller ? ' Write one with AI below.' : ''}</p>
@@ -141,14 +109,7 @@ export function NewEscapeParty() {
                 aria-pressed={roomId === r.id}
                 className={`flex-1 rounded-xl border p-4 text-left transition ${roomId === r.id ? 'border-accent bg-accent/10' : 'border-line bg-surface hover:border-accent/60'}`}
               >
-                {r.generated && <p className="text-xs font-semibold tracking-widest text-accent uppercase">✨ Written by AI for you</p>}
-                <p className="font-display text-lg">{r.title}</p>
-                <p className="mt-1 text-xs text-muted">
-                  {r.contentRating === 'mature' ? '🍷 Adults' : '🧸 Family'} · {r.lengths.map((l) => l.minutes).join('/')} min · {r.minPlayers}–{r.maxPlayers} players ·{' '}
-                  {r.stageCount} rooms, {r.puzzleCount} puzzles{isHalloween(r) && ' · 🎃 Halloween'}
-                </p>
-                <p className="mt-2 text-sm text-ink/90">{r.synopsis}</p>
-                {r.bestScore !== null && <p className="mt-2 text-xs text-accent">🏆 Best escape: {formatDuration(r.bestScore)}</p>}
+                <RoomCardBody room={r} picture="banner" />
               </button>
               {/* Outside the card: a button can't sit inside another button. */}
               {r.generated && (

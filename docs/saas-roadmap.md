@@ -71,20 +71,21 @@ A header menu on every page (Account, My library, Settings, Admin, Sign out) and
 
 **Why `/api/account/*` takes no user id:** every endpoint acts on the signed-in user, so there's nothing to change in a request to reach someone else's account.
 
-### 4. Escape room front door (#99)
+### 4. Escape room front door (#99, done)
 
-Today escape rooms are only inside `/host/new?game=escape`, behind sign-in, so a visitor can't see them at all.
+Escape rooms used to be only inside `/host/new?game=escape`, behind sign-in, so a visitor couldn't see them at all.
 
-- **`/`** becomes the front door for both games: "I have a party code" and two big cards, **Murder Mystery** (`/mystery`) and **Escape Room** (`/escape`).
-- **`/mystery`** gets today's home page.
-- **`/escape`** gets its own look and copy:
+- **`/`** is the front door for both games: "I have a party code" and two big cards, **Murder Mystery** (`/mystery`) and **Escape Room** (`/escape`), each in its game's own colours. "Your parties" stays here, marked Mystery or Escape room.
+- **`/mystery`** has the old home page: the hero and the themes.
+- **`/escape`** has its own colours and copy:
   - "How it works" in three steps;
-  - the room shelf, with Adults / Family and Halloween chips and filters for players, length and difficulty;
-  - each room's best time;
-  - today's challenge leaderboard.
-- **Everything shown already comes from public endpoints** (`GET /api/escape-rooms`, the leaderboards), which return no puzzles and no answers.
-- "Host this room" links to the existing `/host/new?game=escape&room=…`.
-- The room card moves out of `NewEscapeParty.tsx` into a shared component, so both pages show the same thing.
+  - the room shelf, with Adults / Family and Halloween chips, and filters for how many players and how long;
+  - each room's cover picture (or a backdrop in its mood) and best time;
+  - each room's leaderboards (today's challenge and all time), loaded only when opened.
+- **Difficulty isn't a shelf filter:** it's not a property of a room. Every room plays on Easy, Normal or Hard, chosen when hosting.
+- **Everything shown comes from public endpoints** (`GET /api/escape-rooms`, the leaderboards), which return no puzzles and no answers.
+- **"Host this room"** goes to `/host/new?game=escape&room=…`, through sign-in for a visitor and back to the same room.
+- **A printable sheet**, `/how-to-play/escape`, explains escape rooms the way `/how-to-play` explains the mysteries.
 
 ### 5. Plans and entitlements, granted by hand (#100)
 

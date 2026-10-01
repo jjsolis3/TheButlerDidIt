@@ -31,7 +31,7 @@ export function LeaderboardPanel({ roomId, code, daily, minutes, difficulty }: {
       )}
       <ol className="mt-3 space-y-1 text-sm">
         {board.top.map((e) => (
-          <Row key={e.rank} entry={e} />
+          <LeaderboardRow key={e.rank} entry={e} />
         ))}
       </ol>
       {board.top.length === 0 && <p className="mt-2 text-sm text-muted">Nobody has escaped yet. Be the first!</p>}
@@ -40,7 +40,8 @@ export function LeaderboardPanel({ roomId, code, daily, minutes, difficulty }: {
   )
 }
 
-function Row({ entry: e }: { entry: LeaderboardEntry }) {
+/** One line of a leaderboard: rank, team (or "A team of 4"), and score. */
+export function LeaderboardRow({ entry: e }: { entry: LeaderboardEntry }) {
   return (
     <li className={`flex items-baseline justify-between gap-3 rounded-lg px-2 py-1 ${e.thisParty ? 'bg-accent/15 text-ink' : ''}`}>
       <span>

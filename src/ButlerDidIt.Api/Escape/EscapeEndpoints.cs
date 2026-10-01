@@ -38,8 +38,13 @@ public static class EscapeEndpoints
             // The card's best escape is on the room's current edition, at its own length on Normal; the rest are ranked on their own.
             int? Best(EscapeRoom r) => best.Where(b => b.RoomId == r.Id && (b.Minutes ?? r.TimeLimitMinutes) == r.TimeLimitMinutes && (b.Edition ?? 1) == r.Edition)
                 .Min(b => (int?)b.Best);
-            return Results.Ok(mine.Select(r => EscapeRoomSummary.For(r, Best(r), generated: true))
-                .Concat(rooms.Rooms.Select(r => EscapeRoomSummary.For(r, Best(r)))));
+            // Cover pictures, for the rooms the media pipeline has painted (one query for the whole shelf).
+            var jobIds = ids.Select(EscapeMedia.JobId).ToList();
+            var covers = await db.ScenarioMedia.AsNoTracking().Where(m => jobIds.Contains(m.ScenarioId) && m.Key == EscapeArt.Cover)
+                .Select(m => new { m.ScenarioId, m.AssetId }).ToListAsync(ct);
+            string? Cover(EscapeRoom r) => covers.FirstOrDefault(c => c.ScenarioId == EscapeMedia.JobId(r.Id)) is { } c ? ButlerDidIt.Api.Media.MediaStore.Url(c.AssetId) : null;
+            return Results.Ok(mine.Select(r => EscapeRoomSummary.For(r, Best(r), generated: true, Cover(r)))
+                .Concat(rooms.Rooms.Select(r => EscapeRoomSummary.For(r, Best(r), coverUrl: Cover(r)))));
         });
 
         // Write a new room from a theme. It runs in the background (GenerationWorker); the page

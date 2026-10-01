@@ -110,16 +110,21 @@ public sealed record EscapeRoomSummary(
     /// <summary>The lengths a host can pick, shortest first, with how many puzzles each plays.</summary>
     IReadOnlyList<EscapeLength> Lengths,
     /// <summary>Seasonal shelves the room is on ("halloween").</summary>
-    IReadOnlyList<string> Seasons)
+    IReadOnlyList<string> Seasons,
+    /// <summary>The room's background sound, which also sets the mood of its card when there's no cover picture.</summary>
+    Soundscape Soundscape,
+    /// <summary>The room's generated cover picture, once one has been painted (a party played with the AI on), or null.</summary>
+    string? CoverUrl)
 {
     /// <param name="bestScore">The best escape at the room's own length.</param>
-    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool generated = false)
+    /// <param name="coverUrl">The room's <see cref="EscapeArt.Cover"/> picture. It's drawn only from what the TV shows before the game, so it's safe for anyone to see.</param>
+    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool generated = false, string? coverUrl = null)
     {
         // Counted on the room as played at its own length, so the card matches the game the host gets by default.
         var standard = RoomLengths.Cut(r, null);
         return new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, standard.Stages.Count, standard.Puzzles.Count,
             r.HintPenaltySeconds, bestScore, r.Host.Name, generated,
-            r.PlayableLengths.Select(m => new EscapeLength(m, r.Puzzles.Count(p => RoomLengths.Plays(p, m)))).ToList(), r.Seasons);
+            r.PlayableLengths.Select(m => new EscapeLength(m, r.Puzzles.Count(p => RoomLengths.Plays(p, m)))).ToList(), r.Seasons, r.Soundscape, coverUrl);
     }
 }
 
