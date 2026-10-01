@@ -112,7 +112,8 @@ export default function HowToPlay() {
   )
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+/** A titled part of a how-to-play sheet (shared with the escape room sheet). */
+export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-8">
       <h2 className="font-display mb-3 text-2xl">{title}</h2>
@@ -121,7 +122,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-function Item({ label, children }: { label: string; children: ReactNode }) {
+/** A bold label and its explanation, on one line of a how-to-play sheet. */
+export function Item({ label, children }: { label: string; children: ReactNode }) {
   return (
     <p className="mb-2 leading-relaxed">
       <span className="font-semibold">{label}: </span>

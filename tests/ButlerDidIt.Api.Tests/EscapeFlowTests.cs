@@ -64,6 +64,29 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task The_shelf_shows_a_room_s_cover_once_one_is_painted()
+    {
+        var before = GameJson.Deserialize<List<EscapeRoomSummary>>(await app.CreateClient().GetStringAsync("/api/escape-rooms"));
+        var workshop = before.Single(r => r.Id == "the-workshop");
+        Assert.Null(workshop.CoverUrl);
+        Assert.Equal(Soundscape.Workshop, workshop.Soundscape);
+
+        // The media pipeline paints a room's pictures under its own job id (escape:{room}).
+        var asset = Guid.NewGuid();
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.ScenarioMedia.Add(new ScenarioMediaEntity { ScenarioId = EscapeMedia.JobId("the-workshop"), Key = EscapeArt.Cover, AssetId = asset });
+            db.ScenarioMedia.Add(new ScenarioMediaEntity { ScenarioId = EscapeMedia.JobId("the-workshop"), Key = EscapeArt.Stage("stage-1"), AssetId = Guid.NewGuid() });
+            await db.SaveChangesAsync();
+        }
+
+        var after = GameJson.Deserialize<List<EscapeRoomSummary>>(await app.CreateClient().GetStringAsync("/api/escape-rooms"));
+        Assert.Equal($"/media/assets/{asset}", after.Single(r => r.Id == "the-workshop").CoverUrl);
+        Assert.All(after.Where(r => r.Id != "the-workshop"), r => Assert.Null(r.CoverUrl)); // only the cover, only for its own room
+    }
+
+    [Fact]
     public async Task Three_phones_escape_the_workshop_together()
     {
         var (_, cookie, party) = await EscapePartyAsync("the-workshop");

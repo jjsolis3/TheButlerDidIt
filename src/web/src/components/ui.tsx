@@ -1,26 +1,13 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router'
-
-type Variant = 'primary' | 'ghost' | 'danger' | 'quiet'
-
-const variants: Record<Variant, string> = {
-  primary: 'bg-accent text-bg hover:brightness-110 font-semibold',
-  ghost: 'border border-line text-ink hover:border-accent hover:text-accent',
-  danger: 'border border-blood/60 text-red-200 hover:bg-blood/20',
-  quiet: 'text-muted hover:text-ink',
-}
+import { buttonClass, type Variant } from './buttonClass'
 
 export function Button({
   variant = 'primary',
   className = '',
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
-  return (
-    <button
-      {...props}
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${variants[variant]} ${className}`}
-    />
-  )
+  return <button {...props} className={buttonClass(variant, className)} />
 }
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {

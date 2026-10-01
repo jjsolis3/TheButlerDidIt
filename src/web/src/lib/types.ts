@@ -628,6 +628,10 @@ export interface EscapeRoomSummary {
   lengths: EscapeLength[]
   /** Seasonal shelves the room is on ("halloween") */
   seasons: string[]
+  /** The room's background sound; it also sets the mood of the card when there's no cover picture */
+  soundscape: Soundscape
+  /** The room's generated cover picture, once one has been painted, or null */
+  coverUrl: string | null
 }
 
 export interface EscapeLength {

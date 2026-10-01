@@ -114,9 +114,10 @@ Only `media/` folders are served over HTTP (`MediaEndpoints.cs`), with a path ch
 ## 8. The front end
 
 - **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `PassAndPlay`.
+- **Front doors** (#99): `/` (`Home`) offers both games, with a card for each in that game's colours, plus "Your parties". Each game has its own page for visitors who haven't signed in: `/mystery` (`MysteryLanding`: the themes) and `/escape` (`EscapeLanding`: how it works, then the room shelf with filters and each room's leaderboards). Each also has a printable how-to-play sheet, `/how-to-play` and `/how-to-play/escape`. "Host" links go through sign-in with `?next=`, so a visitor lands on the host page with the room they picked.
 - **`PlayerScreen`** is the whole phone experience. Pass-and-play reuses it for each local seat.
 - **`CuePlayer`** plays cinematics: a list of cues (image, narration, NPC line, music, sound, video). Narration uses an audio file when the cue has one, otherwise the browser's built-in speech synthesis. Browsers block sound until the user interacts, which is why the stage starts with a "Tap to begin the evening" button.
-- **Theming**: colours are CSS variables that `useThemePalette` swaps per theme; Tailwind utilities (`bg-surface`, `text-accent`) read those variables.
+- **Theming**: colours are CSS variables that `useThemePalette` swaps per theme; Tailwind utilities (`bg-surface`, `text-accent`) read those variables. A page can also set a fixed palette with `usePalette`: the escape pages use `ESCAPE_PALETTE` (steel and exit-sign green), so the two games look different. It's a layout effect, so the page never flashes in the default gold first.
 
 ## 9. Deployment shape
 
@@ -276,7 +277,9 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - `EscapeService` runs escape commands (and refuses other kinds of party);
   - the hub's escape actions are in `PartyHub.Escape.cs`;
   - rooms are listed at `/api/escape-rooms`, and a party is created with `POST /api/parties/escape`.
-- **Front end:** `src/web/src/escape/` holds the shelf, the TV (`EscapeStage`) and the phone (`EscapePhone`). The game routes pick them by `PartyInfo.kind`.
+- **Front end:** `src/web/src/escape/` holds the shelf, the TV (`EscapeStage`) and the phone (`EscapePhone`). The game routes pick them by `PartyInfo.kind`. The shelf (`RoomShelf`, `useRoomShelf`) is shared by the landing page and the host page:
+  - Each card shows the room's cover picture once the media pipeline has painted one (`EscapeRoomSummary.CoverUrl`, read in one query for the whole shelf). Until then it shows a backdrop and an icon for the room's mood, keyed by its soundscape (`moods.ts`, shared with `SceneView`), so a room the AI wrote gets one too.
+  - Covers are safe to show anyone: they're drawn only from text the TV shows before the game starts.
 
 **Replays** (`RoomVariants`):
 - **The seed:** `EscapeState.Seed` is the puzzle set. The server picks it when the party is created: random, today's date for the daily challenge, or a number the host types in. The engine takes it as given, so it stays free of randomness.

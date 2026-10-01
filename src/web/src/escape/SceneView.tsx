@@ -1,16 +1,7 @@
 import { useState } from 'react'
 import type { EscapeFeedEntry, EscapeSceneView, EscapeSpotView } from '../lib/types'
+import { backdrop } from './moods'
 import { PropIcon } from './props'
-
-/** The backdrop behind a scene when the stage has no painted picture. */
-const BACKDROPS: Record<string, string> = {
-  workshop: 'linear-gradient(180deg, #2a2620 0%, #1b1813 60%, #120f0b 100%)',
-  carnival: 'linear-gradient(180deg, #3a1f3a 0%, #24142b 60%, #140b18 100%)',
-  sea: 'linear-gradient(180deg, #1c3246 0%, #122232 60%, #0a1520 100%)',
-  space: 'linear-gradient(180deg, #151a33 0%, #0d1024 60%, #06070f 100%)',
-  haunted: 'linear-gradient(180deg, #232b26 0%, #161c18 60%, #0c0f0d 100%)',
-}
-const DEFAULT_BACKDROP = 'linear-gradient(180deg, #26221d 0%, #191613 60%, #0f0d0b 100%)'
 
 type Examine = (spotId: string) => Promise<void>
 
@@ -85,7 +76,7 @@ export function SceneView({
           style={{
             width: `${zoom * 100}%`,
             aspectRatio: `${scene.width} / ${scene.height}`,
-            background: artUrl ? `center / cover no-repeat url(${JSON.stringify(artUrl)})` : (BACKDROPS[scene.backdrop] ?? DEFAULT_BACKDROP),
+            background: artUrl ? `center / cover no-repeat url(${JSON.stringify(artUrl)})` : backdrop(scene.backdrop),
           }}
         >
           {scene.objects.map((o) => (

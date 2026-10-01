@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useLocation, useNavigate, useSearchParams } from 'react-router'
 import { Button, Card, ErrorText, Eyebrow, Field, FilterChip, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import { useJobUpdates } from '../lib/hub'
@@ -63,11 +63,15 @@ export default function NewParty() {
   const [params] = useSearchParams()
   const [game, setGame] = useState<GameKind>(params.get('game') === 'escape' ? 'escapeRoom' : 'mystery')
 
+  // Signing in comes back here, to the same game and room (e.g. "Host this room" on /escape).
+  const location = useLocation()
+  const here = location.pathname + location.search
+
   useEffect(() => {
-    if (me === null) navigate('/login')
+    if (me === null) navigate(`/login?next=${encodeURIComponent(here)}`)
     if (me) api.aiStatus().then(setAi, () => setAi(null))
     if (me) api.authOptions().then(setAuthOptions, () => setAuthOptions(null))
-  }, [me, navigate])
+  }, [me, navigate, here])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
   const byRating = playable.filter((p) => p.scenario.contentRating === shelf)

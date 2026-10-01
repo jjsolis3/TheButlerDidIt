@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from 'react-router'
 import { ConfirmEmail, ForgotPassword, ResetPassword } from './pages/Account'
 import AdminAi from './pages/AdminAi'
 import AdminHosts from './pages/AdminHosts'
+import EscapeHowToPlay from './pages/EscapeHowToPlay'
+import EscapeLanding from './pages/EscapeLanding'
 import Home from './pages/Home'
 import HowToPlay from './pages/HowToPlay'
 import Join from './pages/Join'
@@ -9,6 +11,7 @@ import Login from './pages/Login'
 import NewParty from './pages/NewParty'
 import PassAndPlay from './pages/PassAndPlay'
 import MyMysteries from './pages/MyMysteries'
+import MysteryLanding from './pages/MysteryLanding'
 import Play from './pages/Play'
 import ScenarioEditor from './pages/ScenarioEditor'
 import Recap from './pages/Recap'
@@ -21,6 +24,9 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      {/* Each game's own front door. (/mysteries is the host's own library, "My mysteries".) */}
+      <Route path="/mystery" element={<MysteryLanding />} />
+      <Route path="/escape" element={<EscapeLanding />} />
       <Route path="/login" element={<Login />} />
       <Route path="/host/new" element={<NewParty />} />
       <Route path="/admin/ai" element={<AdminAi />} />
@@ -31,6 +37,7 @@ export default function App() {
       <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/mysteries" element={<MyMysteries />} />
       <Route path="/how-to-play" element={<HowToPlay />} />
+      <Route path="/how-to-play/escape" element={<EscapeHowToPlay />} />
       <Route path="/mysteries/:id" element={<ScenarioEditor />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />
