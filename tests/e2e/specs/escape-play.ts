@@ -76,6 +76,10 @@ export async function playThrough(tv: Page, phones: Page[], room: RoomFile, answ
     if (await tv.getByRole('heading', { name: 'You escaped!' }).isVisible()) return shot
     const p = phones[move % phones.length]
 
+    // On the TV layout (#116), every stage's puzzles must fit their column: nobody scrolls the TV.
+    const overflow = await tv.locator('[data-testid="tv-puzzles"]').evaluateAll((els) => els.map((el) => el.scrollHeight - el.clientHeight))
+    if (overflow.some((px) => px > 1)) shot.add(`puzzles overflow by ${Math.max(...overflow)}px in ${await tv.getByRole('heading', { level: 1 }).first().textContent()}`)
+
     // A new stage opens with a reveal on the TV (#110) and a card at the top of every phone. The TV's stays up
     // for a few seconds and the phones' until tapped, so neither gets in the way of the next move.
     if (!shot.has('reveal') && (await tv.getByTestId('room-reveal').isVisible())) {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { EscapeFeedEntry, EscapeSceneView, EscapeSpotView } from '../lib/types'
 import { backdrop } from './moods'
 import { PropIcon } from './props'
@@ -18,11 +18,17 @@ export function SceneView({
   artUrl,
   feed,
   onExamine,
+  fit = false,
 }: {
   scene: EscapeSceneView
   artUrl: string | null
   feed: EscapeFeedEntry[]
   onExamine?: Examine
+  /**
+   * The TV layout (#116): fill the box it's given, as big as fits while keeping the scene's proportions, and
+   * leave the list of what's been searched to the layout (`SearchedList`).
+   */
+  fit?: boolean
 }) {
   const [zoom, setZoom] = useState(1)
   const [last, setLast] = useState<string | null>(null)
@@ -49,7 +55,26 @@ export function SceneView({
   // Feedback for the last tap: what was there, or the penalty for a decoy on Hard (from the ticker).
   const lastSpot = scene.objects.find((o) => o.id === last)
   const penalty = lastSpot && feed.findLast((f) => f.text.includes(`the ${lastSpot.label}. Nothing there`))
-  const found = scene.objects.filter((o) => o.examined && o.look)
+
+  if (fit) {
+    // The box is a size container, so the scene can be sized from both its width (cqw) and its height (cqh):
+    // as wide as the box, unless that would make it taller than the box.
+    return (
+      <section aria-label="The room" className="grid h-full place-items-center" style={{ containerType: 'size' }}>
+        <div
+          className="overflow-hidden rounded-xl border border-line"
+          data-testid="scene"
+          style={{ width: `min(100cqw, calc(100cqh * ${scene.width} / ${scene.height}))` }}
+        >
+          <Canvas scene={scene} artUrl={artUrl} zoom={1}>
+            {scene.objects.map((o) => (
+              <Spot key={o.id} spot={o} scene={scene} disabled={false} />
+            ))}
+          </Canvas>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section aria-label="The room" className="space-y-2">
@@ -71,18 +96,11 @@ export function SceneView({
         </div>
       )}
       <div className="overflow-auto rounded-xl border border-line" data-testid="scene">
-        <div
-          className="relative"
-          style={{
-            width: `${zoom * 100}%`,
-            aspectRatio: `${scene.width} / ${scene.height}`,
-            background: artUrl ? `center / cover no-repeat url(${JSON.stringify(artUrl)})` : backdrop(scene.backdrop),
-          }}
-        >
+        <Canvas scene={scene} artUrl={artUrl} zoom={zoom}>
           {scene.objects.map((o) => (
             <Spot key={o.id} spot={o} scene={scene} onSearch={interactive ? () => void search(o) : undefined} disabled={busy} />
           ))}
-        </div>
+        </Canvas>
       </div>
       {interactive && (
         <div role="status" aria-live="polite" className="min-h-6 text-sm">
@@ -96,16 +114,39 @@ export function SceneView({
           ) : null}
         </div>
       )}
-      {!interactive && found.length > 0 && (
-        <ul className="grid gap-1 text-sm sm:grid-cols-2" aria-label="Searched so far">
-          {found.map((o) => (
-            <li key={o.id} className="text-ink/90">
-              🔎 <span className="font-semibold">{capitalise(o.label)}:</span> <span className="text-muted">{o.look}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {!interactive && <SearchedList scene={scene} className="grid gap-1 text-sm sm:grid-cols-2" />}
     </section>
+  )
+}
+
+/** The picture with its spots, at the scene's own proportions. */
+function Canvas({ scene, artUrl, zoom, children }: { scene: EscapeSceneView; artUrl: string | null; zoom: number; children: ReactNode }) {
+  return (
+    <div
+      className="relative"
+      style={{
+        width: `${zoom * 100}%`,
+        aspectRatio: `${scene.width} / ${scene.height}`,
+        background: artUrl ? `center / cover no-repeat url(${JSON.stringify(artUrl)})` : backdrop(scene.backdrop),
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+/** What the group has found by searching, spot by spot: on the TV, under the scene or beside it. */
+export function SearchedList({ scene, className = '' }: { scene: EscapeSceneView; className?: string }) {
+  const found = scene.objects.filter((o) => o.examined && o.look)
+  if (found.length === 0) return null
+  return (
+    <ul className={className} aria-label="Searched so far">
+      {found.map((o) => (
+        <li key={o.id} className="text-ink/90">
+          🔎 <span className="font-semibold">{capitalise(o.label)}:</span> <span className="text-muted">{o.look}</span>
+        </li>
+      ))}
+    </ul>
   )
 }
 

@@ -8,7 +8,18 @@ import { Button, ErrorText } from './ui'
  * family who can't be there, a way to remove anyone, and a switch to stop people watching at all.
  * `refresh` changes whenever the server says someone started or stopped watching.
  */
-export function WatchersPanel({ code, refresh, open = false }: { code: string; refresh: number; open?: boolean }) {
+export function WatchersPanel({
+  code,
+  refresh,
+  open = false,
+  variant = 'panel',
+}: {
+  code: string
+  refresh: number
+  open?: boolean
+  /** "chip": a small button in the TV layout's header (#116), whose details open as a pop-over. */
+  variant?: 'panel' | 'chip'
+}) {
   const [list, setList] = useState<SpectatorList | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -48,48 +59,63 @@ export function WatchersPanel({ code, refresh, open = false }: { code: string; r
     })
 
   const count = list?.watching.length ?? 0
+  const chip = variant === 'chip'
+  const summary = `👀 ${count} watching${list && !list.allow ? ' · watching is off' : ''}`
+  if (chip)
+    return (
+      <details open={open} data-testid="watchers" className="relative">
+        <summary className="cursor-pointer list-none rounded-full border border-line bg-surface/80 px-3 py-1 text-sm text-muted hover:text-ink">{summary}</summary>
+        <div className="absolute top-full right-0 z-40 mt-2 w-96 rounded-xl border border-line bg-surface p-4 text-left shadow-2xl">{body()}</div>
+      </details>
+    )
   return (
     <details open={open} data-testid="watchers" className="rounded-xl border border-line bg-surface/80 p-4 text-left">
-      <summary className="min-h-11 cursor-pointer content-center font-semibold">
-        👀 {count} watching{list && !list.allow ? ' · watching is off' : ''}
-      </summary>
-      <p className="mt-1 text-sm text-muted">
-        Family who can't be there, or more people than there are seats, can watch this screen on their own phone, even after the game starts, and send cheers. They
-        see what the TV shows, including the players' photos, and nothing else.
-      </p>
-      <label className="mt-3 flex min-h-11 items-center gap-2 text-sm">
-        <input type="checkbox" checked={list?.allow ?? true} disabled={!list} onChange={(e) => toggle(e.target.checked)} />
-        Let people watch
-      </label>
-      {list?.allow && (
-        <div className="mt-2 flex flex-wrap gap-2">
-          <input readOnly value={link} aria-label="Watch link" onFocus={(e) => e.target.select()} className="min-w-0 flex-1 rounded-lg border border-line bg-bg px-3 py-2 font-mono text-sm" />
-          <Button
-            variant="ghost"
-            onClick={() =>
-              run(async () => {
-                await navigator.clipboard.writeText(link)
-                setCopied(true)
-              })
-            }
-          >
-            {copied ? 'Copied!' : 'Copy watch link'}
-          </Button>
-        </div>
-      )}
-      {count > 0 && (
-        <ul className="mt-3 divide-y divide-line">
-          {list!.watching.map((w) => (
-            <li key={w.id} className="flex items-center justify-between gap-2 py-1 text-sm">
-              <span className="truncate">{w.name}</span>
-              <Button variant="quiet" onClick={() => remove(w)} aria-label={`Stop ${w.name} watching`}>
-                Remove
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <ErrorText>{error}</ErrorText>
+      <summary className="min-h-11 cursor-pointer content-center font-semibold">{summary}</summary>
+      {body()}
     </details>
   )
+
+  function body() {
+    return (
+      <>
+        <p className="mt-1 text-sm text-muted">
+          Family who can't be there, or more people than there are seats, can watch this screen on their own phone, even after the game starts, and send cheers. They
+          see what the TV shows, including the players' photos, and nothing else.
+        </p>
+        <label className="mt-3 flex min-h-11 items-center gap-2 text-sm">
+          <input type="checkbox" checked={list?.allow ?? true} disabled={!list} onChange={(e) => toggle(e.target.checked)} />
+          Let people watch
+        </label>
+        {list?.allow && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            <input readOnly value={link} aria-label="Watch link" onFocus={(e) => e.target.select()} className="min-w-0 flex-1 rounded-lg border border-line bg-bg px-3 py-2 font-mono text-sm" />
+            <Button
+              variant="ghost"
+              onClick={() =>
+                run(async () => {
+                  await navigator.clipboard.writeText(link)
+                  setCopied(true)
+                })
+              }
+            >
+              {copied ? 'Copied!' : 'Copy watch link'}
+            </Button>
+          </div>
+        )}
+        {count > 0 && (
+          <ul className="mt-3 divide-y divide-line">
+            {list!.watching.map((w) => (
+              <li key={w.id} className="flex items-center justify-between gap-2 py-1 text-sm">
+                <span className="truncate">{w.name}</span>
+                <Button variant="quiet" onClick={() => remove(w)} aria-label={`Stop ${w.name} watching`}>
+                  Remove
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <ErrorText>{error}</ErrorText>
+      </>
+    )
+  }
 }

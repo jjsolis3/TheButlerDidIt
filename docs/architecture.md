@@ -354,6 +354,12 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **Hiding pieces:** at the start, a puzzle's pieces beyond the player count go into its stage's `hidesPieces` spots, chosen from the seed (`PieceHolder` with a `SpotId` and no seat). Searching the spot hands the piece to the searcher. A room without hiding spots deals exactly as before.
 - **The validator's play-through** is a fixed point per stage: search every spot it can, look at every item, put together every pair, solve every puzzle it can, and repeat until nothing changes. It's exact because an item is either used up (by one puzzle or recipe) or a tool (never used up), never both, so no order of play can strand the group. It runs for every length × difficulty × 200 puzzle sets.
 - **Screens** (`src/web/src/escape/`):
+  - **The TV layout** (#116). While the clock runs on a screen at least 1024×600 (`TV_LAYOUT`, read with `useMediaQuery`), `TvRoom` fills the screen and never scrolls, because nobody works the TV during a game.
+    - **Header:** the stage, its description (2 lines at most), the clock, sound and the host's watchers chip.
+    - **Left column:** the scene, sized with container query units (`SceneView fit`) to fill its box at its own proportions, then the game master's line, then what's been searched, found and happened, newest first and fading out at the bottom.
+    - **Right column:** the puzzles in two newspaper-style columns, open ones first and solved ones shrunk to the end.
+    - **Why it fits:** the busiest stage in any room has six puzzles. The escape e2e checks that the page never scrolls, that every card is wholly on screen at 1440×900, and that no stage's puzzles overflow during a whole game.
+    - **Smaller screens:** phones (someone watching) keep the stacked layout, which scrolls.
   - `SceneView` draws a scene as HTML buttons placed over the picture, by percentage of the canvas, so every spot works by keyboard and screen reader; `props.tsx` draws each prop as a small SVG.
   - `ItemInspector` holds, inspects and combines items; `Notebook` shows the notebook.
   - `PuzzleWidgets` has the light grid, the logic grid and line-up, the cipher decoders and the pattern display.
