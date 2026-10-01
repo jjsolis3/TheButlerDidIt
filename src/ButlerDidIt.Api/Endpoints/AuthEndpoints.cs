@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Plans;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,8 @@ namespace ButlerDidIt.Api.Endpoints;
 /// <param name="Invite">The token from an invite link (<see cref="InviteEndpoints"/>). Needed while registration is closed.</param>
 public sealed record RegisterRequest(string Email, string Password, string DisplayName, string? Invite = null);
 public sealed record LoginRequest(string Email, string Password);
-public sealed record MeResponse(string Id, string Email, string DisplayName, bool IsAdmin, bool EmailConfirmed);
+/// <param name="Access">Which games this host may start, and the plan that gives them (#100).</param>
+public sealed record MeResponse(string Id, string Email, string DisplayName, bool IsAdmin, bool EmailConfirmed, AccessView Access);
 public sealed record AuthOptionsView(bool AllowRegistration, bool EmailEnabled, bool RequireConfirmedEmail);
 public sealed record ForgotRequest(string Email);
 public sealed record ResetRequest(string Email, string Token, string Password);
@@ -76,6 +78,8 @@ public static class AuthEndpoints
             Microsoft.Extensions.Options.IOptions<AppOptions> app,
             ILogger<AuthOptions> log,
             TimeProvider clock,
+            Microsoft.Extensions.Options.IOptions<PlansOptions> plans,
+            HttpContext http,
             CancellationToken ct) =>
         {
             var isFirstUser = !await users.Users.AnyAsync();
@@ -104,14 +108,22 @@ public static class AuthEndpoints
             var result = await users.CreateAsync(user, req.Password);
             if (!result.Succeeded)
                 return Results.Problem(string.Join(" ", result.Errors.Select(e => e.Description)), statusCode: StatusCodes.Status400BadRequest);
+            // A free trial of both games, or free access for good if the invite carried it. The admin needs neither.
+            if (!isFirstUser)
+            {
+                db.AccessGrants.Add(invite is { FreeAccess: true }
+                    ? Access.FreeAccess(user.Id, clock.GetUtcNow(), "From an invite")
+                    : Access.Trial(user.Id, clock.GetUtcNow(), plans.Value.TrialDays));
+                await db.SaveChangesAsync(ct);
+            }
             await transaction.CommitAsync(ct);
 
             await SendConfirmationAsync(user, users, email, app, log, ct);
             await signIn.SignInAsync(user, isPersistent: true);
-            return Results.Ok(ToMe(user));
+            return Results.Ok(await ToMeAsync(user, http));
         }).RequireRateLimiting(RegisterRateLimit);
 
-        group.MapPost("/login", async (LoginRequest req, SignInManager<AppUser> signIn, UserManager<AppUser> users) =>
+        group.MapPost("/login", async (LoginRequest req, SignInManager<AppUser> signIn, UserManager<AppUser> users, HttpContext http) =>
         {
             var result = await signIn.PasswordSignInAsync(req.Email.Trim(), req.Password, isPersistent: true, lockoutOnFailure: true);
             if (!result.Succeeded)
@@ -120,7 +132,7 @@ public static class AuthEndpoints
                 return Results.Problem(message, statusCode: StatusCodes.Status401Unauthorized);
             }
             var user = await users.FindByNameAsync(req.Email.Trim());
-            return Results.Ok(ToMe(user!));
+            return Results.Ok(await ToMeAsync(user!, http));
         });
 
         group.MapPost("/logout", async (SignInManager<AppUser> signIn) =>
@@ -154,7 +166,7 @@ public static class AuthEndpoints
             return Results.Ok(new { Message = ForgotReply });
         }).RequireRateLimiting(EmailRateLimit);
 
-        group.MapPost("/reset", async (ResetRequest req, UserManager<AppUser> users, SignInManager<AppUser> signIn) =>
+        group.MapPost("/reset", async (ResetRequest req, UserManager<AppUser> users, SignInManager<AppUser> signIn, HttpContext http) =>
         {
             var user = await users.FindByEmailAsync(req.Email.Trim());
             if (user is null) return Results.Problem(BadResetLink, statusCode: StatusCodes.Status400BadRequest);
@@ -175,7 +187,7 @@ public static class AuthEndpoints
             await users.ResetAccessFailedCountAsync(user);
             await users.SetLockoutEndDateAsync(user, null);
             await signIn.SignInAsync(user, isPersistent: true);
-            return Results.Ok(ToMe(user));
+            return Results.Ok(await ToMeAsync(user, http));
         });
 
         // ---- Email confirmation
@@ -196,14 +208,20 @@ public static class AuthEndpoints
             return Results.NoContent();
         }).RequireAuthorization(AuthPolicies.Host).RequireRateLimiting(EmailRateLimit);
 
-        group.MapGet("/me", async (ClaimsPrincipal principal, UserManager<AppUser> users) =>
+        group.MapGet("/me", async (ClaimsPrincipal principal, UserManager<AppUser> users, HttpContext http) =>
         {
             var user = await users.GetUserAsync(principal);
-            return user is null ? Results.Unauthorized() : Results.Ok(ToMe(user));
+            return user is null ? Results.Unauthorized() : Results.Ok(await ToMeAsync(user, http));
         }).RequireAuthorization(AuthPolicies.Host);
     }
 
-    internal static MeResponse ToMe(AppUser u) => new(u.Id, u.Email ?? "", u.DisplayName, u.IsAdmin, u.EmailConfirmed);
+    /// <summary>The signed-in host as their pages see them, with the games they may start now.</summary>
+    internal static async Task<MeResponse> ToMeAsync(AppUser u, HttpContext http)
+    {
+        var sp = http.RequestServices;
+        var access = await Access.ForAsync(sp.GetRequiredService<AppDbContext>(), u, sp.GetRequiredService<TimeProvider>().GetUtcNow(), http.RequestAborted);
+        return new(u.Id, u.Email ?? "", u.DisplayName, u.IsAdmin, u.EmailConfirmed, access);
+    }
 
     private static async Task SendConfirmationAsync(AppUser user, UserManager<AppUser> users, IEmailSender email,
         Microsoft.Extensions.Options.IOptions<AppOptions> app, ILogger log, CancellationToken ct)

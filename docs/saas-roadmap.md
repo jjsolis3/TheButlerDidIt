@@ -87,15 +87,24 @@ Escape rooms used to be only inside `/host/new?game=escape`, behind sign-in, so 
 - **"Host this room"** goes to `/host/new?game=escape&room=…`, through sign-in for a visitor and back to the same room.
 - **A printable sheet**, `/how-to-play/escape`, explains escape rooms the way `/how-to-play` explains the mysteries.
 
-### 5. Plans and entitlements, granted by hand (#100)
+### 5. Plans and entitlements, granted by hand (#100, done)
 
 This is the heart of "pay for murder, escape, or both".
 
-- `SubscriptionEntity` (one per host): plan, status (`Trialing`, `Active`, `PastDue`, `Canceled`, `Comp`), period end, and the payment provider's ids (empty for hand grants).
-- An `Entitlements` service turns that into what the code checks: the `GameKind`s this host may start, their AI budget, and whether AI writing is on. The admin is always entitled.
-- A `RequireGame(GameKind)` endpoint filter on the four create endpoints.
-- The admin can grant **Comp** access from the hosts page.
-- `/api/auth/me` gains the host's games and plan, mirrored in `types.ts`, so pages can show "Unlock Escape Rooms". As everywhere else in this app, the page only displays the answer; the server is what enforces it.
+**The owner's decisions:**
+- New hosts get a **14-day free trial of both games**.
+- Hosts who already had accounts keep **both games free, for good**.
+- A one-off **party pass** will be sold too.
+
+**As built:**
+- **Access is a set of grants** (`AccessGrants`): trial, comp (free access), pass and subscription, each with its games and dates.
+  - A host's access is every grant in effect put together.
+  - This replaced the one-row-per-host `SubscriptionEntity` first sketched here, because a trial, a pass and a subscription can overlap.
+  - Stripe (#101) will write `Subscription` and `Pass` grants.
+- **The check:** a `RequireGame(GameKind)` endpoint filter on the four create endpoints. The admin always passes.
+- **The admin gives or removes free access** on the Hosts page, and an invite can carry it instead of the trial.
+- **`/api/auth/me` carries the host's access.** The host page says what's locked, and the account page shows the plan. As everywhere else in this app, the page only displays the answer; the server enforces it.
+- **The AI budget per plan** waits for priced plans (#101).
 
 **Why before payments?** Stripe is just one *source* of access. Hand grants, invites and trials are others. Building the check first means:
 

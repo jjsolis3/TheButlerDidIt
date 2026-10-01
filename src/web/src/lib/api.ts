@@ -14,6 +14,7 @@ import type {
   ValidationResult,
   RecapPage,
   RecapSharing,
+  AccessView,
   AccountView,
   AuthOptions,
   CreatedInvite,
@@ -183,8 +184,11 @@ export const api = {
   admin: {
     hosts: () => request<HostView[]>('GET', '/api/admin/hosts'),
     resetLink: (id: string) => request<{ link: string; validForHours: number }>('POST', `/api/admin/hosts/${encodeURIComponent(id)}/reset-link`),
+    giveFreeAccess: (id: string) => request<AccessView>('POST', `/api/admin/hosts/${encodeURIComponent(id)}/free-access`),
+    removeFreeAccess: (id: string) => request<AccessView>('DELETE', `/api/admin/hosts/${encodeURIComponent(id)}/free-access`),
     invites: () => request<InviteView[]>('GET', '/api/admin/invites'),
-    createInvite: (i: { email: string | null; note: string | null; days: number; send: boolean }) => request<CreatedInvite>('POST', '/api/admin/invites', i),
+    createInvite: (i: { email: string | null; note: string | null; days: number; send: boolean; freeAccess: boolean }) =>
+      request<CreatedInvite>('POST', '/api/admin/invites', i),
     deleteInvite: (id: string) => request<void>('DELETE', `/api/admin/invites/${encodeURIComponent(id)}`),
     providers: () => request<ProviderView[]>('GET', '/api/admin/ai/providers'),
     createProvider: (p: { name: string; kind: AiProviderKind; baseUrl: string | null; apiKey: string | null }) =>

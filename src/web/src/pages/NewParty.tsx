@@ -4,6 +4,8 @@ import { Button, Card, ErrorText, Eyebrow, Field, FilterChip, Heading, inputClas
 import { api } from '../lib/api'
 import { useJobUpdates } from '../lib/hub'
 import { ConfirmEmailBanner } from './Account'
+import { AccessNotice } from '../components/AccessNotice'
+import { allows } from '../lib/access'
 import { useThemes } from '../lib/theme'
 import type { AiStatus, AuthOptions, ContentRating, GameKind, GenerationJob, MysteryLength, PartyMode, ThemeCard, Tone } from '../lib/types'
 import { NewEscapeParty } from '../escape/NewEscapeParty'
@@ -134,14 +136,17 @@ export default function NewParty() {
           </button>
         ))}
       </div>
+      <AccessNotice access={me?.access} game={game} />
     </>
   )
+  // The chosen game isn't in the host's plan: the notice says so, and creating waits (the server refuses it too).
+  const locked = !!me && !allows(me.access, game)
 
   if (game === 'escapeRoom') {
     return (
       <Shell>
         {header}
-        <NewEscapeParty />
+        <NewEscapeParty locked={locked} />
       </Shell>
     )
   }
@@ -350,7 +355,7 @@ export default function NewParty() {
 
       <div className="mt-8 space-y-3">
         <ErrorText>{error}</ErrorText>
-        <Button onClick={create} disabled={!scenarioId || busy} className="w-full text-base">
+        <Button onClick={create} disabled={!scenarioId || busy || locked} className="w-full text-base">
           Create party and get the invite code
         </Button>
       </div>

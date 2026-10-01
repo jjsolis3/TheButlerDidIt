@@ -88,6 +88,7 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 | `Auth__AllowRegistration` | `true` at first, then `false` | `false` makes the site invite-only. |
 | `App__PublicUrl` | `https://your.domain` | The address used in emailed and invite links. |
 | `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **AI settings** unreadable. Keys already in `/data/keys` are copied in on the next start. |
+| `Plans__TrialDays` | `14` | Optional: how long a new host's free trial of both games lasts. Hosts who had an account before plans keep both games free. |
 | `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
 
 The Dockerfile already sets the port (8080), the content folder and the data folders. Untick **Buildtime** on secrets such as the connection string: the app only reads them when it runs.

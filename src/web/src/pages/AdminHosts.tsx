@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Button, ErrorText, Eyebrow, Heading, Shell } from '../components/ui'
+import { describeAccess } from '../lib/access'
 import { api } from '../lib/api'
 import type { HostView } from '../lib/types'
 import { useMe } from '../lib/useMe'
@@ -30,6 +31,17 @@ export default function AdminHosts() {
       cancelled = true
     }
   }, [me, navigate])
+
+  // Free access (#100): both games for good. Taking it away leaves any trial or pass still running.
+  const changeAccess = async (host: HostView, give: boolean) => {
+    setError(null)
+    try {
+      const access = give ? await api.admin.giveFreeAccess(host.id) : await api.admin.removeFreeAccess(host.id)
+      setHosts((all) => all?.map((h) => (h.id === host.id ? { ...h, access } : h)) ?? null)
+    } catch (e) {
+      setError((e as Error).message)
+    }
+  }
 
   const makeLink = async (id: string) => {
     setError(null)
@@ -72,10 +84,26 @@ export default function AdminHosts() {
                     {h.email} · {h.emailConfirmed ? 'email confirmed' : 'email not confirmed'} · {h.parties} part{h.parties === 1 ? 'y' : 'ies'}
                     {h.lockedOut && ' · locked out after too many wrong passwords'}
                   </p>
+                  <p className="text-sm">
+                    <span className="text-accent">{describeAccess(h.access).title}</span>{' '}
+                    <span className="text-muted">· {describeAccess(h.access).detail}</span>
+                  </p>
                 </div>
-                <Button variant="ghost" onClick={() => makeLink(h.id)}>
-                  Make a reset link
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  {!h.isAdmin &&
+                    (h.access.plan === 'free' ? (
+                      <Button variant="quiet" onClick={() => changeAccess(h, false)}>
+                        Remove free access
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" onClick={() => changeAccess(h, true)}>
+                        Give free access
+                      </Button>
+                    ))}
+                  <Button variant="ghost" onClick={() => makeLink(h.id)}>
+                    Make a reset link
+                  </Button>
+                </div>
               </div>
               {links[h.id] && (
                 <div className="mt-3 space-y-1">

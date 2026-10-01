@@ -37,7 +37,7 @@ test('a host renames themselves, changes their password, downloads their data an
   await page.getByRole('link', { name: 'Your account' }).click()
   await page.waitForURL('**/account')
   await expect(page.getByRole('heading', { name: 'Morgan Host' })).toBeVisible()
-  await expect(page.getByText('Early access')).toBeVisible()
+  await expect(page.getByText('Free trial', { exact: true })).toBeVisible() // a new host starts on the free trial
   await expect(page.getByText('0 mysteries and 0 escape rooms hosted')).toBeVisible()
   await page.screenshot({ path: `${SHOTS}/96-account-page.png`, fullPage: true })
 

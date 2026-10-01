@@ -58,6 +58,7 @@ test('a new host signs up with a one-time invite link from the admin', async ({ 
   await admin.goto('/admin/hosts')
   await admin.getByLabel("Who's it for?").fill('Ivy, my cousin')
   await admin.getByLabel('Their email (optional)').fill('ivy@e2e.test')
+  await admin.getByLabel('Free access for good (instead of the free trial)').check() // family: no trial clock
   await admin.getByRole('button', { name: 'Make an invite link' }).click()
   const link = await admin.getByLabel('New invite link').inputValue()
   expect(link).toMatch(/\/login\?invite=[\w-]{43}$/)
@@ -76,6 +77,9 @@ test('a new host signs up with a one-time invite link from the admin', async ({ 
   await ivy.screenshot({ path: 'screenshots/42-invited-sign-up.png', fullPage: true })
   await ivy.getByRole('button', { name: 'Create account' }).click()
   await ivy.waitForURL('**/host/new')
+  await expect(ivy.getByText(/Free trial:/)).toHaveCount(0) // the invite gave free access instead
+  await ivy.goto('/account')
+  await expect(ivy.getByText('Free access', { exact: true })).toBeVisible()
 
   // ---- The link is used up: anyone opening it again is told so, and sent to sign in.
   const stranger = await (await browser.newContext()).newPage()
@@ -86,4 +90,38 @@ test('a new host signs up with a one-time invite link from the admin', async ({ 
   // ---- The admin sees who used it.
   await admin.reload()
   await expect(admin.getByText(/Used by Invited Ivy/)).toBeVisible()
+})
+
+test('a new host starts on a free trial, and the admin can give them free access', async ({ browser }) => {
+  // ---- A new host: the host page says how long the trial has left.
+  const host = await (await browser.newContext()).newPage()
+  const email = `trial-${Date.now()}@e2e.test`
+  await host.goto('/login')
+  await host.getByRole('button', { name: 'Create an account' }).click()
+  await host.getByLabel('Your name').fill('Trial Tess')
+  await host.getByLabel('Email').fill(email)
+  await host.getByLabel('Password').fill('password123')
+  await host.getByRole('button', { name: 'Create account' }).click()
+  await host.waitForURL('**/host/new')
+  await expect(host.getByText('🎟️ Free trial: 14 days left, with every game included.')).toBeVisible()
+
+  // ---- The admin sees the trial on the Hosts page and gives free access.
+  const admin = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage()
+  await admin.goto('/login')
+  await admin.getByLabel('Email').fill('admin@e2e.test')
+  await admin.getByLabel('Password').fill('password123')
+  await admin.getByRole('button', { name: 'Sign in' }).click()
+  await admin.waitForURL('**/host/new')
+  await admin.goto('/admin/hosts')
+  const tess = admin.locator('div.rounded-xl', { hasText: email })
+  await expect(tess.getByText('Free trial', { exact: true })).toBeVisible()
+  await tess.getByRole('button', { name: 'Give free access' }).click()
+  await expect(tess.getByText('Free access', { exact: true })).toBeVisible()
+  await expect(tess.getByRole('button', { name: 'Remove free access' })).toBeVisible()
+  await admin.screenshot({ path: 'screenshots/43-admin-free-access.png', fullPage: true })
+
+  // ---- The host's account page shows it.
+  await host.goto('/account')
+  await expect(host.getByText('Free access', { exact: true })).toBeVisible()
+  await host.screenshot({ path: 'screenshots/44-account-free-access.png', fullPage: true })
 })

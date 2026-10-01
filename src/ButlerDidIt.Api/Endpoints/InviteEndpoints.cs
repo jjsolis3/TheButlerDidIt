@@ -17,12 +17,15 @@ public enum InviteStatus
 
 /// <summary>An invite on the admin's list. It never includes the link: only a hash of it is stored.</summary>
 public sealed record InviteView(Guid Id, string? Email, string? Note, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt,
-    InviteStatus Status, string? UsedBy, DateTimeOffset? UsedAt);
+    InviteStatus Status, string? UsedBy, DateTimeOffset? UsedAt,
+    /// <summary>The account gets both games free for good, instead of the free trial.</summary>
+    bool FreeAccess);
 
 /// <param name="Email">Optional: only this address can use the invite.</param>
 /// <param name="Days">How long the link works, 1 to <see cref="InviteEndpoints.MaxDays"/> days.</param>
 /// <param name="Send">Email the link to <paramref name="Email"/>. Needs email set up on the server.</param>
-public sealed record CreateInviteRequest(string? Email, string? Note, int Days = 7, bool Send = false);
+/// <param name="FreeAccess">Both games free for good (family, friends), instead of the free trial.</param>
+public sealed record CreateInviteRequest(string? Email, string? Note, int Days = 7, bool Send = false, bool FreeAccess = false);
 
 /// <summary>A new invite and its link. This is the only time the server ever hands the link out.</summary>
 public sealed record CreatedInvite(InviteView Invite, string Link, bool Emailed);
@@ -81,7 +84,7 @@ public static class InviteEndpoints
             var invite = new InviteEntity
             {
                 Id = Guid.NewGuid(), TokenHash = SeatTokens.Hash(token), Email = address, Note = note,
-                CreatedByUserId = admin!.Id, CreatedAt = now, ExpiresAt = now.AddDays(req.Days),
+                CreatedByUserId = admin!.Id, CreatedAt = now, ExpiresAt = now.AddDays(req.Days), FreeAccess = req.FreeAccess,
             };
             db.Invites.Add(invite);
             await db.SaveChangesAsync(ct);
@@ -144,5 +147,5 @@ public static class InviteEndpoints
     private static InviteView ToView(InviteEntity i, DateTimeOffset now, IReadOnlyDictionary<string, string> names) =>
         new(i.Id, i.Email, i.Note, i.CreatedAt, i.ExpiresAt,
             i.UsedAt is not null ? InviteStatus.Used : i.ExpiresAt <= now ? InviteStatus.Expired : InviteStatus.Pending,
-            i.UsedByUserId is null ? null : names.GetValueOrDefault(i.UsedByUserId), i.UsedAt);
+            i.UsedByUserId is null ? null : names.GetValueOrDefault(i.UsedByUserId), i.UsedAt, i.FreeAccess);
 }

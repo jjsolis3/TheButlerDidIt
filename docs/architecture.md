@@ -107,6 +107,20 @@ The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the hos
 - **Download my data** is a JSON file of the account, its parties, mysteries, rooms, escapes and monthly AI use. It leaves out guests' names and notes, which belong to the guests.
 - **Deleting** an account removes its parties (with seats, notes and selfie files, via `RetentionWorker.DeletePartyAsync`), its own mysteries and rooms, and their art. Leaderboard times and AI costs are kept without the name. The admin account can't be deleted.
 
+**Plans and access** (`Plans/Access.cs`, #100). Hosts pay for murder mysteries, escape rooms or both. Access is a set of **grants** (`AccessGrants`), each with its games (`GameAccess` flags), kind, start and end:
+
+| Kind | Games | Lasts | Comes from |
+|---|---|---|---|
+| `Trial` | both | `Plans:TrialDays` (14) | signing up |
+| `Comp` | both | for good | the admin (Hosts page), an invite with free access, or having had an account before plans (the migration) |
+| `Pass` | one | e.g. 72 hours | buying a party pass (#101) |
+| `Subscription` | the plan's | the paid period | the payment provider (#101) |
+
+- **A host's access is every grant in effect put together** (`Access.From`, pure and unit-tested), so sources overlap without special cases: a pass bought during a trial, a subscription on top of a pass. Grants aren't edited into something else: they end, or are revoked, and new ones are added.
+- **The code checks games, never plan names.** The filter `Access.RequireGame(GameKind)` sits beside `RequireConfirmedHost` on the four endpoints that start something: a mystery party, an escape party, and the two AI writers. The admin always passes.
+- **Only starting is gated.** Guests, joining, a party already created (a trial that ends mid-evening never stops one), recaps and the host's own content never are.
+- **The pages show the answer:** `MeResponse.Access` carries it. The host page says what's locked (`AccessNotice`), and the account and Hosts pages show the plan. The server is still what enforces it.
+
 **Invites** (`InviteEndpoints.cs`, #97). With `Auth:AllowRegistration=false`, a new host needs an invite link from the admin (`/login?invite=…`):
 - **Stored like seat tokens.** The link carries a random 256-bit token, and the database keeps only its SHA-256 hash. The admin's list never shows a link again, and a copy of the database can't be used to sign up.
 - **Used once, in the sign-up's own transaction.** `POST /api/auth/register` claims the invite with one `UPDATE … WHERE UsedAt IS NULL` inside the transaction that creates the account. The UPDATE locks the row, so if two people use one link at the same moment, the second waits, then finds it used. If creating the account fails (a weak password, an email already taken), the rollback leaves the invite unused.
