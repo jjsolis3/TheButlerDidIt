@@ -126,6 +126,110 @@ public static class EscapeProjector
         return new EscapeCipherView(d.Type, unlocked, found);
     }
 
+    /// <summary>
+    /// The recap of a finished game (#111). It's made only from what the group saw or did: the stages they
+    /// reached and the titles of the puzzles in them (the TV listed those), who opened what and when.
+    /// Answers, prompts, hints, solved texts and clue pieces are never copied, so a shared recap doesn't
+    /// spoil the room for the next group.
+    /// </summary>
+    public static EscapeRecapView Recap(EscapeState s, EscapeRoom template, IReadOnlyDictionary<string, string>? art = null)
+    {
+        if (s.Phase is not (EscapePhase.Escaped or EscapePhase.Failed) || s.StartedAt is not { } start || s.EndedAt is not { } end)
+            throw new ButlerDidIt.Game.Engine.GameRuleException("The recap appears once the game is over.");
+        var room = EscapeEngine.RoomFor(s, template);
+        int At(DateTimeOffset t) => (int)Math.Round((t - start).TotalSeconds);
+        var solved = s.Solved.ToDictionary(x => x.PuzzleId);
+
+        // Stage by stage, up to the one the group was in at the end (the last one, if they escaped).
+        var stages = new List<EscapeRecapStage>();
+        var openedAt = 0;
+        for (var i = 0; i <= s.StageIndex && i < room.Stages.Count; i++)
+        {
+            var stage = room.Stages[i];
+            var puzzles = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Select(p =>
+            {
+                var hints = s.HintsShown.GetValueOrDefault(p.Id);
+                return solved.TryGetValue(p.Id, out var x)
+                    ? new EscapeRecapPuzzle(p.Title, p.Kind, x.SolvedBy, At(x.At), hints)
+                    : new EscapeRecapPuzzle(p.Title, p.Kind, null, null, hints);
+            }).ToList();
+            // Cleared when its last puzzle opened; the next stage opened at that moment.
+            int? clearedAt = puzzles.All(p => p.SolvedAt is not null) ? puzzles.Select(p => p.SolvedAt!.Value).DefaultIfEmpty(openedAt).Max() : null;
+            stages.Add(new EscapeRecapStage(i + 1, stage.Title, openedAt, clearedAt, puzzles.Sum(p => p.Hints), puzzles));
+            if (clearedAt is { } cleared) openedAt = cleared;
+        }
+
+        var escaped = s.Phase == EscapePhase.Escaped;
+        var elapsed = EscapeEngine.ElapsedSeconds(s);
+        var left = s.Deadline is { } deadline && escaped ? Math.Max(0, (int)Math.Round((deadline - end).TotalSeconds)) : 0;
+        var team = s.Players.Select(p => new EscapeRecapPlayer(p.Name, p.PhotoUrl, s.Solved.Count(x => x.SolvedBy == p.Name))).ToList();
+        var lines = s.Cues.Where(c => c.Text is not null).OrderBy(c => c.At).Select(c => c.Text!).ToList();
+
+        return new EscapeRecapView(
+            room.Id, room.Title, room.Synopsis, room.Theme, room.ContentRating,
+            CoverUrl: art?.GetValueOrDefault(EscapeArt.Cover),
+            Escaped: escaped,
+            EndText: escaped ? room.EscapedText : room.FailedText,
+            StartedAt: start,
+            ElapsedSeconds: elapsed,
+            SecondsLeft: left,
+            TimeLimitMinutes: room.TimeLimitMinutes,
+            Difficulty: s.Level,
+            HintsUsed: s.HintsUsed,
+            HintPenaltySeconds: room.HintPenaltySeconds,
+            WrongAttempts: s.WrongAttempts,
+            Score: EscapeEngine.Score(s, template),
+            SolvedCount: s.Solved.Count,
+            PuzzleCount: room.Puzzles.Count,
+            StageCount: room.Stages.Count,
+            Daily: s.Daily,
+            PuzzleSet: s.Seed,
+            Team: team,
+            Stages: stages,
+            Highlights: Highlights(s, escaped, left, team, stages),
+            GameMasterName: lines.Count > 0 ? room.Host.Name : null,
+            GameMasterLines: lines);
+    }
+
+    /// <summary>A few moments worth a cheer, worked out from the timeline. Only things the group saw happen.</summary>
+    private static List<EscapeRecapHighlight> Highlights(EscapeState s, bool escaped, int secondsLeft, List<EscapeRecapPlayer> team, List<EscapeRecapStage> stages)
+    {
+        var list = new List<EscapeRecapHighlight>();
+
+        var most = team.Select(p => p.Solved).DefaultIfEmpty(0).Max();
+        if (most > 0)
+        {
+            var names = team.Where(p => p.Solved == most).Select(p => p.Name).ToList();
+            var detail = names.Count == 1 ? $"{names[0]} ({most})" : $"{JoinNames(names)} ({most} each)";
+            list.Add(new("🧠", "Most puzzles opened", detail));
+        }
+
+        var first = stages.SelectMany(st => st.Puzzles).Where(p => p.SolvedAt is not null).OrderBy(p => p.SolvedAt).FirstOrDefault();
+        if (first is not null) list.Add(new("🔓", "First breakthrough", $"{first.SolvedBy} opened {first.Title} at {Clock(first.SolvedAt!.Value)}"));
+
+        var cleared = stages.Where(st => st.ClearedAt is not null).ToList();
+        if (cleared.Count >= 2)
+        {
+            var fastest = cleared.MinBy(st => st.ClearedAt!.Value - st.OpenedAt)!;
+            list.Add(new("⚡", "Fastest stage", $"{fastest.Title} in {Clock(fastest.ClearedAt!.Value - fastest.OpenedAt)}"));
+        }
+
+        if (escaped && s.HintsUsed == 0) list.Add(new("🦉", "No hints needed", "Escaped without a single hint."));
+        else if (cleared.Where(st => st.Hints == 0).Select(st => st.Title).ToList() is { Count: > 0 } clean)
+            list.Add(new("🦉", "No hints needed", JoinNames(clean)));
+
+        if (escaped && secondsLeft < 60) list.Add(new("⏱️", "Photo finish", $"Out with {secondsLeft} {(secondsLeft == 1 ? "second" : "seconds")} to spare."));
+        return list;
+    }
+
+    private static string Clock(int seconds) => $"{seconds / 60}:{seconds % 60:00}";
+
+    private static string JoinNames(List<string> names) => names.Count switch
+    {
+        1 => names[0],
+        _ => $"{string.Join(", ", names.Take(names.Count - 1))} and {names[^1]}",
+    };
+
     /// <summary>What the phones call a place a key was found: the spot, item or puzzle's own public name.</summary>
     private static string PlaceLabel(EscapeRoom room, string place)
     {

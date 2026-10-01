@@ -140,6 +140,27 @@ public static class EscapeResults
     public static IQueryable<EscapeResult> AtEdition(this IQueryable<EscapeResult> results, EscapeRoom room) =>
         room.Edition == 1 ? results.Where(r => r.Edition == 1 || r.Edition == null) : results.Where(r => r.Edition == room.Edition);
 
+    /// <summary>Where a result ranks on a board: one more than the escapes with a better score (or the same score, sooner).</summary>
+    public static async Task<int> RankInAsync(this IQueryable<EscapeResult> board, EscapeResult own, CancellationToken ct) =>
+        await board.CountAsync(r => r.Score < own.Score || (r.Score == own.Score && r.FinishedAt < own.FinishedAt), ct) + 1;
+
+    /// <summary>
+    /// Where a party's escape ranks on its own board: the same room, length, difficulty and edition it was played on
+    /// (and the same day, for a daily challenge). Null if the group didn't escape.
+    /// </summary>
+    public static async Task<int?> RankOfPartyAsync(AppDbContext db, EscapeRoom room, Guid partyId, CancellationToken ct)
+    {
+        var own = await db.EscapeResults.AsNoTracking().FirstOrDefaultAsync(r => r.PartyId == partyId && r.Escaped, ct);
+        if (own is null) return null;
+        var edition = own.Edition ?? 1;
+        var board = db.EscapeResults.AsNoTracking().Where(r => r.RoomId == own.RoomId && r.Escaped)
+            .AtLength(room, own.Minutes ?? room.TimeLimitMinutes)
+            .AtDifficulty(own.Difficulty ?? EscapeDifficulty.Normal)
+            .Where(r => (r.Edition ?? 1) == edition);
+        if (own.Daily) board = board.Where(r => r.Daily && r.Seed == own.Seed);
+        return await board.RankInAsync(own, ct);
+    }
+
     /// <summary>A room's results at one difficulty. Results from before difficulties existed count as Normal.</summary>
     public static IQueryable<EscapeResult> AtDifficulty(this IQueryable<EscapeResult> results, EscapeDifficulty difficulty) =>
         difficulty == EscapeDifficulty.Normal
@@ -213,7 +234,6 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
     {
         if (previous is not EscapeSession { State.Phase: EscapePhase.Playing }) return;
         if (State.Phase is not (EscapePhase.Escaped or EscapePhase.Failed)) return;
-        var elapsed = (int)Math.Round((State.EndedAt!.Value - State.StartedAt!.Value).TotalSeconds);
         var team = string.Join(", ", State.Players.Select(p => p.Name));
         db.EscapeResults.Add(new EscapeResult
         {
@@ -227,11 +247,10 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
             Difficulty = State.Level,
             Edition = Room.Edition,
             Escaped = State.Phase == EscapePhase.Escaped,
-            ElapsedSeconds = elapsed,
+            ElapsedSeconds = EscapeEngine.ElapsedSeconds(State),
             HintsUsed = State.HintsUsed,
             WrongAttempts = State.WrongAttempts,
-            // The penalty as played: Easy halves it.
-            Score = elapsed + State.HintsUsed * EscapeEngine.RoomFor(State, Room).HintPenaltySeconds,
+            Score = EscapeEngine.Score(State, Room),
             PlayerCount = State.Players.Count,
             Team = team.Length <= 400 ? team : team[..400],
             FinishedAt = State.EndedAt!.Value,

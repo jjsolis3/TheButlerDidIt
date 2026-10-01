@@ -912,3 +912,89 @@ export interface EscapePlayerView {
   pieces: EscapePieceView[]
 }
 
+
+/**
+ * The page after an escape (C# EscapeRecapView, #111). Never spoils the room: no answers, prompts, hints,
+ * solved texts or clue pieces, and only the stages the group reached.
+ */
+export interface EscapeRecapView {
+  roomId: string
+  roomTitle: string
+  synopsis: string
+  theme: string
+  contentRating: ContentRating
+  /** The room's cover picture, if one has been painted */
+  coverUrl: string | null
+  escaped: boolean
+  endText: string
+  startedAt: string
+  elapsedSeconds: number
+  /** What was left on the clock at the end: 0 when time ran out */
+  secondsLeft: number
+  timeLimitMinutes: number
+  difficulty: EscapeDifficulty
+  hintsUsed: number
+  hintPenaltySeconds: number
+  wrongAttempts: number
+  /** What the leaderboard sorts by: the time plus what the hints cost */
+  score: number
+  solvedCount: number
+  puzzleCount: number
+  stageCount: number
+  daily: boolean
+  puzzleSet: number
+  team: EscapeRecapPlayer[]
+  /** The stages the group reached, in order */
+  stages: EscapeRecapStage[]
+  highlights: EscapeRecapHighlight[]
+  /** The game master's name, when it spoke during the game */
+  gameMasterName: string | null
+  /** Its latest lines, oldest first */
+  gameMasterLines: string[]
+}
+
+export interface EscapeRecapPlayer {
+  name: string
+  photoUrl: string | null
+  /** How many puzzles this player opened */
+  solved: number
+}
+
+export interface EscapeRecapStage {
+  number: number
+  title: string
+  /** Seconds from the start */
+  openedAt: number
+  /** Seconds from the start; null when time ran out first */
+  clearedAt: number | null
+  hints: number
+  puzzles: EscapeRecapPuzzle[]
+}
+
+export interface EscapeRecapPuzzle {
+  title: string
+  kind: PuzzleKind
+  /** Null when it was still locked at the end */
+  solvedBy: string | null
+  solvedAt: number | null
+  hints: number
+}
+
+export interface EscapeRecapHighlight {
+  icon: string
+  title: string
+  detail: string
+}
+
+export interface EscapeRecapPage {
+  recap: EscapeRecapView
+  hostName: string
+  /** Where the escape placed on its leaderboard; null when the group didn't escape */
+  rank: number | null
+}
+
+export interface EscapeRecapSharing {
+  shared: boolean
+  url: string | null
+  page: EscapeRecapPage
+}

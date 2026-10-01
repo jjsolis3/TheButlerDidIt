@@ -121,6 +121,33 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByRole('region', { name: 'Leaderboard' })).toContainText('Ada, Ben, Cy')
   await tv.screenshot({ path: `${SHOTS}/94-escape-escaped.png` })
 
+  // ---- The recap (#111): private until the host shares it, then a page anyone with the link can open.
+  await tv.getByRole('button', { name: 'Share the recap' }).click()
+  const link = await tv.getByLabel('Recap link').inputValue()
+  expect(link).toMatch(/\/escape\/recap\/[A-Za-z0-9_-]{22}$/)
+  // The share card: a picture of the result. A phone opens its share sheet; this browser downloads it.
+  const card = tv.waitForEvent('download')
+  await tv.getByRole('button', { name: /Share card/ }).click()
+  expect((await card).suggestedFilename()).toBe('the-workshop-escape.png')
+  await (await card).saveAs(`${SHOTS}/94c-escape-share-card.png`)
+
+  const friend = await (await browser.newContext(phone)).newPage()
+  await friend.goto(link)
+  await expect(friend.getByRole('heading', { name: 'The Workshop', level: 1 })).toBeVisible()
+  await expect(friend.getByTestId('recap-outcome')).toContainText('Escaped')
+  await expect(friend.getByRole('heading', { name: 'Highlights' })).toBeVisible()
+  for (const name of ['Ada', 'Ben', 'Cy']) await expect(friend.getByText(name, { exact: true })).toBeVisible()
+  await expect(friend.getByTestId('recap-timeline')).toContainText(/Room 1 of \d/)
+  // Friends may play the room next, so the page never shows this game's codes. (Every answer, word by word,
+  // is checked for every room by the engine's RecapTests; a riddle's word can also be another puzzle's title.)
+  const page = await friend.locator('body').innerText()
+  for (const code of Object.values(answers).filter((a): a is string => !!a && /^\d{3,}$/.test(a)))
+    expect(page).not.toMatch(new RegExp(`\\b${code}\\b`))
+  await friend.screenshot({ path: `${SHOTS}/94b-escape-recap.png`, fullPage: true })
+  // The link's preview card for chat apps, written into the page by the server.
+  const html = await (await friend.request.get(link)).text()
+  expect(html).toMatch(/<meta property="og:title" content="Escaped The Workshop in \d+:\d\d" \/>/)
+
   // ---- A way out: guests go home; the host can run the same room again, with the same length and difficulty picked.
   await expect(phones[0].getByRole('link', { name: 'Back to home' })).toBeVisible()
   await expect(tv.getByRole('link', { name: /Host another game/ })).toBeVisible()

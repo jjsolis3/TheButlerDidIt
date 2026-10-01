@@ -4,6 +4,7 @@ import { Portrait } from '../components/Portrait'
 import { Shell } from '../components/ui'
 import { api } from '../lib/api'
 import { useThemePalette } from '../lib/theme'
+import { useNoIndex } from '../lib/useNoIndex'
 import type { RecapPage } from '../lib/types'
 
 /**
@@ -38,17 +39,6 @@ export default function Recap() {
     )
   if (!page) return <p className="p-10 text-center text-muted">Opening the case file…</p>
   return <RecapBody page={page} />
-}
-
-/** Asks search engines not to index the page while it's open (the API response says the same). */
-function useNoIndex() {
-  useEffect(() => {
-    const meta = document.createElement('meta')
-    meta.name = 'robots'
-    meta.content = 'noindex'
-    document.head.appendChild(meta)
-    return () => meta.remove()
-  }, [])
 }
 
 export function RecapBody({ page }: { page: RecapPage }) {

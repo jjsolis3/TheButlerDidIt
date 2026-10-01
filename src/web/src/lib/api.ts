@@ -14,6 +14,8 @@ import type {
   ValidationResult,
   RecapPage,
   RecapSharing,
+  EscapeRecapPage,
+  EscapeRecapSharing,
   AccessView,
   AccountView,
   AuthOptions,
@@ -144,6 +146,9 @@ export const api = {
   shareRecap: (code: string) => request<{ url: string }>('POST', `/api/parties/${encodeURIComponent(code)}/recap/share`),
   unshareRecap: (code: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}/recap/share`),
   publicRecap: (slug: string) => request<RecapPage>('GET', `/api/recap/${encodeURIComponent(slug)}`),
+  // Escape rooms share their recap the same way (shareRecap / unshareRecap); only the page differs.
+  escapeRecap: (code: string) => request<EscapeRecapSharing>('GET', `/api/parties/${encodeURIComponent(code)}/escape-recap`),
+  publicEscapeRecap: (slug: string) => request<EscapeRecapPage>('GET', `/api/escape-recap/${encodeURIComponent(slug)}`),
   myMysteries: () => request<MyMystery[]>('GET', '/api/scenarios/mine'),
   scenario: (id: string) => request<{ id: string; source: MyMystery['source']; canEdit: boolean; document: ScenarioDoc }>('GET', `/api/scenarios/${encodeURIComponent(id)}`),
   validateScenario: (document: ScenarioDoc) => request<ValidationResult>('POST', '/api/scenarios/validate', { document }),

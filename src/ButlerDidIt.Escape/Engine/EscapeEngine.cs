@@ -520,5 +520,14 @@ public static class EscapeEngine
 
     public static string FormatPenalty(int seconds) => seconds % 60 == 0 ? $"{seconds / 60} min" : $"{seconds} s";
 
+    /// <summary>How long a finished game took, in whole seconds.</summary>
+    public static int ElapsedSeconds(EscapeState s) => (int)Math.Round((s.EndedAt!.Value - s.StartedAt!.Value).TotalSeconds);
+
+    /// <summary>
+    /// What the leaderboard sorts by: the time taken, plus the time each hint cost at the penalty as
+    /// played (Easy halves it). Lower is better. The leaderboard and the recap both use this, so they agree.
+    /// </summary>
+    public static int Score(EscapeState s, EscapeRoom template) => ElapsedSeconds(s) + s.HintsUsed * RoomFor(s, template).HintPenaltySeconds;
+
     private static EscapeState Clone(EscapeState s) => GameJson.Deserialize<EscapeState>(GameJson.Serialize(s));
 }

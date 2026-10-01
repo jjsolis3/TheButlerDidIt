@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { RecapShare } from '../components/RecapShare'
 import { QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
+import { api } from '../lib/api'
 import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
 import { GameMasterPanel } from './GameMasterPanel'
+import { DIFFICULTY, KIND_ICON } from './labels'
 import { LeaderboardPanel } from './LeaderboardPanel'
 import { Notebook } from './Notebook'
 import { SwitchGrid } from './PuzzleWidgets'
 import { SceneView } from './SceneView'
+import { ShareCardButton } from './ShareCardButton'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 import { useAtmosphere } from './useAtmosphere'
 
@@ -58,8 +62,6 @@ function Art({ url, className = '' }: { url: string | null; className?: string }
   return <img src={url} alt="" data-testid="room-art" className={`fade-in w-full rounded-xl object-cover ${className}`} />
 }
 
-const KIND_ICON: Record<EscapePuzzleView['kind'], string> = { code: '🔢', text: '🔤', use: '🗝️', search: '🔎', switches: '💡' }
-const DIFFICULTY: Record<EscapeStageView['difficulty'], string> = { easy: '🙂 Easy', normal: '😐 Normal', hard: '😈 Hard' }
 
 function Centered({ children }: { children: React.ReactNode }) {
   return <div className="grid min-h-dvh place-items-center p-6 text-center text-muted">{children}</div>
@@ -280,6 +282,14 @@ function Ending({ stage, code, isHost }: { stage: EscapeStageView; code: string;
         </p>
       )}
       <LeaderboardPanel roomId={stage.roomId} code={code} daily={stage.daily} minutes={stage.timeLimitMinutes} difficulty={stage.difficulty} />
+      {isHost && (
+        <RecapShare
+          code={code}
+          load={api.escapeRecap}
+          blurb="A page with your time, the team and their photos, who opened what and when, and the game master's best lines. It never shows the answers, so it's safe to send to friends who haven't played."
+          extra={(loaded, link) => <ShareCardButton page={loaded.page} link={link} />}
+        />
+      )}
       <EndingActions stage={stage} isHost={isHost} />
     </div>
   )
