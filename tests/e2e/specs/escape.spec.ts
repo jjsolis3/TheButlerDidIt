@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
-import { loadRoom, playThrough, type RoomFile } from './escape-play'
+import { loadRoom, playThrough, startClock, type RoomFile } from './escape-play'
 
 // An escape-room night: the host opens The Workshop on the TV, three phones join, and the group
 // works through every room, with clues split across their phones, until they escape.
@@ -76,9 +76,20 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   const phones = [await joinAs(browser, code, 'Ada'), await joinAs(browser, code, 'Ben'), await joinAs(browser, code, 'Cy')]
   await expect(tv.getByText("Who's trapped (3)")).toBeVisible()
 
-  // ---- The clock starts; every phone gets its own clues.
+  // ---- Start: the room's intro plays on the TV first (#110), with its welcome read out and subtitled.
   await tv.getByRole('button', { name: /Start the clock/ }).click()
+  const intro = tv.getByTestId('room-reveal')
+  await expect(intro.getByRole('heading', { name: 'The Workshop' })).toBeVisible()
+  await expect(intro).toContainText('You have wasted every hour you were given')
+  await tv.screenshot({ path: `${SHOTS}/90b-escape-intro.png` })
+  // Skipping it starts the clock; every phone gets its own clues, under a card for the first room.
+  await intro.getByRole('button', { name: /Skip and start the clock/ }).click()
+  await expect(intro).toHaveCount(0)
   await expect(tv.getByRole('heading', { name: 'The Chains' })).toBeVisible()
+  await expect(phones[1].getByTestId('stage-card')).toContainText('The Chains')
+  await phones[1].screenshot({ path: `${SHOTS}/90c-escape-stage-card.png` })
+  await phones[1].getByTestId('stage-card').getByRole('button', { name: 'Got it' }).click()
+  await expect(phones[1].getByTestId('stage-card')).toHaveCount(0)
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
   await expect(tv.getByLabel('Time left')).toContainText(/4[45]:\d\d/)
   for (const p of phones) await expect(p.getByText('Only you can see these')).toBeVisible()
@@ -106,7 +117,8 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   // they find, putting things together and solving what opens up.
   await expect(tv.getByTestId('scene')).toBeVisible()
   await tv.screenshot({ path: `${SHOTS}/92-escape-scene-tv.png` })
-  await playThrough(tv, phones, room, answers, '93-escape-workshop')
+  const moments = await playThrough(tv, phones, room, answers, '93-escape-workshop')
+  expect(moments.has('reveal')).toBe(true) // each new stage opened with its reveal on the TV and a card on the phones
 
   // ---- Out!
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
@@ -190,7 +202,7 @@ test('an escape room written by AI from a theme lands on the host shelf, ready t
   // The saved room renames the puzzles ("puzzle-1"…, in the order written), so the fake's file is renamed to match.
   const code = tv.url().split('/').pop()!
   const ada = await joinAs(browser, code, 'Ada')
-  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  await startClock(tv)
   await expect(tv.getByRole('heading', { name: 'The Spiral Stairs' })).toBeVisible()
   await expect(ada.getByTestId('scene')).toBeVisible()
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>

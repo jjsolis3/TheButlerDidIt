@@ -52,19 +52,38 @@ export function solveLights(size: number, lit: boolean[]): number[] {
   return best!
 }
 
+/** Presses Start on the TV: the room's intro plays first (#110), and skipping it starts the clock. */
+export async function startClock(tv: Page) {
+  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  const intro = tv.getByTestId('room-reveal')
+  await expect(intro).toBeVisible()
+  await intro.getByRole('button', { name: /Skip and start the clock/ }).click()
+  await expect(intro).toHaveCount(0)
+}
+
 /**
  * Plays the room the way a thorough group would, one move at a time, taking turns on the phones:
  * search every spot it can, look closely at everything, put together what fits, then solve what's open.
+ * Returns the moments it saw along the way (a stage's reveal is "reveal").
  */
-export async function playThrough(tv: Page, phones: Page[], room: RoomFile, answers: Record<string, string | null>, shots: string) {
+export async function playThrough(tv: Page, phones: Page[], room: RoomFile, answers: Record<string, string | null>, shots: string): Promise<Set<string>> {
   const byId = new Map(room.puzzles.map((p) => [p.id, p]))
   const itemName = (id: string) => room.items.find((i) => i.id === id)!.name
   const locked = new Set<string>() // spots that need a tool nobody holds yet
   const unreadable = new Set<string>() // items whose closer look needs a tool nobody holds yet
   const shot = new Set<string>()
   for (let move = 0; move < 200; move++) {
-    if (await tv.getByRole('heading', { name: 'You escaped!' }).isVisible()) return
+    if (await tv.getByRole('heading', { name: 'You escaped!' }).isVisible()) return shot
     const p = phones[move % phones.length]
+
+    // A new stage opens with a reveal on the TV (#110) and a card at the top of every phone. The TV's stays up
+    // for a few seconds and the phones' until tapped, so neither gets in the way of the next move.
+    if (!shot.has('reveal') && (await tv.getByTestId('room-reveal').isVisible())) {
+      shot.add('reveal')
+      await tv.screenshot({ path: `${SHOTS}/${shots}-reveal-tv.png` })
+      await expect(p.getByTestId('stage-card')).toBeVisible()
+      await p.screenshot({ path: `${SHOTS}/${shots}-stage-card.png` })
+    }
 
     // 1. Search a spot nobody has searched (a locked one waits until the group's items change).
     const spots = p.getByRole('button', { name: /^Search the / })

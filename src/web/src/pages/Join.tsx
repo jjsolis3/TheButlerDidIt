@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { Button, Card, ErrorText, Field, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
-import { seats } from '../lib/seats'
+import { seats, watching } from '../lib/seats'
 import type { PartyInfo } from '../lib/types'
 
 export default function Join() {
@@ -37,6 +37,23 @@ export default function Join() {
     }
   }, [clean])
 
+  // Watching instead (#112): no seat, just the TV on this phone. Also the way in once the game has started.
+  const started = party !== null && party.status !== 'lobby'
+  const canWatch = party !== null && party.allowSpectators && party.status !== 'finished'
+  const watch = async () => {
+    if (!party) return
+    setBusy(true)
+    setError(null)
+    try {
+      const w = await api.watch(party.code, name.trim())
+      watching.set(party.code, { watcherId: w.watcherId, token: w.token, name: name.trim() })
+      navigate(`/watch/${party.code}`)
+    } catch (err) {
+      setError((err as Error).message)
+      setBusy(false)
+    }
+  }
+
   const join = async (e: FormEvent) => {
     e.preventDefault()
     if (!party) return
@@ -56,7 +73,14 @@ export default function Join() {
     <Shell>
       <Heading className="mt-8 mb-6">Join the party</Heading>
       <Card>
-        <form onSubmit={join} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            if (!started) return join(e)
+            e.preventDefault() // once it has started, Enter watches
+            if (canWatch && name.trim()) void watch()
+          }}
+          className="space-y-4"
+        >
           <Field label="Party code" hint="It's on the host's screen.">
             <input
               className={`${inputClass} font-mono text-2xl tracking-[0.4em] uppercase`}
@@ -76,7 +100,11 @@ export default function Join() {
             <div className="rounded-lg border border-accent/40 bg-accent/5 p-3">
               <p className="font-display text-lg">{party.title}</p>
               <p className="text-sm text-muted">
-                {party.playerCount} of {party.maxPlayers} guests have arrived.
+                {started
+                  ? party.status === 'finished'
+                    ? 'This party has finished.'
+                    : 'This party has started: you can still watch.'
+                  : `${party.playerCount} of ${party.maxPlayers} guests have arrived.`}
               </p>
             </div>
           )}
@@ -84,9 +112,16 @@ export default function Join() {
             <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} maxLength={30} required autoComplete="given-name" />
           </Field>
           <ErrorText>{error ?? (notFound ? 'No party found with that code.' : null)}</ErrorText>
-          <Button type="submit" disabled={!party || !name.trim() || busy} className="w-full text-base">
-            Take my seat
-          </Button>
+          {!started && (
+            <Button type="submit" disabled={!party || !name.trim() || busy} className="w-full text-base">
+              Take my seat
+            </Button>
+          )}
+          {canWatch && (
+            <Button type="button" variant={started ? 'primary' : 'ghost'} disabled={!name.trim() || busy} onClick={watch} className="w-full text-base">
+              👀 {started ? 'Watch the party' : 'Just watch (no seat)'}
+            </Button>
+          )}
         </form>
       </Card>
     </Shell>

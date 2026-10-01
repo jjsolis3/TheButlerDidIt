@@ -1,15 +1,21 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { CheerBar, CheerOverlay } from '../components/Cheers'
 import { RecapShare } from '../components/RecapShare'
 import { QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
+import { WatchersPanel } from '../components/WatchersPanel'
 import { api } from '../lib/api'
+import { useCheers } from '../lib/cheers'
 import { useParty } from '../lib/hub'
+import type { WatchingAs } from '../lib/seats'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
 import { GameMasterPanel } from './GameMasterPanel'
 import { DIFFICULTY, KIND_ICON } from './labels'
 import { LeaderboardPanel } from './LeaderboardPanel'
+import { markSeen, readSeen } from './reveal'
+import { RoomReveal } from './RoomReveal'
 import { Notebook } from './Notebook'
 import { SwitchGrid } from './PuzzleWidgets'
 import { SceneView } from './SceneView'
@@ -25,15 +31,44 @@ type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
  * only public things: clue pieces live on the phones, answers never leave the server.
  * The host (signed in) also gets the Start and Hint buttons here.
  */
-export function EscapeStage({ info, token }: { info: PartyInfo; token?: string }) {
-  const { stage, status, fatal, invoke } = useParty<EscapeStageView, EscapePlayerView>({ code: info.code, token, watchStage: true })
-  if (fatal) return <Centered>{fatal}</Centered>
+export function EscapeStage({ info, token, watcher }: { info: PartyInfo; token?: string; watcher?: WatchingAs }) {
+  const cheers = useCheers()
+  // Bumped whenever someone starts or stops watching, so the host's list refreshes (#112).
+  const [audience, setAudience] = useState(0)
+  const { stage, status, fatal, invoke } = useParty<EscapeStageView, EscapePlayerView>({
+    code: info.code,
+    token,
+    watchStage: true,
+    onRemoved: watcher?.onRemoved,
+    onCheer: cheers.add,
+    onAudience: info.isHost ? () => setAudience((n) => n + 1) : undefined,
+  })
+  if (fatal) return <Centered>{watcher ? <WatchEnded onLeave={watcher.onLeave} /> : fatal}</Centered>
   if (!stage) return <Centered>Unlocking the room…</Centered>
 
   return (
-    <div className="grain min-h-dvh">
+    <div className={`grain min-h-dvh ${watcher ? 'pb-28' : ''}`}>
       <StatusPill status={status} />
       <Tv stage={stage} info={info} invoke={invoke} />
+      {info.isHost && (
+        <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8">
+          <WatchersPanel code={info.code} refresh={audience} open={stage.phase === 'lobby'} />
+        </div>
+      )}
+      <CheerOverlay cheers={cheers.cheers} />
+      {watcher && <CheerBar invoke={invoke} name={watcher.name} onLeave={watcher.onLeave} />}
+    </div>
+  )
+}
+
+/** Shown to someone watching whose token no longer works: the host removed them, or the party is over. */
+function WatchEnded({ onLeave }: { onLeave: () => void }) {
+  return (
+    <div>
+      <p className="font-display text-2xl text-ink">You're no longer watching this party.</p>
+      <Button className="mt-4" onClick={onLeave}>
+        Back home
+      </Button>
     </div>
   )
 }
@@ -42,6 +77,14 @@ export function EscapeStage({ info, token }: { info: PartyInfo; token?: string }
 function Tv({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke }) {
   const sound = useAtmosphere(stage)
   const over = stage.phase === 'escaped' || stage.phase === 'failed'
+  // Each new stage after the first opens with a reveal (#110), once per TV: the intro already covered the first.
+  const [seen, setSeen] = useState(() => readSeen('tv', info.code))
+  const revealing = stage.phase === 'playing' && stage.stageNumber > 1 && stage.stage && !seen.has(stage.stage.id) ? stage.stage.id : null
+  const revealed = (id: string) => {
+    const next = new Set(seen).add(id)
+    setSeen(next)
+    markSeen('tv', info.code, next)
+  }
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
       <div className="mb-2 flex justify-end">
@@ -49,9 +92,10 @@ function Tv({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; 
           {sound.on ? (sound.playing ? '🔊 Sound on' : '🔈 Click anywhere for sound') : '🔇 Sound off'}
         </button>
       </div>
-      {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} />}
+      {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} sound={sound.on} />}
       {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} />}
       {over && <Ending stage={stage} code={info.code} isHost={info.isHost} />}
+      {revealing && <RoomReveal key={revealing} view={stage} mode="stage" sound={sound.on} onDone={() => revealed(revealing)} />}
     </main>
   )
 }
@@ -67,8 +111,14 @@ function Centered({ children }: { children: React.ReactNode }) {
   return <div className="grid min-h-dvh place-items-center p-6 text-center text-muted">{children}</div>
 }
 
-function Lobby({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke }) {
+function Lobby({ stage, info, invoke, sound }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke; sound: boolean }) {
   const [error, setError] = useState<string | null>(null)
+  // Start plays the room's intro first (#110); the clock starts when it ends or is skipped.
+  const [intro, setIntro] = useState(false)
+  const start = () => {
+    setIntro(false)
+    invoke('EscapeStart', info.code).catch((e: Error) => setError(e.message))
+  }
   const joinUrl = `${window.location.origin}/join/${info.code}`
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
@@ -96,12 +146,18 @@ function Lobby({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInf
             <Button
               className="px-8 py-3 text-lg"
               disabled={stage.players.length === 0}
-              onClick={() => invoke('EscapeStart', info.code).catch((e: Error) => setError(e.message))}
+              onClick={() => {
+                setError(null)
+                setIntro(true)
+              }}
             >
               ⏱️ Start the clock
             </Button>
-            <p className="mt-2 text-xs text-muted">Everyone's phone gets different clues when the clock starts, so wait until the whole group has joined.</p>
+            <p className="mt-2 text-xs text-muted">
+              The room's intro plays first, then the clock starts. Everyone's phone gets different clues when it does, so wait until the whole group has joined.
+            </p>
             <ErrorText>{error}</ErrorText>
+            {intro && <RoomReveal view={stage} mode="intro" sound={sound} onDone={start} />}
           </div>
         )}
       </div>

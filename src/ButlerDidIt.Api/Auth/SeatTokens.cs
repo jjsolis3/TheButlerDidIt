@@ -14,10 +14,17 @@ public static class SeatTokens
     public const string Scheme = "SeatToken";
     public const string SeatIdClaim = "seat_id";
     public const string PartyIdClaim = "party_id";
+    public const string WatcherIdClaim = "watcher_id";
     public const string HeaderName = "X-Seat-Token";
+
+    /// <summary>A watcher's token starts with this, so the handler knows which table to look in (#112).</summary>
+    public const string WatchPrefix = "w.";
 
     /// <summary>256 random bits, URL-safe. Unguessable, unlike the 6-letter party code.</summary>
     public static string NewToken() => Base64UrlEncode(RandomNumberGenerator.GetBytes(32));
+
+    /// <summary>A token for someone watching the TV: just as random, marked so it's never mistaken for a seat's.</summary>
+    public static string NewWatchToken() => WatchPrefix + NewToken();
 
     public static string Hash(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 
@@ -29,6 +36,17 @@ public static class SeatTokens
 
     public static Guid? PartyId(this ClaimsPrincipal user) =>
         Guid.TryParse(user.FindFirstValue(PartyIdClaim), out var id) ? id : null;
+
+    /// <summary>The watcher this token belongs to: someone watching the TV, with no seat (#112).</summary>
+    public static Guid? WatcherId(this ClaimsPrincipal user) =>
+        Guid.TryParse(user.FindFirstValue(WatcherIdClaim), out var id) ? id : null;
+
+    /// <summary>
+    /// The name a guest or watcher gave, from their token. Not the principal's Name: on a host's own phone the
+    /// sign-in cookie's identity comes first, and its name is their email address.
+    /// </summary>
+    public static string? GuestName(this ClaimsPrincipal user) =>
+        user.Identities.FirstOrDefault(i => i.AuthenticationType == Scheme)?.Name;
 }
 
 /// <summary>
@@ -60,6 +78,24 @@ public sealed class SeatTokenHandler(
         if (string.IsNullOrEmpty(token)) return AuthenticateResult.NoResult();
 
         var hash = SeatTokens.Hash(token);
+        if (token.StartsWith(SeatTokens.WatchPrefix, StringComparison.Ordinal))
+        {
+            // A watcher (#112): the party it may watch and who's watching, but no seat, so every player action
+            // (they all start with RequireSeat) and every seat endpoint turns it away.
+            var watcher = await db.Spectators.AsNoTracking()
+                .Where(s => s.TokenHash == hash)
+                .Select(s => new { s.Id, s.PartyId, s.DisplayName })
+                .FirstOrDefaultAsync();
+            if (watcher is null) return AuthenticateResult.Fail("Unknown watch token.");
+            var watching = new ClaimsIdentity(
+            [
+                new Claim(SeatTokens.WatcherIdClaim, watcher.Id.ToString()),
+                new Claim(SeatTokens.PartyIdClaim, watcher.PartyId.ToString()),
+                new Claim(ClaimTypes.Name, watcher.DisplayName),
+            ], SeatTokens.Scheme);
+            return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(watching), SeatTokens.Scheme));
+        }
+
         var seat = await db.Seats.AsNoTracking()
             .Where(s => s.TokenHash == hash)
             .Select(s => new { s.Id, s.PartyId, s.DisplayName })

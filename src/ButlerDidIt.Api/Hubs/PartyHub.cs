@@ -23,17 +23,24 @@ namespace ButlerDidIt.Api.Hubs;
 ///   * Host controls take the party code and check the signed-in user owns the party.
 /// </summary>
 [Authorize(Policy = AuthPolicies.PartyMember)]
-public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime, PartyDealer dealer, AppDbContext db, AiGameService aiGame, ButlerDidIt.Api.Escape.EscapeService escape, ButlerDidIt.Api.Escape.EscapeGameMaster gameMaster) : Hub
+public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime, PartyDealer dealer, AppDbContext db, AiGameService aiGame, ButlerDidIt.Api.Escape.EscapeService escape, ButlerDidIt.Api.Escape.EscapeGameMaster gameMaster, CheerLimiter cheers) : Hub
 {
     public static string StageGroup(Guid partyId) => $"stage:{partyId}";
     public static string SeatGroup(Guid seatId) => $"seat:{seatId}";
     public static string UserGroup(string userId) => $"user:{userId}";
 
+    /// <summary>One watcher's screen (#112), so the host removing them reaches it.</summary>
+    public static string WatcherGroup(Guid watcherId) => $"watcher:{watcherId}";
+
+    /// <summary>The cheers a guest or watcher can send to the TV: these and nothing else, so there's nothing to moderate.</summary>
+    public static readonly IReadOnlySet<string> CheerEmoji = new HashSet<string>(StringComparer.Ordinal) { "👏", "😂", "😱", "🔥", "❤️", "🎉" };
+
     // ------------------------------------------------------------------ subscribe
 
     /// <summary>
-    /// Start receiving the public stage view. Allowed for the host and any seated guest.
-    /// Works for every kind of game: the view is whatever the party's game module projects.
+    /// Start receiving the public stage view. Allowed for the host, any seated guest and anyone watching (#112):
+    /// the TV's view is public to the room. Works for every kind of game: the view is whatever the party's game
+    /// module projects.
     /// </summary>
     public async Task<object> WatchParty(string code)
     {
@@ -43,6 +50,11 @@ public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime,
         if (!isHost && !isGuest) throw new HubException("You are not part of this party.");
 
         await Groups.AddToGroupAsync(Context.ConnectionId, StageGroup(party.Id));
+        if (Context.User!.WatcherId() is { } watcher)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, WatcherGroup(watcher));
+            await db.Spectators.Where(s => s.Id == watcher).ExecuteUpdateAsync(u => u.SetProperty(s => s.LastSeenAt, parties.Now));
+        }
         var (_, session) = await runtime.LoadAsync(party.Id);
         return session.StageView(runtime.Now);
     }
@@ -120,6 +132,25 @@ public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime,
         note.Text = text;
         note.UpdatedAt = parties.Now;
         await db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// A cheer for the TV (#112), from someone watching or a guest: one of <see cref="CheerEmoji"/>, shown with their
+    /// name. Nothing is saved. Too many at once are dropped (<see cref="CheerLimiter"/>), and someone the host has
+    /// removed can't cheer from a connection that's still open.
+    /// </summary>
+    public async Task Cheer(string emoji)
+    {
+        if (!CheerEmoji.Contains(emoji)) throw new HubException("Pick one of the cheers.");
+        var user = Context.User!;
+        if (user.PartyId() is not { } partyId || (user.WatcherId() ?? user.SeatId()) is not { } who)
+            throw new HubException("Join or watch the party first.");
+        var stillHere = user.WatcherId() is { } watcher
+            ? await db.Spectators.AnyAsync(s => s.Id == watcher)
+            : await db.Seats.AnyAsync(s => s.Id == who);
+        if (!stillHere) throw new HubException("You're no longer at this party.");
+        if (!cheers.TryCheer(partyId, who)) return;
+        await Clients.Group(StageGroup(partyId)).SendAsync("cheer", new CheerEvent(emoji, user.GuestName() ?? "Someone"));
     }
 
     // ------------------------------------------------------------------ host controls
@@ -201,6 +232,9 @@ public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime,
     private bool IsHostOf(Party party) =>
         Context.User!.FindFirstValue(ClaimTypes.NameIdentifier) is { } userId && userId == party.HostUserId;
 }
+
+/// <summary>A cheer on its way to the TV: which one, and who sent it.</summary>
+public sealed record CheerEvent(string Emoji, string Name);
 
 /// <summary>Tells a host's open pages that one of their background jobs changed (see <see cref="PartyHub.WatchMyJobs"/>).</summary>
 public sealed class JobEvents(IHubContext<PartyHub> hub, ILogger<JobEvents> log)

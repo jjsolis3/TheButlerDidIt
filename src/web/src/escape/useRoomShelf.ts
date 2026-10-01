@@ -16,3 +16,6 @@ export function useRoomShelf(rooms: EscapeRoomSummary[] | null) {
 }
 
 export type RoomShelf = ReturnType<typeof useRoomShelf>
+
+/** The id of a room card's title, so an action beside the card can say which room it's for (aria-describedby). */
+export const roomTitleId = (roomId: string) => `room-title-${roomId}`

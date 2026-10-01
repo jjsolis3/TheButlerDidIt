@@ -26,7 +26,11 @@ public static class EscapeRoomValidator
     /// Every problem with the room. A room with variants or generators is checked the way it will
     /// be played: built from many seeds, each one validated (and played through) on its own.
     /// </summary>
-    public static List<string> Validate(EscapeRoom room)
+    /// <param name="seeds">
+    /// How many puzzle sets to build and play. The full check (<see cref="SeedsChecked"/>) takes a second or two;
+    /// the room editor's check as you type uses a handful, and saving always runs the full one.
+    /// </param>
+    public static List<string> Validate(EscapeRoom room, int seeds = SeedsChecked)
     {
         var template = TemplateErrors(room);
         template.AddRange(LengthErrors(room));
@@ -46,7 +50,7 @@ public static class EscapeRoomValidator
                     if (errors.Count > 0) return errors.Select(e => at + e).ToList();
                     continue;
                 }
-                for (var seed = 0; seed < SeedsChecked; seed++)
+                for (var seed = 0; seed < seeds; seed++)
                 {
                     var errors = ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty));
                     if (errors.Count > 0) return errors.Select(e => $"{at}With puzzle set {seed}: {e}").ToList();

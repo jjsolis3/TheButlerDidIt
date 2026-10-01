@@ -71,12 +71,14 @@ If the host double-taps **Next** on slow Wi-Fi, two commands arrive together. Wi
 - `stage:{partyId}`: every screen watching the stage
 - `seat:{seatId}`: one guest's phone(s)
 - `user:{userId}`: a host's pages that are following a background job (`WatchMyJobs`)
+- `watcher:{watcherId}`: one spectator's screen (#112), so the host removing them reaches it
 
 After every command, `PartyService.BroadcastAsync` sends a **complete snapshot** (not a diff) to each group. Snapshots are a few KB, and a phone that missed messages while asleep fixes itself with the next one.
 
 Two lighter messages sit beside the snapshots:
 - `npcTyping {interrogationId, text}`: an NPC's answer so far, while the AI is still writing it, sent to the stage and every seat at most every 150 ms. It isn't saved; the finished answer arrives in the next snapshot, and screens show `answer ?? typing[id]`, so the finished answer always wins.
 - `jobs`: sent to `user:{userId}` whenever one of that host's mystery or media jobs changes. It carries no data: the page re-fetches the job through its normal, access-checked endpoint, and still polls every 15 seconds in case a signal is lost.
+- `cheer {emoji, name}` and `audience`: spectator mode's cheers, and the data-less "who's watching changed" signal for the host's TV (see section 6).
 
 On the client (`src/web/src/lib/hub.ts`):
 
@@ -92,12 +94,29 @@ On the client (`src/web/src/lib/hub.ts`):
 |---|---|---|
 | **Host** | Email + password → encrypted, HttpOnly auth cookie (ASP.NET Core Identity) | `AuthEndpoints.cs` |
 | **Guest** | A random 256-bit **seat token** issued on joining, saved in the phone's `localStorage` | `SeatTokens.cs` |
+| **Spectator** | The same kind of token, starting `w.`, issued on watching: the TV's view and cheers only (#112) | `SeatTokens.cs`, `SpectatorEndpoints.cs` |
 
 Guests don't need accounts. The 6-letter party code only gets you to the join page (and joins are rate-limited). The seat token is what proves you are "Bob" afterwards. The database stores only a SHA-256 hash of each token, like a password. Because the token lives in `localStorage`, a phone that sleeps, refreshes or drops off Wi-Fi rejoins the same seat.
 
 SignalR sends the token as `Authorization: Bearer …`. For WebSockets, browsers can't set headers, so it goes in the `access_token` query string, which the server only accepts on `/hubs` paths.
 
 The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the host's device can be the stage *and* a pass-and-play seat.
+
+**Spectators** (#112). People can watch a party's TV on their own phone, without a seat: family far away, or more people than a game has seats. This is `SpectatorEndpoints.cs`, `Audience`, and `/watch/:code` on the front end.
+- **A third kind of token.**
+  - `POST /api/parties/{code}/watch` makes a `Spectator` row and returns a token starting with `w.`; only its SHA-256 hash is stored, like a seat's. It's rate-limited like joining.
+  - `SeatTokenHandler` looks a `w.` token up among the spectators and gives it the party's id and a `watcher_id`, **never a `seat_id`**.
+  - So `WatchParty`'s existing guest check lets a watcher see the TV's view, while every player action (all start with `RequireSeat`) and every seat endpoint turns them away. `SpectatorTests` checks both.
+- **When it works.** Anyone with the code can watch, in the lobby or mid-game (joining as a player closes when the clock starts), up to 50 per party (`Audience.MaxWatchers`).
+- **The host's controls.** The host sees who's watching (`GET …/spectators`, refreshed on the data-less `audience` signal), can remove someone, and can switch watching off (`Party.AllowSpectators`, on by default). Switching it off removes everyone.
+- **Being removed.** The token is deleted and the screen gets `removed` through its `watcher:{id}` group.
+  - Over long polling the open connection fails at its next poll.
+  - Over a WebSocket, checked only when it connects, it keeps receiving the TV's updates (as a removed seat does) until it closes, which the page does at once.
+- **Cheers** (`Cheer`). A watcher or guest sends one of six emoji, never free text, so there's nothing to moderate.
+  - The TV shows each one rising with the sender's name: the name from the token, not the host's email on the host's own phone.
+  - `CheerLimiter` drops more than one per person every 2 seconds, or 5 per party per second.
+  - Cheers are never saved, and someone removed can't cheer.
+- **Clean-up.** Watchers go wherever seats go: with a deleted party (cascade) and when the retention job prunes a finished one.
 
 **The host's own account** (`AccountEndpoints.cs`, #98). The header's account menu (`AccountMenu`, on every page but the pass-and-play screen) leads to `/account`:
 - **Every endpoint acts on the signed-in host.** No request carries a user id, so there's nothing to change to reach someone else's account.
@@ -135,7 +154,7 @@ Only `media/` folders are served over HTTP (`MediaEndpoints.cs`), with a path ch
 
 ## 8. The front end
 
-- **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
+- **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `Watch` (the TV on a spectator's phone, with cheers), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
 - **Front doors** (#99): `/` (`Home`) offers both games, with a card for each in that game's colours, plus "Your parties". Each game has its own page for visitors who haven't signed in: `/mystery` (`MysteryLanding`: the themes) and `/escape` (`EscapeLanding`: how it works, then the room shelf with filters and each room's leaderboards). Each also has a printable how-to-play sheet, `/how-to-play` and `/how-to-play/escape`. "Host" links go through sign-in with `?next=`, so a visitor lands on the host page with the room they picked.
 - **`PlayerScreen`** is the whole phone experience. Pass-and-play reuses it for each local seat.
 - **`CuePlayer`** plays cinematics: a list of cues (image, narration, NPC line, music, sound, video). Narration uses an audio file when the cue has one, otherwise the browser's built-in speech synthesis. Browsers block sound until the user interacts, which is why the stage starts with a "Tap to begin the evening" button.
@@ -353,6 +372,13 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - `EscapeMediaPlan` asks for a cover and one picture per stage. The prompts are built only from text the TV already shows, never puzzles, pieces or answers, and `EscapeMediaPlanTests` checks this over many puzzle sets.
   - An escape party created with the AI on queues a `MediaJob` whose id is `escape:{room id}`, so it never mixes with a mystery's. `MediaWorker` paints the pictures once per room, `MediaService` caches them, and every party of the room reuses them.
   - `EscapeCatalog.ArtAsync` loads them into the session, cached for 30 seconds so pictures from another server show up soon. `EscapeProjector` picks the current stage's picture, or the cover.
+- **Room reveals** (#110, step 1):
+  - **On the TV:** pressing Start plays the room's intro full screen: the cover with a slow pan, and the welcome read out in the game master's voice with subtitles. The clock starts when it ends or is skipped, so nobody loses time watching it. Each later stage opens with a short reveal of its own picture, name and description; the clock keeps running in the corner, and anyone can skip it.
+  - **On the phones:** a card at the top shows the same picture and text and is tapped away. It's a card, not a pop-up, so it never blocks a player mid-puzzle, and phones stay quiet.
+  - **Built from the TV's own view** (`escape/reveal.ts`, played by the mystery's `CuePlayer`). So it can't show anything the TV couldn't already: the projector only ever sends the current stage's picture.
+  - **Once per screen:** each screen remembers the reveals it has shown in `sessionStorage`, so a refresh or a reconnect doesn't replay them.
+  - **Reduced motion:** the pan stops under `prefers-reduced-motion`.
+  - **Later steps:** uploaded videos and AI video clips are steps 2 and 3 of #110.
 - **Finale:** doors swing open on an escape, and bars drop when the group is trapped. It uses movement only, never flashing, and nothing moves under `prefers-reduced-motion`. The results, the ranking and the game master's captioned last line stay on screen.
 
 **The recap and share card** (#111):
@@ -384,5 +410,28 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **Neutral ids.** The model names puzzles after what they are ("echo-riddle"), and puzzle ids reach the browsers. So once a room passes, `Anonymize` renames them `puzzle-1`, `puzzle-2`… This runs last, so repair turns can still quote the model's own ids back to it.
 - **Storage and access.** A room is saved as an `EscapeRoomEntity` (jsonb) for its host only after it has passed.
   - `EscapeCatalog` merges the file rooms with the DB rooms. `FindAsync` is for loading a party (guests of any host), and it caches the parsed room because it never changes. `FindForHostAsync` is for starting a party, and it always asks the DB for the owner, so a deleted room can't be started from another server's cache. `OwnedAsync` builds the host's shelf.
-  - Only the owner sees a room on the shelf (`generated: true`), starts parties with it, or deletes it. Its results and leaderboards stay after a delete.
+  - Only the owner sees a room on the shelf (`mine: true`), starts parties with it, edits it or deletes it. Its results and leaderboards stay after a delete.
+
+**The room editor** (#113, `EscapeEditorEndpoints.cs`, `/escape/rooms/:id`). It's the escape rooms' version of the mystery editor.
+- **Who edits what.**
+  - A host edits their own rooms: the ones the AI wrote for them, and their copies.
+  - **Any host can copy any room**, a built-in one included, to change a riddle or put their family's names in. The copy is a record `with` a new id, a "(copy)" title and edition 1, so every other setting carries over. It's marked `CopiedFrom`, and it shares the original's pictures.
+  - Built-in rooms are never edited in place: they're read from `content/escape` at every start.
+- **Answers stay out of sight.** The editor shows every answer only after a "Spoilers!" warning. Generated codes are never written in a room, so they stay a surprise.
+- **Checked like a shipped room.**
+  - A room is saved only when `EscapeRoomValidator` proves it can still be escaped at every length and difficulty over all 200 puzzle sets.
+  - The full check takes a second or two, so checking as you type uses 12 (`Validate(room, seeds)`), and saving runs the full one.
+  - A refused save is a problem whose message is the first error, with the whole list attached.
+  - Limits: 200,000 characters, 6 stages, 30 puzzles. The AI-only shape rules don't apply to a host's edits.
+- **A room in play waits.** Saving is refused while a party is in the lobby or playing it, as the mystery editor does.
+- **Editions.** The server sets the edition, never the document.
+  - A change that alters how the room plays starts a new edition, so its leaderboards start fresh. That's anything but the title, synopsis, intro, endings, look, sound, seasons, game master and the stages' names and descriptions.
+  - A reworded story keeps the old edition, and its leaderboards.
+- **Pictures.**
+  - **Stale pictures:** the keys whose `EscapeMediaPlan` prompt changed (or whose stage went) are forgotten, so only those are painted again.
+  - **Tidy documents:** documents are written without the room's read-only properties and nulls.
+- **Every server sees an edit.**
+  - The catalog caches each database room with its `UpdatedAt`. Party loads check that time with one small query, and re-read the document only after an edit.
+  - An edit saved on another server therefore reaches this one's next command; `EscapeEditorTests` checks this, and fails with the old "cached for ever" rule.
+  - A deleted room is now gone on every server at once.
 

@@ -5,6 +5,7 @@ import AdminHosts from './pages/AdminHosts'
 import EscapeHowToPlay from './pages/EscapeHowToPlay'
 import EscapeLanding from './pages/EscapeLanding'
 import EscapeRecap from './pages/EscapeRecap'
+import EscapeRoomEditor from './pages/EscapeRoomEditor'
 import Home from './pages/Home'
 import HowToPlay from './pages/HowToPlay'
 import Join from './pages/Join'
@@ -19,6 +20,7 @@ import ScenarioEditor from './pages/ScenarioEditor'
 import Recap from './pages/Recap'
 import Remote from './pages/Remote'
 import Stage from './pages/Stage'
+import Watch from './pages/Watch'
 
 // Page map. The same URLs work in production because ASP.NET Core falls back to
 // index.html for any path it doesn't recognise (MapFallbackToFile in Program.cs).
@@ -40,6 +42,7 @@ export default function App() {
       <Route path="/account/confirm-email" element={<ConfirmEmailChange />} />
       <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/escape/recap/:slug" element={<EscapeRecap />} />
+      <Route path="/escape/rooms/:id" element={<EscapeRoomEditor />} />
       <Route path="/mysteries" element={<MyMysteries />} />
       <Route path="/how-to-play" element={<HowToPlay />} />
       <Route path="/how-to-play/escape" element={<EscapeHowToPlay />} />
@@ -49,6 +52,7 @@ export default function App() {
       <Route path="/stage/:code" element={<Stage />} />
       <Route path="/remote/:code" element={<Remote />} />
       <Route path="/play/:code" element={<Play />} />
+      <Route path="/watch/:code" element={<Watch />} />
       <Route path="/pass/:code" element={<PassAndPlay />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

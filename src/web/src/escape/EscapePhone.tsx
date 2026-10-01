@@ -8,6 +8,7 @@ import { ItemInspector } from './ItemInspector'
 import { Notebook } from './Notebook'
 import { CipherTool, DeductionHelper, SequenceTerms, SwitchGrid } from './PuzzleWidgets'
 import { SceneView } from './SceneView'
+import { StageCard } from './StageCard'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
@@ -60,6 +61,7 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
 
       {stage.phase === 'playing' && (
         <>
+          <StageCard code={code} view={stage} />
           <section>
             <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">Only you can see these</h2>
             {player.pieces.length === 0 ? (

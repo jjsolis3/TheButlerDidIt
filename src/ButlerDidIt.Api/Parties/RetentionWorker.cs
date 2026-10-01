@@ -89,7 +89,7 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
     }
 
     /// <summary>
-    /// Deletes a party and everything that belongs to it: seats, notes and selfies. Used by this
+    /// Deletes a party and everything that belongs to it: seats, watchers, notes and selfies. Used by this
     /// job for abandoned parties and by the host's "Remove" button for unfinished ones.
     /// </summary>
     public static async Task DeletePartyAsync(IServiceProvider sp, Guid id, CancellationToken ct)
@@ -99,10 +99,12 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
         await using (await sp.GetRequiredService<PartyLocks>().AcquireAsync(id, ct))
         {
             var seatIds = await db.Seats.Where(s => s.PartyId == id).Select(s => s.Id).ToListAsync(ct);
+            var watcherIds = await db.Spectators.Where(s => s.PartyId == id).Select(s => s.Id).ToListAsync(ct);
             await db.PlayerNotes.Where(n => seatIds.Contains(n.SeatId)).ExecuteDeleteAsync(ct);
-            await db.Parties.Where(p => p.Id == id).ExecuteDeleteAsync(ct); // seats go with it (cascade)
+            await db.Parties.Where(p => p.Id == id).ExecuteDeleteAsync(ct); // seats and watchers go with it (cascade)
             await DeletePartyPhotosAsync(sp, id, ct);
             await NotifyRemovedAsync(sp, seatIds);
+            await sp.GetRequiredService<Audience>().RemovedAsync(watcherIds);
         }
     }
 
@@ -136,6 +138,8 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
                 await db.Parties.Where(p => p.Id == id).ExecuteUpdateAsync(u => u.SetProperty(p => p.PrunedAt, clock.GetUtcNow()), ct);
                 await DeletePartyPhotosAsync(sp, id, ct);
                 await NotifyRemovedAsync(sp, seatIds);
+                // Watchers' tokens stop working with the seats' (#112).
+                await sp.GetRequiredService<Audience>().RemoveAsync(db, id, null, ct);
             }
         }
         return ids.Count;

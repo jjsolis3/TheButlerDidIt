@@ -261,7 +261,35 @@ public sealed class Party
     [Timestamp]
     public uint Version { get; set; }
 
+    /// <summary>
+    /// Whether people can watch the TV on their own devices (#112). On by default, since anyone with the code can
+    /// already join the lobby; the host can switch it off, which also sends everyone watching away.
+    /// </summary>
+    public bool AllowSpectators { get; set; } = true;
+
     public List<Seat> Seats { get; set; } = [];
+}
+
+/// <summary>
+/// Someone watching a party's TV on their own device (#112): a relative far away, or the extra people at a big
+/// family party. No seat, no character and no clues: their token opens only the TV's view (WatchParty) and the
+/// cheers, never a player's action, because it carries a watcher id and no seat id. Like a seat token, only its
+/// SHA-256 hash is stored. The rows go with the party, and when the host removes someone or switches watching off.
+/// </summary>
+public sealed class Spectator
+{
+    public Guid Id { get; set; }
+    public Guid PartyId { get; set; }
+    public Party? Party { get; set; }
+
+    [MaxLength(30)]
+    public required string DisplayName { get; set; }
+
+    [MaxLength(64)]
+    public required string TokenHash { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset LastSeenAt { get; set; }
 }
 
 /// <summary>
@@ -459,4 +487,14 @@ public sealed class EscapeRoomEntity
     public required string Document { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>
+    /// When the room was last saved (#113). Each server caches parsed rooms, and checks this before trusting its
+    /// copy, so an edit reaches every server's next game.
+    /// </summary>
+    public DateTimeOffset UpdatedAt { get; set; }
+
+    /// <summary>The room this one was copied from, for a host's own copy of a room (#113); null for a room the AI wrote.</summary>
+    [MaxLength(120)]
+    public string? CopiedFrom { get; set; }
 }

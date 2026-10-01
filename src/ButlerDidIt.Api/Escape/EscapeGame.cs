@@ -19,8 +19,9 @@ namespace ButlerDidIt.Api.Escape;
 /// (a broken room stops the app starting, like a broken mystery), and kept in memory: they're small,
 /// and every server reads the same files.
 ///
-/// Rooms written by AI live in the database (<see cref="EscapeRoomEntity"/>), one host's each. They
-/// were validated before they were saved and never change, so each is parsed once and cached.
+/// Rooms written by AI, and hosts' own copies, live in the database (<see cref="EscapeRoomEntity"/>), one host's
+/// each. They're validated before every save. Each is parsed once and cached with the time it was saved; since a
+/// host can edit a room (#113), possibly on another server, that time is checked before the cached copy is used.
 ///
 /// For the end-to-end tests only, Escape:TestRoomsRoot adds the rooms in another folder (the test-only
 /// Laboratory, which uses every kind of puzzle). It's ignored unless Escape:ExposeAnswersForTests is on,
@@ -39,8 +40,9 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
         return rooms;
     });
 
-    // Keeping the same instance per id also keeps RoomVariants' cache of built puzzle sets warm.
-    private readonly ConcurrentDictionary<string, EscapeRoom> _generated = new();
+    // Keeping the same instance per id also keeps RoomVariants' cache of built puzzle sets warm. Each is kept with
+    // the UpdatedAt it was parsed from: a different one in the database means the room was edited since.
+    private readonly ConcurrentDictionary<string, (DateTimeOffset UpdatedAt, EscapeRoom Room)> _generated = new();
 
     /// <summary>The hand-written rooms, on every host's shelf.</summary>
     public IReadOnlyList<EscapeRoom> Rooms => _rooms.Value;
@@ -48,35 +50,41 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
     /// <summary>A hand-written room.</summary>
     public EscapeRoom? Find(string id) => Rooms.FirstOrDefault(r => r.Id == id);
 
-    /// <summary>Any room, hand-written or written by AI: for loading a party that's already playing it.</summary>
+    /// <summary>
+    /// Any room, hand-written or from the database: for loading a party that's playing it. A database room costs one
+    /// small query (its UpdatedAt) to check the cached copy is current; the document is read again only after an edit.
+    /// </summary>
     public async Task<EscapeRoom?> FindAsync(AppDbContext db, string id, CancellationToken ct)
     {
         if (Find(id) is { } room) return room;
-        if (_generated.TryGetValue(id, out var cached)) return cached;
-        var document = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id).Select(r => r.Document).FirstOrDefaultAsync(ct);
-        return document is null ? null : Parse(id, document);
+        var saved = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id).Select(r => (DateTimeOffset?)r.UpdatedAt).FirstOrDefaultAsync(ct);
+        if (saved is null) return null; // deleted, on this server or another
+        if (_generated.TryGetValue(id, out var cached) && cached.UpdatedAt == saved) return cached.Room;
+        var row = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id).Select(r => new { r.Document, r.UpdatedAt }).FirstOrDefaultAsync(ct);
+        return row is null ? null : Parse(id, row.UpdatedAt, row.Document);
     }
 
     /// <summary>
-    /// A room this host may start a party with: a hand-written one, or one written for them.
-    /// Always asks the database for an AI room, so a deleted one can't be started from another server's cache.
+    /// A room this host may start a party with: a hand-written one, or one of their own.
+    /// Always asks the database for their own, so a deleted one can't be started from another server's cache.
     /// </summary>
     public async Task<EscapeRoom?> FindForHostAsync(AppDbContext db, string id, string hostUserId, CancellationToken ct)
     {
         if (Find(id) is { } room) return room;
-        var document = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id && r.OwnerUserId == hostUserId).Select(r => r.Document).FirstOrDefaultAsync(ct);
-        return document is null ? null : Parse(id, document);
+        var row = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id && r.OwnerUserId == hostUserId)
+            .Select(r => new { r.Document, r.UpdatedAt }).FirstOrDefaultAsync(ct);
+        return row is null ? null : Parse(id, row.UpdatedAt, row.Document);
     }
 
-    /// <summary>The rooms written for this host, newest first.</summary>
-    public async Task<IReadOnlyList<EscapeRoom>> OwnedAsync(AppDbContext db, string hostUserId, CancellationToken ct)
+    /// <summary>The host's own rooms (written by AI for them, or their copies), newest first.</summary>
+    public async Task<IReadOnlyList<OwnedRoom>> OwnedAsync(AppDbContext db, string hostUserId, CancellationToken ct)
     {
         var rows = await db.EscapeRooms.AsNoTracking().Where(r => r.OwnerUserId == hostUserId).OrderByDescending(r => r.CreatedAt)
-            .Select(r => new { r.Id, r.Document }).ToListAsync(ct);
-        return rows.Select(r => Parse(r.Id, r.Document)).ToList();
+            .Select(r => new { r.Id, r.Document, r.UpdatedAt, r.CopiedFrom }).ToListAsync(ct);
+        return rows.Select(r => new OwnedRoom(Parse(r.Id, r.UpdatedAt, r.Document), Copied: r.CopiedFrom is not null)).ToList();
     }
 
-    /// <summary>Drops a deleted room from this server's cache.</summary>
+    /// <summary>Drops a deleted or edited room from this server's cache (other servers notice by its UpdatedAt).</summary>
     public void Forget(string id) => _generated.TryRemove(id, out _);
 
     // Pictures appear while parties play (the media job runs in the background), possibly on another
@@ -98,15 +106,26 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
     /// <summary>New pictures were made for this room: read them again on the next load.</summary>
     public void ForgetArt(string roomId) => _art.TryRemove(roomId, out _);
 
-    private EscapeRoom Parse(string id, string document) => _generated.GetOrAdd(id, _ => GameJson.Deserialize<EscapeRoom>(document));
+    private EscapeRoom Parse(string id, DateTimeOffset updatedAt, string document)
+    {
+        if (_generated.TryGetValue(id, out var cached) && cached.UpdatedAt == updatedAt) return cached.Room;
+        var room = GameJson.Deserialize<EscapeRoom>(document);
+        _generated[id] = (updatedAt, room);
+        return room;
+    }
 }
+
+/// <param name="Copied">The host's own copy of another room, rather than one the AI wrote for them.</param>
+public sealed record OwnedRoom(EscapeRoom Room, bool Copied);
 
 /// <summary>What the create-party page shows for each room, with the best escape so far (score in seconds, or null).</summary>
 public sealed record EscapeRoomSummary(
     string Id, string Title, string Synopsis, ButlerDidIt.Game.Scenarios.ContentRating ContentRating, string Theme,
     int MinPlayers, int MaxPlayers, int TimeLimitMinutes, int StageCount, int PuzzleCount, int HintPenaltySeconds, int? BestScore, string GameMaster,
-    /// <summary>Written by AI for this host: only they see it, and they can delete it.</summary>
+    /// <summary>Written by AI for this host.</summary>
     bool Generated,
+    /// <summary>The host's own room (written by AI for them, or their copy): only they see it, and they can edit or delete it.</summary>
+    bool Mine,
     /// <summary>The lengths a host can pick, shortest first, with how many puzzles each plays.</summary>
     IReadOnlyList<EscapeLength> Lengths,
     /// <summary>Seasonal shelves the room is on ("halloween").</summary>
@@ -117,13 +136,14 @@ public sealed record EscapeRoomSummary(
     string? CoverUrl)
 {
     /// <param name="bestScore">The best escape at the room's own length.</param>
+    /// <param name="mine">One of the host's own rooms; <paramref name="copied"/> says it's a copy rather than written by AI.</param>
     /// <param name="coverUrl">The room's <see cref="EscapeArt.Cover"/> picture. It's drawn only from what the TV shows before the game, so it's safe for anyone to see.</param>
-    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool generated = false, string? coverUrl = null)
+    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool mine = false, bool copied = false, string? coverUrl = null)
     {
         // Counted on the room as played at its own length, so the card matches the game the host gets by default.
         var standard = RoomLengths.Cut(r, null);
         return new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, standard.Stages.Count, standard.Puzzles.Count,
-            r.HintPenaltySeconds, bestScore, r.Host.Name, generated,
+            r.HintPenaltySeconds, bestScore, r.Host.Name, Generated: mine && !copied, Mine: mine,
             r.PlayableLengths.Select(m => new EscapeLength(m, r.Puzzles.Count(p => RoomLengths.Plays(p, m)))).ToList(), r.Seasons, r.Soundscape, coverUrl);
     }
 }

@@ -374,6 +374,33 @@ export interface PartyInfo {
   dealAtStart: boolean
   /** Which game the party plays; each kind has its own screens. */
   kind: GameKind
+  /** Whether people can watch the TV on their own devices (#112). */
+  allowSpectators: boolean
+}
+
+/** Someone watching the TV (#112): their token opens only the TV's view and the cheers. */
+export interface WatchResponse {
+  watcherId: string
+  token: string
+  code: string
+}
+
+export interface SpectatorView {
+  id: string
+  name: string
+  joinedAt: string
+}
+
+/** The host's view of who's watching. */
+export interface SpectatorList {
+  allow: boolean
+  watching: SpectatorView[]
+}
+
+/** A cheer on its way to the TV: one of the set emoji, and who sent it. */
+export interface CheerEvent {
+  emoji: string
+  name: string
 }
 
 /** Kinds of game night. Escape rooms (#67) are on their way. */
@@ -678,8 +705,10 @@ export interface EscapeRoomSummary {
   bestScore: number | null
   /** Who plays the AI game master in this room. */
   gameMaster: string
-  /** Written by AI for this host: only they see it, and they can delete it. */
+  /** Written by AI for this host */
   generated: boolean
+  /** One of the host's own rooms (written by AI for them, or their copy): they can edit or delete it */
+  mine: boolean
   /** The lengths a host can pick, shortest first, with how many puzzles each plays */
   lengths: EscapeLength[]
   /** Seasonal shelves the room is on ("halloween") */

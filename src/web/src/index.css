@@ -81,6 +81,23 @@ body {
   .kenburns, .candle { animation: none; }
 }
 
+/* Cheers from people watching (#112): each rises up the TV and fades. With reduced motion they only fade. */
+@keyframes cheer-float {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  12% { transform: translateY(-2rem) scale(1); opacity: 1; }
+  100% { transform: translateY(-55vh) scale(1); opacity: 0; }
+}
+@keyframes cheer-fade {
+  0%, 75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.cheer-float {
+  animation: cheer-float 3.5s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cheer-float { animation-name: cheer-fade; }
+}
+
 /* Printing: every colour comes from these variables, so swapping them turns the
    dark candlelit screen into black ink on white paper everywhere at once. */
 @media print {
