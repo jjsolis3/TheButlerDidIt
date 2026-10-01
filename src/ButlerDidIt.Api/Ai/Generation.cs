@@ -267,10 +267,11 @@ public sealed class GenerationWorker(IServiceScopeFactory scopes, TimeProvider c
                 new AiCallContext(job.HostUserId, JobId: job.Id), new JobProgress(scopes, job, clock, events), ct);
 
             var room = result.Room;
+            var now = clock.GetUtcNow();
             db.EscapeRooms.Add(new EscapeRoomEntity
             {
                 Id = room.Id, OwnerUserId = job.HostUserId, Title = room.Title, ContentRating = room.ContentRating,
-                Document = GameJson.Serialize(room), CreatedAt = clock.GetUtcNow(),
+                Document = GameJson.Serialize(room), CreatedAt = now, UpdatedAt = now,
             });
             job.Status = GenerationStatus.Succeeded;
             job.ScenarioId = room.Id;

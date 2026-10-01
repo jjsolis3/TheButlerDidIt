@@ -27,12 +27,12 @@ public static class EscapeEndpoints
     public static void MapEscapeEndpoints(this IEndpointRouteBuilder app, IConfiguration config)
     {
         // The shelf: only what a card shows (no puzzles, no answers), plus the best escape so far.
-        // A signed-in host also sees the rooms written for them, newest first, before the hand-written ones.
+        // A signed-in host also sees their own rooms (written by AI for them, or their copies), newest first, before the hand-written ones.
         app.MapGet("/api/escape-rooms", async (ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db, CancellationToken ct) =>
         {
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var mine = hostId is null ? [] : await rooms.OwnedAsync(db, hostId, ct);
-            var ids = mine.Concat(rooms.Rooms).Select(r => r.Id).ToList();
+            var ids = mine.Select(o => o.Room).Concat(rooms.Rooms).Select(r => r.Id).ToList();
             var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).AtDifficulty(EscapeDifficulty.Normal).GroupBy(r => new { r.RoomId, r.Minutes, r.Edition })
                 .Select(g => new { g.Key.RoomId, g.Key.Minutes, g.Key.Edition, Best = g.Min(r => r.Score) }).ToListAsync(ct);
             // The card's best escape is on the room's current edition, at its own length on Normal; the rest are ranked on their own.
@@ -43,7 +43,7 @@ public static class EscapeEndpoints
             var covers = await db.ScenarioMedia.AsNoTracking().Where(m => jobIds.Contains(m.ScenarioId) && m.Key == EscapeArt.Cover)
                 .Select(m => new { m.ScenarioId, m.AssetId }).ToListAsync(ct);
             string? Cover(EscapeRoom r) => covers.FirstOrDefault(c => c.ScenarioId == EscapeMedia.JobId(r.Id)) is { } c ? ButlerDidIt.Api.Media.MediaStore.Url(c.AssetId) : null;
-            return Results.Ok(mine.Select(r => EscapeRoomSummary.For(r, Best(r), generated: true, Cover(r)))
+            return Results.Ok(mine.Select(o => EscapeRoomSummary.For(o.Room, Best(o.Room), mine: true, copied: o.Copied, coverUrl: Cover(o.Room)))
                 .Concat(rooms.Rooms.Select(r => EscapeRoomSummary.For(r, Best(r), coverUrl: Cover(r)))));
         });
 
@@ -75,7 +75,7 @@ public static class EscapeEndpoints
         }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(ButlerDidIt.Api.Endpoints.AuthEndpoints.RequireConfirmedHost)
           .AddEndpointFilter(ButlerDidIt.Api.Plans.Access.RequireGame(GameKind.EscapeRoom));
 
-        // Delete a room written for this host. Its results stay (they hold only times and first names),
+        // Delete one of this host's own rooms. Its results stay (they hold only times and first names),
         // and a party still playing it is told the room is no longer available.
         app.MapDelete("/api/escape-rooms/{id}", async (string id, ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db, CancellationToken ct) =>
         {

@@ -5,6 +5,7 @@ import AdminHosts from './pages/AdminHosts'
 import EscapeHowToPlay from './pages/EscapeHowToPlay'
 import EscapeLanding from './pages/EscapeLanding'
 import EscapeRecap from './pages/EscapeRecap'
+import EscapeRoomEditor from './pages/EscapeRoomEditor'
 import Home from './pages/Home'
 import HowToPlay from './pages/HowToPlay'
 import Join from './pages/Join'
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="/account/confirm-email" element={<ConfirmEmailChange />} />
       <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/escape/recap/:slug" element={<EscapeRecap />} />
+      <Route path="/escape/rooms/:id" element={<EscapeRoomEditor />} />
       <Route path="/mysteries" element={<MyMysteries />} />
       <Route path="/how-to-play" element={<HowToPlay />} />
       <Route path="/how-to-play/escape" element={<EscapeHowToPlay />} />

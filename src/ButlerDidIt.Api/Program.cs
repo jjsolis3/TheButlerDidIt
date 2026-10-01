@@ -289,6 +289,7 @@ app.MapRecapEndpoints();
 app.MapScenarioEditorEndpoints();
 app.MapThemeEndpoints();
 app.MapEscapeEndpoints(app.Configuration);
+app.MapEscapeEditorEndpoints();
 app.MapPartyEndpoints();
 app.MapSpectatorEndpoints();
 app.MapMediaEndpoints();

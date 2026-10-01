@@ -705,8 +705,10 @@ export interface EscapeRoomSummary {
   bestScore: number | null
   /** Who plays the AI game master in this room. */
   gameMaster: string
-  /** Written by AI for this host: only they see it, and they can delete it. */
+  /** Written by AI for this host */
   generated: boolean
+  /** One of the host's own rooms (written by AI for them, or their copy): they can edit or delete it */
+  mine: boolean
   /** The lengths a host can pick, shortest first, with how many puzzles each plays */
   lengths: EscapeLength[]
   /** Seasonal shelves the room is on ("halloween") */

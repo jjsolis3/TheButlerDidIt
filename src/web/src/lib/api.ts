@@ -37,6 +37,7 @@ import type {
   Tone,
   UsageReport,
 } from './types'
+import type { EditableRoom, EscapeRoomDoc, SavedRoom } from './escapeDoc'
 import type { ScenarioDoc } from './scenarioDoc'
 
 /** The optional choices when creating a party. Named options, so a call reads as what it asks for. */
@@ -118,6 +119,11 @@ export const api = {
   generateEscapeRoom: (theme: string, contentRating: ContentRating, minutes: number) =>
     request<GenerationJob>('POST', '/api/escape-rooms/generate', { theme, contentRating, minutes }),
   deleteEscapeRoom: (id: string) => request<void>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}`),
+  // The escape room editor (#113).
+  escapeRoomDocument: (id: string) => request<EditableRoom>('GET', `/api/escape-rooms/${encodeURIComponent(id)}/document`),
+  validateEscapeRoom: (document: EscapeRoomDoc) => request<ValidationResult>('POST', '/api/escape-rooms/validate', { document }),
+  saveEscapeRoom: (id: string, document: EscapeRoomDoc) => request<SavedRoom>('PUT', `/api/escape-rooms/${encodeURIComponent(id)}/document`, { document }),
+  duplicateEscapeRoom: (id: string) => request<{ id: string }>('POST', `/api/escape-rooms/${encodeURIComponent(id)}/duplicate`),
   createEscapeParty: (
     roomId: string,
     mode: PartyMode,

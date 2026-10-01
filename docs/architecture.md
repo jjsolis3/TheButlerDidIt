@@ -410,5 +410,28 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **Neutral ids.** The model names puzzles after what they are ("echo-riddle"), and puzzle ids reach the browsers. So once a room passes, `Anonymize` renames them `puzzle-1`, `puzzle-2`… This runs last, so repair turns can still quote the model's own ids back to it.
 - **Storage and access.** A room is saved as an `EscapeRoomEntity` (jsonb) for its host only after it has passed.
   - `EscapeCatalog` merges the file rooms with the DB rooms. `FindAsync` is for loading a party (guests of any host), and it caches the parsed room because it never changes. `FindForHostAsync` is for starting a party, and it always asks the DB for the owner, so a deleted room can't be started from another server's cache. `OwnedAsync` builds the host's shelf.
-  - Only the owner sees a room on the shelf (`generated: true`), starts parties with it, or deletes it. Its results and leaderboards stay after a delete.
+  - Only the owner sees a room on the shelf (`mine: true`), starts parties with it, edits it or deletes it. Its results and leaderboards stay after a delete.
+
+**The room editor** (#113, `EscapeEditorEndpoints.cs`, `/escape/rooms/:id`). It's the escape rooms' version of the mystery editor.
+- **Who edits what.**
+  - A host edits their own rooms: the ones the AI wrote for them, and their copies.
+  - **Any host can copy any room**, a built-in one included, to change a riddle or put their family's names in. The copy is a record `with` a new id, a "(copy)" title and edition 1, so every other setting carries over. It's marked `CopiedFrom`, and it shares the original's pictures.
+  - Built-in rooms are never edited in place: they're read from `content/escape` at every start.
+- **Answers stay out of sight.** The editor shows every answer only after a "Spoilers!" warning. Generated codes are never written in a room, so they stay a surprise.
+- **Checked like a shipped room.**
+  - A room is saved only when `EscapeRoomValidator` proves it can still be escaped at every length and difficulty over all 200 puzzle sets.
+  - The full check takes a second or two, so checking as you type uses 12 (`Validate(room, seeds)`), and saving runs the full one.
+  - A refused save is a problem whose message is the first error, with the whole list attached.
+  - Limits: 200,000 characters, 6 stages, 30 puzzles. The AI-only shape rules don't apply to a host's edits.
+- **A room in play waits.** Saving is refused while a party is in the lobby or playing it, as the mystery editor does.
+- **Editions.** The server sets the edition, never the document.
+  - A change that alters how the room plays starts a new edition, so its leaderboards start fresh. That's anything but the title, synopsis, intro, endings, look, sound, seasons, game master and the stages' names and descriptions.
+  - A reworded story keeps the old edition, and its leaderboards.
+- **Pictures.**
+  - **Stale pictures:** the keys whose `EscapeMediaPlan` prompt changed (or whose stage went) are forgotten, so only those are painted again.
+  - **Tidy documents:** documents are written without the room's read-only properties and nulls.
+- **Every server sees an edit.**
+  - The catalog caches each database room with its `UpdatedAt`. Party loads check that time with one small query, and re-read the document only after an edit.
+  - An edit saved on another server therefore reaches this one's next command; `EscapeEditorTests` checks this, and fails with the old "cached for ever" rule.
+  - A deleted room is now gone on every server at once.
 

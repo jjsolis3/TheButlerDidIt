@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Button, ErrorText, inputClass } from '../components/ui'
 import { api } from '../lib/api'
 import type { AiStatus, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
 import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { RoomCardBody, ShelfControls } from './RoomShelf'
-import { useRoomShelf } from './useRoomShelf'
+import { roomTitleId, useRoomShelf } from './useRoomShelf'
 
 /**
  * The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby.
@@ -57,6 +57,17 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
     setShelf(written.contentRating) // show it on its own shelf
     setHalloweenOnly(false)
     setChosen(written.id)
+  }
+
+  // Your own copy of a room, to change a riddle or put the family in it: it opens in the editor.
+  const copy = async (room: EscapeRoomSummary) => {
+    setError(null)
+    try {
+      const made = await api.duplicateEscapeRoom(room.id)
+      navigate(`/escape/rooms/${made.id}`)
+    } catch (e) {
+      setError((e as Error).message)
+    }
   }
 
   const remove = async (room: EscapeRoomSummary) => {
@@ -114,12 +125,24 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
               >
                 <RoomCardBody room={r} picture="banner" />
               </button>
-              {/* Outside the card: a button can't sit inside another button. */}
-              {r.generated && (
-                <button onClick={() => remove(r)} className="mt-1 self-end text-xs text-muted underline hover:text-ink">
-                  Delete this room
-                </button>
-              )}
+              {/* Outside the card: a button can't sit inside another button. Your own rooms can be edited and deleted;
+                  any other room can be copied, and the copy edited (#113). */}
+              <div className="mt-1 flex flex-wrap justify-end gap-x-4 text-xs">
+                {r.mine ? (
+                  <>
+                    <Link to={`/escape/rooms/${encodeURIComponent(r.id)}`} aria-describedby={roomTitleId(r.id)} className="inline-flex min-h-8 items-center text-muted underline hover:text-ink">
+                      ✏️ Edit
+                    </Link>
+                    <button onClick={() => remove(r)} className="min-h-8 text-muted underline hover:text-ink">
+                      Delete this room
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => copy(r)} aria-describedby={roomTitleId(r.id)} className="min-h-8 text-muted underline hover:text-ink">
+                    📄 Make my own copy
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

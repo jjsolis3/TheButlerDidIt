@@ -487,4 +487,14 @@ public sealed class EscapeRoomEntity
     public required string Document { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>
+    /// When the room was last saved (#113). Each server caches parsed rooms, and checks this before trusting its
+    /// copy, so an edit reaches every server's next game.
+    /// </summary>
+    public DateTimeOffset UpdatedAt { get; set; }
+
+    /// <summary>The room this one was copied from, for a host's own copy of a room (#113); null for a room the AI wrote.</summary>
+    [MaxLength(120)]
+    public string? CopiedFrom { get; set; }
 }

@@ -217,11 +217,11 @@ public static class ScenarioEditorEndpoints
         return oldPlan.Keys.Where(k => !newPlan.TryGetValue(k, out var now) || now != oldPlan[k]).ToHashSet();
     }
 
-    /// <summary>A readable, unique id: "death-at-blackwood-manor-7f3a9c".</summary>
-    private static string NewId(string title)
+    /// <summary>A readable, unique id: "death-at-blackwood-manor-7f3a9c". Also used for copies of escape rooms.</summary>
+    internal static string NewId(string title, string fallback = "mystery")
     {
         var slug = Regex.Replace(title.ToLowerInvariant(), "[^a-z0-9]+", "-").Trim('-');
         if (slug.Length > 80) slug = slug[..80].TrimEnd('-');
-        return $"{(slug.Length == 0 ? "mystery" : slug)}-{Convert.ToHexString(RandomNumberGenerator.GetBytes(3)).ToLowerInvariant()}";
+        return $"{(slug.Length == 0 ? fallback : slug)}-{Convert.ToHexString(RandomNumberGenerator.GetBytes(3)).ToLowerInvariant()}";
     }
 }

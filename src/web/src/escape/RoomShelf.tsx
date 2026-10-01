@@ -2,7 +2,7 @@ import { FilterChip } from '../components/ui'
 import type { EscapeRoomSummary } from '../lib/types'
 import { backdrop, moodIcon } from './moods'
 import { formatDuration } from './time'
-import { isHalloween, type RoomShelf } from './useRoomShelf'
+import { isHalloween, type RoomShelf, roomTitleId } from './useRoomShelf'
 
 /**
  * The escape-room shelf, shared by the landing page (/escape) and the host page (/host/new),
@@ -67,7 +67,10 @@ export function RoomCardBody({ room: r, picture }: { room: EscapeRoomSummary; pi
         )}
       </span>
       {r.generated && <span className="mt-3 block text-xs font-semibold tracking-widest text-accent uppercase">✨ Written by AI for you</span>}
-      <span className="font-display mt-2 block text-lg">{r.title}</span>
+      {r.mine && !r.generated && <span className="mt-3 block text-xs font-semibold tracking-widest text-accent uppercase">📄 Your own copy</span>}
+      <span id={roomTitleId(r.id)} className="font-display mt-2 block text-lg">
+        {r.title}
+      </span>
       <span className="mt-1 block text-xs text-muted">
         {r.contentRating === 'mature' ? '🍷 Adults' : '🧸 Family'} · {r.lengths.map((l) => l.minutes).join('/')} min · {r.minPlayers}–{r.maxPlayers} players ·{' '}
         {r.stageCount} rooms, {r.puzzleCount} puzzles{isHalloween(r) && ' · 🎃 Halloween'}
