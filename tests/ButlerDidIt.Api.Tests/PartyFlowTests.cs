@@ -218,11 +218,19 @@ public class RegistrationTests(ClosedRegistrationFactory app) : IClassFixture<Cl
     [Fact]
     public async Task First_user_is_admin_and_registration_can_be_closed()
     {
+        // A brand-new server still offers sign-up, so the admin can create the first account.
+        Assert.True(await AllowsRegistrationAsync());
+
         var first = await app.CreateClient().PostAsJsonAsync("/api/auth/register", new RegisterRequest("owner@example.com", "password123", "Owner"));
         var me = JsonDocument.Parse(await first.Content.ReadAsStringAsync()).RootElement;
         Assert.True(me.GetProperty("isAdmin").GetBoolean());
 
+        // From then on the sign-in page stops offering it, and the server refuses it.
+        Assert.False(await AllowsRegistrationAsync());
         var second = await app.CreateClient().PostAsJsonAsync("/api/auth/register", new RegisterRequest("other@example.com", "password123", "Other"));
         Assert.Equal(HttpStatusCode.Forbidden, second.StatusCode);
     }
+
+    private async Task<bool> AllowsRegistrationAsync() =>
+        JsonDocument.Parse(await app.CreateClient().GetStringAsync("/api/auth/options")).RootElement.GetProperty("allowRegistration").GetBoolean();
 }

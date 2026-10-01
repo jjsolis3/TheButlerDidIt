@@ -112,6 +112,7 @@ docs/                   architecture, deployment and scenario-writing guides
 - [Writing an escape room](docs/writing-escape-rooms.md)
 - [Setting up the AI game master](docs/ai-setup.md)
 - [Verifying the real AI providers](docs/verifying-providers.md)
+- [Roadmap: running it as a paid service](docs/saas-roadmap.md)
 
 ## Roadmap
 

@@ -49,9 +49,12 @@ public static class AuthEndpoints
     {
         var group = app.MapGroup("/api/auth");
 
-        // What the sign-in page should offer: a "Forgot password?" link only makes sense with email.
-        group.MapGet("/options", (Microsoft.Extensions.Options.IOptions<AuthOptions> options, IEmailSender email) =>
-            new AuthOptionsView(options.Value.AllowRegistration, email.IsConfigured, options.Value.RequireConfirmedEmail && email.IsConfigured));
+        // What the sign-in page should offer: a "Forgot password?" link only makes sense with email,
+        // and "Create an account" only while sign-ups are open. The first account (the admin) can
+        // always sign up, so a brand-new server offers it even when registration is closed.
+        group.MapGet("/options", async (Microsoft.Extensions.Options.IOptions<AuthOptions> options, IEmailSender email, UserManager<AppUser> users) =>
+            new AuthOptionsView(options.Value.AllowRegistration || !await users.Users.AnyAsync(), email.IsConfigured,
+                options.Value.RequireConfirmedEmail && email.IsConfigured));
 
         group.MapPost("/register", async (
             RegisterRequest req,
