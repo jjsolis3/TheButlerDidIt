@@ -2,8 +2,8 @@ import type { CueView, EscapeStageView } from '../lib/types'
 
 /**
  * Cinematic room reveals (#110). The cues are built from the TV's own view, so a reveal can only show what
- * the TV may show: the picture of the stage in front of the group (the projector never sends a later one)
- * and text the TV already prints. There's nothing new for the server to send, and nothing to leak.
+ * the TV may show: the picture (or the host's video) of the stage in front of the group (the projector never
+ * sends a later one) and text the TV already prints. There's nothing new for the server to send, and nothing to leak.
  */
 export type RevealMode = 'intro' | 'stage'
 
@@ -11,8 +11,16 @@ const cue = (c: Partial<CueView> & Pick<CueView, 'type'>): CueView => ({
   text: null, src: null, speaker: null, speakerName: null, effect: null, voice: null, alternative: null, ...c,
 })
 
-/** The intro: the room's picture with a slow pan, and its welcome read out. A new stage: its picture, and what the group sees. */
+/** The video the host uploaded for this moment, if any. */
+export const revealVideo = (view: EscapeStageView, mode: RevealMode) => (mode === 'intro' ? view.introVideoUrl : view.stageVideoUrl)
+
+/**
+ * The intro: the room's picture with a slow pan, and its welcome read out. A new stage: its picture, and what the group
+ * sees. When the host uploaded a video for the moment, the video plays instead: it's their telling of it.
+ */
 export function revealCues(view: EscapeStageView, mode: RevealMode): CueView[] {
+  const video = revealVideo(view, mode)
+  if (video) return [cue({ type: 'video', src: video })]
   const voice = view.gameMaster?.voice ?? null
   const text = mode === 'intro' ? view.intro : (view.stage?.description ?? '')
   return [cue({ type: 'image', src: view.artUrl, effect: 'kenburns' }), cue({ type: 'narration', text, voice })]

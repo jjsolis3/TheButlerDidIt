@@ -96,6 +96,35 @@ public static class MediaApi
 }
 
 /// <summary>
+/// What a video or sound file really is, from its first bytes (its "magic number"). A file's name and the type the
+/// browser reports are only claims; the bytes are what a player will actually have to read.
+/// </summary>
+public static class MediaFormats
+{
+    public sealed record Format(string ContentType, string Extension);
+
+    /// <summary>MP4 or MOV (the ISO media family: "ftyp" at byte 4), or WebM. Null for anything else.</summary>
+    public static Format? Video(ReadOnlySpan<byte> head) =>
+        IsIsoMedia(head) ? (head[8..12].SequenceEqual("qt  "u8) ? new("video/quicktime", "mov") : new("video/mp4", "mp4"))
+        : IsWebM(head) ? new("video/webm", "webm")
+        : null;
+
+    /// <summary>MP3, M4A, OGG, WAV or WebM sound. Null for anything else.</summary>
+    public static Format? Audio(ReadOnlySpan<byte> head) =>
+        IsIsoMedia(head) ? new("audio/mp4", "m4a")
+        : head.StartsWith("OggS"u8) ? new("audio/ogg", "ogg")
+        // An MP3 starts with its tags ("ID3"), or straight away with a frame: eleven 1 bits.
+        : head.StartsWith("ID3"u8) || (head.Length >= 2 && head[0] == 0xFF && (head[1] & 0xE0) == 0xE0) ? new("audio/mpeg", "mp3")
+        : head.Length >= 12 && head.StartsWith("RIFF"u8) && head[8..12].SequenceEqual("WAVE"u8) ? new("audio/wav", "wav")
+        : IsWebM(head) ? new("audio/webm", "webm")
+        : null;
+
+    private static bool IsIsoMedia(ReadOnlySpan<byte> head) => head.Length >= 12 && head[4..8].SequenceEqual("ftyp"u8);
+
+    private static bool IsWebM(ReadOnlySpan<byte> head) => head.StartsWith((ReadOnlySpan<byte>)[0x1A, 0x45, 0xDF, 0xA3]);
+}
+
+/// <summary>
 /// Turns an uploaded photo into a small, safe JPEG. Decoding and re-encoding
 /// drops all metadata: phone photos often carry the GPS location where they were
 /// taken, and we don't want to publish anyone's address. The image is also

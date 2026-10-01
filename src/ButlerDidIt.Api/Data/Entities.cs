@@ -366,6 +366,10 @@ public sealed class MediaAsset
     /// file on disk, which only the retention job can do.
     /// </summary>
     public Guid? PartyId { get; set; }
+
+    /// <summary>The host who uploaded it (a room's own picture, video or sound), for their upload allowance. Null otherwise.</summary>
+    [MaxLength(450)]
+    public string? OwnerUserId { get; set; }
 }
 
 /// <summary>Which generated file fills which slot of a scenario (see MediaOverlay for the keys).</summary>

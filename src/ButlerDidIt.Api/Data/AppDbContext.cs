@@ -78,6 +78,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         b.Entity<MediaAsset>().HasIndex(m => m.ContentHash).IsUnique();
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<MediaAsset>().HasIndex(m => m.PartyId);
+        b.Entity<MediaAsset>().HasIndex(m => m.OwnerUserId);
         b.Entity<ScenarioEntity>().HasIndex(s => s.OwnerUserId);
         b.Entity<ScenarioEntity>().HasIndex(s => s.VariantOf);
 
@@ -101,6 +102,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         b.Entity<ScenarioMediaEntity>(e =>
         {
             e.HasKey(x => new { x.ScenarioId, x.Key });
+            // "Does any other room still use this file?" before an upload is deleted.
+            e.HasIndex(x => x.AssetId);
         });
         b.Entity<MediaJobEntity>(e =>
         {

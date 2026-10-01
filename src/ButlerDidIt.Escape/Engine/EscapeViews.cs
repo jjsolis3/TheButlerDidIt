@@ -49,7 +49,13 @@ public sealed record EscapeStageView(
     /// <summary>The spots to search in the stage in front of the group, or null when it has none.</summary>
     EscapeSceneView? Scene,
     /// <summary>What the group has found out, oldest first.</summary>
-    IReadOnlyList<EscapeNoteView> Notebook);
+    IReadOnlyList<EscapeNoteView> Notebook,
+    /// <summary>A video the host uploaded to play when the clock starts, or null. Public, like the intro.</summary>
+    string? IntroVideoUrl,
+    /// <summary>A video the host uploaded for the stage in front of the group (never a later one), or null.</summary>
+    string? StageVideoUrl,
+    /// <summary>A recorded background sound to loop now (the current stage's, or the room's), or null for the made-up one.</summary>
+    string? AmbienceUrl);
 
 public sealed record EscapeSceneView(int Width, int Height, string Backdrop, IReadOnlyList<EscapeSpotView> Objects);
 

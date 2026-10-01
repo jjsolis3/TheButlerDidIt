@@ -2,18 +2,20 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { EditorCard as Card, JsonTab, Lines, ListDetail, Num, Select, Text } from '../components/EditorFields'
 import { Button, ErrorText, Eyebrow, Shell } from '../components/ui'
+import { RoomMediaPanel } from '../escape/RoomMediaPanel'
 import { api } from '../lib/api'
 import type { EscapeItemDoc, EscapePuzzleDoc, EscapeRoomDoc, EscapeStageDoc } from '../lib/escapeDoc'
 import { newId } from '../lib/newId'
 import { ESCAPE_PALETTE, usePalette } from '../lib/theme'
 import type { PuzzleKind, Soundscape, ValidationResult } from '../lib/types'
 
-type Tab = 'story' | 'stages' | 'puzzles' | 'items' | 'json'
+type Tab = 'story' | 'stages' | 'puzzles' | 'items' | 'media' | 'json'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'story', label: 'Story' },
   { id: 'stages', label: 'Stages' },
   { id: 'puzzles', label: 'Puzzles' },
   { id: 'items', label: 'Items' },
+  { id: 'media', label: '🎬 Pictures, video & sound' },
   { id: 'json', label: 'JSON' },
 ]
 
@@ -208,34 +210,41 @@ export default function EscapeRoomEditor() {
         ))}
       </nav>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
-        <fieldset disabled={readOnly} className="min-w-0 space-y-4">
-          {tab === 'story' && <StoryTab doc={doc} update={update} />}
-          {tab === 'stages' && <StagesTab doc={doc} update={update} />}
-          {tab === 'puzzles' && <PuzzlesTab doc={doc} update={update} />}
-          {tab === 'items' && <ItemsTab doc={doc} update={update} />}
-          {tab === 'json' && <JsonTab doc={doc} what="room" onApply={(d) => update((x) => Object.assign(x, d))} />}
-        </fieldset>
-        {!readOnly && (
-          <aside className="lg:sticky lg:top-4 lg:self-start">
-            <div className={`rounded-xl border p-4 text-sm ${valid ? 'border-accent/50 bg-accent/5' : 'border-red-400/50 bg-red-950/20'}`} data-testid="room-check">
-              <p className="font-semibold">{check === null ? 'Checking…' : valid ? '✓ Ready to play' : `${check.errors.length} thing${check.errors.length === 1 ? '' : 's'} to fix`}</p>
-              {check && !valid && (
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-red-200" aria-label="Problems">
-                  {check.errors.map((e) => (
-                    <li key={e}>{e}</li>
-                  ))}
-                </ul>
-              )}
-              {valid && (
-                <p className="mt-1 text-muted">
-                  The group can still get out, at every length and difficulty. Saving checks every puzzle set; changing how a puzzle plays starts fresh leaderboards.
-                </p>
-              )}
-            </div>
-          </aside>
-        )}
-      </div>
+      {/* Media has its own rules (the admin can add some to a built-in room) and saves each change at once, so it's outside the form. */}
+      {tab === 'media' ? (
+        <div className="mt-6">
+          <RoomMediaPanel roomId={id} />
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
+          <fieldset disabled={readOnly} className="min-w-0 space-y-4">
+            {tab === 'story' && <StoryTab doc={doc} update={update} />}
+            {tab === 'stages' && <StagesTab doc={doc} update={update} />}
+            {tab === 'puzzles' && <PuzzlesTab doc={doc} update={update} />}
+            {tab === 'items' && <ItemsTab doc={doc} update={update} />}
+            {tab === 'json' && <JsonTab doc={doc} what="room" onApply={(d) => update((x) => Object.assign(x, d))} />}
+          </fieldset>
+          {!readOnly && (
+            <aside className="lg:sticky lg:top-4 lg:self-start">
+              <div className={`rounded-xl border p-4 text-sm ${valid ? 'border-accent/50 bg-accent/5' : 'border-red-400/50 bg-red-950/20'}`} data-testid="room-check">
+                <p className="font-semibold">{check === null ? 'Checking…' : valid ? '✓ Ready to play' : `${check.errors.length} thing${check.errors.length === 1 ? '' : 's'} to fix`}</p>
+                {check && !valid && (
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-red-200" aria-label="Problems">
+                    {check.errors.map((e) => (
+                      <li key={e}>{e}</li>
+                    ))}
+                  </ul>
+                )}
+                {valid && (
+                  <p className="mt-1 text-muted">
+                    The group can still get out, at every length and difficulty. Saving checks every puzzle set; changing how a puzzle plays starts fresh leaderboards.
+                  </p>
+                )}
+              </div>
+            </aside>
+          )}
+        </div>
+      )}
     </Shell>
   )
 }

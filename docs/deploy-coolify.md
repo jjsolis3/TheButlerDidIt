@@ -90,10 +90,14 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 | `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **AI settings** unreadable. Keys already in `/data/keys` are copied in on the next start. |
 | `Plans__TrialDays` | `14` | Optional: how long a new host's free trial of both games lasts. Hosts who had an account before plans keep both games free. |
 | `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
+| `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room, in MB. |
+| `Media__UploadQuotaMb` | `2048` | Optional: how much each host can upload in all, in MB. The admin has no limit. |
 
 The Dockerfile already sets the port (8080), the content folder and the data folders. Untick **Buildtime** on secrets such as the connection string: the app only reads them when it runs.
 
-**2. Storage.** In **Persistent Storage**, add a volume mounted at `/data/media` for generated pictures, voice clips and costume selfies. Without it they're lost on every redeploy. (`/data/keys` needs one too, unless you set `DataProtection__Store=Database`.)
+**2. Storage.** In **Persistent Storage**, add a volume mounted at `/data/media` for generated pictures, voice clips, costume selfies and the pictures, videos and sounds hosts upload for their escape rooms. Without it they're lost on every redeploy. A new volume takes effect on the next deploy, so redeploy once you've added it. (`/data/keys` needs one too, unless you set `DataProtection__Store=Database`.)
+
+If the site is behind Cloudflare's proxy (the orange cloud), its free plan refuses uploads over 100 MB, so leave `Media__MaxVideoMb` at 100 or less.
 
 **3. Health check and backups.** In **Healthcheck**, set the path to `/healthz` and the port to `8080`, so Coolify knows when the app is really up. The Compose stack's nightly `backup` service isn't there, so turn on **Scheduled Backups** on the PostgreSQL database resource instead.
 
@@ -105,7 +109,7 @@ The compose file declares four named volumes, which Coolify keeps across redeplo
 |---|---|
 | `pgdata` | the PostgreSQL database |
 | `keys` | ASP.NET Data Protection keys. Without these, every redeploy would sign every host out. |
-| `media` | generated pictures and voice clips, and guests' costume selfies. Back it up along with the database: the database only stores where each file is. |
+| `media` | generated pictures and voice clips, guests' costume selfies, and the pictures, videos and sounds hosts upload for their rooms. Back it up along with the database: the database only stores where each file is. |
 | `backups` | nightly database dumps from the `backup` service (see below) |
 
 ### Database backups
@@ -167,7 +171,7 @@ One server comfortably runs many parties at once, so most hosts never need this.
 
 **Moving existing media to S3:** copy the `media` volume into the bucket, keeping the folder layout (`2026-09/…`), for example with `rclone copy /path/to/media r2:your-bucket`. The database stores each file's path, so the same paths work in the bucket.
 
-Files are always served through the app (`/media/assets/…`), so the bucket can stay private.
+Files are always served through the app (`/media/assets/…`), so the bucket can stay private. For now the app reads a file from the bucket whole before serving it, which is fine for pictures and voices but slow for large uploaded videos; the local volume streams them from disk (#119).
 
 ## Updating
 

@@ -69,6 +69,7 @@ export function CuePlayer({
   useEffect(() => {
     mutedRef.current = muted
     if (musicRef.current) musicRef.current.muted = muted
+    if (videoRef.current) videoRef.current.muted = muted
     if (muted) narrator.stop()
   }, [muted])
 
@@ -78,10 +79,12 @@ export function CuePlayer({
     // older run notices it was superseded and stops talking over the new one.
     let cancelled = false
     const active = () => !cancelled
+    let clip: HTMLVideoElement | null = null // the video this run is playing, to stop it if the scene changes
     const { cues, onFinished } = latest.current
 
     const run = async () => {
       setPlaying(true)
+      setVideo(null)
       const firstImage = cues.find((c) => c.type === 'image')
       setShot({ src: firstImage?.src ?? null, caption: firstImage?.text ?? null, effect: firstImage?.effect ?? 'kenburns' })
 
@@ -131,10 +134,17 @@ export function CuePlayer({
               await new Promise<void>((resolve) => {
                 const check = () => (videoRef.current ? attach(videoRef.current) : setTimeout(check, 50))
                 const attach = (el: HTMLVideoElement) => {
+                  clip = el
                   el.muted = mutedRef.current
                   el.onended = () => resolve()
                   el.onerror = () => resolve()
-                  el.play().catch(() => resolve())
+                  // A browser may refuse to start a video with sound until someone clicks on this page.
+                  // Then it plays muted rather than not at all (anyone can unmute it with the sound switch).
+                  el.play().catch(() => {
+                    if (el.muted) return resolve()
+                    el.muted = true
+                    el.play().catch(() => resolve())
+                  })
                 }
                 check()
               })
@@ -155,6 +165,7 @@ export function CuePlayer({
       cancelled = true
       narrator.stop()
       voice?.pause()
+      clip?.pause()
     }
   }, [runKey, enabled, replayCount])
 

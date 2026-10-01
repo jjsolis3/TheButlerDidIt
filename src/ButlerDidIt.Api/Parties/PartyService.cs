@@ -169,6 +169,21 @@ public sealed class PartyRuntime(
         await Task.WhenAll(tasks);
     }
 
+    /// <summary>
+    /// Fresh views for every party still playing this mystery or room, e.g. once its pictures change. Nothing in the
+    /// game changed, so there's nothing to save: each party is loaded (with the new media) and sent out again.
+    /// </summary>
+    public async Task RefreshAsync(string scenarioId, CancellationToken ct)
+    {
+        var partyIds = await db.Parties.AsNoTracking()
+            .Where(p => p.ScenarioId == scenarioId && p.Status != PartyStatus.Finished).Select(p => p.Id).ToListAsync(ct);
+        foreach (var id in partyIds)
+        {
+            var (_, session) = await LoadAsync(id, ct);
+            await BroadcastAsync(id, session, Now);
+        }
+    }
+
     /// <summary>A message for the stage and every seat at once, such as an NPC's answer being typed.</summary>
     public Task SendToEveryoneAsync(Guid partyId, IEnumerable<Guid> seatIds, string method, object payload) =>
         hub.Clients.Groups([PartyHub.StageGroup(partyId), .. seatIds.Select(PartyHub.SeatGroup)]).SendAsync(method, payload);

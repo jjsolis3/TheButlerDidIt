@@ -4,6 +4,7 @@ using ButlerDidIt.Ai.Media;
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
+using ButlerDidIt.Api.Media;
 using ButlerDidIt.Escape.Rooms;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.Identity;
@@ -75,7 +76,7 @@ public static class EscapeEditorEndpoints
         });
 
         group.MapPut("/{id}/document", async (string id, RoomDocumentRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, AppDbContext db,
-            EscapeCatalog catalog, TimeProvider clock, CancellationToken ct) =>
+            EscapeCatalog catalog, MediaService media, TimeProvider clock, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -101,12 +102,20 @@ public static class EscapeEditorEndpoints
             row.Document = JsonSerializer.Serialize(room, Tidy);
             row.UpdatedAt = clock.GetUtcNow();
 
-            // Pictures painted from words that changed are now wrong; forget just those. The next game with the AI
-            // on paints the new ones, and anything unchanged keeps its picture.
+            // Pictures the AI painted from words that changed are now wrong; forget just those. The next game with the
+            // AI on paints the new ones, and anything unchanged keeps its picture. The host's own uploads stay, unless
+            // their stage is gone.
             var stale = StaleArt(old, room);
+            var slots = EscapeMediaEndpoints.Slots(room).Select(s => s.Key).ToHashSet();
             var jobId = EscapeMedia.JobId(id);
-            await db.ScenarioMedia.Where(m => m.ScenarioId == jobId && stale.Contains(m.Key)).ExecuteDeleteAsync(ct);
+            var art = await db.ScenarioMedia.Where(m => m.ScenarioId == jobId)
+                .Select(m => new { m.Key, m.AssetId, Uploaded = db.MediaAssets.Any(a => a.Id == m.AssetId && a.Provider == MediaService.Upload) })
+                .ToListAsync(ct);
+            var gone = art.Where(m => !slots.Contains(m.Key) || (stale.Contains(m.Key) && !m.Uploaded)).ToList();
+            var goneKeys = gone.Select(m => m.Key).ToList();
+            await db.ScenarioMedia.Where(m => m.ScenarioId == jobId && goneKeys.Contains(m.Key)).ExecuteDeleteAsync(ct);
             await db.SaveChangesAsync(ct);
+            await media.DeleteUnusedUploadsAsync(gone.Where(m => m.Uploaded).Select(m => m.AssetId), ct);
             catalog.Forget(id);
             catalog.ForgetArt(id);
             return Results.Ok(new SavedRoom(true, [], room.Edition, newEdition));
@@ -152,7 +161,7 @@ public static class EscapeEditorEndpoints
         statusCode: 400, extensions: new Dictionary<string, object?> { ["errors"] = errors });
 
     // Unknown and someone else's look the same (404), so nobody can probe for other hosts' rooms.
-    private static bool CanEdit(AppUser user, EscapeRoomEntity row) => row.OwnerUserId == user.Id || user.IsAdmin;
+    internal static bool CanEdit(AppUser user, EscapeRoomEntity row) => row.OwnerUserId == user.Id || user.IsAdmin;
 
     private static Task<string?> BusyPartyAsync(AppDbContext db, string id, CancellationToken ct) =>
         db.Parties.AsNoTracking().Where(p => p.ScenarioId == id && p.Kind == GameKind.EscapeRoom && p.Status != PartyStatus.Finished)

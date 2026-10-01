@@ -49,7 +49,11 @@ public static class EscapeProjector
             ArtUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.Stage(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Cover),
             Difficulty: s.Level,
             Scene: stage?.Scene is { } scene ? Scene(s, scene) : null,
-            Notebook: s.Notebook.Select(n => new EscapeNoteView(n.Source, n.Text, n.At)).ToList());
+            Notebook: s.Notebook.Select(n => new EscapeNoteView(n.Source, n.Text, n.At)).ToList(),
+            IntroVideoUrl: art?.GetValueOrDefault(EscapeArt.IntroVideo),
+            // Like the pictures: only the stage in front of the group, so a later stage's video can't give it away.
+            StageVideoUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageVideo(stage.Id)),
+            AmbienceUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageAmbience(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Ambience));
     }
 
     private static EscapeSceneView Scene(EscapeState s, EscapeScene scene) => new(

@@ -106,7 +106,7 @@ function Tv({ stage, info, invoke, tv, watchers, inset }: { stage: EscapeStageVi
       {sound.on ? (sound.playing ? '🔊 Sound on' : '🔈 Click anywhere for sound') : '🔇 Sound off'}
     </button>
   )
-  const reveal = revealing && <RoomReveal key={revealing} view={stage} mode="stage" sound={sound.on} onDone={() => revealed(revealing)} />
+  const reveal = revealing && <RoomReveal key={revealing} view={stage} mode="stage" sound={sound.on} duck={sound.duck} onDone={() => revealed(revealing)} />
 
   if (tv && stage.phase === 'playing')
     return (
@@ -130,7 +130,7 @@ function Tv({ stage, info, invoke, tv, watchers, inset }: { stage: EscapeStageVi
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
       <div className="mb-2 flex justify-end">{soundSwitch}</div>
-      {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} sound={sound.on} />}
+      {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} sound={sound.on} duck={sound.duck} />}
       {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} tv={false} controls={null} />}
       {over && <Ending stage={stage} code={info.code} isHost={info.isHost} />}
       {reveal}
@@ -149,7 +149,7 @@ function Centered({ children }: { children: React.ReactNode }) {
   return <div className="grid min-h-dvh place-items-center p-6 text-center text-muted">{children}</div>
 }
 
-function Lobby({ stage, info, invoke, sound }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke; sound: boolean }) {
+function Lobby({ stage, info, invoke, sound, duck }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke; sound: boolean; duck: (down: boolean) => void }) {
   const [error, setError] = useState<string | null>(null)
   // Start plays the room's intro first (#110); the clock starts when it ends or is skipped.
   const [intro, setIntro] = useState(false)
@@ -195,7 +195,7 @@ function Lobby({ stage, info, invoke, sound }: { stage: EscapeStageView; info: P
               The room's intro plays first, then the clock starts. Everyone's phone gets different clues when it does, so wait until the whole group has joined.
             </p>
             <ErrorText>{error}</ErrorText>
-            {intro && <RoomReveal view={stage} mode="intro" sound={sound} onDone={start} />}
+            {intro && <RoomReveal view={stage} mode="intro" sound={sound} duck={duck} onDone={start} />}
           </div>
         )}
       </div>

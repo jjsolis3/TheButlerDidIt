@@ -217,7 +217,7 @@ public static class AccountEndpoints
         // ---- Delete the account and what it made. Leaderboard times and AI costs are kept without the
         // name: the times are public anyway, and the costs are the admin's bill.
         group.MapPost("/delete", async (DeleteAccountRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, SignInManager<AppUser> signIn,
-            AppDbContext db, ContentCatalog catalog, EscapeCatalog rooms, HttpContext http, CancellationToken ct) =>
+            AppDbContext db, ContentCatalog catalog, EscapeCatalog rooms, ButlerDidIt.Api.Media.MediaService media, HttpContext http, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -234,6 +234,9 @@ public static class AccountEndpoints
             var scenarioIds = await db.Scenarios.Where(s => s.OwnerUserId == user.Id).Select(s => s.Id).ToListAsync(ct);
             var roomIds = await db.EscapeRooms.Where(r => r.OwnerUserId == user.Id).Select(r => r.Id).ToListAsync(ct);
             var roomJobIds = roomIds.Select(EscapeMedia.JobId).ToList();
+            // Their rooms' pictures, videos and sounds, and anything else they uploaded: deleted below once nothing uses them.
+            var uploads = await db.ScenarioMedia.Where(m => roomJobIds.Contains(m.ScenarioId)).Select(m => m.AssetId)
+                .Union(db.MediaAssets.Where(a => a.OwnerUserId == user.Id).Select(a => a.Id)).ToListAsync(ct);
             await using (var transaction = await db.Database.BeginTransactionAsync(ct))
             {
                 await db.ScenarioMedia.Where(m => scenarioIds.Contains(m.ScenarioId) || roomJobIds.Contains(m.ScenarioId)).ExecuteDeleteAsync(ct);
@@ -244,13 +247,21 @@ public static class AccountEndpoints
                 await db.EscapeResults.Where(r => r.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(r => r.HostUserId, "").SetProperty(r => r.Team, ""), ct);
                 await db.AiUsage.Where(u => u.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(u => u.HostUserId, ""), ct);
                 await db.MediaJobs.Where(j => j.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(j => j.HostUserId, ""), ct);
+                // A file the admin's copy of one of their rooms still uses stays for that copy, no longer theirs.
+                await db.MediaAssets.Where(a => a.OwnerUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.OwnerUserId, (string?)null), ct);
                 var deleted = await users.DeleteAsync(user);
                 if (!deleted.Succeeded)
                     return Results.Problem(string.Join(" ", deleted.Errors.Select(e => e.Description)), statusCode: StatusCodes.Status500InternalServerError);
                 await transaction.CommitAsync(ct);
             }
+            // Files after the rows: a crash in between leaves a file nothing points at, never a row pointing at nothing.
+            await media.DeleteUnusedUploadsAsync(uploads, ct);
             foreach (var id in scenarioIds) catalog.Invalidate(id);
-            foreach (var id in roomIds) rooms.Forget(id);
+            foreach (var id in roomIds)
+            {
+                rooms.Forget(id);
+                rooms.ForgetArt(id);
+            }
             await signIn.SignOutAsync();
             return Results.NoContent();
         });
