@@ -58,7 +58,7 @@ function removeWarning(p: PartyInfo) {
  * plus a party code box for guests and the host's own parties.
  */
 export default function Home() {
-  const { me, setMe } = useMe()
+  const { me } = useMe()
   const { themes } = useThemes()
   const [rooms, setRooms] = useState<EscapeRoomSummary[] | null>(null)
   const [parties, setParties] = useState<PartyInfo[]>([])
@@ -113,30 +113,6 @@ export default function Home() {
             </Button>
           )}
         </div>
-        {me && (
-          <p className="mt-4 text-sm text-muted">
-            Signed in as {me.displayName}.{' '}
-            <button className="underline hover:text-ink" onClick={() => api.logout().then(() => setMe(null))}>
-              Sign out
-            </button>
-            {' · '}
-            <Link to="/mysteries" className="underline hover:text-ink">
-              My mysteries
-            </Link>
-            {me.isAdmin && (
-              <>
-                {' · '}
-                <Link to="/admin/ai" className="underline hover:text-ink">
-                  AI settings
-                </Link>
-                {' · '}
-                <Link to="/admin/hosts" className="underline hover:text-ink">
-                  Hosts
-                </Link>
-              </>
-            )}
-          </p>
-        )}
       </section>
 
       <section className="mb-12 grid gap-4 md:grid-cols-2" aria-label="Choose a game">

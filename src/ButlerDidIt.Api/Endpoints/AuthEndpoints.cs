@@ -29,6 +29,12 @@ public sealed class AuthOptions
     /// someone else's address.
     /// </summary>
     public bool RequireConfirmedEmail { get; set; }
+
+    /// <summary>
+    /// How often a signed-in browser's session is checked against the account. A changed password,
+    /// a changed email or "Sign out everywhere else" ends the other sessions within this time.
+    /// </summary>
+    public int SessionCheckSeconds { get; set; } = 60;
 }
 
 /// <summary>
@@ -197,7 +203,7 @@ public static class AuthEndpoints
         }).RequireAuthorization(AuthPolicies.Host);
     }
 
-    private static MeResponse ToMe(AppUser u) => new(u.Id, u.Email ?? "", u.DisplayName, u.IsAdmin, u.EmailConfirmed);
+    internal static MeResponse ToMe(AppUser u) => new(u.Id, u.Email ?? "", u.DisplayName, u.IsAdmin, u.EmailConfirmed);
 
     private static async Task SendConfirmationAsync(AppUser user, UserManager<AppUser> users, IEmailSender email,
         Microsoft.Extensions.Options.IOptions<AppOptions> app, ILogger log, CancellationToken ct)

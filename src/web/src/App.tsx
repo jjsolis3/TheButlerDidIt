@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router'
-import { ConfirmEmail, ForgotPassword, ResetPassword } from './pages/Account'
+import { ConfirmEmail, ConfirmEmailChange, ForgotPassword, ResetPassword } from './pages/Account'
 import AdminAi from './pages/AdminAi'
 import AdminHosts from './pages/AdminHosts'
 import EscapeHowToPlay from './pages/EscapeHowToPlay'
@@ -10,6 +10,7 @@ import Join from './pages/Join'
 import Login from './pages/Login'
 import NewParty from './pages/NewParty'
 import PassAndPlay from './pages/PassAndPlay'
+import MyAccount from './pages/MyAccount'
 import MyMysteries from './pages/MyMysteries'
 import MysteryLanding from './pages/MysteryLanding'
 import Play from './pages/Play'
@@ -34,6 +35,8 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />
+      <Route path="/account" element={<MyAccount />} />
+      <Route path="/account/confirm-email" element={<ConfirmEmailChange />} />
       <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/mysteries" element={<MyMysteries />} />
       <Route path="/how-to-play" element={<HowToPlay />} />

@@ -59,15 +59,15 @@ With `ALLOW_REGISTRATION=false` the site is invite-only. The admin makes an invi
 - **Two modes, not three.** The plan was `Open`, `InviteOnly` and `Closed`. But "closed even to invites" only blocks an admin from their own invites, so the existing switch stays: open, or invite-only.
 - **Plan grants come with plans** (step 5): an invite will be able to carry "Both games, free for a year".
 
-### 3. Account hub (#98)
+### 3. Account hub (#98, done)
 
-A header menu on every page (Account, My library, Settings, Admin, Sign out) and an `/account` page:
+A header menu on every page (Your account, Your parties, My mysteries, admin pages, Sign out) and an `/account` page. Settings will join the menu with step 7. The page has:
 
 - **Profile:** name, email (changed only after a confirmation link to the new address), password, and "Sign out everywhere". These are ASP.NET Core Identity's `GenerateChangeEmailTokenAsync`, `ChangePasswordAsync` and `UpdateSecurityStampAsync`.
-- **Library:** your parties with a Mystery or Escape badge, your mysteries, your AI-written rooms, your best escape times.
+- **What you've made:** counts with links to your parties, your mysteries and the rooms the AI wrote for you, and your number of escapes. The lists themselves stay where you use them ("Your parties" on the home page).
 - **Usage:** parties this month and AI spend against your budget.
-- **Plan & billing:** from step 6.
-- **Danger zone:** download your data; delete your account.
+- **Plan & billing:** an "Early access" placeholder until step 5 and step 6.
+- **Your data:** download it; delete your account.
 
 **Why `/api/account/*` takes no user id:** every endpoint acts on the signed-in user, so there's nothing to change in a request to reach someone else's account.
 

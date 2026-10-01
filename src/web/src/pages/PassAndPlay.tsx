@@ -98,8 +98,9 @@ export default function PassAndPlay() {
     )
   }
 
+  // No account menu: this device goes round the table, and guests shouldn't wander into the host's account.
   return (
-    <Shell>
+    <Shell account={false}>
       <h1 className="font-display mt-6 text-3xl">Pass & play</h1>
       <p className="mt-2 text-muted">Tap a name, then hand the device to that guest. Only they should look.</p>
       <div className="mt-6 grid gap-3">

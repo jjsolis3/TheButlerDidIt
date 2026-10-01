@@ -99,6 +99,14 @@ SignalR sends the token as `Authorization: Bearer …`. For WebSockets, browsers
 
 The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the host's device can be the stage *and* a pass-and-play seat.
 
+**The host's own account** (`AccountEndpoints.cs`, #98). The header's account menu (`AccountMenu`, on every page but the pass-and-play screen) leads to `/account`:
+- **Every endpoint acts on the signed-in host.** No request carries a user id, so there's nothing to change to reach someone else's account.
+- **The current password guards what could lock the owner out** (email, password, deleting). It's checked with lockout on (`CheckPasswordSignInAsync`), so someone with a stolen session can't guess it faster than on the sign-in page.
+- **A new email address must confirm itself** with a link sent there (`GenerateChangeEmailTokenAsync`), and the old address is told. The email and the sign-in name change together in one transaction. A server without email changes it at once, because there's nothing to confirm with.
+- **Other devices are signed out** by a new security stamp: a new password, a new email or "Sign out everywhere else". Each browser re-checks its stamp every `Auth:SessionCheckSeconds` (60, rather than Identity's default 30 minutes), and the device that made the change is signed in again (`RefreshSignInAsync`).
+- **Download my data** is a JSON file of the account, its parties, mysteries, rooms, escapes and monthly AI use. It leaves out guests' names and notes, which belong to the guests.
+- **Deleting** an account removes its parties (with seats, notes and selfie files, via `RetentionWorker.DeletePartyAsync`), its own mysteries and rooms, and their art. Leaderboard times and AI costs are kept without the name. The admin account can't be deleted.
+
 **Invites** (`InviteEndpoints.cs`, #97). With `Auth:AllowRegistration=false`, a new host needs an invite link from the admin (`/login?invite=…`):
 - **Stored like seat tokens.** The link carries a random 256-bit token, and the database keeps only its SHA-256 hash. The admin's list never shows a link again, and a copy of the database can't be used to sign up.
 - **Used once, in the sign-up's own transaction.** `POST /api/auth/register` claims the invite with one `UPDATE … WHERE UsedAt IS NULL` inside the transaction that creates the account. The UPDATE locks the row, so if two people use one link at the same moment, the second waits, then finds it used. If creating the account fails (a weak password, an email already taken), the rollback leaves the invite unused.

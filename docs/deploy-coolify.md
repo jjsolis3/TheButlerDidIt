@@ -48,7 +48,7 @@ To let hosts reset a forgotten password themselves, add SMTP settings from any e
 | `SMTP_FROM` | `The Butler Did It <butler@example.com>` |
 | `REQUIRE_CONFIRMED_EMAIL` | `true` to make new hosts click the link in their welcome email before creating parties |
 
-**Without email**, the sign-in page tells hosts to ask the admin. The admin opens **Hosts** on the home page and presses **Make a reset link**, then sends the link to the host. It works once, for 3 hours.
+**Without email**, the sign-in page tells hosts to ask the admin. The admin opens **Hosts & invites** from the account menu (their name, top right) and presses **Make a reset link**, then sends the link to the host. It works once, for 3 hours.
 
 ### Optional: AI game master
 To switch on AI (generated mysteries, NPCs you can question, hints and verdicts), add `AI_PROVIDER_NAME`, `AI_PROVIDER_KIND`, `AI_PROVIDER_API_KEY` and the three `AI_*_MODEL` variables, as in `.env.example`. You can also skip these and set everything up later on the **Admin → AI** page. See [ai-setup.md](ai-setup.md).
@@ -71,9 +71,30 @@ Optionally, in the app service's health check settings, use path `/healthz` on p
 ## 5. First run
 
 1. Visit your domain, choose **Sign in to host → Create an account**. The first account becomes the admin.
-2. Set `ALLOW_REGISTRATION=false` and redeploy to make the site invite-only.
-3. To add a host, sign in, open **Hosts** (linked on the home page) and make an invite under **Invites**. Send them the link by text or chat. With email set up, the site can email it for you. Each link makes one account, and you choose how long it works (a day, a week or 30 days). Add their email address and only that address can use it.
+2. Set `ALLOW_REGISTRATION=false` and redeploy to make the site invite-only. (Deployed as a Dockerfile application instead? The variable is `Auth__AllowRegistration`; see the next section.)
+3. To add a host, sign in, open **Hosts & invites** from the account menu (your name, top right) and make an invite under **Invites**. Send them the link by text or chat. With email set up, the site can email it for you. Each link makes one account, and you choose how long it works (a day, a week or 30 days). Add their email address and only that address can use it.
 4. Create a party. Put the stage on a TV and have guests scan the QR code.
+
+## Deploying the Dockerfile as an application (without Docker Compose)
+
+You can also deploy the app as a single Coolify **Application** (Build Pack: **Dockerfile**), with PostgreSQL as a separate Coolify **Database** resource. Three things differ from the Compose stack above.
+
+**1. Use the app's own variable names.** The friendly names in this guide (`ALLOW_REGISTRATION`, `PUBLIC_URL`, `SMTP_HOST`…) are translated into the app's settings by `docker-compose.yml`. Without Compose nothing translates them, so the app never sees them. Use the real names instead. In each one, a double underscore `__` stands for a section of `appsettings.json` (`Auth__AllowRegistration` is `AllowRegistration` in the `Auth` section).
+
+| Variable | Value | Why |
+|---|---|---|
+| `ConnectionStrings__Default` | `Host=<the database's internal host>;Port=5432;Database=…;Username=…;Password=…` | The only database setting the app reads. Copy the internal URL's parts from the database resource. |
+| `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` | Coolify's proxy handles HTTPS. This tells the app visitors arrived over HTTPS, for secure cookies and `https` QR code and invite links. |
+| `Auth__AllowRegistration` | `true` at first, then `false` | `false` makes the site invite-only. |
+| `App__PublicUrl` | `https://your.domain` | The address used in emailed and invite links. |
+| `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **AI settings** unreadable. Keys already in `/data/keys` are copied in on the next start. |
+| `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
+
+The Dockerfile already sets the port (8080), the content folder and the data folders. Untick **Buildtime** on secrets such as the connection string: the app only reads them when it runs.
+
+**2. Storage.** In **Persistent Storage**, add a volume mounted at `/data/media` for generated pictures, voice clips and costume selfies. Without it they're lost on every redeploy. (`/data/keys` needs one too, unless you set `DataProtection__Store=Database`.)
+
+**3. Health check and backups.** In **Healthcheck**, set the path to `/healthz` and the port to `8080`, so Coolify knows when the app is really up. The Compose stack's nightly `backup` service isn't there, so turn on **Scheduled Backups** on the PostgreSQL database resource instead.
 
 ## Data and backups
 

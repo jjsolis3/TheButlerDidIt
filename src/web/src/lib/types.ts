@@ -400,6 +400,44 @@ export interface AuthOptions {
   requireConfirmedEmail: boolean
 }
 
+// ---- The host's own account (AccountEndpoints.cs)
+export interface AccountView {
+  displayName: string
+  email: string
+  emailConfirmed: boolean
+  isAdmin: boolean
+  /** True when the server can send email, so a new address is confirmed by a link */
+  emailEnabled: boolean
+  usage: AccountUsage
+  library: AccountLibrary
+}
+
+export interface AccountUsage {
+  mysteriesThisMonth: number
+  escapeRoomsThisMonth: number
+  partiesAllTime: number
+  aiSpentThisMonthUsd: number
+  aiBudgetUsd: number
+}
+
+export interface AccountLibrary {
+  /** On the host's list (not removed from it) */
+  parties: number
+  /** Their own copies and AI-written mysteries */
+  mysteries: number
+  /** Rooms the AI wrote for them */
+  escapeRooms: number
+  /** Games of theirs that escaped */
+  escapes: number
+}
+
+export interface EmailChangeResult {
+  /** True when a link was emailed to the new address and the change waits for it */
+  pending: boolean
+  message: string
+  me: Me
+}
+
 // ---- Invites (InviteEndpoints.cs)
 export type InviteStatus = 'pending' | 'used' | 'expired'
 
