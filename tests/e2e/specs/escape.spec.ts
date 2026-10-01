@@ -110,8 +110,23 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByTestId('puzzle-tape')).toContainText('The game master whispers')
   await expect(phones[2].getByTestId('phone-puzzle-tape')).toContainText('The game master whispers')
   await expect(tv.getByText(/solved · 1 hint$/)).toBeVisible()
-  await expect(tv.getByText(/an hour is worth/)).toBeVisible() // the villain's welcome
   await phones[0].waitForTimeout(3200) // the lock resets after a wrong answer
+
+  // ---- The TV shows the whole room on one screen, and never needs scrolling: nobody works it during a game (#116).
+  // (The villain's welcome isn't repeated there: it played as the intro, checked above, and opens the phones' card.)
+  await expect(tv.getByTestId('tv-room')).toBeVisible()
+  await expect.poll(() => tv.evaluate(() => document.documentElement.scrollHeight - window.innerHeight)).toBeLessThanOrEqual(1)
+  for (const part of [tv.getByLabel('Time left'), tv.getByTestId('scene'), tv.getByTestId('game-master'), tv.getByText("What's happened")])
+    await expect(part).toBeInViewport()
+  for (const card of await tv.locator('[data-testid^="puzzle-"]').all()) await expect(card).toBeInViewport({ ratio: 1 }) // every card whole
+  await expect(tv.getByTestId('watchers')).toContainText('0 watching') // the host's watchers, in the header
+  // A full-HD TV, for the screenshot.
+  const fullHd = await (await browser.newContext({ viewport: { width: 1920, height: 1080 }, storageState: await tv.context().storageState() })).newPage()
+  await fullHd.goto(tv.url())
+  await expect(fullHd.getByTestId('tv-room')).toBeVisible()
+  await expect.poll(() => fullHd.evaluate(() => document.documentElement.scrollHeight - window.innerHeight)).toBeLessThanOrEqual(1)
+  await fullHd.screenshot({ path: `${SHOTS}/95-escape-tv-1080p.png` })
+  await fullHd.close()
 
   // ---- Work through every room, taking turns on the phones: searching the scene, looking closely at what
   // they find, putting things together and solving what opens up.
@@ -119,6 +134,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await tv.screenshot({ path: `${SHOTS}/92-escape-scene-tv.png` })
   const moments = await playThrough(tv, phones, room, answers, '93-escape-workshop')
   expect(moments.has('reveal')).toBe(true) // each new stage opened with its reveal on the TV and a card on the phones
+  expect([...moments].filter((m) => m.startsWith('puzzles overflow'))).toEqual([]) // every stage fit the TV
 
   // ---- Out!
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()

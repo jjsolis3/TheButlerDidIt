@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { CheerBar, CheerOverlay } from '../components/Cheers'
 import { RecapShare } from '../components/RecapShare'
@@ -8,6 +8,7 @@ import { WatchersPanel } from '../components/WatchersPanel'
 import { api } from '../lib/api'
 import { useCheers } from '../lib/cheers'
 import { useParty } from '../lib/hub'
+import { TV_LAYOUT, useMediaQuery } from '../lib/useMediaQuery'
 import type { WatchingAs } from '../lib/seats'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
@@ -18,7 +19,8 @@ import { markSeen, readSeen } from './reveal'
 import { RoomReveal } from './RoomReveal'
 import { Notebook } from './Notebook'
 import { SwitchGrid } from './PuzzleWidgets'
-import { SceneView } from './SceneView'
+import { backdrop } from './moods'
+import { SceneView, SearchedList } from './SceneView'
 import { ShareCardButton } from './ShareCardButton'
 import { elapsedSeconds, formatDuration, penaltyLabel } from './time'
 import { useAtmosphere } from './useAtmosphere'
@@ -35,6 +37,7 @@ export function EscapeStage({ info, token, watcher }: { info: PartyInfo; token?:
   const cheers = useCheers()
   // Bumped whenever someone starts or stops watching, so the host's list refreshes (#112).
   const [audience, setAudience] = useState(0)
+  const tvLayout = useMediaQuery(TV_LAYOUT)
   const { stage, status, fatal, invoke } = useParty<EscapeStageView, EscapePlayerView>({
     code: info.code,
     token,
@@ -46,11 +49,20 @@ export function EscapeStage({ info, token, watcher }: { info: PartyInfo; token?:
   if (fatal) return <Centered>{watcher ? <WatchEnded onLeave={watcher.onLeave} /> : fatal}</Centered>
   if (!stage) return <Centered>Unlocking the room…</Centered>
 
+  // While the clock runs on a big screen, the room fills it (#116) and the host's watchers sit in its header.
+  const fullScreen = tvLayout && stage.phase === 'playing'
   return (
-    <div className={`grain min-h-dvh ${watcher ? 'pb-28' : ''}`}>
+    <div className={`grain min-h-dvh ${watcher && !fullScreen ? 'pb-28' : ''}`}>
       <StatusPill status={status} />
-      <Tv stage={stage} info={info} invoke={invoke} />
-      {info.isHost && (
+      <Tv
+        stage={stage}
+        info={info}
+        invoke={invoke}
+        tv={tvLayout}
+        inset={!!watcher}
+        watchers={info.isHost && <WatchersPanel code={info.code} refresh={audience} variant="chip" />}
+      />
+      {info.isHost && !fullScreen && (
         <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8">
           <WatchersPanel code={info.code} refresh={audience} open={stage.phase === 'lobby'} />
         </div>
@@ -73,8 +85,12 @@ function WatchEnded({ onLeave }: { onLeave: () => void }) {
   )
 }
 
-/** Split out so the sound hook only runs once there is a room to play. */
-function Tv({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke }) {
+/**
+ * Split out so the sound hook only runs once there is a room to play. `tv` is the full-screen layout (#116): while
+ * the clock runs, the room fills the screen, with the sound switch and the host's watchers in its header.
+ * `inset` leaves room for a watcher's cheer bar along the bottom.
+ */
+function Tv({ stage, info, invoke, tv, watchers, inset }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke; tv: boolean; watchers: ReactNode; inset: boolean }) {
   const sound = useAtmosphere(stage)
   const over = stage.phase === 'escaped' || stage.phase === 'failed'
   // Each new stage after the first opens with a reveal (#110), once per TV: the intro already covered the first.
@@ -85,17 +101,39 @@ function Tv({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; 
     setSeen(next)
     markSeen('tv', info.code, next)
   }
+  const soundSwitch = (
+    <button onClick={sound.toggle} className="rounded-full border border-line bg-surface/80 px-3 py-1 text-sm text-muted hover:text-ink" aria-pressed={sound.on}>
+      {sound.on ? (sound.playing ? '🔊 Sound on' : '🔈 Click anywhere for sound') : '🔇 Sound off'}
+    </button>
+  )
+  const reveal = revealing && <RoomReveal key={revealing} view={stage} mode="stage" sound={sound.on} onDone={() => revealed(revealing)} />
+
+  if (tv && stage.phase === 'playing')
+    return (
+      <main className={`w-full px-6 py-5 xl:px-10 ${inset ? 'h-[calc(100dvh-4.5rem)]' : 'h-dvh'}`}>
+        <Room
+          stage={stage}
+          info={info}
+          invoke={invoke}
+          tv
+          controls={
+            <>
+              {soundSwitch}
+              {watchers}
+            </>
+          }
+        />
+        {reveal}
+      </main>
+    )
+
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
-      <div className="mb-2 flex justify-end">
-        <button onClick={sound.toggle} className="rounded-full border border-line bg-surface/80 px-3 py-1 text-sm text-muted hover:text-ink" aria-pressed={sound.on}>
-          {sound.on ? (sound.playing ? '🔊 Sound on' : '🔈 Click anywhere for sound') : '🔇 Sound off'}
-        </button>
-      </div>
+      <div className="mb-2 flex justify-end">{soundSwitch}</div>
       {stage.phase === 'lobby' && <Lobby stage={stage} info={info} invoke={invoke} sound={sound.on} />}
-      {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} />}
+      {stage.phase === 'playing' && <Room stage={stage} info={info} invoke={invoke} tv={false} controls={null} />}
       {over && <Ending stage={stage} code={info.code} isHost={info.isHost} />}
-      {revealing && <RoomReveal key={revealing} view={stage} mode="stage" sound={sound.on} onDone={() => revealed(revealing)} />}
+      {reveal}
     </main>
   )
 }
@@ -170,13 +208,95 @@ function Lobby({ stage, info, invoke, sound }: { stage: EscapeStageView; info: P
   )
 }
 
-function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke }) {
+/**
+ * The room while the clock runs. On a TV or a laptop (TV_LAYOUT) it's the whole room on one screen that never
+ * scrolls (#116): nobody works the TV during a game. On a phone (someone watching) it's the stacked page.
+ */
+function Room({ stage, info, invoke, tv, controls }: { stage: EscapeStageView; info: PartyInfo; invoke: Invoke; tv: boolean; controls: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const hint = (p: EscapePuzzleView) => {
     if (!confirm(`A hint for "${p.title}" costs ${penaltyLabel(stage.hintPenaltySeconds)} of your time. Take it?`)) return
     setError(null)
     invoke('EscapeHostHint', info.code, p.id).catch((e: Error) => setError(e.message))
   }
+  const onHint = info.isHost ? hint : undefined
+  return tv ? <TvRoom stage={stage} onHint={onHint} error={error} controls={controls} /> : <StackedRoom stage={stage} onHint={onHint} error={error} />
+}
+
+const solvedSummary = (stage: EscapeStageView) => `${stage.solvedCount}/${stage.puzzleCount} solved · ${stage.hintsUsed} hint${stage.hintsUsed === 1 ? '' : 's'}`
+
+/**
+ * The TV layout: a header, then two columns filling the rest of the screen. Every panel has a fixed share of it
+ * (min-h-0, so content can't stretch the page), and the lists show the newest first and fade out at the bottom,
+ * so what matters most is always on screen. Only the puzzles may scroll inside themselves, as a last resort on a
+ * small laptop: the busiest stage in any room has six.
+ */
+function TvRoom({ stage, onHint, error, controls }: { stage: EscapeStageView; onHint?: (p: EscapePuzzleView) => void; error: string | null; controls: ReactNode }) {
+  // Open puzzles first, then the ones waiting for an item, then the solved ones (shrunk): the TV's own order within each.
+  const rank = (p: EscapePuzzleView) => (p.solved ? 2 : p.needs.length ? 1 : 0)
+  const puzzles = [...stage.puzzles].sort((a, b) => rank(a) - rank(b))
+  const fade = '[mask-image:linear-gradient(to_bottom,black_75%,transparent)]'
+  return (
+    <div className="flex h-full flex-col gap-4" data-testid="tv-room">
+      <header className="flex shrink-0 items-start justify-between gap-6">
+        <div className="min-w-0">
+          <p className="text-xs tracking-[0.3em] text-accent uppercase">
+            {stage.roomTitle} · Room {stage.stageNumber} of {stage.stageCount}
+          </p>
+          <h1 className="font-display mt-1 text-4xl 2xl:text-5xl">{stage.stage?.title}</h1>
+          <p className="mt-1 line-clamp-2 max-w-5xl text-ink/80 2xl:text-lg">{stage.stage?.description}</p>
+        </div>
+        <div className="flex shrink-0 items-start gap-5">
+          <div className="text-right" aria-label="Time left">
+            <EscapeClock view={stage} large />
+            <p className="text-xs text-muted 2xl:text-sm">{solvedSummary(stage)}</p>
+          </div>
+          <div className="flex flex-col items-end gap-2">{controls}</div>
+        </div>
+      </header>
+
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-6">
+        <div className="flex min-h-0 flex-col gap-4">
+          <div className="min-h-0 flex-1">
+            {/* Keyed on the stage, so the new room's picture fades in as the door opens. */}
+            {stage.scene ? (
+              <SceneView key={stage.stage?.id} scene={stage.scene} artUrl={stage.artUrl} feed={stage.feed} fit />
+            ) : stage.artUrl ? (
+              <Art key={stage.stage?.id} url={stage.artUrl} className="h-full" />
+            ) : (
+              <div className="h-full rounded-xl border border-line" style={{ background: backdrop(stage.soundscape) }} aria-hidden />
+            )}
+          </div>
+          <div className="shrink-0">
+            <GameMasterPanel gameMaster={stage.gameMaster} narration={stage.narration} />
+          </div>
+          <div className={`grid max-h-[30%] min-h-0 shrink-0 grid-cols-2 gap-6 overflow-hidden ${fade}`}>
+            <div className="min-h-0 space-y-3">
+              {stage.scene && <SearchedList scene={stage.scene} className="space-y-1 text-sm 2xl:text-base" />}
+              <Notebook notes={stage.notebook} limit={4} />
+            </div>
+            <RoomLog stage={stage} tv />
+          </div>
+        </div>
+
+        <div className="flex min-h-0 flex-col gap-3">
+          <ErrorText>{error}</ErrorText>
+          {/* Two newspaper-style columns: each card takes the height it needs, so short ones don't leave gaps. */}
+          <div className="min-h-0 flex-1 overflow-y-auto" data-testid="tv-puzzles">
+            <div className="columns-2 gap-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
+              {puzzles.map((p) => (
+                <PuzzleCard key={p.id} puzzle={p} stage={stage} onHint={onHint} compact />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** The phone layout: everything stacked, for someone holding the screen (and scrolling it). */
+function StackedRoom({ stage, onHint, error }: { stage: EscapeStageView; onHint?: (p: EscapePuzzleView) => void; error: string | null }) {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -188,9 +308,7 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
         </div>
         <div className="text-right" aria-label="Time left">
           <EscapeClock view={stage} large />
-          <p className="text-xs text-muted">
-            {stage.solvedCount}/{stage.puzzleCount} solved · {stage.hintsUsed} hint{stage.hintsUsed === 1 ? '' : 's'}
-          </p>
+          <p className="text-xs text-muted">{solvedSummary(stage)}</p>
         </div>
       </header>
       {/* Keyed on the stage, so the new room's picture fades in as the door opens. A stage with spots to search shows them on the picture instead. */}
@@ -208,81 +326,124 @@ function Room({ stage, info, invoke }: { stage: EscapeStageView; info: PartyInfo
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {stage.puzzles.map((p) => (
-          <article
-            key={p.id}
-            data-testid={`puzzle-${p.id}`}
-            className={`rounded-xl border p-4 ${p.solved ? 'border-green-600/60 bg-green-900/10' : p.needs.length ? 'border-line bg-surface/60 opacity-80' : 'border-accent/60 bg-surface'}`}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <h2 className="font-display text-xl">{p.title}</h2>
-              <span className="shrink-0 text-lg" aria-hidden>
-                {p.solved ? '✅' : p.needs.length ? '🔒' : KIND_ICON[p.kind]}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-ink/90">{p.prompt}</p>
-            {p.solved ? (
-              <p className="mt-3 text-sm text-green-300">
-                Opened by {p.solvedBy}. {p.solvedText}
-              </p>
-            ) : (
-              <>
-                {p.needs.length > 0 && <p className="mt-3 text-xs text-muted">Needs: {p.needs.join(', ')}</p>}
-                {p.pieceCount > 0 && <p className="mt-3 text-xs text-accent">🧩 Clues on {p.pieceCount} phones: read them out!</p>}
-                {p.piecesHidden > 0 && (
-                  <p className="mt-1 text-xs text-accent">
-                    🔎 {p.piecesHidden} more clue piece{p.piecesHidden === 1 ? '' : 's'} hidden somewhere in the room
-                  </p>
-                )}
-                {p.finds && (
-                  <p className="mt-3 text-sm text-muted">
-                    Searched {p.finds.found} of {p.finds.total}
-                  </p>
-                )}
-                {p.switches && <SwitchGrid puzzle={p} readOnly />}
-                {p.hints.map((h, i) => (
-                  <p key={i} className="mt-2 rounded-lg bg-bg/60 p-2 text-sm">
-                    💡 {h}
-                  </p>
-                ))}
-                {p.hintPending && <p className="mt-2 animate-pulse text-sm text-muted">💭 {stage.gameMaster?.name ?? 'The game master'} is thinking of a hint…</p>}
-                {info.isHost && p.hintsLeft > 0 && !p.hintPending && (
-                  <button className="mt-3 text-xs text-muted underline hover:text-ink" onClick={() => hint(p)}>
-                    Hint (−{penaltyLabel(stage.hintPenaltySeconds)})
-                  </button>
-                )}
-              </>
-            )}
-          </article>
+          <PuzzleCard key={p.id} puzzle={p} stage={stage} onHint={onHint} />
         ))}
       </div>
       <ErrorText>{error}</ErrorText>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <section>
-          <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">What you've found</h2>
-          {stage.inventory.length === 0 ? (
-            <p className="mt-2 text-sm text-muted">Nothing yet.</p>
-          ) : (
-            <ul className="mt-2 space-y-1 text-sm">
-              {stage.inventory.map((i) => (
-                <li key={i.id}>
-                  🎒 <span className="text-ink">{i.name}</span> <span className="text-muted">— {i.description}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-        <section aria-live="polite">
-          <Notebook notes={stage.notebook} limit={5} />
-          <h2 className="mt-4 text-xs font-semibold tracking-widest text-accent uppercase first:mt-0">What's happened</h2>
-          <ul className="mt-2 space-y-1 text-sm text-muted">
-            {[...stage.feed].reverse().slice(0, 6).map((f) => (
-              <li key={f.at + f.text}>{f.text}</li>
-            ))}
-          </ul>
-        </section>
+        <RoomLog stage={stage} notebook />
       </div>
     </div>
+  )
+}
+
+/**
+ * One puzzle in front of the group: its prompt, what it needs, its clues on the phones, the hints taken, and
+ * (for the host) the Hint button. `compact` (the TV layout) shrinks a solved one to its title and outcome.
+ */
+function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: EscapePuzzleView; stage: EscapeStageView; onHint?: (p: EscapePuzzleView) => void; compact?: boolean }) {
+  if (compact && p.solved)
+    return (
+      <article data-testid={`puzzle-${p.id}`} className="rounded-xl border border-green-600/40 bg-green-900/10 px-3 py-2">
+        <p className="flex flex-wrap items-baseline gap-x-2">
+          <span aria-hidden>✅</span>
+          <span className="font-display text-lg">{p.title}</span>
+          <span className="text-xs text-green-300">opened by {p.solvedBy}</span>
+        </p>
+        <p className="mt-1 line-clamp-2 text-xs text-green-300/80">{p.solvedText}</p>
+      </article>
+    )
+  return (
+    <article
+      data-testid={`puzzle-${p.id}`}
+      className={`rounded-xl border ${compact ? 'p-3' : 'p-4'} ${p.solved ? 'border-green-600/60 bg-green-900/10' : p.needs.length ? 'border-line bg-surface/60 opacity-80' : 'border-accent/60 bg-surface'}`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <h2 className={`font-display ${compact ? 'text-lg 2xl:text-2xl' : 'text-xl'}`}>{p.title}</h2>
+        <span className="shrink-0 text-lg" aria-hidden>
+          {p.solved ? '✅' : p.needs.length ? '🔒' : KIND_ICON[p.kind]}
+        </span>
+      </div>
+      <p className={`mt-2 text-sm text-ink/90 ${compact ? 'leading-snug 2xl:text-base' : 'leading-relaxed'}`}>{p.prompt}</p>
+      {p.solved ? (
+        <p className="mt-3 text-sm text-green-300">
+          Opened by {p.solvedBy}. {p.solvedText}
+        </p>
+      ) : (
+        <>
+          {p.needs.length > 0 && <p className="mt-3 text-xs text-muted">Needs: {p.needs.join(', ')}</p>}
+          {p.pieceCount > 0 && <p className="mt-3 text-xs text-accent">🧩 Clues on {p.pieceCount} phones: read them out!</p>}
+          {p.piecesHidden > 0 && (
+            <p className="mt-1 text-xs text-accent">
+              🔎 {p.piecesHidden} more clue piece{p.piecesHidden === 1 ? '' : 's'} hidden somewhere in the room
+            </p>
+          )}
+          {p.finds && (
+            <p className="mt-3 text-sm text-muted">
+              Searched {p.finds.found} of {p.finds.total}
+            </p>
+          )}
+          {p.switches && <SwitchGrid puzzle={p} readOnly />}
+          {p.hints.map((h, i) => (
+            <p key={i} className="mt-2 rounded-lg bg-bg/60 p-2 text-sm">
+              💡 {h}
+            </p>
+          ))}
+          {p.hintPending && <p className="mt-2 animate-pulse text-sm text-muted">💭 {stage.gameMaster?.name ?? 'The game master'} is thinking of a hint…</p>}
+          {onHint && p.hintsLeft > 0 && !p.hintPending && (
+            <button className="mt-3 text-xs text-muted underline hover:text-ink" onClick={() => onHint(p)}>
+              Hint (−{penaltyLabel(stage.hintPenaltySeconds)})
+            </button>
+          )}
+        </>
+      )}
+    </article>
+  )
+}
+
+/**
+ * What the group carries and what's happened, newest first (and, on the stacked page, the notebook too). On the TV
+ * what's happened comes first: it's the live part, and the list fades out at the bottom.
+ */
+function RoomLog({ stage, notebook = false, tv = false }: { stage: EscapeStageView; notebook?: boolean; tv?: boolean }) {
+  const found = (
+    <section key="found">
+      <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">What you've found</h2>
+      {stage.inventory.length === 0 ? (
+        <p className="mt-2 text-sm text-muted">Nothing yet.</p>
+      ) : (
+        <ul className="mt-2 space-y-1 text-sm 2xl:text-base">
+          {stage.inventory.map((i) => (
+            <li key={i.id}>
+              🎒 <span className="text-ink">{i.name}</span> <span className="text-muted">— {i.description}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+  const happened = (
+    <section key="happened" aria-live="polite">
+      {notebook && <Notebook notes={stage.notebook} limit={5} />}
+      <h2 className="mt-4 text-xs font-semibold tracking-widest text-accent uppercase first:mt-0">What's happened</h2>
+      <ul className="mt-2 space-y-1 text-sm text-muted 2xl:text-base">
+        {[...stage.feed].reverse().slice(0, 6).map((f) => (
+          <li key={f.at + f.text}>{f.text}</li>
+        ))}
+      </ul>
+    </section>
+  )
+  return tv ? (
+    <div className="min-h-0 space-y-4">
+      {happened}
+      {found}
+    </div>
+  ) : (
+    <>
+      {found}
+      {happened}
+    </>
   )
 }
 
