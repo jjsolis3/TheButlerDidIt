@@ -232,7 +232,9 @@ var app = builder.Build();
 //     never seed the same themes at once. The second finds nothing left to do.
 if (migrateOnly || !app.Configuration.GetValue<bool>("SkipStartupTasks"))
 {
-    await using (await app.Services.GetRequiredService<ClusterLock>().AcquireAsync("startup", CancellationToken.None))
+    // Another server holds the lock for as long as its migrations and seeding take, which on a fresh
+    // database (or a busy server) is longer than the 30 seconds a database command gets by default.
+    await using (await app.Services.GetRequiredService<ClusterLock>().AcquireAsync("startup", CancellationToken.None, TimeSpan.FromMinutes(10)))
     {
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

@@ -88,6 +88,30 @@ public class ClusterLockTests
     }
 
     [Fact]
+    public async Task A_waiting_lock_gives_up_only_when_its_own_timeout_runs_out()
+    {
+        // Startup waits up to 10 minutes for another server's migrations and seeding (#93); before, every
+        // wait was cut off at the 30 seconds a database command gets, and the waiting server crashed.
+        var serverA = NewServerLock();
+        var serverB = NewServerLock();
+        var key = $"startup-test:{Guid.NewGuid()}";
+
+        var held = await serverA.AcquireAsync(key, CancellationToken.None);
+
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        var error = await Assert.ThrowsAnyAsync<NpgsqlException>(() => serverB.AcquireAsync(key, CancellationToken.None, TimeSpan.FromSeconds(1)));
+        Assert.IsType<TimeoutException>(error.InnerException);
+        Assert.InRange(clock.Elapsed, TimeSpan.FromSeconds(0.9), TimeSpan.FromSeconds(10)); // its own 1 second, not the default 30
+
+        // A longer wait keeps waiting past that, and gets the lock once the holder lets go.
+        var waiting = serverB.AcquireAsync(key, CancellationToken.None, TimeSpan.FromMinutes(1));
+        await Task.Delay(1500);
+        Assert.False(waiting.IsCompleted);
+        await held.DisposeAsync();
+        await (await waiting).DisposeAsync();
+    }
+
+    [Fact]
     public async Task A_single_server_needs_no_database_locks()
     {
         var single = new ClusterLock(null);
@@ -225,7 +249,9 @@ public class MultiServerTests
             await guest.InvokeAsync<PlayerView>("JoinSeat");
             await guest.InvokeAsync("ChooseCharacter", "violet");
 
-            for (var i = 0; i < 100; i++)
+            // Up to 30 seconds: the whole Api suite runs at once, and the relay through Redis can be slow then (#93).
+            var deadline = DateTime.UtcNow.AddSeconds(30);
+            while (DateTime.UtcNow < deadline)
             {
                 lock (seen)
                     if (seen.Any(v => v.Cast.Any(c => c.CharacterId == "violet" && c.PlayedBy == "Ada"))) return;

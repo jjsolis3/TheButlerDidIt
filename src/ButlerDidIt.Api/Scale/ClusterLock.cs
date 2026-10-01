@@ -41,14 +41,17 @@ public sealed class ClusterLock(NpgsqlDataSource? dataSource)
 {
     public bool Enabled => dataSource is not null;
 
-    /// <summary>Waits until no other server holds <paramref name="key"/>.</summary>
-    public async Task<IAsyncDisposable> AcquireAsync(string key, CancellationToken ct) =>
-        await LockAsync(key, wait: true, ct) ?? throw new InvalidOperationException("A waiting lock always succeeds.");
+    /// <summary>
+    /// Waits until no other server holds <paramref name="key"/>: for up to <paramref name="timeout"/>,
+    /// or the 30 seconds any database command gets when it's null.
+    /// </summary>
+    public async Task<IAsyncDisposable> AcquireAsync(string key, CancellationToken ct, TimeSpan? timeout = null) =>
+        await LockAsync(key, wait: true, ct, timeout) ?? throw new InvalidOperationException("A waiting lock always succeeds.");
 
     /// <summary>Takes <paramref name="key"/> if it's free, or returns null at once if another server holds it.</summary>
-    public Task<IAsyncDisposable?> TryAcquireAsync(string key, CancellationToken ct) => LockAsync(key, wait: false, ct);
+    public Task<IAsyncDisposable?> TryAcquireAsync(string key, CancellationToken ct) => LockAsync(key, wait: false, ct, null);
 
-    private async Task<IAsyncDisposable?> LockAsync(string key, bool wait, CancellationToken ct)
+    private async Task<IAsyncDisposable?> LockAsync(string key, bool wait, CancellationToken ct, TimeSpan? timeout)
     {
         if (dataSource is null) return NoLock.Instance;
 
@@ -61,6 +64,7 @@ public sealed class ClusterLock(NpgsqlDataSource? dataSource)
                 wait ? "SELECT pg_advisory_xact_lock(hashtextextended(@key, 0))" : "SELECT pg_try_advisory_xact_lock(hashtextextended(@key, 0))",
                 connection, transaction);
             cmd.Parameters.AddWithValue("key", key);
+            if (timeout is { } limit) cmd.CommandTimeout = (int)Math.Ceiling(limit.TotalSeconds);
             var result = await cmd.ExecuteScalarAsync(ct);
             if (!wait && result is false)
             {
