@@ -678,9 +678,18 @@ export type CipherType = 'shift' | 'symbols' | 'morse' | 'numbers' | 'mirror'
 
 export interface EscapeCipherView {
   type: CipherType
-  /** The group has found the key (numbers and mirror need none) */
+  /** The group has found a key for it (numbers and mirror need none) */
   unlocked: boolean
-  /** Symbols and Morse: the key card, once unlocked. Never the shift amount. */
+  /** Every key found so far, labelled with where. With decoys, only one is right, and nothing here says which. */
+  keys: EscapeFoundKey[]
+}
+
+export interface EscapeFoundKey {
+  /** Where it was found: a spot's label, an item's name or a puzzle's title */
+  from: string
+  /** Shift ciphers: the amount written there */
+  shift: number | null
+  /** Symbols and Morse: the key card written there */
   table: { code: string; letter: string }[] | null
 }
 

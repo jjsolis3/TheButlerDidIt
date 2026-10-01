@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 2,
+  "edition": 3,
   "hintPenaltySeconds": 90,
   "soundscape": "sea",
   "intro": "Ahoy, stowaways! Captain Salty Sal here, and this is MY ship. You want to go ashore? Then earn it, me hearties! Every hatch is locked, every chest is sealed, and the gangplank key is hidden. Work together like a proper crew, and be quick about it before the tide turns. Yo ho!",
@@ -49,9 +49,9 @@
           {
             "id": "stew-pot",
             "prop": "barrel",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "bubbling stew pot",
             "look": "You fish about with the ladle. Clonk! Out comes a big iron key with a little anchor on it, dripping stew.",
@@ -62,9 +62,9 @@
           {
             "id": "far-porthole",
             "prop": "window",
-            "x": 270,
+            "x": 215,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "far porthole",
             "look": "Through the spyglass, you read words painted on a buoy far out at sea: 'Sea shanty code: slide back {key:sea-shanty}.'",
@@ -74,9 +74,9 @@
           {
             "id": "hatch-spot",
             "prop": "door",
-            "x": 520,
+            "x": 415,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "galley hatch",
             "look": "The hatch up to the captain's cabin, with a big padlock with an anchor carved on it."
@@ -84,9 +84,9 @@
           {
             "id": "stove",
             "prop": "machine",
-            "x": 770,
+            "x": 615,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "stove",
             "look": "A big iron stove, still warm. It smells of toast and seaweed."
@@ -94,9 +94,9 @@
           {
             "id": "apple-barrels",
             "prop": "crate",
-            "x": 20,
-            "y": 220,
-            "w": 210,
+            "x": 815,
+            "y": 20,
+            "w": 170,
             "h": 160,
             "label": "apple barrels",
             "look": "Apples, apples and more apples. Under the last one: the brass tube of a spyglass, with no glass in it.",
@@ -105,9 +105,9 @@
           {
             "id": "pot-hooks",
             "prop": "shelf",
-            "x": 270,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "pots and pans",
             "look": "Pots and pans clank together every time the ship rocks.",
@@ -116,9 +116,9 @@
           {
             "id": "bunks",
             "prop": "rug",
-            "x": 520,
+            "x": 215,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "sailors’ bunks",
             "look": "Swaying canvas bunks. One has a sock in it. Just one.",
@@ -127,9 +127,9 @@
           {
             "id": "sack",
             "prop": "box",
-            "x": 770,
+            "x": 415,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "vegetable sack",
             "look": "Carrots, onions and a lot of very knobbly lumps.",
@@ -138,9 +138,9 @@
           {
             "id": "cook-table",
             "prop": "desk",
-            "x": 20,
-            "y": 420,
-            "w": 210,
+            "x": 615,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "cook's table",
             "look": "Flour everywhere, and a recipe for sea biscuits with a big jam thumbprint on it.",
@@ -149,9 +149,9 @@
           {
             "id": "spice-rack",
             "prop": "cabinet",
-            "x": 270,
-            "y": 420,
-            "w": 210,
+            "x": 815,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "spice rack",
             "look": "Tiny jars of pepper, salt and something labelled 'DRAGON DUST'.",
@@ -160,9 +160,9 @@
           {
             "id": "rope-coil",
             "prop": "drawer",
-            "x": 520,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "coil of rope",
             "look": "A big coil of rope. You untangle it, then tangle it back up.",
@@ -171,13 +171,35 @@
           {
             "id": "mop-bucket",
             "prop": "statue",
-            "x": 770,
+            "x": 215,
             "y": 420,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "mop and bucket",
             "look": "A mop with a face drawn on it. The crew call it Mopsy.",
             "hidesPieces": true
+          },
+          {
+            "id": "salt-barrel",
+            "prop": "barrel",
+            "label": "salt barrel",
+            "look": "Scratched on the barrel: back {key:sea-shanty}.",
+            "minDifficulty": "normal",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "bread-bin",
+            "prop": "box",
+            "label": "bread bin",
+            "look": "Carved in the lid: back {key:sea-shanty}.",
+            "minDifficulty": "hard",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160
           }
         ]
       }
@@ -199,9 +221,9 @@
           {
             "id": "chest-spot",
             "prop": "chest",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "treasure chest",
             "look": "A treasure chest with a 3-digit lock, sitting under the round portholes."
@@ -209,9 +231,9 @@
           {
             "id": "wheel",
             "prop": "machine",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "ship's wheel",
             "look": "A big wooden wheel, locked in place. A brass plate asks for a navigator."
@@ -219,9 +241,9 @@
           {
             "id": "letters-wall",
             "prop": "poster",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "letters on the wall",
             "look": "Letters to the captain, all written in numbers."
@@ -229,9 +251,9 @@
           {
             "id": "lantern-hooks",
             "prop": "lamp",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "lanterns",
             "look": "A row of lanterns on hooks, all dark."
@@ -239,9 +261,9 @@
           {
             "id": "map-table",
             "prop": "painting",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "treasure map",
             "look": "A map covered in X's. Every X says 'NOT HERE' next to it.",
@@ -250,9 +272,9 @@
           {
             "id": "parrot-perch",
             "prop": "statue",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "parrot perch",
             "look": "A wooden parrot on a perch. It's painted to look cross.",
@@ -261,9 +283,9 @@
           {
             "id": "sea-chest",
             "prop": "box",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "captain's sea chest",
             "look": "Big hats, a spare eye patch and a lot of stripy socks.",
@@ -272,13 +294,45 @@
           {
             "id": "bookcase",
             "prop": "bookshelf",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "logbooks",
             "look": "Logbooks of every voyage. Most entries say 'Sunny. Found no treasure.'",
             "hidesPieces": true
+          },
+          {
+            "id": "ink-pot",
+            "prop": "table",
+            "label": "ink pot",
+            "look": "A symbol card under the ink pot: {key:captains-letters}",
+            "x": 15,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "hat-peg",
+            "prop": "lamp",
+            "label": "hat peg",
+            "look": "A symbol card tucked in a hat band: {key:captains-letters}",
+            "minDifficulty": "normal",
+            "x": 265,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "porthole-sill",
+            "prop": "window",
+            "label": "porthole sill",
+            "look": "A symbol card on the sill: {key:captains-letters}",
+            "minDifficulty": "hard",
+            "x": 515,
+            "y": 420,
+            "w": 220,
+            "h": 160
           }
         ]
       }
@@ -300,9 +354,9 @@
           {
             "id": "gangplank-spot",
             "prop": "door",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "gangplank",
             "look": "Pulled up tight, with a lock and a three-digit keypad."
@@ -310,9 +364,9 @@
           {
             "id": "knot-board",
             "prop": "sign",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "knot board",
             "look": "Knots tied in rows, each row with more knots than the last."
@@ -320,9 +374,9 @@
           {
             "id": "bottle-rail",
             "prop": "shelf",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "message in a bottle",
             "look": "A bottle wedged in the rail, with a message in the captain's back-to-front alphabet."
@@ -330,9 +384,9 @@
           {
             "id": "mast",
             "prop": "statue",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "mast",
             "look": "Flags flap high above. Seagulls squawk at you from the top.",
@@ -341,9 +395,9 @@
           {
             "id": "cannon",
             "prop": "barrel",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "cannon",
             "look": "A cannon full of sand and one very surprised crab.",
@@ -352,9 +406,9 @@
           {
             "id": "lifeboat",
             "prop": "crate",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "lifeboat",
             "look": "A little lifeboat with two oars and a bucket.",
@@ -363,9 +417,9 @@
           {
             "id": "net",
             "prop": "rug",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "fishing net",
             "look": "A tangled net full of seaweed and one old boot.",
@@ -374,9 +428,9 @@
           {
             "id": "anchor-chain",
             "prop": "pipe",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "anchor chain",
             "look": "Heavy, rusty and very, very long.",
@@ -385,9 +439,9 @@
           {
             "id": "crows-nest",
             "prop": "window",
-            "x": 20,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "crow's nest",
             "look": "Through the spyglass, you spot a lighthouse. Painted on its wall is a table of dots and dashes: {key:lighthouse}",
@@ -398,14 +452,36 @@
           {
             "id": "fish-box",
             "prop": "box",
-            "x": 270,
+            "x": 265,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "fish box",
             "look": "Something squeaks in there. It's a rubber fish.",
             "gives": "rubber-fish",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "ship-bell",
+            "prop": "statue",
+            "label": "ship's bell",
+            "look": "A code card tied to the bell rope: {key:lighthouse}",
+            "minDifficulty": "hard",
+            "x": 515,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "rope-locker",
+            "prop": "cabinet",
+            "label": "rope locker",
+            "look": "A code card among the ropes: {key:lighthouse}",
+            "minDifficulty": "hard",
+            "x": 765,
+            "y": 420,
+            "w": 220,
+            "h": 160
           }
         ]
       }
@@ -541,9 +617,9 @@
         ]
       },
       "hints": [
+        "There's more than one number around the room. Only one of them turns this into a real word.",
         "How far to slide the letters is written somewhere. Look far out to sea through the right thing.",
-        "Slide every letter back along the alphabet by that many places.",
-        "It says {answer}."
+        "Slide every letter back along the alphabet by that many places."
       ],
       "solvedText": "You sing the word and the spice rack springs open. The cook would be proud!"
     },
@@ -592,22 +668,36 @@
       "id": "captains-letters",
       "title": "The Captain's Letters",
       "kind": "text",
-      "prompt": "The captain signs her letters in numbers. The newest one ends: {cipher}. The letter box lock wants the word.",
+      "prompt": "The captain signs her letters in secret symbols. The newest one ends with a word from a pirate's life: {cipher}. The letter box lock wants the word.",
       "generator": {
         "type": "cipher",
-        "cipher": "numbers",
+        "cipher": "symbols",
         "words": [
-          "cutlass",
-          "doubloon",
-          "galleon",
           "bosun",
           "scurvy",
-          "squid"
+          "squid",
+          "plunder"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop",
+          "blanket",
+          "chimney",
+          "cabinet",
+          "dolphin"
         ]
       },
       "hints": [
-        "Each number is a letter.",
-        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "There's more than one symbol card in the cabin. Only one is the captain's real one.",
+        "Try each card: only one turns the symbols into a word a pirate would use.",
         "It says {answer}."
       ],
       "solvedText": "The letter box opens. Inside: a lot more letters, and a biscuit."
@@ -759,18 +849,25 @@
       "minDifficulty": "hard",
       "title": "The Lighthouse Signal",
       "kind": "text",
-      "prompt": "The lighthouse flashes, long and short, over and over: {cipher}",
+      "prompt": "The lighthouse flashes, long and short, over and over, something from the sea: {cipher}",
       "generator": {
         "type": "cipher",
         "cipher": "morse",
         "words": [
-          "tugboat",
-          "harbor",
           "sailor",
-          "mainsail"
+          "oyster",
+          "rowing"
+        ],
+        "decoyWords": [
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "These need a key. Something far away needs a spyglass to read.",
         "Swap each one for its letter, one at a time."
       ],

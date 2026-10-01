@@ -323,7 +323,7 @@ public class ReplayTests
     {
         var room = Rooms.Get(id);
         for (var seed = 1000; seed < 2000; seed++)
-            Assert.Empty(EscapeRoomValidator.Validate(RoomVariants.Build(room, seed)));
+            Assert.Empty(EscapeRoomValidator.ValidateGame(room, seed));
     }
 
     [Theory]

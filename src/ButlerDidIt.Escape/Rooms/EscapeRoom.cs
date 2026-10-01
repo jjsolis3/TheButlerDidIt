@@ -316,7 +316,19 @@ public sealed record EscapePuzzle
     public List<string> Lineup { get; init; } = [];
 }
 
-public sealed record CipherDecoder(CipherType Type, string Key);
+/// <param name="Key">The real key, as written in the room.</param>
+/// <param name="Encoded">The coded text shown in the prompt.</param>
+/// <param name="Candidates">
+/// Every place the room writes a key for this cipher (<see cref="EscapePuzzle.KeyAt"/>), with the key written there:
+/// the real one in one place, picked from the seed among the places shown at this difficulty, and decoys everywhere
+/// else. Never sent as it is: the phones get only the keys found so far, and never which one is real.
+/// </param>
+public sealed record CipherDecoder(CipherType Type, string Key, string Encoded = "", IReadOnlyList<KeyCandidate>? Candidates = null);
+
+/// <param name="Place">Where it's written ("object:rug", "inspect:locket"…), as in <see cref="EscapePuzzle.KeyAt"/>.</param>
+/// <param name="Decodes">What the coded text reads with this key.</param>
+/// <param name="FromDecoyWords">A decoy that reads as one of the room's decoy words (a real word), rather than gibberish.</param>
+public sealed record KeyCandidate(string Place, string Key, bool Real, string Decodes, bool FromDecoyWords);
 
 /// <summary>A square grid of lights, numbered row by row from the top left. <see cref="Lit"/> lists the ones that are on.</summary>
 public sealed record SwitchGrid(int Size, List<int> Lit);
@@ -396,6 +408,14 @@ public sealed class PuzzleGenerator
 
     /// <summary>For Cipher: which code.</summary>
     public CipherType Cipher { get; init; }
+
+    /// <summary>
+    /// For a symbols or Morse cipher whose key is written in more than one place ({key:id} on several spots):
+    /// real words that must <em>not</em> fit the puzzle's clue. Each wrong key decodes the same symbols into one
+    /// of these, so the group has to reason about which key is real. Needs words shaped like each of
+    /// <see cref="Words"/> (same length, same repeated letters); see <see cref="PuzzleGenerators.Shape"/>.
+    /// </summary>
+    public List<string> DecoyWords { get; init; } = [];
 
     /// <summary>For ColorDigits: the colours to choose from.</summary>
     public List<string> Colors { get; init; } = [];

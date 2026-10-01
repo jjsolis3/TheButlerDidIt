@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 2,
+  "edition": 3,
   "hintPenaltySeconds": 90,
   "soundscape": "haunted",
   "intro": "Oh my, oh dear, what have you done? You read the spell, and now it's begun! Every door is locked up tight, until you solve my puzzles right. Share your clues and work as one, and you'll be home when the magic's done!",
@@ -51,9 +51,9 @@
           {
             "id": "top-shelf",
             "prop": "bookshelf",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "top of the tall shelf",
             "look": "You sweep the broom along the top of the shelf. Down tumbles a little silver key, with a sneeze of dust!",
@@ -64,9 +64,9 @@
           {
             "id": "spellbook-stand",
             "prop": "table",
-            "x": 270,
+            "x": 215,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "spellbook stand",
             "look": "The huge spellbook, open on its stand. Its pages turn by themselves."
@@ -74,9 +74,9 @@
           {
             "id": "blank-scroll",
             "prop": "painting",
-            "x": 520,
+            "x": 415,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "blank scroll",
             "look": "Through the moon lens, silvery writing appears: 'Quill's secret code: slide back {key:quill-code}.'",
@@ -86,9 +86,9 @@
           {
             "id": "library-door-spot",
             "prop": "door",
-            "x": 770,
+            "x": 615,
             "y": 20,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "library door",
             "look": "A heavy wooden door with a tiny keyhole that glitters silver."
@@ -96,9 +96,9 @@
           {
             "id": "reading-chair",
             "prop": "desk",
-            "x": 20,
-            "y": 220,
-            "w": 210,
+            "x": 815,
+            "y": 20,
+            "w": 170,
             "h": 160,
             "label": "reading chair",
             "look": "A squashy armchair. Down the side of the cushion: a round brass frame, the kind that holds a lens.",
@@ -107,9 +107,9 @@
           {
             "id": "book-pile",
             "prop": "box",
-            "x": 270,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "pile of books",
             "look": "Books about dragons, books about teapots, and one about how to talk to snails.",
@@ -118,9 +118,9 @@
           {
             "id": "globe",
             "prop": "statue",
-            "x": 520,
+            "x": 215,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "spinning globe",
             "look": "A globe of a world you've never seen. It spins on its own and hums.",
@@ -129,9 +129,9 @@
           {
             "id": "rug",
             "prop": "rug",
-            "x": 770,
+            "x": 415,
             "y": 220,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "star rug",
             "look": "A rug covered in stitched stars. Under a corner: dust bunnies, and nothing else.",
@@ -140,9 +140,9 @@
           {
             "id": "candle-shelf",
             "prop": "shelf",
-            "x": 20,
-            "y": 420,
-            "w": 210,
+            "x": 615,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "candle shelf",
             "look": "Candles of every colour, dripping wax. The wax spells nothing at all.",
@@ -151,9 +151,9 @@
           {
             "id": "ink-desk",
             "prop": "drawer",
-            "x": 270,
-            "y": 420,
-            "w": 210,
+            "x": 815,
+            "y": 220,
+            "w": 170,
             "h": 160,
             "label": "ink drawer",
             "look": "Feather pens, blotting paper and a pot of glittery ink.",
@@ -162,9 +162,9 @@
           {
             "id": "owl-perch",
             "prop": "lamp",
-            "x": 520,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "owl perch",
             "look": "An owl blinks at you and hoots. It isn't telling.",
@@ -173,13 +173,35 @@
           {
             "id": "scroll-rack",
             "prop": "cabinet",
-            "x": 770,
+            "x": 215,
             "y": 420,
-            "w": 210,
+            "w": 170,
             "h": 160,
             "label": "scroll rack",
             "look": "Rolled-up maps, rolled-up spells and one rolled-up sock.",
             "hidesPieces": true
+          },
+          {
+            "id": "ink-well",
+            "prop": "barrel",
+            "label": "ink well",
+            "look": "Written in the ink: back {key:quill-code}.",
+            "minDifficulty": "normal",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160
+          },
+          {
+            "id": "candle-stub",
+            "prop": "lamp",
+            "label": "candle stub",
+            "look": "Scratched in the wax: back {key:quill-code}.",
+            "minDifficulty": "hard",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160
           }
         ]
       }
@@ -202,9 +224,9 @@
           {
             "id": "cabinet-spot",
             "prop": "cabinet",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "ingredient cabinet",
             "look": "A cabinet with a 3-digit lock and a spell card stuck to the door."
@@ -212,9 +234,9 @@
           {
             "id": "mirror-spot",
             "prop": "mirror",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "magic mirror",
             "look": "Its glass ripples like water. Your reflection waves, a moment too late."
@@ -222,9 +244,9 @@
           {
             "id": "potion-shelf",
             "prop": "shelf",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "potion shelf",
             "look": "Bottles in every colour, with labels written in numbers."
@@ -232,9 +254,9 @@
           {
             "id": "broom-cupboard",
             "prop": "drawer",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "broom cupboard",
             "look": "Brooms, a bucket, and a long thin stick of dragon-wood that hums in your hand.",
@@ -243,9 +265,9 @@
           {
             "id": "rune-panel",
             "prop": "sign",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "rune stones",
             "look": "Stones set in the wall, each carved with a rune. They're all dark."
@@ -253,9 +275,9 @@
           {
             "id": "jar-shelf",
             "prop": "box",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "jar of eyeballs",
             "look": "Pickled gumballs. Probably. You don't want to find out.",
@@ -264,9 +286,9 @@
           {
             "id": "herb-rack",
             "prop": "plant",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "herb rack",
             "look": "Bunches of drying herbs that smell of peppermint and old socks.",
@@ -275,9 +297,9 @@
           {
             "id": "bubble-pot",
             "prop": "barrel",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "small cauldron",
             "look": "It blows one bubble, then another, then a raspberry.",
@@ -286,13 +308,45 @@
           {
             "id": "recipe-book",
             "prop": "bookshelf",
-            "x": 20,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "recipe books",
             "look": "'Potions for Beginners', 'Potions for Show-Offs', 'Potions That Went Wrong'.",
             "hidesPieces": true
+          },
+          {
+            "id": "spice-jar",
+            "prop": "box",
+            "label": "spice jar",
+            "look": "A rune card stuck to the jar: {key:potion-labels}",
+            "x": 265,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "mortar",
+            "prop": "barrel",
+            "label": "mortar and pestle",
+            "look": "A rune card under the bowl: {key:potion-labels}",
+            "minDifficulty": "normal",
+            "x": 515,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "bottle-rack",
+            "prop": "shelf",
+            "label": "bottle rack",
+            "look": "A rune card behind the bottles: {key:potion-labels}",
+            "minDifficulty": "hard",
+            "x": 765,
+            "y": 420,
+            "w": 220,
+            "h": 160
           }
         ]
       }
@@ -315,9 +369,9 @@
           {
             "id": "telescope-spot",
             "prop": "machine",
-            "x": 20,
+            "x": 15,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "great telescope",
             "look": "A great brass telescope, locked with a word dial."
@@ -325,9 +379,9 @@
           {
             "id": "tower-door-spot",
             "prop": "door",
-            "x": 270,
+            "x": 265,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "tower door",
             "look": "The tower's last door, with a glowing keypad and a slot shaped like a scroll."
@@ -335,9 +389,9 @@
           {
             "id": "star-chart",
             "prop": "poster",
-            "x": 520,
+            "x": 515,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "star chart",
             "look": "A chart of the sky. The star names are written in Quill's back-to-front alphabet."
@@ -345,9 +399,9 @@
           {
             "id": "rafters",
             "prop": "lamp",
-            "x": 770,
+            "x": 765,
             "y": 20,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "rafters",
             "look": "Owls blink down at you. One of them winks.",
@@ -356,9 +410,9 @@
           {
             "id": "armillary",
             "prop": "statue",
-            "x": 20,
+            "x": 15,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "brass rings",
             "look": "Brass rings that spin around each other like planets.",
@@ -367,9 +421,9 @@
           {
             "id": "cushions",
             "prop": "rug",
-            "x": 270,
+            "x": 265,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "stargazing cushions",
             "look": "Big soft cushions for lying back and looking up.",
@@ -378,9 +432,9 @@
           {
             "id": "trunk",
             "prop": "chest",
-            "x": 520,
+            "x": 515,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "wizard's trunk",
             "look": "Spare hats, spare robes and a spare beard.",
@@ -389,9 +443,9 @@
           {
             "id": "log-desk",
             "prop": "desk",
-            "x": 770,
+            "x": 765,
             "y": 220,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "star log",
             "look": "Notes about every star, in very small writing.",
@@ -400,9 +454,9 @@
           {
             "id": "moon-window",
             "prop": "window",
-            "x": 20,
+            "x": 15,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "moon window",
             "look": "Through the moon lens, the window's frost turns into a table of runes: {key:rune-spell}",
@@ -413,14 +467,36 @@
           {
             "id": "hat-stand",
             "prop": "box",
-            "x": 270,
+            "x": 265,
             "y": 420,
-            "w": 210,
+            "w": 220,
             "h": 160,
             "label": "hat box",
             "look": "A box of wizard hats. You put one on. It's a bit big.",
             "gives": "floppy-hat",
             "minDifficulty": "hard"
+          },
+          {
+            "id": "star-globe",
+            "prop": "statue",
+            "label": "star globe",
+            "look": "A rune card tucked into the stand: {key:rune-spell}",
+            "minDifficulty": "hard",
+            "x": 515,
+            "y": 420,
+            "w": 220,
+            "h": 160
+          },
+          {
+            "id": "telescope-case",
+            "prop": "chest",
+            "label": "telescope case",
+            "look": "A rune card in the lining: {key:rune-spell}",
+            "minDifficulty": "hard",
+            "x": 765,
+            "y": 420,
+            "w": 220,
+            "h": 160
           }
         ]
       }
@@ -553,9 +629,9 @@
         ]
       },
       "hints": [
+        "There's more than one number around the room. Only one of them turns this into a real word.",
         "How far to slide the letters is written somewhere. Look at something blank through the right lens.",
-        "Slide every letter back along the alphabet by that many places.",
-        "It says {answer}."
+        "Slide every letter back along the alphabet by that many places."
       ],
       "solvedText": "'Oh, you worked it out! Nobody ever works it out!'"
     },
@@ -604,22 +680,35 @@
       "id": "potion-labels",
       "title": "The Potion Labels",
       "kind": "text",
-      "prompt": "The newest potion bottle's label is written in numbers: {cipher}. The shelf won't let go of it until you say what's inside.",
+      "prompt": "The newest potion bottle's label is written in runes. It names a potion ingredient: {cipher}. The shelf won't let go of it until you say what's inside.",
       "generator": {
         "type": "cipher",
-        "cipher": "numbers",
+        "cipher": "symbols",
         "words": [
           "frog",
           "slime",
           "sparkle",
-          "fizz",
-          "honey",
-          "pepper"
+          "honey"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "coat",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "blanket",
+          "chimney",
+          "cabinet",
+          "dolphin"
         ]
       },
       "hints": [
-        "Each number is a letter.",
-        "A is 1, B is 2, C is 3… all the way to Z is 26.",
+        "There's more than one rune card in the lab. Only one is Professor Quill's real one.",
+        "Try each card: only one turns the runes into something you'd put in a potion.",
         "It says {answer}."
       ],
       "solvedText": "The bottle pops its cork and hiccups a bubble. Correct!"
@@ -773,18 +862,34 @@
       "minDifficulty": "hard",
       "title": "The Rune Spell",
       "kind": "text",
-      "prompt": "Carved over the tower door, a spell in runes: {cipher}",
+      "prompt": "Carved over the tower door, a spell in runes, a word of magic: {cipher}",
       "generator": {
         "type": "cipher",
         "cipher": "symbols",
         "words": [
-          "enchant",
-          "abracadabra",
-          "sorcery",
-          "hocuspocus"
+          "hocus",
+          "jinx",
+          "vanish"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "coat",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "These need a key. Something frosty needs looking at through the moon lens.",
         "Swap each one for its letter, one at a time."
       ],

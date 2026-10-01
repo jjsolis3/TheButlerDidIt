@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 2,
+  "edition": 3,
   "hintPenaltySeconds": 120,
   "soundscape": "drone",
   "intro": "Attention. This is the Overseer. You have been selected for a survival exercise. The surface hatch is sealed. The only way out is the blast door at the far end of this bunker, and it opens only for a team that works like one. Every camera is on you. Every mistake is logged. The exercise begins now.",
@@ -133,6 +133,28 @@
             "h": 330,
             "label": "steel locker",
             "look": "A steel locker with a three-digit dial."
+          },
+          {
+            "id": "shower-head",
+            "prop": "pipe",
+            "x": 330,
+            "y": 190,
+            "w": 140,
+            "h": 100,
+            "label": "shower head",
+            "look": "Scratched on the pipe: back {key:decon-log}.",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "boot-rack",
+            "prop": "shelf",
+            "x": 330,
+            "y": 290,
+            "w": 140,
+            "h": 100,
+            "label": "boot rack",
+            "look": "Chalked inside a boot: back {key:decon-log}.",
+            "minDifficulty": "hard"
           }
         ]
       }
@@ -379,6 +401,50 @@
             "h": 520,
             "label": "blast door",
             "look": "Two metres of steel, a keyhole and a three-digit keypad."
+          },
+          {
+            "id": "map-board",
+            "prop": "poster",
+            "x": 10,
+            "y": 420,
+            "w": 140,
+            "h": 100,
+            "label": "map board",
+            "look": "A cipher card pinned to the map: {key:orders}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "filing-cabinet",
+            "prop": "cabinet",
+            "x": 150,
+            "y": 420,
+            "w": 140,
+            "h": 100,
+            "label": "filing cabinet",
+            "look": "A cipher card in the top drawer: {key:orders}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "radio-log",
+            "prop": "sign",
+            "x": 330,
+            "y": 180,
+            "w": 100,
+            "h": 80,
+            "label": "radio log",
+            "look": "A code sheet clipped to the log: {key:distress}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "headset-hook",
+            "prop": "lamp",
+            "x": 430,
+            "y": 180,
+            "w": 100,
+            "h": 80,
+            "label": "headset hook",
+            "look": "A code sheet folded into the headset: {key:distress}",
+            "minDifficulty": "hard"
           }
         ]
       }
@@ -498,9 +564,9 @@
         ]
       },
       "hints": [
+        "There's more than one number around the room. Only one of them turns this into a real word.",
         "The Overseer wrote the offset on the clipboard.",
-        "Move every letter back along the alphabet by that many.",
-        "It says {answer}."
+        "Move every letter back along the alphabet by that many."
       ],
       "solvedText": "The letter lock clicks. 'Adequate,' says the intercom."
     },
@@ -648,20 +714,34 @@
       "id": "orders",
       "title": "The Standing Orders",
       "kind": "text",
-      "prompt": "The standing orders on the wall are typed in symbols: {cipher}. The command terminal wants the word.",
+      "prompt": "The standing orders on the wall are typed in symbols, a military order: {cipher}. The command terminal wants the word.",
       "generator": {
         "type": "cipher",
         "cipher": "symbols",
         "words": [
-          "evacuate",
           "standby",
-          "lockdown",
-          "override",
           "sentry",
-          "perimeter"
+          "blackout",
+          "curfew",
+          "patrol"
+        ],
+        "decoyWords": [
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop",
+          "blanket",
+          "chimney",
+          "cabinet",
+          "dolphin",
+          "dumpling",
+          "hospital",
+          "backpack"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "The symbols need a key. Somebody pencilled one into a book you found.",
         "Look closely at the field manual from the ration crate, then read the symbols."
       ],
@@ -735,18 +815,30 @@
       "minDifficulty": "hard",
       "title": "The Distress Call",
       "kind": "text",
-      "prompt": "The radio beeps a message in short and long tones, over and over: {cipher}",
+      "prompt": "The radio beeps a message in short and long tones, over and over, a call for help: {cipher}",
       "generator": {
         "type": "cipher",
         "cipher": "morse",
         "words": [
-          "mayday",
-          "rescue",
           "signal",
-          "beacon"
+          "alert",
+          "flare"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "piano",
+          "grape",
+          "garden",
+          "window",
+          "planet",
+          "rocket",
+          "bishop"
         ]
       },
       "hints": [
+        "There's more than one key card around. Only one is real: it reads a word that fits the clue.",
         "Short and long tones need a key. There's a signals codebook in this room, behind a panel.",
         "Unscrew the wall panel, then read the tones letter by letter."
       ],

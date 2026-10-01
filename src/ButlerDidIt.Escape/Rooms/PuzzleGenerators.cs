@@ -9,7 +9,12 @@ public static class PuzzleGenerators
 {
     // ─── Ciphers ────────────────────────────────────────────────────────────────
 
-    public sealed record CipherMade(string Word, string Encoded, string Key);
+    /// <param name="Decoys">Wrong keys for the other places the room writes this cipher's key (see <see cref="CipherDecoder.Candidates"/>).</param>
+    public sealed record CipherMade(string Word, string Encoded, string Key, List<DecoyKey> Decoys);
+
+    /// <param name="Decodes">What the coded text reads with this wrong key.</param>
+    /// <param name="FromDecoyWords">It reads as one of the room's decoy words (a real word), not gibberish.</param>
+    public sealed record DecoyKey(string Key, string Decodes, bool FromDecoyWords);
 
     private static readonly string[] Symbols =
         ["◆", "★", "●", "▲", "■", "♥", "♣", "♠", "☀", "☾", "✿", "☂", "♪", "⚓", "✦", "☘", "✚", "✖", "⚑", "✈", "☎", "♞", "☕", "⌛", "☯", "✂"];
@@ -20,7 +25,10 @@ public static class PuzzleGenerators
     /// <summary>Written between the entries of a key table, so the table can be read back (by people and by <see cref="Decode"/>).</summary>
     private const string KeySeparator = "   ";
 
-    public static CipherMade Cipher(CipherType type, IReadOnlyList<string> words, EscapeDifficulty difficulty, SeededRandom rng)
+    /// <param name="decoyWords">Real words a wrong symbols or Morse key should decode to (see <see cref="PuzzleGenerator.DecoyWords"/>).</param>
+    /// <param name="decoys">How many wrong keys to make: one for each other place the key is written.</param>
+    public static CipherMade Cipher(CipherType type, IReadOnlyList<string> words, EscapeDifficulty difficulty, SeededRandom rng,
+        IReadOnlyList<string>? decoyWords = null, int decoys = 0)
     {
         var pool = WordsFor(words, difficulty);
         var word = pool[rng.Next(pool.Count)].ToUpperInvariant();
@@ -29,26 +37,84 @@ public static class PuzzleGenerators
             case CipherType.Shift:
             {
                 var shift = 1 + rng.Next(25);
-                return new(word, new string(word.Select(c => (char)('A' + (c - 'A' + shift) % 26)).ToArray()), shift.ToString());
+                var encoded = new string(word.Select(c => (char)('A' + (c - 'A' + shift) % 26)).ToArray());
+                // A wrong amount turns the letters into gibberish: a real-word decoy is almost never possible with a shift.
+                var wrong = rng.Pick(Enumerable.Range(1, 25).Where(n => n != shift).ToList(), Math.Min(decoys, 24))
+                    .Select(n => new DecoyKey(n.ToString(), Decode(CipherType.Shift, encoded, n.ToString()), false)).ToList();
+                return new(word, encoded, shift.ToString(), wrong);
             }
             case CipherType.Symbols:
             {
                 var symbols = rng.Pick(Symbols, 26);
                 var table = KeyLetters(word, rng).Select(l => $"{symbols[l - 'A']} = {l}");
-                return new(word, string.Join(" ", word.Select(c => symbols[c - 'A'])), string.Join(KeySeparator, table));
+                var encoded = string.Join(" ", word.Select(c => symbols[c - 'A']));
+                var wrong = DecoyWordsFor(word, decoyWords, decoys, rng).Select(d =>
+                {
+                    // The same symbols, read as the decoy's letters, plus two spare symbols the word doesn't use: it looks just like the real card.
+                    var entries = word.Distinct().Select(c => (Symbol: symbols[c - 'A'], Letter: d.Word[word.IndexOf(c)])).ToList();
+                    var spareSymbols = rng.Pick(Enumerable.Range(0, 26).Where(i => !word.Contains((char)('A' + i))).Select(i => symbols[i]).ToList(), 2);
+                    var spareLetters = rng.Pick(Enumerable.Range('A', 26).Select(c => (char)c).Where(c => !d.Word.Contains(c)).ToList(), 2);
+                    entries.AddRange(spareSymbols.Zip(spareLetters, (sym, l) => (sym, l)));
+                    var key = string.Join(KeySeparator, rng.Pick(entries, entries.Count).Select(e => $"{e.Symbol} = {e.Letter}"));
+                    return new DecoyKey(key, d.Word, d.Real);
+                }).ToList();
+                return new(word, encoded, string.Join(KeySeparator, table), wrong);
             }
             case CipherType.Morse:
             {
                 var table = KeyLetters(word, rng).Order().Select(l => $"{l} = {MorseCode[l - 'A']}");
-                return new(word, string.Join(" ", word.Select(c => MorseCode[c - 'A'])), string.Join(KeySeparator, table));
+                var encoded = string.Join(" ", word.Select(c => MorseCode[c - 'A']));
+                var wrong = DecoyWordsFor(word, decoyWords, decoys, rng).Select(d =>
+                {
+                    // A wrong code card: the dots and dashes of the message, labelled with the decoy's letters.
+                    var entries = word.Distinct().Select(c => (Letter: d.Word[word.IndexOf(c)], Code: MorseCode[c - 'A'])).ToList();
+                    var spareCodes = rng.Pick(Enumerable.Range(0, 26).Where(i => !word.Contains((char)('A' + i))).Select(i => MorseCode[i]).ToList(), 2);
+                    var spareLetters = rng.Pick(Enumerable.Range('A', 26).Select(c => (char)c).Where(c => !d.Word.Contains(c)).ToList(), 2);
+                    entries.AddRange(spareLetters.Zip(spareCodes, (l, code) => (l, code)));
+                    var key = string.Join(KeySeparator, entries.OrderBy(e => e.Letter).Select(e => $"{e.Letter} = {e.Code}"));
+                    return new DecoyKey(key, d.Word, d.Real);
+                }).ToList();
+                return new(word, encoded, string.Join(KeySeparator, table), wrong);
             }
             case CipherType.Numbers:
-                return new(word, string.Join("-", word.Select(c => c - 'A' + 1)), "A=1, B=2, C=3 … Z=26");
+                return new(word, string.Join("-", word.Select(c => c - 'A' + 1)), "A=1, B=2, C=3 … Z=26", []);
             case CipherType.Mirror:
-                return new(word, new string(word.Select(c => (char)('Z' - (c - 'A'))).ToArray()), "A↔Z, B↔Y, C↔X … M↔N");
+                return new(word, new string(word.Select(c => (char)('Z' - (c - 'A'))).ToArray()), "A↔Z, B↔Y, C↔X … M↔N", []);
             default:
                 throw new InvalidOperationException($"Unknown cipher {type}.");
         }
+    }
+
+    /// <summary>
+    /// A word's shape: its length and which letters repeat ("LETTER" is 0,1,2,2,1,3). A symbols or Morse card can
+    /// read the same symbols as a different word only if the two words have the same shape.
+    /// </summary>
+    public static string Shape(string word)
+    {
+        var w = word.ToUpperInvariant();
+        return string.Join(",", w.Select(c => w.IndexOf(c)));
+    }
+
+    /// <summary>
+    /// The words wrong keys decode to: decoy words shaped like <paramref name="word"/> first, then made-up letters
+    /// of the same shape when there aren't enough (the validator reports that, so shipped rooms always have real words).
+    /// </summary>
+    private static List<(string Word, bool Real)> DecoyWordsFor(string word, IReadOnlyList<string>? decoyWords, int count, SeededRandom rng)
+    {
+        if (count <= 0) return [];
+        var shape = Shape(word);
+        var fitting = (decoyWords ?? []).Select(w => w.Trim().ToUpperInvariant()).Distinct()
+            .Where(w => w != word && w.Length == word.Length && w.All(char.IsAsciiLetterUpper) && Shape(w) == shape).ToList();
+        var picked = rng.Pick(fitting, Math.Min(count, fitting.Count)).Select(w => (w, true)).ToList();
+        while (picked.Count < count)
+        {
+            // Gibberish with the same repeats: a fresh letter for each new letter of the word.
+            var letters = rng.Pick(Enumerable.Range('A', 26).Select(c => (char)c).ToList(), word.Distinct().Count());
+            var distinct = word.Distinct().ToList();
+            var made = new string(word.Select(c => letters[distinct.IndexOf(c)]).ToArray());
+            if (made != word && picked.All(p => p.Item1 != made)) picked.Add((made, false));
+        }
+        return picked;
     }
 
     /// <summary>Reads a cipher back using only what players see: the coded text and the key as written. For the proofs.</summary>
@@ -245,8 +311,10 @@ public static class PuzzleGenerators
             direct.Add(new(ClueForm.At, a, 0, pos[a]));
         }
         // A few tries, keeping the shortest set of clues: fewer, sharper pieces to share out.
+        // A rare unlucky set still needs more than MaxDeductionClues; keep trying for those alone (the others
+        // draw exactly as before), so a solo player's clue pieces always fit the stage's hiding spots.
         List<DeductionClue>? best = null;
-        for (var attempt = 0; attempt < DeductionAttempts; attempt++)
+        for (var attempt = 0; attempt < DeductionAttempts || best!.Count > MaxDeductionClues(n) && attempt < DeductionAttemptsAtMost; attempt++)
         {
             var clues = Clues(n, rng.Pick(indirect, indirect.Count).Concat(rng.Pick(direct, direct.Count)));
             if (best is null || clues.Count < best.Count) best = clues;
@@ -255,6 +323,10 @@ public static class PuzzleGenerators
     }
 
     private const int DeductionAttempts = 6;
+    private const int DeductionAttemptsAtMost = 60;
+
+    /// <summary>The most clues a logic puzzle of <paramref name="n"/> things deals out: one per thing, plus one.</summary>
+    public static int MaxDeductionClues(int n) => n + 1;
 
     /// <summary>Adds clues in the given order until only one arrangement fits, then drops any the others make unnecessary.</summary>
     private static List<DeductionClue> Clues(int n, IEnumerable<DeductionClue> candidates)

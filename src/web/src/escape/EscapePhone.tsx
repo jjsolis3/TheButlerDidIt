@@ -180,7 +180,7 @@ function PuzzleCard({ code, puzzle: p, penalty, gameMaster, invoke }: { code: st
       ) : (
         <>
         {p.kind === 'code' && <SequenceTerms prompt={p.prompt} />}
-        {p.cipher && <CipherTool cipher={p.cipher} prompt={p.prompt} />}
+        {p.cipher && <CipherTool cipher={p.cipher} />}
         {p.deduction && <DeductionHelper puzzle={p} scratchKey={`escape:${code}:${p.id}`} onUseCode={setAnswer} />}
         <form
           className="mt-3 flex gap-2"

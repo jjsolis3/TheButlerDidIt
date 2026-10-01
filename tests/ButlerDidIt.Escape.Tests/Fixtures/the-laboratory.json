@@ -30,7 +30,9 @@
           { "id": "plant", "prop": "plant", "x": 880, "y": 380, "w": 100, "h": 180, "label": "plant", "look": "A thirsty plant. Nothing else." },
           { "id": "rug", "prop": "rug", "x": 420, "y": 500, "w": 260, "h": 90, "label": "rug", "look": "Dust under the rug.", "hidesPieces": true },
           { "id": "clock", "prop": "clock", "x": 60, "y": 60, "w": 100, "h": 100, "label": "clock", "look": "The clock has stopped.", "hidesPieces": true },
-          { "id": "vent", "prop": "vent", "x": 200, "y": 60, "w": 120, "h": 80, "label": "vent", "look": "Cold air from the vent.", "hidesPieces": true }
+          { "id": "vent", "prop": "vent", "x": 200, "y": 60, "w": 120, "h": 80, "label": "vent", "look": "Cold air from the vent.", "hidesPieces": true },
+          { "id": "ledge", "prop": "shelf", "x": 700, "y": 300, "w": 140, "h": 80, "label": "chalk ledge", "look": "Chalked on the ledge: back {key:formula}.", "minDifficulty": "normal" },
+          { "id": "notebook", "prop": "desk", "x": 200, "y": 200, "w": 160, "h": 100, "label": "notebook", "look": "A note in the margin: turn back {key:formula}.", "minDifficulty": "hard" }
         ]
       },
       "puzzles": ["gather", "formula", "sequence", "digits"]
@@ -52,7 +54,9 @@
           { "id": "box", "prop": "box", "x": 540, "y": 460, "w": 120, "h": 100, "label": "box", "look": "Packing peanuts.", "hidesPieces": true },
           { "id": "chest", "prop": "chest", "x": 700, "y": 440, "w": 160, "h": 120, "label": "chest", "look": "Old lab coats.", "hidesPieces": true },
           { "id": "sink", "prop": "table", "x": 520, "y": 200, "w": 200, "h": 120, "label": "sink", "look": "A dripping tap.", "hidesPieces": true },
-          { "id": "cabinet-door", "prop": "cabinet", "x": 880, "y": 300, "w": 100, "h": 260, "label": "cabinet", "look": "Beakers.", "hidesPieces": true }
+          { "id": "cabinet-door", "prop": "cabinet", "x": 880, "y": 300, "w": 100, "h": 260, "label": "cabinet", "look": "Beakers.", "hidesPieces": true },
+          { "id": "telegraph-desk", "prop": "desk", "x": 20, "y": 460, "w": 200, "h": 100, "label": "telegraph desk", "look": "A code card taped to the desk: {key:signal}", "minDifficulty": "hard" },
+          { "id": "lab-notes", "prop": "box", "x": 560, "y": 340, "w": 140, "h": 100, "label": "lab notes", "look": "Another code card, in a different hand: {key:signal}", "minDifficulty": "hard" }
         ]
       },
       "puzzles": ["jars", "frame", "lights", "signal"]
@@ -79,7 +83,7 @@
       "id": "formula",
       "title": "The Blackboard",
       "kind": "text",
-      "prompt": "Scrawled on the blackboard: {cipher}",
+      "prompt": "Scrawled on the blackboard, a word from the professor's science: {cipher}",
       "generator": { "type": "cipher", "cipher": "shift", "words": ["atom", "flask", "spark", "magnet", "crystal", "science"] },
       "hints": ["The portrait holds a number.", "Move every letter back along the alphabet by that number.", "It spells {answer}."],
       "solvedText": "The blackboard wipes itself clean."
@@ -137,9 +141,9 @@
       "id": "signal",
       "title": "The Telegraph",
       "kind": "text",
-      "prompt": "The telegraph taps: {cipher}",
+      "prompt": "The telegraph taps, spelling something from the lab: {cipher}",
       "minDifficulty": "hard",
-      "generator": { "type": "cipher", "cipher": "morse", "words": ["beaker", "quartz", "oxygen", "helium"] },
+      "generator": { "type": "cipher", "cipher": "morse", "words": ["beaker", "quartz", "oxygen", "helium"], "decoyWords": ["planet", "castle", "garden", "winter", "leader", "heater"] },
       "hints": ["The manual has a table in invisible ink.", "Read it letter by letter."],
       "solvedText": "The telegraph falls silent."
     },

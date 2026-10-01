@@ -76,6 +76,32 @@ test('harder rooms: a solo player searches, decodes and reasons their way out of
   await ada.getByRole('group', { name: 'Zoom' }).getByRole('button', { name: '2×' }).click()
   await expect(ada.getByRole('group', { name: 'Zoom' }).getByRole('button', { name: '2×' })).toHaveAttribute('aria-pressed', 'true')
 
+  // Decoy keys: on Hard the formula's key is written in three places, and only one of them is right.
+  for (const spot of ['portrait', 'chalk ledge', 'notebook']) await ada.getByRole('button', { name: `Search the ${spot}` }).click()
+  const formula = ada.getByTestId('phone-puzzle-formula')
+  await formula.getByText('🔑 Decoder').click()
+  await expect(formula.getByTestId('key-count')).toContainText("You've found 3 keys")
+  const tabs = formula.getByRole('group', { name: 'Keys found' }).getByRole('button')
+  await expect(tabs).toHaveText(['From the portrait', 'From the chalk ledge', 'From the notebook'], { useInnerText: true, ignoreCase: true })
+  // No free spin: the wheel turns only by a found amount, and the group copies the coded letters in themselves.
+  const coded = /science: ([A-Za-z]+)/.exec((await formula.textContent()) ?? '')![1]
+  const readings: string[] = []
+  for (let i = 0; i < 3; i++) {
+    await tabs.nth(i).click()
+    const letters = formula.getByPlaceholder('Type the coded letters')
+    await expect(letters).toHaveValue('')
+    await letters.fill(coded)
+    readings.push((await formula.getByText(/^Reads:/).textContent())!.replace('Reads:', '').trim())
+  }
+  await ada.screenshot({ path: `${SHOTS}/98-escape-decoy-keys.png`, fullPage: true })
+  expect(readings.filter((r) => r === answers.formula!.toUpperCase())).toHaveLength(1)
+  // What a decoy key reads is simply a wrong answer.
+  const decoy = readings.find((r) => r !== answers.formula!.toUpperCase())!
+  await formula.getByLabel('Answer for The Blackboard').fill(decoy)
+  await formula.getByRole('button', { name: 'Try' }).click()
+  await expect(formula.getByRole('status').filter({ hasText: '✗' })).toBeVisible()
+  await ada.waitForTimeout(3200) // the lock resets after a wrong answer
+
   await playThrough(tv, [ada], lab, answers, '98-escape-solo')
 
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
