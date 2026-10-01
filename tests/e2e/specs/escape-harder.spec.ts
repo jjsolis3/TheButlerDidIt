@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
-import { SHOTS, loadRoom, playThrough } from './escape-play'
+import { SHOTS, loadRoom, playThrough, startClock } from './escape-play'
 
 // Harder rooms: the test-only Laboratory (tests/ButlerDidIt.Escape.Tests/Fixtures, put on the shelf by
 // Escape__TestRoomsRoot) uses every newer kind of puzzle: spots to search, items to look at and put
@@ -57,7 +57,7 @@ test('harder rooms: a solo player searches, decodes and reasons their way out of
   await expect(tv.getByText(/😈 Hard/)).toBeVisible()
 
   const ada = await joinAs(browser, code, 'Ada')
-  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  await startClock(tv)
   await expect(tv.getByRole('heading', { name: 'The Bench' })).toBeVisible()
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
 
@@ -117,7 +117,7 @@ test('harder rooms: three phones share the search and the clues on Normal', asyn
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = tv.url().split('/').pop()!
   const phones = [await joinAs(browser, code, 'Ada'), await joinAs(browser, code, 'Ben'), await joinAs(browser, code, 'Cy')]
-  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  await startClock(tv)
   await expect(tv.getByRole('heading', { name: 'The Bench' })).toBeVisible()
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
 
@@ -142,7 +142,7 @@ test('harder rooms: a young family escapes the rebuilt Pirate Ship solo on Easy'
   await expect(tv.getByText(/🙂 Easy/)).toBeVisible()
 
   const kid = await joinAs(browser, code, 'Pip')
-  await tv.getByRole('button', { name: /Start the clock/ }).click()
+  await startClock(tv)
   await expect(tv.getByRole('heading', { name: 'The Galley', exact: true })).toBeVisible()
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
 

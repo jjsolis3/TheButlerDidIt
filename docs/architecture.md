@@ -353,6 +353,13 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - `EscapeMediaPlan` asks for a cover and one picture per stage. The prompts are built only from text the TV already shows, never puzzles, pieces or answers, and `EscapeMediaPlanTests` checks this over many puzzle sets.
   - An escape party created with the AI on queues a `MediaJob` whose id is `escape:{room id}`, so it never mixes with a mystery's. `MediaWorker` paints the pictures once per room, `MediaService` caches them, and every party of the room reuses them.
   - `EscapeCatalog.ArtAsync` loads them into the session, cached for 30 seconds so pictures from another server show up soon. `EscapeProjector` picks the current stage's picture, or the cover.
+- **Room reveals** (#110, step 1):
+  - **On the TV:** pressing Start plays the room's intro full screen: the cover with a slow pan, and the welcome read out in the game master's voice with subtitles. The clock starts when it ends or is skipped, so nobody loses time watching it. Each later stage opens with a short reveal of its own picture, name and description; the clock keeps running in the corner, and anyone can skip it.
+  - **On the phones:** a card at the top shows the same picture and text and is tapped away. It's a card, not a pop-up, so it never blocks a player mid-puzzle, and phones stay quiet.
+  - **Built from the TV's own view** (`escape/reveal.ts`, played by the mystery's `CuePlayer`). So it can't show anything the TV couldn't already: the projector only ever sends the current stage's picture.
+  - **Once per screen:** each screen remembers the reveals it has shown in `sessionStorage`, so a refresh or a reconnect doesn't replay them.
+  - **Reduced motion:** the pan stops under `prefers-reduced-motion`.
+  - **Later steps:** uploaded videos and AI video clips are steps 2 and 3 of #110.
 - **Finale:** doors swing open on an escape, and bars drop when the group is trapped. It uses movement only, never flashing, and nothing moves under `prefers-reduced-motion`. The results, the ranking and the game master's captioned last line stay on screen.
 
 **The recap and share card** (#111):
