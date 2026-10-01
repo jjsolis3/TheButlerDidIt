@@ -84,12 +84,18 @@ export default function Login() {
           )}
         </p>
       )}
-      <p className="mt-4 text-center text-sm text-muted">
-        {mode === 'login' ? 'New here? ' : 'Already have an account? '}
-        <button className="text-accent underline" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
-          {mode === 'login' ? 'Create an account' : 'Sign in'}
-        </button>
-      </p>
+      {/* Sign-ups can be closed (ALLOW_REGISTRATION=false). The server enforces it; this only stops
+          offering a form that would be refused. Shown while the options load, as before. */}
+      {mode === 'login' && options?.allowRegistration === false ? (
+        <p className="mt-4 text-center text-sm text-muted">This site isn't taking new host accounts right now.</p>
+      ) : (
+        <p className="mt-4 text-center text-sm text-muted">
+          {mode === 'login' ? 'New here? ' : 'Already have an account? '}
+          <button className="text-accent underline" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
+            {mode === 'login' ? 'Create an account' : 'Sign in'}
+          </button>
+        </p>
+      )}
     </Shell>
   )
 }

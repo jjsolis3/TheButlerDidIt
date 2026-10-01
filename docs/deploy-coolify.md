@@ -33,7 +33,7 @@ In **Environment Variables**, add:
 | Variable | Value | Notes |
 |---|---|---|
 | `POSTGRES_PASSWORD` | a long random string | Used by both containers. Mark it as a secret. |
-| `ALLOW_REGISTRATION` | `true` at first | Set to `false` once your host account exists, so strangers can't sign up. |
+| `ALLOW_REGISTRATION` | `true` at first | Set to `false` once your host account exists, so strangers can't sign up. The sign-in page then stops offering "Create an account". |
 
 The compose file already sets `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`. This tells ASP.NET Core to trust the `X-Forwarded-Proto` header from the proxy, so the app knows visitors arrived over HTTPS. Secure cookies and correct QR code links depend on it.
 
@@ -71,7 +71,7 @@ Optionally, in the app service's health check settings, use path `/healthz` on p
 ## 5. First run
 
 1. Visit your domain, choose **Sign in to host → Create an account**. The first account becomes the admin.
-2. Set `ALLOW_REGISTRATION=false` and redeploy if you want the server to be invite-only.
+2. Set `ALLOW_REGISTRATION=false` and redeploy to stop anyone else signing up. (There's no way to invite more hosts yet; invite links are planned in [saas-roadmap.md](saas-roadmap.md), #97.)
 3. Create a party. Put the stage on a TV and have guests scan the QR code.
 
 ## Data and backups
