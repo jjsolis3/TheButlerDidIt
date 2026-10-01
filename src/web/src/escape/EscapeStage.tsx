@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { CheerBar, CheerOverlay } from '../components/Cheers'
 import { RecapShare } from '../components/RecapShare'
 import { QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
+import { WatchersPanel } from '../components/WatchersPanel'
 import { api } from '../lib/api'
+import { useCheers } from '../lib/cheers'
 import { useParty } from '../lib/hub'
+import type { WatchingAs } from '../lib/seats'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView, PartyInfo } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
 import { GameMasterPanel } from './GameMasterPanel'
@@ -27,15 +31,44 @@ type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
  * only public things: clue pieces live on the phones, answers never leave the server.
  * The host (signed in) also gets the Start and Hint buttons here.
  */
-export function EscapeStage({ info, token }: { info: PartyInfo; token?: string }) {
-  const { stage, status, fatal, invoke } = useParty<EscapeStageView, EscapePlayerView>({ code: info.code, token, watchStage: true })
-  if (fatal) return <Centered>{fatal}</Centered>
+export function EscapeStage({ info, token, watcher }: { info: PartyInfo; token?: string; watcher?: WatchingAs }) {
+  const cheers = useCheers()
+  // Bumped whenever someone starts or stops watching, so the host's list refreshes (#112).
+  const [audience, setAudience] = useState(0)
+  const { stage, status, fatal, invoke } = useParty<EscapeStageView, EscapePlayerView>({
+    code: info.code,
+    token,
+    watchStage: true,
+    onRemoved: watcher?.onRemoved,
+    onCheer: cheers.add,
+    onAudience: info.isHost ? () => setAudience((n) => n + 1) : undefined,
+  })
+  if (fatal) return <Centered>{watcher ? <WatchEnded onLeave={watcher.onLeave} /> : fatal}</Centered>
   if (!stage) return <Centered>Unlocking the room…</Centered>
 
   return (
-    <div className="grain min-h-dvh">
+    <div className={`grain min-h-dvh ${watcher ? 'pb-28' : ''}`}>
       <StatusPill status={status} />
       <Tv stage={stage} info={info} invoke={invoke} />
+      {info.isHost && (
+        <div className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-8">
+          <WatchersPanel code={info.code} refresh={audience} open={stage.phase === 'lobby'} />
+        </div>
+      )}
+      <CheerOverlay cheers={cheers.cheers} />
+      {watcher && <CheerBar invoke={invoke} name={watcher.name} onLeave={watcher.onLeave} />}
+    </div>
+  )
+}
+
+/** Shown to someone watching whose token no longer works: the host removed them, or the party is over. */
+function WatchEnded({ onLeave }: { onLeave: () => void }) {
+  return (
+    <div>
+      <p className="font-display text-2xl text-ink">You're no longer watching this party.</p>
+      <Button className="mt-4" onClick={onLeave}>
+        Back home
+      </Button>
     </div>
   )
 }

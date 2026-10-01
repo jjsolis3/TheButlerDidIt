@@ -71,12 +71,14 @@ If the host double-taps **Next** on slow Wi-Fi, two commands arrive together. Wi
 - `stage:{partyId}`: every screen watching the stage
 - `seat:{seatId}`: one guest's phone(s)
 - `user:{userId}`: a host's pages that are following a background job (`WatchMyJobs`)
+- `watcher:{watcherId}`: one spectator's screen (#112), so the host removing them reaches it
 
 After every command, `PartyService.BroadcastAsync` sends a **complete snapshot** (not a diff) to each group. Snapshots are a few KB, and a phone that missed messages while asleep fixes itself with the next one.
 
 Two lighter messages sit beside the snapshots:
 - `npcTyping {interrogationId, text}`: an NPC's answer so far, while the AI is still writing it, sent to the stage and every seat at most every 150 ms. It isn't saved; the finished answer arrives in the next snapshot, and screens show `answer ?? typing[id]`, so the finished answer always wins.
 - `jobs`: sent to `user:{userId}` whenever one of that host's mystery or media jobs changes. It carries no data: the page re-fetches the job through its normal, access-checked endpoint, and still polls every 15 seconds in case a signal is lost.
+- `cheer {emoji, name}` and `audience`: spectator mode's cheers, and the data-less "who's watching changed" signal for the host's TV (see section 6).
 
 On the client (`src/web/src/lib/hub.ts`):
 
@@ -92,12 +94,29 @@ On the client (`src/web/src/lib/hub.ts`):
 |---|---|---|
 | **Host** | Email + password → encrypted, HttpOnly auth cookie (ASP.NET Core Identity) | `AuthEndpoints.cs` |
 | **Guest** | A random 256-bit **seat token** issued on joining, saved in the phone's `localStorage` | `SeatTokens.cs` |
+| **Spectator** | The same kind of token, starting `w.`, issued on watching: the TV's view and cheers only (#112) | `SeatTokens.cs`, `SpectatorEndpoints.cs` |
 
 Guests don't need accounts. The 6-letter party code only gets you to the join page (and joins are rate-limited). The seat token is what proves you are "Bob" afterwards. The database stores only a SHA-256 hash of each token, like a password. Because the token lives in `localStorage`, a phone that sleeps, refreshes or drops off Wi-Fi rejoins the same seat.
 
 SignalR sends the token as `Authorization: Bearer …`. For WebSockets, browsers can't set headers, so it goes in the `access_token` query string, which the server only accepts on `/hubs` paths.
 
 The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the host's device can be the stage *and* a pass-and-play seat.
+
+**Spectators** (#112). People can watch a party's TV on their own phone, without a seat: family far away, or more people than a game has seats. This is `SpectatorEndpoints.cs`, `Audience`, and `/watch/:code` on the front end.
+- **A third kind of token.**
+  - `POST /api/parties/{code}/watch` makes a `Spectator` row and returns a token starting with `w.`; only its SHA-256 hash is stored, like a seat's. It's rate-limited like joining.
+  - `SeatTokenHandler` looks a `w.` token up among the spectators and gives it the party's id and a `watcher_id`, **never a `seat_id`**.
+  - So `WatchParty`'s existing guest check lets a watcher see the TV's view, while every player action (all start with `RequireSeat`) and every seat endpoint turns them away. `SpectatorTests` checks both.
+- **When it works.** Anyone with the code can watch, in the lobby or mid-game (joining as a player closes when the clock starts), up to 50 per party (`Audience.MaxWatchers`).
+- **The host's controls.** The host sees who's watching (`GET …/spectators`, refreshed on the data-less `audience` signal), can remove someone, and can switch watching off (`Party.AllowSpectators`, on by default). Switching it off removes everyone.
+- **Being removed.** The token is deleted and the screen gets `removed` through its `watcher:{id}` group.
+  - Over long polling the open connection fails at its next poll.
+  - Over a WebSocket, checked only when it connects, it keeps receiving the TV's updates (as a removed seat does) until it closes, which the page does at once.
+- **Cheers** (`Cheer`). A watcher or guest sends one of six emoji, never free text, so there's nothing to moderate.
+  - The TV shows each one rising with the sender's name: the name from the token, not the host's email on the host's own phone.
+  - `CheerLimiter` drops more than one per person every 2 seconds, or 5 per party per second.
+  - Cheers are never saved, and someone removed can't cheer.
+- **Clean-up.** Watchers go wherever seats go: with a deleted party (cascade) and when the retention job prunes a finished one.
 
 **The host's own account** (`AccountEndpoints.cs`, #98). The header's account menu (`AccountMenu`, on every page but the pass-and-play screen) leads to `/account`:
 - **Every endpoint acts on the signed-in host.** No request carries a user id, so there's nothing to change to reach someone else's account.
@@ -135,7 +154,7 @@ Only `media/` folders are served over HTTP (`MediaEndpoints.cs`), with a path ch
 
 ## 8. The front end
 
-- **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
+- **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `Watch` (the TV on a spectator's phone, with cheers), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
 - **Front doors** (#99): `/` (`Home`) offers both games, with a card for each in that game's colours, plus "Your parties". Each game has its own page for visitors who haven't signed in: `/mystery` (`MysteryLanding`: the themes) and `/escape` (`EscapeLanding`: how it works, then the room shelf with filters and each room's leaderboards). Each also has a printable how-to-play sheet, `/how-to-play` and `/how-to-play/escape`. "Host" links go through sign-in with `?next=`, so a visitor lands on the host page with the room they picked.
 - **`PlayerScreen`** is the whole phone experience. Pass-and-play reuses it for each local seat.
 - **`CuePlayer`** plays cinematics: a list of cues (image, narration, NPC line, music, sound, video). Narration uses an audio file when the cue has one, otherwise the browser's built-in speech synthesis. Browsers block sound until the user interacts, which is why the stage starts with a "Tap to begin the evening" button.

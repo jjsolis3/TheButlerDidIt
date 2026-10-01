@@ -87,6 +87,7 @@ public class RetentionTests(ApiFactory app) : IClassFixture<ApiFactory>
     {
         var party = await PartyAsync();
         var (guest, photo) = await GuestWithSelfieAsync(party.Code, "Ada");
+        var watch = GameJson.Deserialize<WatchResponse>(await (await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/watch", new WatchRequest("Grandma"))).Content.ReadAsStringAsync());
         await AgeAsync(party.Code, days: 31, PartyStatus.Finished);
 
         await RunAsync();
@@ -101,6 +102,9 @@ public class RetentionTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Null(state.Players.Single().PhotoUrl);
         Assert.Equal(HttpStatusCode.NotFound, await StatusOf(photo));
         Assert.Equal(HttpStatusCode.Unauthorized, (await guest.DeleteAsync("/api/seat/photo")).StatusCode);
+        // Watchers' tokens go with the seats' (#112).
+        Assert.Empty(await db.Spectators.Where(s => s.PartyId == row.Id).ToListAsync());
+        await Assert.ThrowsAnyAsync<Exception>(async () => await app.ConnectAsync(watch.Token));
 
         // Running again finds nothing more to do for this party. (Status is set again because this
         // test only fakes "finished": the saved game itself is still in its lobby phase.)

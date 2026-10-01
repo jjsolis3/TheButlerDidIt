@@ -62,3 +62,51 @@ export const seats = {
     writeAll(all)
   },
 }
+
+// Watching a party's TV (#112) keeps its token the same way, so a phone that sleeps or refreshes keeps watching.
+export interface StoredWatcher {
+  watcherId: string
+  token: string
+  name: string
+}
+
+const WATCH_KEY = 'butler.watching.v1'
+
+function readWatching(): Record<string, StoredWatcher> {
+  try {
+    return JSON.parse(localStorage.getItem(WATCH_KEY) ?? '{}')
+  } catch {
+    return {}
+  }
+}
+
+function writeWatching(all: Record<string, StoredWatcher>) {
+  try {
+    localStorage.setItem(WATCH_KEY, JSON.stringify(all))
+  } catch {
+    /* storage unavailable; watching just won't survive a refresh */
+  }
+}
+
+export const watching = {
+  get(code: string): StoredWatcher | undefined {
+    return readWatching()[norm(code)]
+  },
+  set(code: string, watcher: StoredWatcher) {
+    writeWatching({ ...readWatching(), [norm(code)]: watcher })
+  },
+  forget(code: string) {
+    const all = readWatching()
+    delete all[norm(code)]
+    writeWatching(all)
+  },
+}
+
+/** What a TV screen needs to know when it's someone watching on their own phone, not the TV itself. */
+export interface WatchingAs {
+  name: string
+  /** They chose to stop watching. */
+  onLeave: () => void
+  /** The host stopped them watching (or the party ended), so their token no longer works. */
+  onRemoved: () => void
+}

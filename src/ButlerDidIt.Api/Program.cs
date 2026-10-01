@@ -185,6 +185,9 @@ builder.Services.AddScoped<VersionRemixer>();
 builder.Services.AddScoped<AiGameService>();
 builder.Services.AddSingleton<VerdictQueue>();
 builder.Services.AddSingleton<JobEvents>();
+// Spectator mode (#112): telling screens who's watching, and keeping cheers to a trickle.
+builder.Services.AddSingleton<Audience>();
+builder.Services.AddSingleton<CheerLimiter>();
 builder.Services.AddHostedService<VerdictWorker>();
 builder.Services.AddSingleton<GenerationWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<GenerationWorker>());
@@ -287,6 +290,7 @@ app.MapScenarioEditorEndpoints();
 app.MapThemeEndpoints();
 app.MapEscapeEndpoints(app.Configuration);
 app.MapPartyEndpoints();
+app.MapSpectatorEndpoints();
 app.MapMediaEndpoints();
 app.MapAiEndpoints();
 app.MapGenerationEndpoints();

@@ -19,6 +19,7 @@ import ScenarioEditor from './pages/ScenarioEditor'
 import Recap from './pages/Recap'
 import Remote from './pages/Remote'
 import Stage from './pages/Stage'
+import Watch from './pages/Watch'
 
 // Page map. The same URLs work in production because ASP.NET Core falls back to
 // index.html for any path it doesn't recognise (MapFallbackToFile in Program.cs).
@@ -49,6 +50,7 @@ export default function App() {
       <Route path="/stage/:code" element={<Stage />} />
       <Route path="/remote/:code" element={<Remote />} />
       <Route path="/play/:code" element={<Play />} />
+      <Route path="/watch/:code" element={<Watch />} />
       <Route path="/pass/:code" element={<PassAndPlay />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

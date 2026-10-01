@@ -13,6 +13,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<ScenarioEntity> Scenarios => Set<ScenarioEntity>();
     public DbSet<Party> Parties => Set<Party>();
     public DbSet<Seat> Seats => Set<Seat>();
+    public DbSet<Spectator> Spectators => Set<Spectator>();
     public DbSet<PlayerNote> PlayerNotes => Set<PlayerNote>();
     public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
     public DbSet<AiProviderEntity> AiProviders => Set<AiProviderEntity>();
@@ -62,6 +63,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         });
 
         b.Entity<Seat>().HasIndex(s => s.TokenHash).IsUnique();
+        b.Entity<Spectator>(s =>
+        {
+            s.HasIndex(x => x.TokenHash).IsUnique();
+            s.HasIndex(x => x.PartyId);
+            s.HasOne(x => x.Party).WithMany().HasForeignKey(x => x.PartyId).OnDelete(DeleteBehavior.Cascade);
+        });
         b.Entity<InviteEntity>().HasIndex(i => i.TokenHash).IsUnique();
         b.Entity<AccessGrantEntity>(e =>
         {

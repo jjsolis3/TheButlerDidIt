@@ -374,6 +374,33 @@ export interface PartyInfo {
   dealAtStart: boolean
   /** Which game the party plays; each kind has its own screens. */
   kind: GameKind
+  /** Whether people can watch the TV on their own devices (#112). */
+  allowSpectators: boolean
+}
+
+/** Someone watching the TV (#112): their token opens only the TV's view and the cheers. */
+export interface WatchResponse {
+  watcherId: string
+  token: string
+  code: string
+}
+
+export interface SpectatorView {
+  id: string
+  name: string
+  joinedAt: string
+}
+
+/** The host's view of who's watching. */
+export interface SpectatorList {
+  allow: boolean
+  watching: SpectatorView[]
+}
+
+/** A cheer on its way to the TV: one of the set emoji, and who sent it. */
+export interface CheerEvent {
+  emoji: string
+  name: string
 }
 
 /** Kinds of game night. Escape rooms (#67) are on their way. */

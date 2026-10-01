@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr'
-import type { NpcTypingEvent, PlayerView, StageView } from './types'
+import type { CheerEvent, NpcTypingEvent, PlayerView, StageView } from './types'
 
 /** NPC answers still being written, from `useParty().typing`. Screens provide it once at the top. */
 export const NpcTypingContext = createContext<Record<string, string>>({})
@@ -22,8 +22,12 @@ interface Options {
   watchStage?: boolean
   /** Subscribe to this seat's private view (requires token). */
   joinSeat?: boolean
-  /** Called when the host removes this seat. */
+  /** Called when the host removes this seat (or, for someone watching, stops them watching). */
   onRemoved?: () => void
+  /** A cheer for the TV, from someone watching or a guest (#112). */
+  onCheer?: (cheer: CheerEvent) => void
+  /** Someone started or stopped watching: the host's TV refreshes its list (#112). */
+  onAudience?: () => void
 }
 
 /**
@@ -68,7 +72,7 @@ export function hubErrorMessage(err: unknown): string {
 export function useParty<
   TStage extends { version: number } = StageView,
   TPlayer extends { version: number; stage: { version: number } } = PlayerView,
->({ code, token, watchStage = false, joinSeat = false, onRemoved }: Options) {
+>({ code, token, watchStage = false, joinSeat = false, onRemoved, onCheer, onAudience }: Options) {
   // The view types default to the murder mystery's. Another kind of game passes its own,
   // since every game's views carry a version number (and a player view includes the stage).
   const [stage, setStage] = useState<TStage | null>(null)
@@ -79,10 +83,11 @@ export function useParty<
   // so a finished answer always wins and a piece arriving after it is simply ignored.
   const [typing, setTyping] = useState<Record<string, string>>({})
   const connRef = useRef<HubConnection | null>(null)
-  const onRemovedRef = useRef(onRemoved)
+  // The latest callbacks, read when a message arrives, so a new function from the page doesn't reconnect.
+  const handlers = useRef({ onRemoved, onCheer, onAudience })
   useEffect(() => {
-    onRemovedRef.current = onRemoved
-  }, [onRemoved])
+    handlers.current = { onRemoved, onCheer, onAudience }
+  }, [onRemoved, onCheer, onAudience])
 
   useEffect(() => {
     let disposed = false
@@ -101,7 +106,9 @@ export function useParty<
     }
     conn.on('stage', acceptStage)
     conn.on('player', acceptPlayer)
-    conn.on('removed', () => onRemovedRef.current?.())
+    conn.on('removed', () => handlers.current.onRemoved?.())
+    conn.on('cheer', (c: CheerEvent) => handlers.current.onCheer?.(c))
+    conn.on('audience', () => handlers.current.onAudience?.())
     // Pieces can arrive out of order; the text only ever grows, so keep the longer one.
     conn.on('npcTyping', (e: NpcTypingEvent) =>
       setTyping((prev) => ((prev[e.interrogationId]?.length ?? 0) >= e.text.length ? prev : { ...prev, [e.interrogationId]: e.text })),

@@ -3,17 +3,20 @@ import { Link, useParams } from 'react-router'
 import { CuePlayer } from '../components/CuePlayer'
 import { GuideButton } from '../components/Guide'
 import { nextAction, nextSpeaker, spotlightTime, turnSecondsLeft, useHostCall, type Invoke } from '../components/HostControls'
+import { CheerBar, CheerOverlay } from '../components/Cheers'
 import { Portrait } from '../components/Portrait'
 import { RecapShare } from '../components/RecapShare'
 import { ClueCard, Countdown, FeedToasts, QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
+import { WatchersPanel } from '../components/WatchersPanel'
 import { api } from '../lib/api'
 import { stageGuide } from '../lib/guide'
+import { useCheers } from '../lib/cheers'
 import { NpcTypingContext, useJobUpdates, useParty } from '../lib/hub'
 import { NpcAnswer } from '../components/NpcAnswer'
 import { UnsupportedGame } from '../components/UnsupportedGame'
 import { EscapeStage } from '../escape/EscapeStage'
-import { seats } from '../lib/seats'
+import { seats, type WatchingAs } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
 import type { InterrogationView, MediaJob, PartyInfo, SpotlightView, StageView } from '../lib/types'
@@ -37,12 +40,20 @@ export default function Stage() {
   if (error) return <Centered>{error}</Centered>
   if (!info) return <Centered>Opening the manor doors…</Centered>
   if (!info.isHost && !guestSeat) {
+    // Anyone else watches through /watch, as themselves (#112).
     return (
       <Centered>
-        <p className="mb-4">Only the host or seated guests can watch the stage.</p>
-        <Link className="text-accent underline" to={`/join/${code}`}>
-          Join this party
-        </Link>
+        <p className="mb-4">This screen is for the host and the guests.</p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link className="text-accent underline" to={`/join/${code}`}>
+            Join this party
+          </Link>
+          {info.allowSpectators && info.status !== 'finished' && (
+            <Link className="text-accent underline" to={`/watch/${code}`}>
+              Just watch
+            </Link>
+          )}
+        </div>
       </Centered>
     )
   }
@@ -56,8 +67,19 @@ function Centered({ children }: { children: React.ReactNode }) {
   return <div className="grid min-h-dvh place-items-center p-6 text-center text-muted">{children}</div>
 }
 
-function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
-  const { stage, status, fatal, invoke, typing } = useParty({ code: info.code, token, watchStage: true })
+/** The mystery's TV. `watcher` is set when it's someone watching on their own phone (#112), not the TV itself. */
+export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?: string; watcher?: WatchingAs }) {
+  const cheers = useCheers()
+  // Bumped whenever someone starts or stops watching, so the host's list refreshes.
+  const [audience, setAudience] = useState(0)
+  const { stage, status, fatal, invoke, typing } = useParty({
+    code: info.code,
+    token,
+    watchStage: true,
+    onRemoved: watcher?.onRemoved,
+    onCheer: cheers.add,
+    onAudience: info.isHost ? () => setAudience((n) => n + 1) : undefined,
+  })
   const [begun, setBegun] = useState(false)
   const [muted, setMuted] = useState(false)
   useThemePalette(info.themeSlug)
@@ -78,7 +100,21 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
     }
   }, [begun])
 
-  if (fatal) return <Centered>{fatal}</Centered>
+  if (fatal)
+    return (
+      <Centered>
+        {watcher ? (
+          <div>
+            <p className="font-display text-2xl text-ink">You're no longer watching this party.</p>
+            <Button className="mt-4" onClick={watcher.onLeave}>
+              Back home
+            </Button>
+          </div>
+        ) : (
+          fatal
+        )}
+      </Centered>
+    )
   if (!stage) return <Centered>Lighting the candles…</Centered>
 
   // Browsers only allow sound after the user interacts with the page, so the
@@ -109,7 +145,7 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
       <div className="grain flex min-h-dvh flex-col">
         <StatusPill status={status} />
         <TopBar stage={stage} info={info} muted={muted} onMute={() => setMuted((m) => !m)} />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-4 pb-32 sm:px-8">
+        <main className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 sm:px-8 ${watcher ? 'pb-40' : 'pb-32'}`}>
           <PhaseView
             stage={stage}
             info={info}
@@ -122,9 +158,16 @@ function StageScreen({ info, token }: { info: PartyInfo; token?: string }) {
               setBegun(true)
             }}
           />
+          {info.isHost && (
+            <div className="mt-10">
+              <WatchersPanel code={info.code} refresh={audience} open={stage.phase === 'lobby'} />
+            </div>
+          )}
         </main>
         {info.isHost && <HostBar stage={stage} info={info} invoke={invoke} />}
         <FeedToasts feed={stage.feed} offset="top-20" />
+        <CheerOverlay cheers={cheers.cheers} />
+        {watcher && <CheerBar invoke={invoke} name={watcher.name} onLeave={watcher.onLeave} />}
       </div>
     </NpcTypingContext.Provider>
   )

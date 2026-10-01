@@ -48,7 +48,9 @@ public sealed record PartyInfo(
     // "Surprise me": the version is dealt when the evening begins. Told to the host only.
     bool DealAtStart,
     // Which game the party plays, so the pages can show the right screens.
-    GameKind Kind);
+    GameKind Kind,
+    // Whether people can watch the TV on their own devices (#112).
+    bool AllowSpectators);
 
 public static class PartyEndpoints
 {
@@ -282,6 +284,6 @@ public static class PartyEndpoints
     {
         var game = (await modules.For(p.Kind).LoadAsync(db, p, ct)).Describe(isHost);
         return new PartyInfo(p.Code, game.ContentId, game.Title, game.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
-            p.CreatedAt, p.ScheduledFor, game.PlayerCount, game.MaxPlayers, isHost, isHost && p.DealAtStart, p.Kind);
+            p.CreatedAt, p.ScheduledFor, game.PlayerCount, game.MaxPlayers, isHost, isHost && p.DealAtStart, p.Kind, p.AllowSpectators);
     }
 }

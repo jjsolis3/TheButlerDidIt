@@ -16,6 +16,8 @@ import type {
   RecapSharing,
   EscapeRecapPage,
   EscapeRecapSharing,
+  SpectatorList,
+  WatchResponse,
   AccessView,
   AccountView,
   AuthOptions,
@@ -146,6 +148,11 @@ export const api = {
   shareRecap: (code: string) => request<{ url: string }>('POST', `/api/parties/${encodeURIComponent(code)}/recap/share`),
   unshareRecap: (code: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}/recap/share`),
   publicRecap: (slug: string) => request<RecapPage>('GET', `/api/recap/${encodeURIComponent(slug)}`),
+  // Spectator mode (#112): watch a party's TV without a seat; the host sees who's watching and can stop them.
+  watch: (code: string, name: string) => request<WatchResponse>('POST', `/api/parties/${encodeURIComponent(code)}/watch`, { name }),
+  spectators: (code: string) => request<SpectatorList>('GET', `/api/parties/${encodeURIComponent(code)}/spectators`),
+  removeSpectator: (code: string, id: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}/spectators/${id}`),
+  allowSpectators: (code: string, allow: boolean) => request<SpectatorList>('PUT', `/api/parties/${encodeURIComponent(code)}/spectators`, { allow }),
   // Escape rooms share their recap the same way (shareRecap / unshareRecap); only the page differs.
   escapeRecap: (code: string) => request<EscapeRecapSharing>('GET', `/api/parties/${encodeURIComponent(code)}/escape-recap`),
   publicEscapeRecap: (slug: string) => request<EscapeRecapPage>('GET', `/api/escape-recap/${encodeURIComponent(slug)}`),
