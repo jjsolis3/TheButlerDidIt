@@ -7,8 +7,11 @@ import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { RoomCardBody, ShelfControls } from './RoomShelf'
 import { useRoomShelf } from './useRoomShelf'
 
-/** The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby. */
-export function NewEscapeParty() {
+/**
+ * The escape-room shelf on the create-party page: pick a room, pick how you'll play, open the lobby.
+ * `locked` when escape rooms aren't in the host's plan (the page says so above): rooms can still be looked at.
+ */
+export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
   const navigate = useNavigate()
   const [rooms, setRooms] = useState<EscapeRoomSummary[] | null>(null)
   // "Play this room again" links here with the room, length and difficulty just played (?room=…&minutes=…&difficulty=…).
@@ -230,7 +233,7 @@ export function NewEscapeParty() {
       )}
 
       <div>
-        <Button onClick={create} disabled={busy || !roomId || (puzzles === 'replay' && puzzleSet === '')}>
+        <Button onClick={create} disabled={busy || locked || !roomId || (puzzles === 'replay' && puzzleSet === '')}>
           {busy ? 'Opening the room…' : 'Create the escape room and get the invite code'}
         </Button>
         <ErrorText>{error}</ErrorText>

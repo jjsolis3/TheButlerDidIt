@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } from '../components/ui'
+import { describeAccess } from '../lib/access'
 import { api } from '../lib/api'
 import type { AccountView } from '../lib/types'
 import { announceMeChanged, useMe } from '../lib/useMe'
@@ -81,12 +82,12 @@ export default function MyAccount() {
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <Card>
           <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">Your plan</h2>
-          <p className="font-display mt-2 text-xl">Early access</p>
-          <ul className="mt-2 space-y-1 text-sm">
-            <li>✓ 🔍 Murder mysteries</li>
-            <li>✓ 🔐 Escape rooms</li>
+          <p className="font-display mt-2 text-xl">{describeAccess(account.access).title}</p>
+          <ul className="mt-2 space-y-1 text-sm" aria-label="Games in your plan">
+            <li className={account.access.mysteries ? '' : 'text-muted'}>{account.access.mysteries ? '✓' : '🔒'} 🔍 Murder mysteries</li>
+            <li className={account.access.escapeRooms ? '' : 'text-muted'}>{account.access.escapeRooms ? '✓' : '🔒'} 🔐 Escape rooms</li>
           </ul>
-          <p className="mt-3 text-xs text-muted">Every game is included while plans are being set up. There's nothing to pay.</p>
+          <p className="mt-3 text-xs text-muted">{describeAccess(account.access).detail}</p>
         </Card>
         <Card>
           <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">This month</h2>

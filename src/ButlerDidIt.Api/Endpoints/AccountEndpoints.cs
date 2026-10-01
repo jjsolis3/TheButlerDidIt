@@ -7,6 +7,7 @@ using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Escape;
 using ButlerDidIt.Api.Parties;
+using ButlerDidIt.Api.Plans;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,9 @@ namespace ButlerDidIt.Api.Endpoints;
 /// <summary>The account page: who you are, what you've made, and this month's use.</summary>
 public sealed record AccountView(string DisplayName, string Email, bool EmailConfirmed, bool IsAdmin,
     /// <summary>True when the server can send email, so an email change is confirmed by a link.</summary>
-    bool EmailEnabled, AccountUsage Usage, AccountLibrary Library);
+    bool EmailEnabled, AccountUsage Usage, AccountLibrary Library,
+    /// <summary>Which games the host may start, and the plan that gives them.</summary>
+    AccessView Access);
 
 public sealed record AccountUsage(int MysteriesThisMonth, int EscapeRoomsThisMonth, int PartiesAllTime, decimal AiSpentThisMonthUsd, decimal AiBudgetUsd);
 
@@ -71,10 +74,11 @@ public static class AccountEndpoints
                 await db.Scenarios.CountAsync(s => s.OwnerUserId == user.Id && s.ArchivedAt == null, ct),
                 await db.EscapeRooms.CountAsync(r => r.OwnerUserId == user.Id, ct),
                 await db.EscapeResults.CountAsync(r => r.HostUserId == user.Id && r.Escaped, ct));
-            return Results.Ok(new AccountView(user.DisplayName, user.Email ?? "", user.EmailConfirmed, user.IsAdmin, email.IsConfigured, usage, library));
+            return Results.Ok(new AccountView(user.DisplayName, user.Email ?? "", user.EmailConfirmed, user.IsAdmin, email.IsConfigured, usage, library,
+                await Access.ForAsync(db, user, now, ct)));
         });
 
-        group.MapPut("/profile", async (ProfileRequest req, ClaimsPrincipal principal, UserManager<AppUser> users) =>
+        group.MapPut("/profile", async (ProfileRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, HttpContext http) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -82,14 +86,14 @@ public static class AccountEndpoints
             if (name.Length is < 1 or > 60) return Results.Problem("Your name must be 1 to 60 characters.", statusCode: StatusCodes.Status400BadRequest);
             user.DisplayName = name;
             await users.UpdateAsync(user);
-            return Results.Ok(AuthEndpoints.ToMe(user));
+            return Results.Ok(await AuthEndpoints.ToMeAsync(user, http));
         });
 
         // ---- Email. With email set up, the new address must confirm it (a link sent there), and the
         // old address is told. Without email there's nothing to confirm with, so it changes at once:
         // the current password is the check.
         group.MapPost("/email", async (ChangeEmailRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, SignInManager<AppUser> signIn,
-            AppDbContext db, IEmailSender email, IOptions<AppOptions> options, ILogger<AccountView> log, CancellationToken ct) =>
+            AppDbContext db, IEmailSender email, IOptions<AppOptions> options, ILogger<AccountView> log, HttpContext http, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -123,18 +127,18 @@ public static class AccountEndpoints
                 {
                     log.LogError(ex, "Could not send an email-change notice to the old address");
                 }
-                return Results.Ok(new EmailChangeResult(true, $"We sent a link to {newEmail}. Your email address changes when you click it.", AuthEndpoints.ToMe(user)));
+                return Results.Ok(new EmailChangeResult(true, $"We sent a link to {newEmail}. Your email address changes when you click it.", await AuthEndpoints.ToMeAsync(user, http)));
             }
 
             if (await ApplyEmailChangeAsync(db, users, user, newEmail, token, ct) is { } error)
                 return Results.Problem(error, statusCode: StatusCodes.Status400BadRequest);
             await signIn.RefreshSignInAsync(user); // the change ended every session; keep this one
-            return Results.Ok(new EmailChangeResult(false, $"Done. Sign in with {newEmail} from now on.", AuthEndpoints.ToMe(user)));
+            return Results.Ok(new EmailChangeResult(false, $"Done. Sign in with {newEmail} from now on.", await AuthEndpoints.ToMeAsync(user, http)));
         }).RequireRateLimiting(AuthEndpoints.EmailRateLimit);
 
         // The link from the email. It may be opened on another device, so no sign-in is needed: the token proves it.
         app.MapPost("/api/account/email/confirm", async (ConfirmEmailChangeRequest req, ClaimsPrincipal principal, UserManager<AppUser> users,
-            SignInManager<AppUser> signIn, AppDbContext db, CancellationToken ct) =>
+            SignInManager<AppUser> signIn, AppDbContext db, HttpContext http, CancellationToken ct) =>
         {
             var user = await users.FindByIdAsync(req.UserId ?? "");
             if (user is null || string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Token))
@@ -143,7 +147,7 @@ public static class AccountEndpoints
                 return Results.Problem(error, statusCode: StatusCodes.Status400BadRequest);
             // The change ended every session. If this browser was signed in as them, keep it signed in.
             if (principal.FindFirstValue(ClaimTypes.NameIdentifier) == user.Id) await signIn.RefreshSignInAsync(user);
-            return Results.Ok(AuthEndpoints.ToMe(user));
+            return Results.Ok(await AuthEndpoints.ToMeAsync(user, http));
         });
 
         group.MapPost("/password", async (ChangePasswordRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, SignInManager<AppUser> signIn,

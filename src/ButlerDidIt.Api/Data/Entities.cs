@@ -43,6 +43,62 @@ public sealed class InviteEntity
     public string? UsedByUserId { get; set; }
 
     public DateTimeOffset? UsedAt { get; set; }
+
+    /// <summary>The account gets free access to both games for good, instead of the free trial (#100).</summary>
+    public bool FreeAccess { get; set; }
+}
+
+/// <summary>Which games a grant covers. A host may start a game when any grant in effect covers it.</summary>
+[Flags]
+public enum GameAccess
+{
+    None = 0,
+    Mysteries = 1,
+    EscapeRooms = 2,
+    Both = Mysteries | EscapeRooms,
+}
+
+public enum GrantKind
+{
+    /// <summary>A new host's free trial of both games (Plans:TrialDays).</summary>
+    Trial,
+
+    /// <summary>Free access the admin gave, or an invite carried. Usually for good.</summary>
+    Comp,
+
+    /// <summary>A one-off party pass: one game for a few days (bought through Stripe, #101).</summary>
+    Pass,
+
+    /// <summary>A paid plan, kept up to date by the payment provider (#101).</summary>
+    Subscription,
+}
+
+/// <summary>
+/// Access to start games (#100). A host's access is every grant in effect now put together, so a
+/// trial, a party pass and a subscription can overlap without special cases (see Plans/Access.cs).
+/// Grants are never edited into something else: they end, or are revoked, and new ones are added.
+/// </summary>
+public sealed class AccessGrantEntity
+{
+    public Guid Id { get; set; }
+
+    [MaxLength(450)]
+    public required string UserId { get; set; }
+
+    public GameAccess Games { get; set; }
+    public GrantKind Kind { get; set; }
+    public DateTimeOffset StartsAt { get; set; }
+
+    /// <summary>When it stops counting; null for good.</summary>
+    public DateTimeOffset? EndsAt { get; set; }
+
+    public DateTimeOffset? RevokedAt { get; set; }
+
+    /// <summary>Why it exists, for the admin ("Given by the admin", "From an invite").</summary>
+    [MaxLength(200)]
+    public string? Note { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
 }
 
 public sealed class ThemeEntity

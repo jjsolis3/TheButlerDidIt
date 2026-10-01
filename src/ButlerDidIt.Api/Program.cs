@@ -41,6 +41,7 @@ builder.Services.Configure<AiOptions>(config.GetSection("Ai"));
 builder.Services.Configure<MediaOptions>(config.GetSection("Media"));
 builder.Services.Configure<RetentionOptions>(config.GetSection("Retention"));
 builder.Services.Configure<ScaleOptions>(config.GetSection("Scale"));
+builder.Services.Configure<ButlerDidIt.Api.Plans.PlansOptions>(config.GetSection("Plans"));
 var scale = config.GetSection("Scale").Get<ScaleOptions>() ?? new ScaleOptions();
 
 // ---------------------------------------------------------------- database

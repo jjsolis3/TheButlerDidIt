@@ -72,7 +72,8 @@ public static class EscapeEndpoints
             db.GenerationJobs.Add(job);
             await db.SaveChangesAsync(ct);
             return Results.Ok(GenerationEndpoints.ToView(job));
-        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(ButlerDidIt.Api.Endpoints.AuthEndpoints.RequireConfirmedHost);
+        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(ButlerDidIt.Api.Endpoints.AuthEndpoints.RequireConfirmedHost)
+          .AddEndpointFilter(ButlerDidIt.Api.Plans.Access.RequireGame(GameKind.EscapeRoom));
 
         // Delete a room written for this host. Its results stay (they hold only times and first names),
         // and a party still playing it is told the room is no longer available.

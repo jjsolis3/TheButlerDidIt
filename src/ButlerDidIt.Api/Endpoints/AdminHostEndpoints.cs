@@ -1,12 +1,13 @@
 using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Data;
+using ButlerDidIt.Api.Plans;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record HostView(string Id, string DisplayName, string Email, bool EmailConfirmed, bool IsAdmin, int Parties, bool LockedOut);
+public sealed record HostView(string Id, string DisplayName, string Email, bool EmailConfirmed, bool IsAdmin, int Parties, bool LockedOut, AccessView Access);
 public sealed record ResetLinkView(string Link, int ValidForHours);
 
 /// <summary>
@@ -26,8 +27,34 @@ public static class AdminHostEndpoints
             var partyCounts = await db.Parties.AsNoTracking().GroupBy(p => p.HostUserId)
                 .Select(g => new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count, ct);
             var users = await db.Users.AsNoTracking().OrderBy(u => u.DisplayName).ToListAsync(ct);
+            var grants = (await db.AccessGrants.AsNoTracking().ToListAsync(ct)).ToLookup(g => g.UserId);
             return users.Select(u => new HostView(u.Id, u.DisplayName, u.Email ?? "", u.EmailConfirmed, u.IsAdmin,
-                partyCounts.GetValueOrDefault(u.Id), u.LockoutEnd > now));
+                partyCounts.GetValueOrDefault(u.Id), u.LockoutEnd > now, Access.From(u.IsAdmin, grants[u.Id].ToList(), now)));
+        });
+
+        // ---- Free access (#100): both games for good, for family, friends and testers. Taking it away
+        // revokes the free grants only; a trial or pass still in effect keeps counting.
+        admin.MapPost("/{id}/free-access", async (string id, UserManager<AppUser> users, AppDbContext db, TimeProvider clock, CancellationToken ct) =>
+        {
+            var user = await users.FindByIdAsync(id);
+            if (user is null) return Results.NotFound();
+            var now = clock.GetUtcNow();
+            if (!await db.AccessGrants.AnyAsync(g => g.UserId == id && g.Kind == GrantKind.Comp && g.RevokedAt == null && (g.EndsAt == null || g.EndsAt > now), ct))
+            {
+                db.AccessGrants.Add(Access.FreeAccess(id, now, "Given by the admin"));
+                await db.SaveChangesAsync(ct);
+            }
+            return Results.Ok(await Access.ForAsync(db, user, now, ct));
+        });
+
+        admin.MapDelete("/{id}/free-access", async (string id, UserManager<AppUser> users, AppDbContext db, TimeProvider clock, CancellationToken ct) =>
+        {
+            var user = await users.FindByIdAsync(id);
+            if (user is null) return Results.NotFound();
+            var now = clock.GetUtcNow();
+            await db.AccessGrants.Where(g => g.UserId == id && g.Kind == GrantKind.Comp && g.RevokedAt == null)
+                .ExecuteUpdateAsync(s => s.SetProperty(g => g.RevokedAt, now), ct);
+            return Results.Ok(await Access.ForAsync(db, user, now, ct));
         });
 
         admin.MapPost("/{id}/reset-link", async (string id, UserManager<AppUser> users, IOptions<AppOptions> options, HttpRequest request) =>

@@ -6,6 +6,7 @@ using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Parties;
+using ButlerDidIt.Api.Plans;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using ButlerDidIt.Game.Scenarios;
@@ -131,7 +132,7 @@ public static class PartyEndpoints
             if (req.UseAi && (await media.VoicesConfiguredAsync(ct) || await media.ImagesConfiguredAsync(ct)))
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, scenario.Id, userId, clock, ct);
             return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
-        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
+        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost).AddEndpointFilter(Access.RequireGame(GameKind.Mystery));
 
         // ---- Host: start an escape-room party. The room is checked, the clock doesn't start until the host says so.
         group.MapPost("/escape", async (CreateEscapePartyRequest req, ClaimsPrincipal user, AppDbContext db, GameModules modules,
@@ -165,7 +166,7 @@ public static class PartyEndpoints
             if (req.UseAi && await media.ImagesConfiguredAsync(ct))
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, ButlerDidIt.Api.Escape.EscapeMedia.JobId(room.Id), party.HostUserId, clock, ct);
             return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
-        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost);
+        }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost).AddEndpointFilter(Access.RequireGame(GameKind.EscapeRoom));
 
         // ---- Host: remove a party from their list.
         // An unfinished party (never started, or abandoned halfway) is deleted outright: its code

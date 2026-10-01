@@ -19,6 +19,8 @@ services:
       # Set to false after you create your host account to make the server invite-only.
       Auth__AllowRegistration: "${ALLOW_REGISTRATION:-true}"
       Auth__RequireConfirmedEmail: "${REQUIRE_CONFIRMED_EMAIL:-false}"
+      # A new host's free trial of both games, in days (#100). Hosts from before plans keep both free.
+      Plans__TrialDays: "${TRIAL_DAYS:-14}"
       # Optional email (password reset and sign-up confirmation). Links in emails use PUBLIC_URL.
       App__PublicUrl: "${PUBLIC_URL:-}"
       Email__Host: "${SMTP_HOST:-}"

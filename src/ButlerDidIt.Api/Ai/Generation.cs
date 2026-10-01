@@ -47,7 +47,8 @@ public static class GenerationEndpoints
             db.GenerationJobs.Add(job);
             await db.SaveChangesAsync(ct);
             return Results.Ok(ToView(job));
-        }).AddEndpointFilter(ButlerDidIt.Api.Endpoints.AuthEndpoints.RequireConfirmedHost);
+        }).AddEndpointFilter(ButlerDidIt.Api.Endpoints.AuthEndpoints.RequireConfirmedHost)
+          .AddEndpointFilter(ButlerDidIt.Api.Plans.Access.RequireGame(GameKind.Mystery));
 
         group.MapGet("/{id:guid}", async (Guid id, ClaimsPrincipal user, AppDbContext db, CancellationToken ct) =>
         {

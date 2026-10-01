@@ -391,6 +391,19 @@ export interface Me {
   displayName: string
   isAdmin: boolean
   emailConfirmed: boolean
+  /** Which games this host may start, and the plan that gives them */
+  access: AccessView
+}
+
+// ---- Plans (Plans/Access.cs). Pages check the games; the plan is only what it's called.
+export type AccessPlan = 'admin' | 'free' | 'subscription' | 'pass' | 'trial' | 'trialEnded' | 'none'
+
+export interface AccessView {
+  mysteries: boolean
+  escapeRooms: boolean
+  plan: AccessPlan
+  /** When the plan shown ends; null when it doesn't */
+  endsAt: string | null
 }
 
 /** What the sign-in page can offer on this server. */
@@ -410,6 +423,8 @@ export interface AccountView {
   emailEnabled: boolean
   usage: AccountUsage
   library: AccountLibrary
+  /** Which games the host may start, and the plan that gives them */
+  access: AccessView
 }
 
 export interface AccountUsage {
@@ -451,6 +466,8 @@ export interface InviteView {
   status: InviteStatus
   usedBy: string | null
   usedAt: string | null
+  /** The account gets both games free for good, instead of the free trial */
+  freeAccess: boolean
 }
 
 /** A new invite and its link: the only time the server hands the link out. */
@@ -475,6 +492,7 @@ export interface HostView {
   isAdmin: boolean
   parties: number
   lockedOut: boolean
+  access: AccessView
 }
 
 // ---- AI (admin + generation)

@@ -35,6 +35,8 @@ export function InvitesPanel() {
   const [email, setEmail] = useState('')
   const [days, setDays] = useState(7)
   const [send, setSend] = useState(true)
+  // Family and friends: both games free for good, instead of the free trial.
+  const [freeAccess, setFreeAccess] = useState(false)
   const [made, setMade] = useState<Made | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -64,7 +66,7 @@ export function InvitesPanel() {
     setMade(null)
     try {
       const meantToSend = canSend && send
-      const created = await api.admin.createInvite({ email: email.trim() || null, note: note.trim() || null, days, send: meantToSend })
+      const created = await api.admin.createInvite({ email: email.trim() || null, note: note.trim() || null, days, send: meantToSend, freeAccess })
       // The clipboard can refuse (an insecure page, a strict browser), so only say "copied" when it worked.
       const copied = (await navigator.clipboard?.writeText(created.link).then(
         () => true,
@@ -74,6 +76,7 @@ export function InvitesPanel() {
       setInvites((all) => [created.invite, ...(all ?? [])])
       setNote('')
       setEmail('')
+      setFreeAccess(false)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -121,6 +124,10 @@ export function InvitesPanel() {
               ))}
             </select>
           </Field>
+          <label className="flex min-h-11 items-center gap-2 text-sm">
+            <input type="checkbox" checked={freeAccess} onChange={(e) => setFreeAccess(e.target.checked)} />
+            Free access for good (instead of the free trial)
+          </label>
           {options?.emailEnabled && (
             <label className="flex min-h-11 items-center gap-2 text-sm">
               <input type="checkbox" checked={canSend && send} disabled={!email.trim()} onChange={(e) => setSend(e.target.checked)} />
@@ -164,7 +171,10 @@ export function InvitesPanel() {
             <li key={i.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold">{label(i)}</p>
-                <p className="text-sm text-muted">{describe(i)}</p>
+                <p className="text-sm text-muted">
+                  {describe(i)}
+                  {i.freeAccess && ' · free access'}
+                </p>
               </div>
               <Button variant="quiet" onClick={() => remove(i)} aria-label={`${i.status === 'pending' ? 'Revoke' : 'Remove'} the invite for ${label(i)}`}>
                 {i.status === 'pending' ? 'Revoke' : 'Remove'}
