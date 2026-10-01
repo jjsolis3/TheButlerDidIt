@@ -11,6 +11,7 @@ test('the admin copies a hand-written mystery, edits it with live checks, and pl
   await page.waitForURL('**/host/new')
 
   await page.goto('/')
+  await page.getByRole('button', { name: /account menu/ }).click()
   await page.getByRole('link', { name: 'My mysteries' }).click()
   const blackwood = page.locator('div.rounded-xl', { hasText: 'Death at Blackwood Manor' }).filter({ hasText: 'Hand-written' })
   await expect(blackwood.getByRole('link', { name: 'Read' })).toBeVisible() // hand-written: read-only

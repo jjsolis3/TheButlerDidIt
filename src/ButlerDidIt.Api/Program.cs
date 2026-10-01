@@ -90,6 +90,10 @@ builder.Services
     // working once it has been used (using it changes the stamp).
     .AddDefaultTokenProviders();
 builder.Services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = AccountTokens.Lifespan);
+// Each signed-in browser re-checks its session against the account this often (it's 30 minutes by
+// default), so "Sign out everywhere else" and a password change end other sessions within a minute.
+builder.Services.Configure<SecurityStampValidatorOptions>(o =>
+    o.ValidationInterval = TimeSpan.FromSeconds(config.GetValue("Auth:SessionCheckSeconds", 60)));
 builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
 
 builder.Services.AddAuthorizationBuilder()
@@ -274,6 +278,7 @@ app.MapHealthChecks("/healthz");
 app.MapAuthEndpoints();
 app.MapAdminHostEndpoints();
 app.MapInviteEndpoints();
+app.MapAccountEndpoints();
 app.MapRecapEndpoints();
 app.MapScenarioEditorEndpoints();
 app.MapThemeEndpoints();

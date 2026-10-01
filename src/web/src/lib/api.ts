@@ -14,8 +14,10 @@ import type {
   ValidationResult,
   RecapPage,
   RecapSharing,
+  AccountView,
   AuthOptions,
   CreatedInvite,
+  EmailChangeResult,
   HostView,
   InviteInfo,
   InviteView,
@@ -92,6 +94,19 @@ export const api = {
   resetPassword: (email: string, token: string, password: string) => request<Me>('POST', '/api/auth/reset', { email, token, password }),
   confirmEmail: (userId: string, token: string) => request<void>('POST', '/api/auth/confirm', { userId, token }),
   resendConfirmation: () => request<void>('POST', '/api/auth/resend-confirmation'),
+
+  /** The signed-in host's own account. Every call acts on whoever is signed in. */
+  account: {
+    get: () => request<AccountView>('GET', '/api/account'),
+    rename: (displayName: string) => request<Me>('PUT', '/api/account/profile', { displayName }),
+    changeEmail: (newEmail: string, password: string) => request<EmailChangeResult>('POST', '/api/account/email', { newEmail, password }),
+    confirmEmailChange: (userId: string, email: string, token: string) => request<Me>('POST', '/api/account/email/confirm', { userId, email, token }),
+    changePassword: (currentPassword: string, newPassword: string) => request<void>('POST', '/api/account/password', { currentPassword, newPassword }),
+    signOutEverywhere: () => request<void>('POST', '/api/account/sign-out-everywhere'),
+    /** A file download, so it's a plain link rather than a fetch. */
+    exportUrl: '/api/account/export',
+    remove: (password: string) => request<void>('POST', '/api/account/delete', { password }),
+  },
 
   themes: () => request<ThemeCard[]>('GET', '/api/themes'),
   escapeRooms: () => request<EscapeRoomSummary[]>('GET', '/api/escape-rooms'),

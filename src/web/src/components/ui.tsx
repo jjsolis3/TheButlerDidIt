@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router'
+import { AccountMenu } from './AccountMenu'
 import { buttonClass, type Variant } from './buttonClass'
 
 export function Button({
@@ -44,13 +45,15 @@ export function Field({ label, children, hint }: { label: string; children: Reac
 export const inputClass =
   'w-full rounded-lg border border-line bg-bg px-3 py-2.5 text-base text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none'
 
-export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+/** The page frame: the logo, the account menu (off on a shared game screen) and the content. */
+export function Shell({ children, wide = false, account = true }: { children: ReactNode; wide?: boolean; account?: boolean }) {
   return (
     <div className="grain min-h-dvh">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4">
         <Link to="/" className="font-display text-lg text-ink">
           The Butler <span className="text-accent italic">Did It</span>
         </Link>
+        {account && <AccountMenu />}
       </header>
       <main className={`mx-auto px-4 pb-16 ${wide ? 'max-w-6xl' : 'max-w-2xl'}`}>{children}</main>
     </div>

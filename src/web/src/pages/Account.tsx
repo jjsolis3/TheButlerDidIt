@@ -151,6 +151,44 @@ export function ConfirmEmail() {
   )
 }
 
+/** The link emailed to a new address (/account/confirm-email): confirming it moves the account there. */
+export function ConfirmEmailChange() {
+  const [params] = useSearchParams()
+  const userId = params.get('user') ?? ''
+  const email = params.get('email') ?? ''
+  const token = params.get('token') ?? ''
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null)
+
+  // A POST sent when the page opens, like ConfirmEmail: an email scanner that pre-opens links can't confirm it.
+  useEffect(() => {
+    if (!userId || !email || !token) return
+    let cancelled = false
+    api.account.confirmEmailChange(userId, email, token).then(
+      (me) => !cancelled && setResult({ ok: true, message: `Done. Your email is now ${me.email}. Sign in with it from now on.` }),
+      (e: Error) => !cancelled && setResult({ ok: false, message: e.message }),
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [userId, email, token])
+
+  const message = !userId || !email || !token ? { ok: false, message: 'This link is incomplete. Open the whole link from your email.' } : result
+
+  return (
+    <Shell>
+      <Heading className="mt-8 mb-4">Confirm your new email</Heading>
+      <Card>
+        {message ? <p className={message.ok ? '' : 'text-red-200'}>{message.message}</p> : <p className="text-muted">Confirming…</p>}
+      </Card>
+      <p className="mt-4 text-center text-sm">
+        <Link to="/account" className="text-accent underline">
+          Your account
+        </Link>
+      </p>
+    </Shell>
+  )
+}
+
 /** Shown to a signed-in host whose email isn't confirmed yet, on servers that require it. */
 export function ConfirmEmailBanner({ required }: { required: boolean }) {
   const [state, setState] = useState<'idle' | 'sent' | string>('idle')

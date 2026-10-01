@@ -71,6 +71,39 @@ public static class AccountLinks
     public static string Confirm(string baseUrl, string userId, string token) =>
         $"{baseUrl.TrimEnd('/')}/confirm-email?user={WebUtility.UrlEncode(userId)}&token={WebUtility.UrlEncode(token)}";
 
+    /// <summary>The link that confirms a new email address (it's sent to that address).</summary>
+    public static string ChangeEmail(string baseUrl, string userId, string newEmail, string token) =>
+        $"{baseUrl.TrimEnd('/')}/account/confirm-email?user={WebUtility.UrlEncode(userId)}&email={WebUtility.UrlEncode(newEmail)}&token={WebUtility.UrlEncode(token)}";
+
+    public static string ChangeEmailEmail(string name, string link) => $"""
+        Hello {name},
+
+        To use this address for your host account on The Butler Did It, confirm it here:
+
+        {link}
+
+        The link works for 3 hours. Until you click it, your account keeps its old address.
+        If you didn't ask for this, you can ignore this email.
+        """;
+
+    /// <summary>Sent to the old address, so a stolen session can't quietly move an account to another inbox.</summary>
+    public static string EmailChangingNotice(string name, string newEmail) => $"""
+        Hello {name},
+
+        Someone signed in to your host account on The Butler Did It asked to change its email address to {newEmail}.
+        It changes only if that address confirms it.
+
+        If this wasn't you, change your password now, and use "Sign out everywhere else" on your account page.
+        """;
+
+    public static string PasswordChangedNotice(string name) => $"""
+        Hello {name},
+
+        The password for your host account on The Butler Did It was just changed.
+
+        If this wasn't you, use "Forgot your password?" on the sign-in page to choose a new one, or ask the site's admin.
+        """;
+
     /// <summary>An invite opens the sign-up form with the token filled in.</summary>
     public static string Invite(string baseUrl, string token) =>
         $"{baseUrl.TrimEnd('/')}/login?invite={WebUtility.UrlEncode(token)}";
