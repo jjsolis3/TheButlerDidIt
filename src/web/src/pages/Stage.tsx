@@ -19,6 +19,7 @@ import { EscapeStage } from '../escape/EscapeStage'
 import { seats, type WatchingAs } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
+import { useBackgroundMusic } from '../lib/useBackgroundMusic'
 import type { InterrogationView, MediaJob, PartyInfo, SpotlightView, StageView } from '../lib/types'
 
 
@@ -85,6 +86,8 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
   useThemePalette(info.themeSlug)
   useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted, stage?.ai.voices ?? false)
   useSpeakNpcSpotlight(stage, begun && !muted)
+  // The host's background music, softer while a scene plays (stage.cues is what the scene plays now).
+  const music = useBackgroundMusic(stage?.musicUrl ?? null, begun && !muted, (stage?.cues.length ?? 0) > 0)
 
   // Keep the TV or laptop from going to sleep mid-mystery.
   useEffect(() => {
@@ -168,6 +171,7 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
         <FeedToasts feed={stage.feed} offset="top-20" />
         <CheerOverlay cheers={cheers.cheers} />
         {watcher && <CheerBar invoke={invoke} name={watcher.name} onLeave={watcher.onLeave} />}
+        <audio ref={music} loop hidden data-testid="background-music" />
       </div>
     </NpcTypingContext.Provider>
   )

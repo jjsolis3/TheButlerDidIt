@@ -55,6 +55,45 @@ public class ViewProjectorTests
     }
 
     [Fact]
+    public void A_scene_s_video_and_an_act_s_music_reach_the_stage_only_when_their_moment_comes()
+    {
+        // Every upload a host can make for the scenes, each with its own address.
+        var media = new Dictionary<string, string>
+        {
+            [MediaOverlay.Video(MediaOverlay.Prologue)] = "/media/assets/video-prologue",
+            [MediaOverlay.Video("act1")] = "/media/assets/video-act1",
+            [MediaOverlay.Video("act2")] = "/media/assets/video-act2",
+            [MediaOverlay.Video(MediaOverlay.Finale)] = "/media/assets/video-finale",
+            [MediaOverlay.Music] = "/media/assets/music",
+            [MediaOverlay.ActMusic("act1")] = "/media/assets/music-act1",
+            [MediaOverlay.ActMusic("act2")] = "/media/assets/music-act2",
+        };
+        var scenario = MediaOverlay.Apply(Create(), media, media.Keys.ToHashSet());
+
+        var seen = new HashSet<string>();
+        foreach (var state in StatesBeforeReveal())
+        {
+            var json = StageJson(state, scenario);
+            // A later act's video or music, and the finale's video (which may show who did it), never arrive early.
+            var allowed = new HashSet<string> { "/media/assets/music" };
+            if (state.Phase == Phase.Prologue) allowed.Add("/media/assets/video-prologue");
+            if (state.Phase == Phase.Act)
+            {
+                var act = scenario.Acts[state.ActIndex].Id;
+                allowed.Add($"/media/assets/music-{act}");
+                if (state.ActStep == ActStep.Cinematic) allowed.Add($"/media/assets/video-{act}");
+            }
+            foreach (var url in media.Values.Where(u => !allowed.Contains(u)))
+                Assert.False(json.Contains($"\"{url}\"", StringComparison.Ordinal), $"Stage sent {url} during {state.Phase}/{state.ActStep} of act {state.ActIndex + 1}.");
+            foreach (var url in allowed.Where(u => json.Contains($"\"{u}\"", StringComparison.Ordinal))) seen.Add(url);
+            foreach (var seat in new[] { Alice, Bob, Cara })
+                Assert.DoesNotContain("/media/assets/video-finale", PlayerJson(state, scenario, seat));
+        }
+        // And each one does arrive at its moment (the finale's comes with the reveal).
+        foreach (var url in media.Values.Where(u => u != "/media/assets/video-finale")) Assert.Contains(url, seen);
+    }
+
+    [Fact]
     public void Player_sees_only_their_own_private_information()
     {
         var scenario = Create();

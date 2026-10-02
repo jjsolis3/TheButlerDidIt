@@ -63,6 +63,8 @@ export interface DocAct {
   cues: DocCue[]
   mingleMinutes: number
   prompts: string[]
+  /** A background track for this act (set from the media tab) */
+  music?: string | null
   [key: string]: unknown
 }
 
@@ -95,5 +97,7 @@ export interface ScenarioDoc {
     timeline: { time: string; event: string }[]
   }
   finale: DocCue[]
+  /** A background track for the evening (set from the media tab) */
+  music?: string | null
   [key: string]: unknown
 }

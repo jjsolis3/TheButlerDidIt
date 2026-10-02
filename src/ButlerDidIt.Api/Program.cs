@@ -291,6 +291,7 @@ app.MapThemeEndpoints();
 app.MapEscapeEndpoints(app.Configuration);
 app.MapEscapeEditorEndpoints();
 app.MapEscapeMediaEndpoints();
+app.MapMysteryMediaEndpoints();
 app.MapPartyEndpoints();
 app.MapSpectatorEndpoints();
 app.MapMediaEndpoints();

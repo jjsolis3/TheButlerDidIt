@@ -15,6 +15,7 @@ import type {
   RecapPage,
   RecapSharing,
   RoomMediaView,
+  MysteryMediaView,
   EscapeLibraryItem,
   SharingRequest,
   EscapeRecapPage,
@@ -85,6 +86,9 @@ function upload<T>(url: string, file: File, onProgress?: (fraction: number) => v
     xhr.send(file)
   })
 }
+
+/** A media key as a URL path: "clue/c1/ab12" stays three segments, each encoded. */
+const keyPath = (key: string) => key.split('/').map(encodeURIComponent).join('/')
 
 async function request<T>(method: string, url: string, body?: unknown): Promise<T> {
   const res = await fetch(url, {
@@ -201,6 +205,12 @@ export const api = {
     upload<RoomMediaView>(`/api/escape-rooms/${encodeURIComponent(id)}/media/${encodeURIComponent(key)}`, file, onProgress),
   removeRoomMedia: (id: string, key: string) =>
     request<RoomMediaView>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}/media/${encodeURIComponent(key)}`),
+  // A mystery's own pictures, videos and music, played in every version of it. Keys have slashes ("portrait/finch"),
+  // which stay as they are; each part is encoded on its own.
+  mysteryMedia: (id: string) => request<MysteryMediaView>('GET', `/api/scenarios/${encodeURIComponent(id)}/media`),
+  uploadMysteryMedia: (id: string, key: string, file: File, onProgress?: (fraction: number) => void) =>
+    upload<MysteryMediaView>(`/api/scenarios/${encodeURIComponent(id)}/media/${keyPath(key)}`, file, onProgress),
+  removeMysteryMedia: (id: string, key: string) => request<MysteryMediaView>('DELETE', `/api/scenarios/${encodeURIComponent(id)}/media/${keyPath(key)}`),
   saveScenario: (id: string, document: ScenarioDoc) => request<ValidationResult>('PUT', `/api/scenarios/${encodeURIComponent(id)}`, { document }),
   duplicateScenario: (id: string) => request<{ id: string }>('POST', `/api/scenarios/${encodeURIComponent(id)}/duplicate`),
   deleteScenario: (id: string) => request<void>('DELETE', `/api/scenarios/${encodeURIComponent(id)}`),

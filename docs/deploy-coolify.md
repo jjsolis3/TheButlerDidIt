@@ -90,12 +90,12 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 | `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **AI settings** unreadable. Keys already in `/data/keys` are copied in on the next start. |
 | `Plans__TrialDays` | `14` | Optional: how long a new host's free trial of both games lasts. Hosts who had an account before plans keep both games free. |
 | `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
-| `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room, in MB. |
-| `Media__UploadQuotaMb` | `2048` | Optional: how much each host can upload in all, in MB. The admin has no limit. |
+| `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room or a mystery, in MB. |
+| `Media__UploadQuotaMb` | `2048` | Optional: how much each host can upload in all, for both games, in MB. The admin has no limit. |
 
 The Dockerfile already sets the port (8080), the content folder and the data folders. Untick **Buildtime** on secrets such as the connection string: the app only reads them when it runs.
 
-**2. Storage.** In **Persistent Storage**, add a volume mounted at `/data/media` for generated pictures, voice clips, costume selfies and the pictures, videos and sounds hosts upload for their escape rooms. Without it they're lost on every redeploy. A new volume takes effect on the next deploy, so redeploy once you've added it. (`/data/keys` needs one too, unless you set `DataProtection__Store=Database`.)
+**2. Storage.** In **Persistent Storage**, add a volume mounted at `/data/media` for generated pictures, voice clips, costume selfies and the pictures, videos, sounds and music hosts upload for their escape rooms and mysteries. Without it they're lost on every redeploy. A new volume takes effect on the next deploy, so redeploy once you've added it. (`/data/keys` needs one too, unless you set `DataProtection__Store=Database`.)
 
 If the site is behind Cloudflare's proxy (the orange cloud), its free plan refuses uploads over 100 MB, so leave `Media__MaxVideoMb` at 100 or less.
 

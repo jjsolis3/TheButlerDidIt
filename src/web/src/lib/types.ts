@@ -193,6 +193,8 @@ export interface StageView {
   suspicion: SuspicionView[]
   /** The AI is writing a version of the mystery for tonight's cast; the lobby is frozen. */
   tailoring: boolean
+  /** The background track to loop now: the current act's, else the mystery's. Never a later act's; null from the reveal on */
+  musicUrl: string | null
 }
 
 export interface AiFeatures {
@@ -965,13 +967,13 @@ export interface RoomMediaSlot {
   sizeBytes: number | null
 }
 
-export interface RoomMediaLimits {
+export interface MediaLimits {
   imageBytes: number
   videoBytes: number
   audioBytes: number
   /** How much this host can upload in all, or null for no limit (the admin) */
   allowanceBytes: number | null
-  /** How much they've uploaded so far, across all their rooms */
+  /** How much they've uploaded so far, across all their rooms and mysteries */
   usedBytes: number
 }
 
@@ -981,7 +983,35 @@ export interface RoomMediaView {
   canEdit: boolean
   builtIn: boolean
   slots: RoomMediaSlot[]
-  limits: RoomMediaLimits
+  limits: MediaLimits
+}
+
+/** One place in a mystery for a picture, a video or a sound. */
+export interface MysteryMediaSlot {
+  key: string
+  kind: RoomMediaKind
+  /** The whole evening, the cast, the acts or the clues */
+  section: 'mystery' | 'cast' | 'acts' | 'clues'
+  /** The character, act or clue it belongs to; null for the whole mystery */
+  itemId: string | null
+  /** That character's name, act's title or clue's title (or the victim's name, or the setting) */
+  itemTitle: string | null
+  /** What's there now, or null when it's empty */
+  url: string | null
+  /** Someone uploaded it, rather than the AI painting it */
+  uploaded: boolean
+  sizeBytes: number | null
+}
+
+export interface MysteryMediaView {
+  scenarioId: string
+  canEdit: boolean
+  /** A hand-written mystery: only the admin can change its media, and every host's games get it */
+  builtIn: boolean
+  /** It has versions with other killers, which all play these files */
+  hasVersions: boolean
+  slots: MysteryMediaSlot[]
+  limits: MediaLimits
 }
 
 /** Background sound presets, synthesised in the browser by escape/sound.ts. */

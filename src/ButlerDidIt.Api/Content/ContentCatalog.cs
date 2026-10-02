@@ -82,18 +82,45 @@ public sealed class ContentCatalog(IServiceScopeFactory scopes, ILogger<ContentC
     }
 
     /// <summary>
-    /// The scenario as played: the document plus any generated portraits, scene
-    /// art and voice clips (see MediaOverlay). Cached until <see cref="Invalidate"/>.
+    /// The scenario as played: the document plus any generated portraits, scene art and voice clips, and the host's
+    /// own uploads (see MediaOverlay). Cached until <see cref="Invalidate"/>.
+    ///
+    /// The AI's media is made for each version (a version's words differ). A host's uploads are kept on the original
+    /// mystery and play in every version of it, so a version takes its own AI media plus the original's uploads.
     /// </summary>
     public async Task<Scenario> GetScenarioAsync(AppDbContext db, string id, CancellationToken ct = default)
     {
         if (_scenarioCache.TryGetValue(id, out var cached)) return cached;
         var scenario = await GetBaseScenarioAsync(db, id, ct);
-        var media = await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == id)
-            .ToDictionaryAsync(m => m.Key, m => Media.MediaStore.Url(m.AssetId), ct);
-        var playable = MediaOverlay.Apply(scenario, media);
+        // The row says which mystery a version belongs to (versions the AI writes don't say so in their document).
+        var original = await db.Scenarios.AsNoTracking().Where(s => s.Id == id).Select(s => s.VariantOf).FirstOrDefaultAsync(ct) ?? id;
+        var rows = await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == id || m.ScenarioId == original)
+            .Select(m => new { m.ScenarioId, m.Key, m.AssetId }).ToListAsync(ct);
+        var assetIds = rows.Select(r => r.AssetId).Distinct().ToList();
+        var uploads = (await db.MediaAssets.AsNoTracking().Where(a => assetIds.Contains(a.Id) && a.Provider == Media.MediaService.Upload)
+            .Select(a => a.Id).ToListAsync(ct)).ToHashSet();
+
+        var media = rows.Where(r => r.ScenarioId == id).ToDictionary(r => r.Key, r => Media.MediaStore.Url(r.AssetId));
+        var uploaded = rows.Where(r => r.ScenarioId == original && uploads.Contains(r.AssetId)).ToList();
+        foreach (var r in uploaded) media[r.Key] = Media.MediaStore.Url(r.AssetId); // the host's choice wins
+        var playable = MediaOverlay.Apply(scenario, media, uploaded.Select(r => r.Key).ToHashSet());
+        _originalOf[id] = original;
         _scenarioCache[id] = playable;
         return playable;
+    }
+
+    // Which mystery each cached version belongs to, so all of them can be forgotten together.
+    private readonly ConcurrentDictionary<string, string> _originalOf = new();
+
+    /// <summary>
+    /// Forget a mystery and all its versions, e.g. after the host changed its media (which every version plays).
+    /// Only this server forgets them; with several servers, the others keep their copies until they restart (#125).
+    /// </summary>
+    public void InvalidateFamily(string originalId)
+    {
+        _scenarioCache.TryRemove(originalId, out _);
+        foreach (var (id, original) in _originalOf)
+            if (original == originalId) _scenarioCache.TryRemove(id, out _);
     }
 
     /// <summary>The scenario exactly as written, without generated media (used to plan what media to create).</summary>
