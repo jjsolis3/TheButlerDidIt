@@ -108,7 +108,7 @@ public static class ScenarioEditorEndpoints
         });
 
         group.MapPut("/{id}", async (string id, ScenarioDocumentRequest req, ClaimsPrincipal principal, UserManager<AppUser> users,
-            AppDbContext db, ContentCatalog catalog, MediaGateway media, TimeProvider clock, CancellationToken ct) =>
+            AppDbContext db, ContentCatalog catalog, MediaGateway media, MediaService files, TimeProvider clock, CancellationToken ct) =>
         {
             var (user, row) = await LoadAsync(id, principal, users, db, ct);
             if (row is null || !CanRead(user, row)) return Results.NotFound();
@@ -133,10 +133,19 @@ public static class ScenarioEditorEndpoints
             // Voices and pictures whose words changed are now wrong (a voice clip still says the old
             // line). Forget just those; everything else keeps its media. The next preparation job
             // makes the new ones, and anything unchanged is found in the cache for free.
+            // The host's own uploads stay, unless their place is gone (a character, act or clue removed, or a clue renamed:
+            // its picture belongs to its title).
             var stale = await StaleMediaKeysAsync(db, old, scenario, ct);
-            await db.ScenarioMedia.Where(m => m.ScenarioId == id && stale.Contains(m.Key)).ExecuteDeleteAsync(ct);
+            var places = MysteryMediaEndpoints.Slots(scenario).Select(s => s.Key).ToHashSet();
+            var rows = await db.ScenarioMedia.Where(m => m.ScenarioId == id)
+                .Select(m => new { m.Key, m.AssetId, Uploaded = db.MediaAssets.Any(a => a.Id == m.AssetId && a.Provider == MediaService.Upload) })
+                .ToListAsync(ct);
+            var gone = rows.Where(m => m.Uploaded ? !places.Contains(m.Key) : stale.Contains(m.Key)).ToList();
+            var goneKeys = gone.Select(m => m.Key).ToList();
+            await db.ScenarioMedia.Where(m => m.ScenarioId == id && goneKeys.Contains(m.Key)).ExecuteDeleteAsync(ct);
             await db.SaveChangesAsync(ct);
-            catalog.Invalidate(id);
+            await files.DeleteUnusedUploadsAsync(gone.Where(m => m.Uploaded).Select(m => m.AssetId), ct);
+            catalog.InvalidateFamily(id);
             if (stale.Count > 0 && (await media.VoicesConfiguredAsync(ct) || await media.ImagesConfiguredAsync(ct)))
                 await MediaWorker.EnqueueAsync(db, id, user!.Id, clock, ct);
             return Results.Ok(new ValidationResult(true, []));
@@ -168,7 +177,7 @@ public static class ScenarioEditorEndpoints
         });
 
         group.MapDelete("/{id}", async (string id, ClaimsPrincipal principal, UserManager<AppUser> users, AppDbContext db,
-            ContentCatalog catalog, TimeProvider clock, CancellationToken ct) =>
+            ContentCatalog catalog, MediaService files, TimeProvider clock, CancellationToken ct) =>
         {
             var (user, row) = await LoadAsync(id, principal, users, db, ct);
             if (row is null || !CanRead(user, row)) return Results.NotFound();
@@ -184,8 +193,12 @@ public static class ScenarioEditorEndpoints
             else
             {
                 db.Scenarios.Remove(row);
+                var assets = await db.ScenarioMedia.Where(m => m.ScenarioId == id).Select(m => m.AssetId).ToListAsync(ct);
                 await db.ScenarioMedia.Where(m => m.ScenarioId == id).ExecuteDeleteAsync(ct);
                 await db.MediaJobs.Where(j => j.ScenarioId == id).ExecuteDeleteAsync(ct);
+                await db.SaveChangesAsync(ct);
+                // Its uploads go too, once nothing else uses them (a copy shares its files).
+                await files.DeleteUnusedUploadsAsync(assets, ct);
             }
             await db.SaveChangesAsync(ct);
             catalog.Invalidate(id);
@@ -201,7 +214,7 @@ public static class ScenarioEditorEndpoints
     }
 
     // Unknown and forbidden look the same (404), so nobody can probe for other hosts' mysteries.
-    private static bool CanRead(AppUser? user, ScenarioEntity row) =>
+    internal static bool CanRead(AppUser? user, ScenarioEntity row) =>
         user is not null && (row.OwnerUserId == user.Id || user.IsAdmin);
 
     private static bool CanEdit(AppUser? user, ScenarioEntity row) =>

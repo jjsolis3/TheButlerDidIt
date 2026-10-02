@@ -243,7 +243,27 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 
 **Why a cache keyed by a hash:** the same sentence in the same voice from the same model always sounds the same, so it's only paid for once. The hash of the request is the `MediaAssets.ContentHash` (unique), which also stops two workers from saving duplicates at the same time.
 
-**Why an overlay instead of editing the scenario:** hand-written scenario JSON stays exactly as written, and `ScenarioMedia` maps keys like `portrait/finch` or `line/finch/act1/0` to files. `MediaOverlay` (pure, in `ButlerDidIt.Game`) fills them in only where the author left `src`, `portrait` or `image` empty, so hand-made art always wins.
+**Why an overlay instead of editing the scenario:** hand-written scenario JSON stays exactly as written, and `ScenarioMedia` maps keys like `portrait/finch` or `line/finch/act1/0` to files. `MediaOverlay` (pure, in `ButlerDidIt.Game`) fills them in only where the author left `src`, `portrait` or `image` empty, so hand-made art always wins over the AI's.
+
+**A host's own media for a mystery** (`MysteryMediaEndpoints`, the editor's "Pictures, video & music" tab):
+- **What a host can upload:**
+  - the cover (`setting`), the victim, each character's portrait and each clue's picture;
+  - a video for the opening scene, for each act and for the finale (`video/prologue`, `video/{actId}`, `video/finale`);
+  - background music for the evening and for each act (`music`, `music/{actId}`).
+- **Same pipeline as the escape rooms.** Upload, checks, allowance and shared files all go through `MediaUploads` (see §14). Only the owner or the admin can upload; hand-written mysteries only the admin, like the editor.
+- **Uploads win over everything.** `MediaOverlay.Apply` takes the uploaded keys separately: they replace even hand-placed media, while the AI's still only fills gaps.
+- **A scene's video *is* the scene:** it replaces that scene's narration, pictures and sounds. The NPCs' lines and the drinking toasts still follow it.
+- **Music:**
+  - `Scenario.Music` and `Act.Music` reach the stage as `StageView.MusicUrl`: the current act's, else the evening's, and none from the reveal on. That's never a later act's.
+  - The stage loops it in an `<audio>` element (`useBackgroundMusic`), softer while a scene plays.
+- **Versions share the original's uploads.**
+  - Uploads are stored under the original mystery's id. `ContentCatalog.GetScenarioAsync` merges them over each version's own AI media, and `InvalidateFamily` forgets every version when they change.
+  - The editor warns that a finale video plays in every version, each with a different killer, so it shouldn't name one.
+- **Nothing is wasted or deleted by mistake:**
+  - `MediaWorker` doesn't paint what a host uploaded, or voice narration a video replaces.
+  - Editing a mystery keeps uploads unless their place is gone (a removed character, act or clue, or a renamed clue).
+  - Deleting a never-played mystery frees its files.
+- **Never early:** `ViewProjectorTests` checks that no act's video or music, and no finale video, reaches a screen before its moment.
 
 **Why clue pictures use only the title:** a clue's text (and whether it's a red herring) can change between versions of a story, so the prompt is just "an evidence photograph of: *title*". The key, `clue/{id}/{hash of title}`, changes if the clue is renamed, so a renamed clue gets a new picture instead of the wrong one. Views only carry the clues a screen may see, so a private clue's picture reaches only its recipient.
 

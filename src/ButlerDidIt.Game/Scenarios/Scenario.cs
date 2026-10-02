@@ -52,6 +52,9 @@ public sealed class Scenario
     /// <summary>Cinematic for the very end, after the solution is explained.</summary>
     public List<Cue> Finale { get; init; } = [];
 
+    /// <summary>A background track that loops quietly on the stage until the reveal (an act can have its own). Optional.</summary>
+    public string? Music { get; init; }
+
     public Character? FindCharacter(string id) => Characters.FirstOrDefault(c => c.Id == id);
     public Clue? FindClue(string id) => Clues.FirstOrDefault(c => c.Id == id);
 }
@@ -199,6 +202,9 @@ public sealed class Act
 
     /// <summary>Conversation starters shown on the stage while guests mingle.</summary>
     public List<string> Prompts { get; init; } = [];
+
+    /// <summary>A background track for this act, in place of the mystery's. Optional.</summary>
+    public string? Music { get; init; }
 }
 
 public enum CueType

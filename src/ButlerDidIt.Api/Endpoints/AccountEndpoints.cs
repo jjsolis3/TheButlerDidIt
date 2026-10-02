@@ -234,8 +234,8 @@ public static class AccountEndpoints
             var scenarioIds = await db.Scenarios.Where(s => s.OwnerUserId == user.Id).Select(s => s.Id).ToListAsync(ct);
             var roomIds = await db.EscapeRooms.Where(r => r.OwnerUserId == user.Id).Select(r => r.Id).ToListAsync(ct);
             var roomJobIds = roomIds.Select(EscapeMedia.JobId).ToList();
-            // Their rooms' pictures, videos and sounds, and anything else they uploaded: deleted below once nothing uses them.
-            var uploads = await db.ScenarioMedia.Where(m => roomJobIds.Contains(m.ScenarioId)).Select(m => m.AssetId)
+            // Their rooms' and mysteries' pictures, videos and sounds, and anything else they uploaded: deleted below once nothing uses them.
+            var uploads = await db.ScenarioMedia.Where(m => roomJobIds.Contains(m.ScenarioId) || scenarioIds.Contains(m.ScenarioId)).Select(m => m.AssetId)
                 .Union(db.MediaAssets.Where(a => a.OwnerUserId == user.Id).Select(a => a.Id)).ToListAsync(ct);
             await using (var transaction = await db.Database.BeginTransactionAsync(ct))
             {

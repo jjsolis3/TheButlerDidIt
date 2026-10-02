@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { EditorCard as Card, JsonTab, Lines, ListDetail, Num, Select, Text } from '../components/EditorFields'
+import { MysteryMediaPanel } from '../components/MysteryMediaPanel'
 import { Button, ErrorText, Eyebrow, Shell, inputClass } from '../components/ui'
 import { newId } from '../lib/newId'
 import { api } from '../lib/api'
@@ -8,13 +9,14 @@ import type { CueType, DocAct, DocCharacter, DocClue, DocCue, ScenarioDoc } from
 import { useThemes } from '../lib/theme'
 import type { ValidationResult } from '../lib/types'
 
-type Tab = 'story' | 'characters' | 'clues' | 'acts' | 'solution' | 'json'
+type Tab = 'story' | 'characters' | 'clues' | 'acts' | 'solution' | 'media' | 'json'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'story', label: 'Story' },
   { id: 'characters', label: 'Characters' },
   { id: 'clues', label: 'Clues' },
   { id: 'acts', label: 'Acts & scenes' },
   { id: 'solution', label: 'Solution' },
+  { id: 'media', label: '🎬 Pictures, video & music' },
   { id: 'json', label: 'JSON' },
 ]
 
@@ -174,29 +176,36 @@ export default function ScenarioEditor() {
         ))}
       </nav>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
-        <fieldset disabled={readOnly} className="min-w-0 space-y-4">
-          {tab === 'story' && <StoryTab doc={doc} update={update} />}
-          {tab === 'characters' && <CharactersTab doc={doc} update={update} />}
-          {tab === 'clues' && <CluesTab doc={doc} update={update} />}
-          {tab === 'acts' && <ActsTab doc={doc} update={update} />}
-          {tab === 'solution' && <SolutionTab doc={doc} update={update} />}
-          {tab === 'json' && <JsonTab doc={doc} what="mystery" onApply={(d) => update((x) => Object.assign(x, d))} />}
-        </fieldset>
-        <aside className="lg:sticky lg:top-4 lg:self-start">
-          <div className={`rounded-xl border p-4 text-sm ${valid ? 'border-accent/50 bg-accent/5' : 'border-red-400/50 bg-red-950/20'}`}>
-            <p className="font-semibold">{check === null ? 'Checking…' : valid ? '✓ Ready to play' : `${check.errors.length} thing${check.errors.length === 1 ? '' : 's'} to fix`}</p>
-            {check && !valid && (
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-red-200" aria-label="Problems">
-                {check.errors.map((e) => (
-                  <li key={e}>{e}</li>
-                ))}
-              </ul>
-            )}
-            {valid && <p className="mt-1 text-muted">Every reference checks out, and the killer can be caught from the clues.</p>}
-          </div>
-        </aside>
-      </div>
+      {/* Media has its own rules (the admin can add some to a hand-written mystery) and saves each change at once, so it's outside the form. */}
+      {tab === 'media' ? (
+        <div className="mt-6">
+          <MysteryMediaPanel scenarioId={id} />
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
+          <fieldset disabled={readOnly} className="min-w-0 space-y-4">
+            {tab === 'story' && <StoryTab doc={doc} update={update} />}
+            {tab === 'characters' && <CharactersTab doc={doc} update={update} />}
+            {tab === 'clues' && <CluesTab doc={doc} update={update} />}
+            {tab === 'acts' && <ActsTab doc={doc} update={update} />}
+            {tab === 'solution' && <SolutionTab doc={doc} update={update} />}
+            {tab === 'json' && <JsonTab doc={doc} what="mystery" onApply={(d) => update((x) => Object.assign(x, d))} />}
+          </fieldset>
+          <aside className="lg:sticky lg:top-4 lg:self-start">
+            <div className={`rounded-xl border p-4 text-sm ${valid ? 'border-accent/50 bg-accent/5' : 'border-red-400/50 bg-red-950/20'}`}>
+              <p className="font-semibold">{check === null ? 'Checking…' : valid ? '✓ Ready to play' : `${check.errors.length} thing${check.errors.length === 1 ? '' : 's'} to fix`}</p>
+              {check && !valid && (
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-red-200" aria-label="Problems">
+                  {check.errors.map((e) => (
+                    <li key={e}>{e}</li>
+                  ))}
+                </ul>
+              )}
+              {valid && <p className="mt-1 text-muted">Every reference checks out, and the killer can be caught from the clues.</p>}
+            </div>
+          </aside>
+        </div>
+      )}
     </Shell>
   )
 }

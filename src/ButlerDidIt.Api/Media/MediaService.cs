@@ -182,6 +182,15 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
             var themeRow = await db.Themes.AsNoTracking().FirstAsync(t => t.Slug == scenario.ThemeSlug, ct);
             var theme = GameJson.Deserialize<ThemeDefinition>(themeRow.Document);
             wanted = MediaPlan.For(scenario, theme, await gateway.VoicesConfiguredAsync(ct), await gateway.ImagesConfiguredAsync(ct));
+
+            // The host's own uploads (kept on the original mystery, for every version) take those places, and a scene
+            // with an uploaded video needs no narration: nothing is paid for that would never be shown or heard.
+            var original = await db.Scenarios.AsNoTracking().Where(s => s.Id == job.ScenarioId).Select(s => s.VariantOf).FirstOrDefaultAsync(ct) ?? job.ScenarioId;
+            var uploads = await db.ScenarioMedia.AsNoTracking()
+                .Where(m => m.ScenarioId == original && db.MediaAssets.Any(a => a.Id == m.AssetId && a.Provider == MediaService.Upload))
+                .Select(m => m.Key).ToListAsync(ct);
+            var videoScenes = uploads.Where(k => k.StartsWith("video/", StringComparison.Ordinal)).Select(k => $"cue/{k["video/".Length..]}/").ToList();
+            wanted = wanted.Where(i => !uploads.Contains(i.Key) && !videoScenes.Any(scene => i.Key.StartsWith(scene, StringComparison.Ordinal))).ToList();
         }
         var done = await db.ScenarioMedia.Where(m => m.ScenarioId == job.ScenarioId).Select(m => m.Key).ToHashSetAsync(ct);
         var plan = wanted.Where(i => !done.Contains(i.Key)).ToList();

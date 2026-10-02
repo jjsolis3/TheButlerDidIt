@@ -35,7 +35,9 @@ public sealed record StageView(
     // "Who looks guiltiest?" totals per character, during the acts only. Never who voted for whom.
     IReadOnlyList<SuspicionView> Suspicion,
     // True while the AI writes a version of the mystery for tonight's cast; the lobby is frozen meanwhile.
-    bool Tailoring);
+    bool Tailoring,
+    // The background track to loop now: the current act's, else the mystery's. Never a later act's; null from the reveal on.
+    string? MusicUrl = null);
 
 /// <summary>
 /// Whose turn it is to speak (see GameState.SpotlightCharacterId). SeatId and PlayerName are set when a
