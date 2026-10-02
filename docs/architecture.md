@@ -152,6 +152,20 @@ The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the hos
 
 Only `media/` folders are served over HTTP (`MediaEndpoints.cs`), with a path check against `../` tricks. The scenario JSON sits next door and contains the solution.
 
+**Libraries, sharing and hiding** (both games). Built-in rooms (`content/escape`) and hand-written mysteries are read from files at every start, so they're never edited in place. A host edits their own copy, listed in **My mysteries** (`/mysteries`) or **My escape rooms** (`/escape/rooms`, `GET /api/escape-rooms/library`).
+
+The admin can improve one for everyone, with two switches (`PUT …/{id}/sharing`, `ContentVisibility`):
+- **Share** their own room or mystery with every host. That's a `Shared` flag on its row.
+  - A shared escape room is on every shelf, including the public one. Anyone can host it, read it and copy it, like a built-in room; only the admin edits it or its media.
+  - A shared mystery is on every shelf and playable, versions included. Like a hand-written one, other hosts can't read or copy it.
+- **Hide** a built-in room or hand-written mystery: a `HiddenContent` row.
+  - It's a table because built-in rooms aren't database rows, and the mystery seeder rewrites its rows on every start.
+  - A hidden one is off every shelf, and new parties with it are refused, except the admin's. Existing parties, recaps and leaderboards keep working.
+
+Together, they let an improved copy take the original's place. The copy is a new room, with its own leaderboards.
+
+These rules are checked on the server where a party starts (`EscapeCatalog.FindForHostAsync`, the mystery party endpoint), not just on the shelves.
+
 ## 8. The front end
 
 - **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `Watch` (the TV on a spectator's phone, with cheers), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.

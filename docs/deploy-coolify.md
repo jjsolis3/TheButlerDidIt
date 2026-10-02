@@ -66,7 +66,7 @@ Click **Deploy**. The first build takes a few minutes (it compiles both the Reac
 
 Check the app's logs for `Seeded 13 themes and 41 scenarios`, then open `https://mystery.example.com/healthz`, which should say `Healthy`.
 
-Optionally, in the app service's health check settings, use path `/healthz` on port `8080`.
+Optionally, in the app service's health check settings, use path `/healthz` on port `8080`. The image includes `curl`, which Coolify's check runs inside the container, and a Docker `HEALTHCHECK` of its own.
 
 ## 5. First run
 
@@ -100,6 +100,10 @@ The Dockerfile already sets the port (8080), the content folder and the data fol
 If the site is behind Cloudflare's proxy (the orange cloud), its free plan refuses uploads over 100 MB, so leave `Media__MaxVideoMb` at 100 or less.
 
 **3. Health check and backups.** In **Healthcheck**, set the path to `/healthz` and the port to `8080`, so Coolify knows when the app is really up. The Compose stack's nightly `backup` service isn't there, so turn on **Scheduled Backups** on the PostgreSQL database resource instead.
+
+**Troubleshooting a deploy that rolls back:**
+- **`curl: not found` / `wget: not found`, then "New container is unhealthy".** Coolify checks the health by running `curl` inside the container. Images built before curl was added to the Dockerfile don't have it, so the check fails even though the app is fine. Update to the current code, or switch the health check off until you do. CI checks that curl is in the image, so this can't come back unnoticed.
+- **`Cannot load library libgssapi_krb5.so.2` in the log.** This is harmless. The PostgreSQL driver looks for Kerberos (a corporate sign-in system) before using the normal password. The image now includes the library, so the line no longer appears.
 
 ## Data and backups
 

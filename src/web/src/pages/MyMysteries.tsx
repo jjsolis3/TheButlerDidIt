@@ -58,6 +58,13 @@ export default function MyMysteries() {
         Read, polish and play-test your mysteries. Mysteries written by AI can be edited directly; hand-written ones are copied first, so
         your changes are never lost when the server updates.
       </p>
+      {me?.isAdmin && (
+        <p className="mb-6 max-w-2xl rounded-lg border border-line bg-surface p-3 text-sm text-muted">
+          <strong className="text-ink">As the admin:</strong> to improve a hand-written mystery for everyone, duplicate it and edit the copy, then{' '}
+          <em>share it with every host</em> and <em>take the original off the shelf</em>. Nothing is deleted: parties that played the original keep their recaps,
+          and you can put it back any time.
+        </p>
+      )}
       <ErrorText>{error}</ErrorText>
 
       {items?.length === 0 && (
@@ -75,6 +82,8 @@ export default function MyMysteries() {
               <p className="text-sm text-muted">
                 {SOURCE_LABEL[m.source]} · {m.contentRating === 'family' ? 'Family' : 'Mature'} · played {m.timesPlayed} time
                 {m.timesPlayed === 1 ? '' : 's'}
+                {m.shared && ' · 🌍 shared with every host'}
+                {m.hidden && ' · 🙈 off the shelf'}
                 {m.inUse && ' · a party is using it now'}
               </p>
             </div>
@@ -88,6 +97,16 @@ export default function MyMysteries() {
               <Button variant="ghost" onClick={() => playTest(m)}>
                 Play-test
               </Button>
+              {m.canShare && (
+                <Button variant="ghost" aria-pressed={m.shared} onClick={() => act(() => api.shareScenario(m.id, { shared: !m.shared }))}>
+                  {m.shared ? 'Stop sharing' : '🌍 Share with every host'}
+                </Button>
+              )}
+              {m.canHide && (
+                <Button variant="quiet" aria-pressed={m.hidden} onClick={() => act(() => api.shareScenario(m.id, { hidden: !m.hidden }))}>
+                  {m.hidden ? 'Put back on the shelf' : 'Take off the shelf'}
+                </Button>
+              )}
               {m.canEdit && (
                 <Button
                   variant="quiet"

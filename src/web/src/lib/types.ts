@@ -350,6 +350,8 @@ export interface ScenarioCard {
   custom: boolean
   /** Versions of this story (same place, different killer). Empty when there's only one. */
   versions: VersionOption[]
+  /** The admin shared it with every host. To everyone else it's like a hand-written mystery */
+  shared: boolean
 }
 
 export interface ThemeCard {
@@ -667,6 +669,22 @@ export interface MyMystery {
   timesPlayed: number
   inUse: boolean
   canEdit: boolean
+  /** The admin shared it with every host */
+  shared: boolean
+  /** A hand-written mystery the admin took off the shelf */
+  hidden: boolean
+  /** The admin's own mystery: they can share it with every host */
+  canShare: boolean
+  /** A hand-written mystery, for the admin: they can take it off the shelf */
+  canHide: boolean
+}
+
+/** The admin's switches, for both games. A field left out stays as it is. */
+export interface SharingRequest {
+  /** On every host's shelf (the admin's own room or mystery) */
+  shared?: boolean
+  /** Off the shelf (a built-in room or hand-written mystery) */
+  hidden?: boolean
 }
 
 export interface ValidationResult {
@@ -717,6 +735,28 @@ export interface EscapeRoomSummary {
   soundscape: Soundscape
   /** The room's generated cover picture, once one has been painted, or null */
   coverUrl: string | null
+  /** The admin shared it with every host. On other hosts' shelves it sits with the built-in rooms */
+  shared: boolean
+}
+
+/** Where a room in My escape rooms comes from. */
+export type EscapeRoomSource = 'builtIn' | 'generated' | 'copy' | 'shared'
+
+/** A room in My escape rooms, with what this host may do to it. */
+export interface EscapeLibraryItem {
+  room: EscapeRoomSummary
+  source: EscapeRoomSource
+  canEdit: boolean
+  /** The admin's own room: they can share it with every host */
+  canShare: boolean
+  /** A built-in room, for the admin: they can take it off the shelf */
+  canHide: boolean
+  /** Taken off the shelf by the admin (only the admin's library lists these) */
+  hidden: boolean
+  /** How many of this host's parties played it */
+  timesPlayed: number
+  /** A party is using it now, so it can't be edited or deleted until that ends */
+  inUse: boolean
 }
 
 export interface EscapeLength {

@@ -159,6 +159,27 @@ public sealed class ScenarioEntity
     /// <summary>For a version of a hand-written story (same place, different killer): the original's id.</summary>
     [MaxLength(120)]
     public string? VariantOf { get; set; }
+
+    /// <summary>
+    /// The admin shared it with every host: it's on everyone's shelf and anyone can host it, like a hand-written
+    /// mystery. Only the admin can edit it. This is how an improved copy of a built-in mystery reaches everyone.
+    /// </summary>
+    public bool Shared { get; set; }
+}
+
+/// <summary>
+/// A built-in escape room or hand-written mystery the admin took off the shelf, usually because an improved,
+/// shared copy takes its place. Nothing is deleted: parties, recaps and leaderboards that use it keep working.
+/// A table rather than a flag, because built-in rooms aren't database rows and the mystery seeder rewrites its rows.
+/// </summary>
+public sealed class HiddenContentEntity
+{
+    public GameKind Kind { get; set; }
+
+    [MaxLength(120)]
+    public required string ContentId { get; set; }
+
+    public DateTimeOffset HiddenAt { get; set; }
 }
 
 public enum PartyMode
@@ -501,4 +522,10 @@ public sealed class EscapeRoomEntity
     /// <summary>The room this one was copied from, for a host's own copy of a room (#113); null for a room the AI wrote.</summary>
     [MaxLength(120)]
     public string? CopiedFrom { get; set; }
+
+    /// <summary>
+    /// The admin shared it with every host: it's on everyone's shelf (and the public page), anyone can host it,
+    /// read it and copy it, like a built-in room. Only the admin can edit it.
+    /// </summary>
+    public bool Shared { get; set; }
 }

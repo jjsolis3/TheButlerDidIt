@@ -12,9 +12,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ButlerDidIt.Api.Escape;
 
-/// <param name="Mine">The host's own room, which they can edit (or the admin, any room in the database).</param>
+/// <param name="CanEdit">The host's own room (or, for the admin, any room in the database).</param>
 /// <param name="BuiltIn">A hand-written room from content/escape: read-only, but anyone can make their own copy.</param>
-public sealed record EditableRoom(string Id, bool CanEdit, bool BuiltIn, JsonElement Document);
+/// <param name="Shared">A room the admin shared with every host: read-only for everyone else, who can make their own copy.</param>
+public sealed record EditableRoom(string Id, bool CanEdit, bool BuiltIn, JsonElement Document, bool Shared = false);
 public sealed record RoomDocumentRequest(JsonElement Document);
 
 /// <param name="Edition">The room's edition after saving. It goes up when the change alters how the room plays,
@@ -64,8 +65,8 @@ public static class EscapeEditorEndpoints
             if (user is null) return Results.Unauthorized();
             if (catalog.Find(id) is { } builtIn) return Results.Ok(new EditableRoom(id, CanEdit: false, BuiltIn: true, ForEditor(builtIn)));
             var row = await db.EscapeRooms.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id, ct);
-            if (row is null || !CanEdit(user, row)) return Results.NotFound();
-            return Results.Ok(new EditableRoom(id, CanEdit: true, BuiltIn: false, ForEditor(GameJson.Deserialize<EscapeRoom>(row.Document))));
+            if (row is null || !CanRead(user, row)) return Results.NotFound();
+            return Results.Ok(new EditableRoom(id, CanEdit: CanEdit(user, row), BuiltIn: false, ForEditor(GameJson.Deserialize<EscapeRoom>(row.Document)), row.Shared));
         });
 
         // Live feedback while typing. Nothing is saved.
@@ -83,7 +84,9 @@ public static class EscapeEditorEndpoints
             if (catalog.Find(id) is not null)
                 return Results.Problem("Built-in rooms can't be edited. Make your own copy and edit that.", statusCode: 403);
             var row = await db.EscapeRooms.FirstOrDefaultAsync(r => r.Id == id, ct);
-            if (row is null || !CanEdit(user, row)) return Results.NotFound();
+            if (row is null || !CanRead(user, row)) return Results.NotFound();
+            if (!CanEdit(user, row))
+                return Results.Problem("This room is shared with every host, and only the admin can change it. Make your own copy and edit that.", statusCode: 403);
             if (await BusyPartyAsync(db, id, ct) is { } code)
                 return Results.Problem($"Party {code} is using this room right now. Finish or delete that party first, or edit a copy.", statusCode: 409);
 
@@ -128,7 +131,7 @@ public static class EscapeEditorEndpoints
             if (user is null) return Results.Unauthorized();
             EscapeRoom source;
             if (catalog.Find(id) is { } builtIn) source = builtIn;
-            else if (await db.EscapeRooms.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id, ct) is { } row && CanEdit(user, row)) source = GameJson.Deserialize<EscapeRoom>(row.Document);
+            else if (await db.EscapeRooms.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id, ct) is { } row && CanRead(user, row)) source = GameJson.Deserialize<EscapeRoom>(row.Document);
             else return Results.NotFound();
 
             // A record, so `with` copies every setting, including ones added later; only the id, title and edition change.
@@ -162,6 +165,9 @@ public static class EscapeEditorEndpoints
 
     // Unknown and someone else's look the same (404), so nobody can probe for other hosts' rooms.
     internal static bool CanEdit(AppUser user, EscapeRoomEntity row) => row.OwnerUserId == user.Id || user.IsAdmin;
+
+    /// <summary>Who can read a database room and make their own copy: whoever can edit it, and every host once the admin shared it.</summary>
+    internal static bool CanRead(AppUser user, EscapeRoomEntity row) => CanEdit(user, row) || row.Shared;
 
     private static Task<string?> BusyPartyAsync(AppDbContext db, string id, CancellationToken ct) =>
         db.Parties.AsNoTracking().Where(p => p.ScenarioId == id && p.Kind == GameKind.EscapeRoom && p.Status != PartyStatus.Finished)

@@ -78,10 +78,15 @@ public static class PartyEndpoints
             AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, IOptions<AiOptions> aiOptions, TimeProvider clock, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            // AI-generated mysteries belong to the host who generated them.
-            var row = await db.Scenarios.AsNoTracking().Where(x => x.Id == req.ScenarioId).Select(x => new { x.OwnerUserId, x.ArchivedAt }).FirstOrDefaultAsync(ct);
-            if (row is not null && ((row.OwnerUserId is not null && row.OwnerUserId != userId) || row.ArchivedAt is not null))
+            // AI-generated mysteries and copies belong to their host, unless the admin shared one with everyone.
+            var row = await db.Scenarios.AsNoTracking().Where(x => x.Id == req.ScenarioId)
+                .Select(x => new { x.OwnerUserId, x.ArchivedAt, x.Shared, x.VariantOf }).FirstOrDefaultAsync(ct);
+            if (row is not null && ((row.OwnerUserId is not null && row.OwnerUserId != userId && !row.Shared) || row.ArchivedAt is not null))
                 return Results.Problem("Pick a mystery to play.", statusCode: 400);
+            // A hand-written mystery the admin took off the shelf takes no new parties (the admin can still try it out).
+            if (row is { OwnerUserId: null } && await ContentVisibility.IsHiddenAsync(db, GameKind.Mystery, row.VariantOf ?? req.ScenarioId, ct)
+                && !await ContentVisibility.IsAdminAsync(db, userId, ct))
+                return Results.Problem("That mystery is no longer on the shelf.", statusCode: 400);
 
             // Which version of the story to play (same place and cast, different killer). With
             // "Surprise me" the party starts on the original and the version is dealt when the
@@ -140,8 +145,10 @@ public static class PartyEndpoints
         group.MapPost("/escape", async (CreateEscapePartyRequest req, ClaimsPrincipal user, AppDbContext db, GameModules modules,
             ButlerDidIt.Api.Escape.EscapeCatalog rooms, PartyService parties, AiGateway ai, ButlerDidIt.Ai.Media.MediaGateway media, TimeProvider clock, CancellationToken ct) =>
         {
-            // A hand-written room, or one written for this host: nobody else can start a party with another host's room.
-            if (await rooms.FindForHostAsync(db, req.RoomId, user.FindFirstValue(ClaimTypes.NameIdentifier)!, ct) is not { } room)
+            // A hand-written room still on the shelf, one written for this host, or one the admin shared: nobody else can
+            // start a party with another host's room.
+            var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            if (await rooms.FindForHostAsync(db, req.RoomId, hostId, await ContentVisibility.IsAdminAsync(db, hostId, ct), ct) is not { } room)
                 return Results.Problem("Pick an escape room to play.", statusCode: 400);
             if (req.Minutes is { } minutes && !room.PlayableLengths.Contains(minutes))
                 return Results.Problem($"This room can be played in {string.Join(", ", room.PlayableLengths)} minutes.", statusCode: 400);
@@ -151,7 +158,7 @@ public static class PartyEndpoints
             {
                 Id = Guid.NewGuid(),
                 Code = await UniqueCodeAsync(db, ct),
-                HostUserId = user.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                HostUserId = hostId,
                 Kind = GameKind.EscapeRoom,
                 ScenarioId = room.Id,
                 Mode = req.Mode,

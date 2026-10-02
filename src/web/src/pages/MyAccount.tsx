@@ -104,7 +104,7 @@ export default function MyAccount() {
         <ul className="grid gap-2 sm:grid-cols-2">
           <LibraryLink to="/" label="Your parties" count={account.library.parties} />
           <LibraryLink to="/mysteries" label="Your mysteries" count={account.library.mysteries} />
-          <LibraryLink to="/host/new?game=escape" label="Escape rooms the AI wrote for you" count={account.library.escapeRooms} />
+          <LibraryLink to="/escape/rooms" label="Your escape rooms" count={account.library.escapeRooms} />
           <li className="rounded-xl border border-line bg-surface px-4 py-3">
             <span className="font-semibold">{account.library.escapes}</span> <span className="text-muted">successful escapes</span>
           </li>
