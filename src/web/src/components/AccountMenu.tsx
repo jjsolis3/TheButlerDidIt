@@ -71,6 +71,9 @@ export function AccountMenu() {
           <MenuLink to="/mysteries" onClick={close}>
             My mysteries
           </MenuLink>
+          <MenuLink to="/escape/rooms" onClick={close}>
+            My escape rooms
+          </MenuLink>
           {me.isAdmin && (
             <>
               <hr className="my-1 border-line" />

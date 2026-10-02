@@ -3,6 +3,7 @@ using ButlerDidIt.Ai;
 using ButlerDidIt.Ai.Generation;
 using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
+using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Escape.Engine;
@@ -20,32 +21,129 @@ public sealed record Leaderboard(string RoomId, bool Daily, int Minutes, EscapeD
 /// <param name="Minutes">The clock: 30, 45 or 60.</param>
 public sealed record EscapeRoomGenerateRequest(string? Theme, ButlerDidIt.Game.Scenarios.ContentRating ContentRating, int Minutes);
 
+/// <summary>Where a room in My escape rooms comes from.</summary>
+public enum EscapeRoomSource
+{
+    /// <summary>A hand-written room from content/escape.</summary>
+    BuiltIn,
+    /// <summary>Written by AI for this host.</summary>
+    Generated,
+    /// <summary>This host's own copy of another room.</summary>
+    Copy,
+    /// <summary>A room the admin shared with every host.</summary>
+    Shared,
+}
+
+/// <summary>A room in My escape rooms, with what this host may do to it.</summary>
+/// <param name="CanShare">The admin's own room: they can share it with every host.</param>
+/// <param name="CanHide">A built-in room, for the admin: they can take it off the shelf.</param>
+/// <param name="Hidden">Taken off the shelf by the admin (only the admin's library lists these).</param>
+/// <param name="TimesPlayed">How many of this host's parties played it.</param>
+/// <param name="InUse">A party is using it now, so it can't be edited or deleted until that ends.</param>
+public sealed record EscapeLibraryItem(EscapeRoomSummary Room, EscapeRoomSource Source, bool CanEdit, bool CanShare, bool CanHide, bool Hidden, int TimesPlayed, bool InUse);
+
+/// <summary>The admin's switches, for both games. A field left out stays as it is.</summary>
+/// <param name="Shared">On every host's shelf (the admin's own room or mystery).</param>
+/// <param name="Hidden">Off the shelf (a built-in room or hand-written mystery).</param>
+public sealed record SharingRequest(bool? Shared, bool? Hidden);
+
 public static class EscapeEndpoints
 {
     private const int TopCount = 10;
 
+    /// <summary>Makes a shelf card for a room (see <see cref="CardsAsync"/>).</summary>
+    private delegate EscapeRoomSummary CardMaker(EscapeRoom room, bool mine = false, bool copied = false, bool shared = false);
+
+    /// <summary>
+    /// Card makers for a set of rooms, with the two things that need the database read in one query each: the best
+    /// escape (on the room's current edition, at its own length, on Normal; the rest are ranked on their own boards)
+    /// and the cover picture, for the rooms that have one.
+    /// </summary>
+    private static async Task<CardMaker> CardsAsync(AppDbContext db, IReadOnlyList<EscapeRoom> shown, CancellationToken ct)
+    {
+        var ids = shown.Select(r => r.Id).ToList();
+        var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).AtDifficulty(EscapeDifficulty.Normal).GroupBy(r => new { r.RoomId, r.Minutes, r.Edition })
+            .Select(g => new { g.Key.RoomId, g.Key.Minutes, g.Key.Edition, Best = g.Min(r => r.Score) }).ToListAsync(ct);
+        int? Best(EscapeRoom r) => best.Where(b => b.RoomId == r.Id && (b.Minutes ?? r.TimeLimitMinutes) == r.TimeLimitMinutes && (b.Edition ?? 1) == r.Edition)
+            .Min(b => (int?)b.Best);
+        var jobIds = ids.Select(EscapeMedia.JobId).ToList();
+        var covers = await db.ScenarioMedia.AsNoTracking().Where(m => jobIds.Contains(m.ScenarioId) && m.Key == EscapeArt.Cover)
+            .Select(m => new { m.ScenarioId, m.AssetId }).ToListAsync(ct);
+        string? Cover(EscapeRoom r) => covers.FirstOrDefault(c => c.ScenarioId == EscapeMedia.JobId(r.Id)) is { } c ? ButlerDidIt.Api.Media.MediaStore.Url(c.AssetId) : null;
+        return (room, mine, copied, shared) => EscapeRoomSummary.For(room, Best(room), mine, copied, Cover(room), shared);
+    }
+
     public static void MapEscapeEndpoints(this IEndpointRouteBuilder app, IConfiguration config)
     {
         // The shelf: only what a card shows (no puzzles, no answers), plus the best escape so far.
-        // A signed-in host also sees their own rooms (written by AI for them, or their copies), newest first, before the hand-written ones.
+        // A signed-in host also sees their own rooms (written by AI for them, or their copies), newest first. Then come the
+        // rooms the admin shared with every host, and the hand-written ones the admin hasn't taken off the shelf.
         app.MapGet("/api/escape-rooms", async (ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db, CancellationToken ct) =>
         {
             var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var mine = hostId is null ? [] : await rooms.OwnedAsync(db, hostId, ct);
-            var ids = mine.Select(o => o.Room).Concat(rooms.Rooms).Select(r => r.Id).ToList();
-            var best = await db.EscapeResults.AsNoTracking().Where(r => r.Escaped && ids.Contains(r.RoomId)).AtDifficulty(EscapeDifficulty.Normal).GroupBy(r => new { r.RoomId, r.Minutes, r.Edition })
-                .Select(g => new { g.Key.RoomId, g.Key.Minutes, g.Key.Edition, Best = g.Min(r => r.Score) }).ToListAsync(ct);
-            // The card's best escape is on the room's current edition, at its own length on Normal; the rest are ranked on their own.
-            int? Best(EscapeRoom r) => best.Where(b => b.RoomId == r.Id && (b.Minutes ?? r.TimeLimitMinutes) == r.TimeLimitMinutes && (b.Edition ?? 1) == r.Edition)
-                .Min(b => (int?)b.Best);
-            // Cover pictures, for the rooms the media pipeline has painted (one query for the whole shelf).
-            var jobIds = ids.Select(EscapeMedia.JobId).ToList();
-            var covers = await db.ScenarioMedia.AsNoTracking().Where(m => jobIds.Contains(m.ScenarioId) && m.Key == EscapeArt.Cover)
-                .Select(m => new { m.ScenarioId, m.AssetId }).ToListAsync(ct);
-            string? Cover(EscapeRoom r) => covers.FirstOrDefault(c => c.ScenarioId == EscapeMedia.JobId(r.Id)) is { } c ? ButlerDidIt.Api.Media.MediaStore.Url(c.AssetId) : null;
-            return Results.Ok(mine.Select(o => EscapeRoomSummary.For(o.Room, Best(o.Room), mine: true, copied: o.Copied, coverUrl: Cover(o.Room)))
-                .Concat(rooms.Rooms.Select(r => EscapeRoomSummary.For(r, Best(r), coverUrl: Cover(r)))));
+            var shared = await rooms.SharedAsync(db, hostId, ct);
+            var hidden = await ContentVisibility.HiddenAsync(db, GameKind.EscapeRoom, ct);
+            var builtIn = rooms.Rooms.Where(r => !hidden.Contains(r.Id)).ToList();
+            var cards = await CardsAsync(db, [.. mine.Select(o => o.Room), .. shared, .. builtIn], ct);
+            return Results.Ok(mine.Select(o => cards(o.Room, mine: true, copied: o.Copied, shared: o.Shared))
+                .Concat(shared.Select(r => cards(r, shared: true)))
+                .Concat(builtIn.Select(r => cards(r))));
         });
+
+        // My escape rooms: everything this host can manage or copy, with what they may do to each.
+        // The admin also sees the built-in rooms they took off the shelf, to put them back.
+        app.MapGet("/api/escape-rooms/library", async (ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db, CancellationToken ct) =>
+        {
+            var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var admin = await ContentVisibility.IsAdminAsync(db, hostId, ct);
+            var mine = await rooms.OwnedAsync(db, hostId, ct);
+            var shared = await rooms.SharedAsync(db, hostId, ct);
+            var hidden = await ContentVisibility.HiddenAsync(db, GameKind.EscapeRoom, ct);
+            var builtIn = rooms.Rooms.Where(r => admin || !hidden.Contains(r.Id)).ToList();
+            var cards = await CardsAsync(db, [.. mine.Select(o => o.Room), .. shared, .. builtIn], ct);
+
+            var ids = mine.Select(o => o.Room.Id).Concat(shared.Select(r => r.Id)).Concat(builtIn.Select(r => r.Id)).ToList();
+            var played = await db.Parties.AsNoTracking()
+                .Where(p => p.Kind == GameKind.EscapeRoom && p.HostUserId == hostId && p.Status != PartyStatus.Lobby && ids.Contains(p.ScenarioId))
+                .GroupBy(p => p.ScenarioId).Select(g => new { Id = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Id, x => x.Count, ct);
+            var ownIds = mine.Select(o => o.Room.Id).ToList();
+            var busy = (await db.Parties.AsNoTracking().Where(p => p.Kind == GameKind.EscapeRoom && p.Status != PartyStatus.Finished && ownIds.Contains(p.ScenarioId))
+                .Select(p => p.ScenarioId).Distinct().ToListAsync(ct)).ToHashSet();
+
+            return Results.Ok(mine.Select(o => new EscapeLibraryItem(cards(o.Room, mine: true, copied: o.Copied, shared: o.Shared),
+                    o.Copied ? EscapeRoomSource.Copy : EscapeRoomSource.Generated, CanEdit: true, CanShare: admin, CanHide: false, Hidden: false,
+                    played.GetValueOrDefault(o.Room.Id), InUse: busy.Contains(o.Room.Id)))
+                .Concat(shared.Select(r => new EscapeLibraryItem(cards(r, shared: true), EscapeRoomSource.Shared, CanEdit: false, CanShare: false, CanHide: false,
+                    Hidden: false, played.GetValueOrDefault(r.Id), InUse: false)))
+                .Concat(builtIn.Select(r => new EscapeLibraryItem(cards(r), EscapeRoomSource.BuiltIn, CanEdit: false, CanShare: false, CanHide: admin,
+                    Hidden: hidden.Contains(r.Id), played.GetValueOrDefault(r.Id), InUse: false))));
+        }).RequireAuthorization(AuthPolicies.Host);
+
+        // The admin shares one of their own rooms with every host, or takes a built-in room off the shelf (or puts it back).
+        app.MapPut("/api/escape-rooms/{id}/sharing", async (string id, SharingRequest req, ClaimsPrincipal user, EscapeCatalog rooms, AppDbContext db,
+            TimeProvider clock, CancellationToken ct) =>
+        {
+            var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!await ContentVisibility.IsAdminAsync(db, hostId, ct))
+                return Results.Problem("Only the admin can share rooms with every host or take them off the shelf.", statusCode: 403);
+            if (rooms.Find(id) is not null)
+            {
+                if (req.Shared is not null) return Results.Problem("Built-in rooms are already on every host's shelf.", statusCode: 400);
+                if (req.Hidden is { } hide) await ContentVisibility.SetHiddenAsync(db, GameKind.EscapeRoom, id, hide, clock.GetUtcNow(), ct);
+                return Results.NoContent();
+            }
+            var row = await db.EscapeRooms.FirstOrDefaultAsync(r => r.Id == id, ct);
+            if (row is null) return Results.NotFound();
+            if (req.Hidden is not null) return Results.Problem("Only built-in rooms can be taken off the shelf. Stop sharing this one instead.", statusCode: 400);
+            if (row.OwnerUserId != hostId) return Results.Problem("Make your own copy of this room first, then share the copy.", statusCode: 400);
+            if (req.Shared is { } share)
+            {
+                row.Shared = share;
+                await db.SaveChangesAsync(ct);
+            }
+            return Results.NoContent();
+        }).RequireAuthorization(AuthPolicies.Host);
 
         // Write a new room from a theme. It runs in the background (GenerationWorker); the page
         // follows it with GET /api/generation/{id}, which ends with the new room's id.

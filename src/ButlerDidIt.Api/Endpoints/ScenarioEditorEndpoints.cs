@@ -14,9 +14,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ButlerDidIt.Api.Endpoints;
 
+/// <param name="Shared">The admin shared it with every host.</param>
+/// <param name="Hidden">A hand-written mystery the admin took off the shelf.</param>
+/// <param name="CanShare">The admin's own mystery: they can share it with every host.</param>
+/// <param name="CanHide">A hand-written mystery, for the admin: they can take it off the shelf.</param>
 public sealed record MyMystery(
     string Id, string Title, string ThemeSlug, ScenarioSource Source, ContentRating ContentRating,
-    DateTimeOffset UpdatedAt, int TimesPlayed, bool InUse, bool CanEdit);
+    DateTimeOffset UpdatedAt, int TimesPlayed, bool InUse, bool CanEdit,
+    bool Shared = false, bool Hidden = false, bool CanShare = false, bool CanHide = false);
 
 public sealed record EditableScenario(string Id, ScenarioSource Source, bool CanEdit, JsonElement Document);
 public sealed record ScenarioDocumentRequest(JsonElement Document);
@@ -47,16 +52,44 @@ public static class ScenarioEditorEndpoints
             var rows = await db.Scenarios.AsNoTracking()
                 .Where(s => s.ArchivedAt == null && s.VariantOf == null && (s.OwnerUserId == user.Id || (user.IsAdmin && s.Source == ScenarioSource.Handwritten)))
                 .OrderBy(s => s.Source).ThenBy(s => s.Title)
-                .Select(s => new { s.Id, s.Title, s.ThemeSlug, s.Source, s.ContentRating, s.UpdatedAt, s.OwnerUserId })
+                .Select(s => new { s.Id, s.Title, s.ThemeSlug, s.Source, s.ContentRating, s.UpdatedAt, s.OwnerUserId, s.Shared })
                 .ToListAsync(ct);
             var ids = rows.Select(r => r.Id).ToList();
             var plays = await db.Parties.AsNoTracking().Where(p => ids.Contains(p.ScenarioId))
                 .GroupBy(p => p.ScenarioId)
                 .Select(g => new { g.Key, Played = g.Count(p => p.Status == PartyStatus.Finished), Active = g.Count(p => p.Status != PartyStatus.Finished) })
                 .ToDictionaryAsync(x => x.Key, ct);
+            var hidden = await ContentVisibility.HiddenAsync(db, GameKind.Mystery, ct);
             return Results.Ok(rows.Select(r => new MyMystery(r.Id, r.Title, r.ThemeSlug, r.Source, r.ContentRating, r.UpdatedAt,
                 plays.GetValueOrDefault(r.Id)?.Played ?? 0, (plays.GetValueOrDefault(r.Id)?.Active ?? 0) > 0,
-                r.Source != ScenarioSource.Handwritten)));
+                r.Source != ScenarioSource.Handwritten,
+                r.Shared, Hidden: r.Source == ScenarioSource.Handwritten && hidden.Contains(r.Id),
+                CanShare: user.IsAdmin && r.OwnerUserId == user.Id, CanHide: user.IsAdmin && r.Source == ScenarioSource.Handwritten)));
+        });
+
+        // The admin shares one of their own mysteries with every host (and its versions with it), or takes a
+        // hand-written one off the shelf, or puts it back.
+        group.MapPut("/{id}/sharing", async (string id, ButlerDidIt.Api.Escape.SharingRequest req, ClaimsPrincipal principal, UserManager<AppUser> users,
+            AppDbContext db, TimeProvider clock, CancellationToken ct) =>
+        {
+            var (user, row) = await LoadAsync(id, principal, users, db, ct);
+            if (user is not { IsAdmin: true })
+                return Results.Problem("Only the admin can share mysteries with every host or take them off the shelf.", statusCode: 403);
+            if (row is null || row.VariantOf is not null) return Results.NotFound(); // a story is shared or hidden as a whole
+            if (row.Source == ScenarioSource.Handwritten)
+            {
+                if (req.Shared is not null) return Results.Problem("Hand-written mysteries are already on every host's shelf.", statusCode: 400);
+                if (req.Hidden is { } hide) await ContentVisibility.SetHiddenAsync(db, GameKind.Mystery, id, hide, clock.GetUtcNow(), ct);
+                return Results.NoContent();
+            }
+            if (req.Hidden is not null) return Results.Problem("Only hand-written mysteries can be taken off the shelf. Stop sharing this one instead.", statusCode: 400);
+            if (row.OwnerUserId != user.Id) return Results.Problem("Duplicate this mystery first, then share the copy.", statusCode: 400);
+            if (req.Shared is { } share)
+            {
+                row.Shared = share;
+                await db.SaveChangesAsync(ct);
+            }
+            return Results.NoContent();
         });
 
         // The whole mystery, solution included. The editor hides it behind a "Spoilers!" warning.

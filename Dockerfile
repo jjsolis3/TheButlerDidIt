@@ -32,6 +32,13 @@ RUN dotnet publish src/ButlerDidIt.Api/ButlerDidIt.Api.csproj -c Release -o /app
 
 # ---- 3. Runtime ----------------------------------------------------------------
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
+# The runtime image is deliberately bare, so add the two things it lacks:
+#   curl              Coolify (and Docker, below) check the app's health by running curl inside the container.
+#   libgssapi-krb5-2  the PostgreSQL driver looks for Kerberos when it connects; without it, it logs a harmless error.
+# Cleaning the package lists in the same step keeps them out of the image.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl libgssapi-krb5-2 \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=api /app ./
 COPY content ./content
@@ -48,4 +55,10 @@ RUN mkdir -p /data/keys /data/media && chown -R $APP_UID /data
 USER $APP_UID
 
 EXPOSE 8080
+
+# Healthy once /healthz answers. -f makes curl fail on an error status (e.g. 503 when the database is
+# unreachable); the start period allows for migrations on the first start after an update.
+HEALTHCHECK --interval=15s --timeout=3s --start-period=30s --retries=5 \
+  CMD curl -fsS http://localhost:8080/healthz || exit 1
+
 ENTRYPOINT ["dotnet", "ButlerDidIt.Api.dll"]

@@ -79,6 +79,8 @@ export interface EditableRoom {
   /** A built-in room: read-only, but anyone can make their own copy. */
   builtIn: boolean
   document: EscapeRoomDoc
+  /** A room the admin shared with every host: read-only for everyone else, who can make their own copy. */
+  shared: boolean
 }
 
 /** After saving: the edition goes up when the change alters how the room plays, starting fresh leaderboards. */

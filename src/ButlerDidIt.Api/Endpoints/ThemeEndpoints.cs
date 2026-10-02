@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
@@ -6,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ButlerDidIt.Api.Endpoints;
 
+/// <param name="AiGenerated">Written by AI for this host.</param>
+/// <param name="Custom">This host's own copy.</param>
+/// <param name="Shared">The admin shared it with every host. To everyone else it's like a hand-written mystery.</param>
 public sealed record ScenarioCard(string Id, string Title, string Synopsis, int MinPlayers, int MaxPlayers, int EstimatedMinutes, ContentRating ContentRating, int CharacterCount, bool AiGenerated, bool Custom,
-    IReadOnlyList<VersionOption> Versions);
+    IReadOnlyList<VersionOption> Versions, bool Shared = false);
 
 /// <summary>
 /// One version of a story (same place and cast, different killer). The label is deliberately
@@ -28,10 +32,14 @@ public static class ThemeEndpoints
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var themes = await db.Themes.AsNoTracking().OrderBy(t => t.SortOrder).ToListAsync(ct);
-            // Everyone sees the hand-written mysteries; a signed-in host also sees the ones they generated.
-            var scenarios = await db.Scenarios.AsNoTracking()
-                .Where(s => s.ArchivedAt == null && (s.OwnerUserId == null || s.OwnerUserId == userId))
-                .ToListAsync(ct);
+            // Everyone sees the hand-written mysteries (except any the admin took off the shelf) and the ones the admin
+            // shared; a signed-in host also sees their own: the ones they generated, and their copies.
+            var hidden = await ContentVisibility.HiddenAsync(db, GameKind.Mystery, ct);
+            var scenarios = (await db.Scenarios.AsNoTracking()
+                .Where(s => s.ArchivedAt == null && (s.OwnerUserId == null || s.OwnerUserId == userId || s.Shared))
+                .ToListAsync(ct))
+                .Where(s => s.OwnerUserId is not null || !hidden.Contains(s.VariantOf ?? s.Id))
+                .ToList();
             // Versions are listed under their story, not as separate mysteries.
             var versionsOf = scenarios.Where(s => s.VariantOf is not null).ToLookup(s => s.VariantOf!);
             HashSet<string> played = userId is null ? [] : (await db.Parties.AsNoTracking()
@@ -53,9 +61,12 @@ public static class ThemeEndpoints
                 var cards = scenarios
                     .Where(s => s.ThemeSlug == t.Slug && s.VariantOf is null)
                     .Select(e => (Entity: e, Scenario: GameJson.Deserialize<Scenario>(e.Document)))
+                    .Select(x => (x.Entity, x.Scenario, Mine: x.Entity.OwnerUserId is not null && x.Entity.OwnerUserId == userId))
                     .Select(x => new ScenarioCard(x.Scenario.Id, x.Scenario.Title, x.Scenario.Synopsis, x.Scenario.MinPlayers, x.Scenario.MaxPlayers,
-                        x.Scenario.EstimatedMinutes, x.Scenario.ContentRating, x.Scenario.Characters.Count, x.Entity.Source == ScenarioSource.AiGenerated, x.Entity.Source == ScenarioSource.Custom,
-                        Versions(x.Entity)))
+                        x.Scenario.EstimatedMinutes, x.Scenario.ContentRating, x.Scenario.Characters.Count,
+                        // "Written by AI for you" and "Your copy" only on the host's own: a shared mystery is like a hand-written one to everyone else.
+                        x.Mine && x.Entity.Source == ScenarioSource.AiGenerated, x.Mine && x.Entity.Source == ScenarioSource.Custom,
+                        Versions(x.Entity), x.Entity.Shared))
                     .OrderBy(s => s.AiGenerated || s.Custom).ThenBy(s => s.Title)
                     .ToList();
                 return new ThemeCard(GameJson.Deserialize<ThemeDefinition>(t.Document), cards);

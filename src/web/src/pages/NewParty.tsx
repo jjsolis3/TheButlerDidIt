@@ -210,6 +210,7 @@ export default function NewParty() {
               {isHalloween(theme) && ' · 🎃 Halloween'}
               {scenario.aiGenerated && ' · ✨ written by AI for you'}
               {scenario.custom && ' · ✏️ your edited copy'}
+              {scenario.custom && scenario.shared && ' · 🌍 shared with every host'}
               {scenario.versions.length > 1 && ` · 🎲 ${scenario.versions.length} versions, a different killer each`}
             </p>
           </button>

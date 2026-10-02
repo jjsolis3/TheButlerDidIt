@@ -67,7 +67,11 @@ export function RoomCardBody({ room: r, picture }: { room: EscapeRoomSummary; pi
         )}
       </span>
       {r.generated && <span className="mt-3 block text-xs font-semibold tracking-widest text-accent uppercase">✨ Written by AI for you</span>}
-      {r.mine && !r.generated && <span className="mt-3 block text-xs font-semibold tracking-widest text-accent uppercase">📄 Your own copy</span>}
+      {r.mine && !r.generated && (
+        <span className="mt-3 block text-xs font-semibold tracking-widest text-accent uppercase">
+          📄 Your own copy{r.shared && ' · 🌍 shared with every host'}
+        </span>
+      )}
       <span id={roomTitleId(r.id)} className="font-display mt-2 block text-lg">
         {r.title}
       </span>

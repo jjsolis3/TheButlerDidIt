@@ -27,6 +27,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<EscapeRoomEntity> EscapeRooms => Set<EscapeRoomEntity>();
     public DbSet<InviteEntity> Invites => Set<InviteEntity>();
     public DbSet<AccessGrantEntity> AccessGrants => Set<AccessGrantEntity>();
+    public DbSet<HiddenContentEntity> HiddenContent => Set<HiddenContentEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -81,6 +82,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         b.Entity<MediaAsset>().HasIndex(m => m.OwnerUserId);
         b.Entity<ScenarioEntity>().HasIndex(s => s.OwnerUserId);
         b.Entity<ScenarioEntity>().HasIndex(s => s.VariantOf);
+        b.Entity<HiddenContentEntity>(e =>
+        {
+            // One row per hidden room or mystery; the key is also the lookup.
+            e.HasKey(x => new { x.Kind, x.ContentId });
+            e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
+        });
 
         b.Entity<AiProviderEntity>(e =>
         {

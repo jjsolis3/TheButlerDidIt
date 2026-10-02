@@ -50,11 +50,12 @@ export default function EscapeRoomEditor() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
   usePalette(ESCAPE_PALETTE)
-  const [loaded, setLoaded] = useState<{ canEdit: boolean; builtIn: boolean } | null>(null)
+  const [loaded, setLoaded] = useState<{ canEdit: boolean; builtIn: boolean; shared: boolean } | null>(null)
   const [doc, setDoc] = useState<EscapeRoomDoc | null>(null)
   const [dirty, setDirty] = useState(false)
   const [spoilersOk, setSpoilersOk] = useState(false)
-  const [tab, setTab] = useState<Tab>('story')
+  // My escape rooms links straight to the pictures with #media.
+  const [tab, setTab] = useState<Tab>(() => (window.location.hash === '#media' ? 'media' : 'story'))
   const [check, setCheck] = useState<ValidationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState<string | null>(null)
@@ -65,7 +66,7 @@ export default function EscapeRoomEditor() {
     api.escapeRoomDocument(id).then(
       (r) => {
         if (cancelled) return
-        setLoaded({ canEdit: r.canEdit, builtIn: r.builtIn })
+        setLoaded({ canEdit: r.canEdit, builtIn: r.builtIn, shared: r.shared })
         setDoc(r.document)
         setDirty(false)
         setSaved(null)
@@ -182,7 +183,8 @@ export default function EscapeRoomEditor() {
       </div>
       {readOnly && (
         <p className="mt-3 rounded-lg border border-line bg-surface p-3 text-sm text-muted">
-          This is one of the built-in rooms, so it can't be changed here. Make your own copy to change a riddle, rename things or put your family in it.
+          {loaded.shared ? 'The admin shared this room with every host, so only they can change it.' : "This is one of the built-in rooms, so it can't be changed here."}{' '}
+          Make your own copy to change a riddle, rename things or put your family in it.
         </p>
       )}
       {/* On a phone the check's box is below the form, so its verdict also shows up here. */}

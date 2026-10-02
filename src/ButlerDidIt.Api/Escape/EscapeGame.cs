@@ -65,13 +65,15 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
     }
 
     /// <summary>
-    /// A room this host may start a party with: a hand-written one, or one of their own.
-    /// Always asks the database for their own, so a deleted one can't be started from another server's cache.
+    /// A room this host may start a party with: a hand-written one still on the shelf (the admin may use a hidden one),
+    /// one of their own, or one the admin shared with every host.
+    /// Always asks the database for the others, so a deleted one can't be started from another server's cache.
     /// </summary>
-    public async Task<EscapeRoom?> FindForHostAsync(AppDbContext db, string id, string hostUserId, CancellationToken ct)
+    public async Task<EscapeRoom?> FindForHostAsync(AppDbContext db, string id, string hostUserId, bool isAdmin, CancellationToken ct)
     {
-        if (Find(id) is { } room) return room;
-        var row = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id && r.OwnerUserId == hostUserId)
+        if (Find(id) is { } room)
+            return isAdmin || !await ContentVisibility.IsHiddenAsync(db, GameKind.EscapeRoom, id, ct) ? room : null;
+        var row = await db.EscapeRooms.AsNoTracking().Where(r => r.Id == id && (r.OwnerUserId == hostUserId || r.Shared))
             .Select(r => new { r.Document, r.UpdatedAt }).FirstOrDefaultAsync(ct);
         return row is null ? null : Parse(id, row.UpdatedAt, row.Document);
     }
@@ -80,8 +82,16 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
     public async Task<IReadOnlyList<OwnedRoom>> OwnedAsync(AppDbContext db, string hostUserId, CancellationToken ct)
     {
         var rows = await db.EscapeRooms.AsNoTracking().Where(r => r.OwnerUserId == hostUserId).OrderByDescending(r => r.CreatedAt)
-            .Select(r => new { r.Id, r.Document, r.UpdatedAt, r.CopiedFrom }).ToListAsync(ct);
-        return rows.Select(r => new OwnedRoom(Parse(r.Id, r.UpdatedAt, r.Document), Copied: r.CopiedFrom is not null)).ToList();
+            .Select(r => new { r.Id, r.Document, r.UpdatedAt, r.CopiedFrom, r.Shared }).ToListAsync(ct);
+        return rows.Select(r => new OwnedRoom(Parse(r.Id, r.UpdatedAt, r.Document), Copied: r.CopiedFrom is not null, r.Shared)).ToList();
+    }
+
+    /// <summary>Rooms the admin shared with every host, except this host's own (those are in <see cref="OwnedAsync"/>), newest first.</summary>
+    public async Task<IReadOnlyList<EscapeRoom>> SharedAsync(AppDbContext db, string? exceptOwner, CancellationToken ct)
+    {
+        var rows = await db.EscapeRooms.AsNoTracking().Where(r => r.Shared && r.OwnerUserId != exceptOwner).OrderByDescending(r => r.CreatedAt)
+            .Select(r => new { r.Id, r.Document, r.UpdatedAt }).ToListAsync(ct);
+        return rows.Select(r => Parse(r.Id, r.UpdatedAt, r.Document)).ToList();
     }
 
     /// <summary>Drops a deleted or edited room from this server's cache (other servers notice by its UpdatedAt).</summary>
@@ -116,7 +126,8 @@ public sealed class EscapeCatalog(IOptions<ContentOptions> options, IWebHostEnvi
 }
 
 /// <param name="Copied">The host's own copy of another room, rather than one the AI wrote for them.</param>
-public sealed record OwnedRoom(EscapeRoom Room, bool Copied);
+/// <param name="Shared">The admin shared it with every host.</param>
+public sealed record OwnedRoom(EscapeRoom Room, bool Copied, bool Shared);
 
 /// <summary>What the create-party page shows for each room, with the best escape so far (score in seconds, or null).</summary>
 public sealed record EscapeRoomSummary(
@@ -133,18 +144,21 @@ public sealed record EscapeRoomSummary(
     /// <summary>The room's background sound, which also sets the mood of its card when there's no cover picture.</summary>
     Soundscape Soundscape,
     /// <summary>The room's generated cover picture, once one has been painted (a party played with the AI on), or null.</summary>
-    string? CoverUrl)
+    string? CoverUrl,
+    /// <summary>The admin shared it with every host. On other hosts' shelves it sits with the built-in rooms.</summary>
+    bool Shared)
 {
     /// <param name="bestScore">The best escape at the room's own length.</param>
     /// <param name="mine">One of the host's own rooms; <paramref name="copied"/> says it's a copy rather than written by AI.</param>
     /// <param name="coverUrl">The room's <see cref="EscapeArt.Cover"/> picture. It's drawn only from what the TV shows before the game, so it's safe for anyone to see.</param>
-    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool mine = false, bool copied = false, string? coverUrl = null)
+    /// <param name="shared">The admin shared it with every host.</param>
+    public static EscapeRoomSummary For(EscapeRoom r, int? bestScore, bool mine = false, bool copied = false, string? coverUrl = null, bool shared = false)
     {
         // Counted on the room as played at its own length, so the card matches the game the host gets by default.
         var standard = RoomLengths.Cut(r, null);
         return new(r.Id, r.Title, r.Synopsis, r.ContentRating, r.Theme, r.MinPlayers, r.MaxPlayers, r.TimeLimitMinutes, standard.Stages.Count, standard.Puzzles.Count,
             r.HintPenaltySeconds, bestScore, r.Host.Name, Generated: mine && !copied, Mine: mine,
-            r.PlayableLengths.Select(m => new EscapeLength(m, r.Puzzles.Count(p => RoomLengths.Plays(p, m)))).ToList(), r.Seasons, r.Soundscape, coverUrl);
+            r.PlayableLengths.Select(m => new EscapeLength(m, r.Puzzles.Count(p => RoomLengths.Plays(p, m)))).ToList(), r.Seasons, r.Soundscape, coverUrl, shared);
     }
 }
 

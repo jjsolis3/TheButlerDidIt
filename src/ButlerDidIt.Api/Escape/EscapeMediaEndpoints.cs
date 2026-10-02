@@ -213,8 +213,9 @@ public static class EscapeMediaEndpoints
     {
         if (catalog.Find(id) is { } builtIn) return new Found(builtIn, CanEdit: user.IsAdmin, BuiltIn: true);
         var row = await db.EscapeRooms.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id, ct);
-        if (row is null || !EscapeEditorEndpoints.CanEdit(user, row)) return null;
-        return new Found(GameJson.Deserialize<EscapeRoom>(row.Document), CanEdit: true, BuiltIn: false);
+        // A room the admin shared can be looked at by every host, and changed only by whoever can edit it.
+        if (row is null || !EscapeEditorEndpoints.CanRead(user, row)) return null;
+        return new Found(GameJson.Deserialize<EscapeRoom>(row.Document), CanEdit: EscapeEditorEndpoints.CanEdit(user, row), BuiltIn: false);
     }
 
     /// <summary>As <see cref="FindAsync"/>, with a reason to refuse when this host can see the room but not change it.</summary>
@@ -222,7 +223,9 @@ public static class EscapeMediaEndpoints
     {
         if (await FindAsync(db, catalog, user, id, ct) is not { } found) return null;
         var refusal = found.CanEdit ? null
-            : Results.Problem("Only the admin can change a built-in room's pictures, video and sound. Make your own copy to add yours.", statusCode: 403);
+            : Results.Problem(found.BuiltIn
+                ? "Only the admin can change a built-in room's pictures, video and sound. Make your own copy to add yours."
+                : "Only the admin can change this room's pictures, video and sound. Make your own copy to add yours.", statusCode: 403);
         return (found.Room, found.BuiltIn, refusal);
     }
 

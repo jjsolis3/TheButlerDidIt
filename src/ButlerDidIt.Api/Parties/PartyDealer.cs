@@ -129,7 +129,7 @@ public static class StoryVersions
     public static async Task<List<VersionPicker.Candidate>> ForHostAsync(AppDbContext db, ContentCatalog catalog, string story, string hostUserId, CancellationToken ct)
     {
         var ids = await db.Scenarios.AsNoTracking()
-            .Where(x => (x.Id == story || x.VariantOf == story) && x.ArchivedAt == null && (x.OwnerUserId == null || x.OwnerUserId == hostUserId))
+            .Where(x => (x.Id == story || x.VariantOf == story) && x.ArchivedAt == null && (x.OwnerUserId == null || x.OwnerUserId == hostUserId || x.Shared))
             .OrderBy(x => x.Id).Select(x => x.Id).ToListAsync(ct);
         var result = new List<VersionPicker.Candidate>();
         foreach (var id in ids) result.Add(new(id, (await catalog.GetScenarioAsync(db, id, ct)).Solution.MurdererId));

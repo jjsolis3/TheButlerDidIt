@@ -15,6 +15,8 @@ import type {
   RecapPage,
   RecapSharing,
   RoomMediaView,
+  EscapeLibraryItem,
+  SharingRequest,
   EscapeRecapPage,
   EscapeRecapSharing,
   SpectatorList,
@@ -144,6 +146,9 @@ export const api = {
   generateEscapeRoom: (theme: string, contentRating: ContentRating, minutes: number) =>
     request<GenerationJob>('POST', '/api/escape-rooms/generate', { theme, contentRating, minutes }),
   deleteEscapeRoom: (id: string) => request<void>('DELETE', `/api/escape-rooms/${encodeURIComponent(id)}`),
+  // My escape rooms, and the admin's switches: share their own room with every host, or take a built-in one off the shelf.
+  escapeLibrary: () => request<EscapeLibraryItem[]>('GET', '/api/escape-rooms/library'),
+  shareEscapeRoom: (id: string, change: SharingRequest) => request<void>('PUT', `/api/escape-rooms/${encodeURIComponent(id)}/sharing`, change),
   // The escape room editor (#113).
   escapeRoomDocument: (id: string) => request<EditableRoom>('GET', `/api/escape-rooms/${encodeURIComponent(id)}/document`),
   validateEscapeRoom: (document: EscapeRoomDoc) => request<ValidationResult>('POST', '/api/escape-rooms/validate', { document }),
@@ -199,6 +204,7 @@ export const api = {
   saveScenario: (id: string, document: ScenarioDoc) => request<ValidationResult>('PUT', `/api/scenarios/${encodeURIComponent(id)}`, { document }),
   duplicateScenario: (id: string) => request<{ id: string }>('POST', `/api/scenarios/${encodeURIComponent(id)}/duplicate`),
   deleteScenario: (id: string) => request<void>('DELETE', `/api/scenarios/${encodeURIComponent(id)}`),
+  shareScenario: (id: string, change: SharingRequest) => request<void>('PUT', `/api/scenarios/${encodeURIComponent(id)}/sharing`, change),
   kitUrl: (code: string, kind: 'invitations' | 'booklets' | 'nametags' | 'clues') => `/api/parties/${encodeURIComponent(code)}/kit/${kind}.pdf`,
 
   /** Upload a costume selfie. Uses the seat token, because guests don't have accounts. */
