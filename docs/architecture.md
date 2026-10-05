@@ -171,6 +171,18 @@ These rules are checked on the server where a party starts (`EscapeCatalog.FindF
 - **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `Watch` (the TV on a spectator's phone, with cheers), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
 - **Front doors** (#99): `/` (`Home`) offers both games, with a card for each in that game's colours, plus "Your parties". Each game has its own page for visitors who haven't signed in: `/mystery` (`MysteryLanding`: the themes) and `/escape` (`EscapeLanding`: how it works, then the room shelf with filters and each room's leaderboards). Each also has a printable how-to-play sheet, `/how-to-play` and `/how-to-play/escape`. "Host" links go through sign-in with `?next=`, so a visitor lands on the host page with the room they picked.
 - **`PlayerScreen`** is the whole phone experience. Pass-and-play reuses it for each local seat.
+- **The mystery's TV layout** (#129): nobody scrolls a TV, so on a screen at least 1024×600 (`TV_LAYOUT`, the escape TV's test), `Stage` becomes a full-height frame: the top bar, then the phase, then the host bar (part of the frame rather than floating over it). The watchers panel becomes the top bar's 👀 chip.
+  - **The phase is wrapped in `FitToScreen`.** It measures the content's natural height and scales it down to fit when it's a little too tall, but never below 0.6. Below that it's unreadable from the sofa, so the box scrolls instead, as a last resort that `mystery-tv.spec.ts` checks never happens. `data-fit` says which it did.
+  - **Lists that grow all evening stay short on the TV, because the phones keep everything.**
+    - Evidence shows the newest four clues as compact cards on a 1080p screen, or two on a short one, and names the rest.
+    - Secrets show the latest three.
+    - The NPC interrogation room shows the last two.
+  - **The endings are laid out in two columns:**
+    - the unmasked killer beside the Inspector's verdicts, then beside the explanation;
+    - the finale beside the scores and the timeline;
+    - the winners beside the scores.
+  - **Scenes are sized to fit:** each is as wide as the screen allows while its 16:9 picture fits between the bars.
+  - **Phones and small windows** keep the scrolling page.
 - **`CuePlayer`** plays cinematics: a list of cues (image, narration, NPC line, music, sound, video). Narration uses an audio file when the cue has one, otherwise the browser's built-in speech synthesis. Browsers block sound until the user interacts, which is why the stage starts with a "Tap to begin the evening" button.
 - **Theming**: colours are CSS variables that `useThemePalette` swaps per theme; Tailwind utilities (`bg-surface`, `text-accent`) read those variables. A page can also set a fixed palette with `usePalette`: the escape pages use `ESCAPE_PALETTE` (steel and exit-sign green), so the two games look different. It's a layout effect, so the page never flashes in the default gold first.
 

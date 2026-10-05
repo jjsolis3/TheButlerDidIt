@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { CuePlayer } from '../components/CuePlayer'
+import { FitToScreen } from '../components/FitToScreen'
 import { GuideButton } from '../components/Guide'
 import { nextAction, nextSpeaker, spotlightTime, turnSecondsLeft, useHostCall, type Invoke } from '../components/HostControls'
 import { CheerBar, CheerOverlay } from '../components/Cheers'
@@ -20,6 +21,7 @@ import { seats, type WatchingAs } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
 import { useBackgroundMusic } from '../lib/useBackgroundMusic'
+import { TV_LAYOUT, useMediaQuery } from '../lib/useMediaQuery'
 import { useSoundscape } from '../lib/useSoundscape'
 import type { InterrogationView, MediaJob, PartyInfo, SpotlightView, StageView } from '../lib/types'
 
@@ -84,6 +86,8 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
   })
   const [begun, setBegun] = useState(false)
   const [muted, setMuted] = useState(false)
+  // A TV-sized screen gets a frame that fills it and never scrolls (#129); phones and small windows scroll as a page.
+  const tv = useMediaQuery(TV_LAYOUT)
   useThemePalette(info.themeSlug)
   useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted, stage?.ai.voices ?? false)
   useSpeakNpcSpotlight(stage, begun && !muted)
@@ -149,29 +153,53 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
 
   return (
     <NpcTypingContext.Provider value={typing}>
-      <div className="grain flex min-h-dvh flex-col" data-soundscape={stage.musicUrl ? 'music' : stage.soundscape}>
+      <div
+        className={`grain flex flex-col ${tv ? 'h-dvh overflow-hidden' : 'min-h-dvh'}`}
+        data-layout={tv ? 'tv' : 'page'}
+        data-soundscape={stage.musicUrl ? 'music' : stage.soundscape}
+      >
         <StatusPill status={status} />
-        <TopBar stage={stage} info={info} muted={muted} onMute={() => setMuted((m) => !m)} />
-        <main className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 sm:px-8 ${watcher ? 'pb-40' : 'pb-32'}`}>
-          <PhaseView
-            stage={stage}
-            info={info}
-            invoke={invoke}
-            muted={muted}
-            begun={begun || stage.phase === 'lobby'}
-            soundOn={begun}
-            onBegin={() => {
-              narrator.speak(' ', null, false)
-              setBegun(true)
-            }}
-          />
-          {info.isHost && (
+        <TopBar
+          stage={stage}
+          info={info}
+          muted={muted}
+          onMute={() => setMuted((m) => !m)}
+          watchers={tv && info.isHost ? <WatchersPanel code={info.code} refresh={audience} variant="chip" /> : null}
+        />
+        {/* On the TV the phase gets exactly the space between the bars, and fits itself into it. */}
+        <main
+          className={
+            tv
+              ? `min-h-0 w-full flex-1 px-8 pt-2 xl:px-12 ${watcher ? 'pb-28' : 'pb-4'}`
+              : `mx-auto w-full max-w-6xl flex-1 px-4 pt-4 sm:px-8 ${watcher ? 'pb-40' : 'pb-32'}`
+          }
+        >
+          {(() => {
+            const phase = (
+              <PhaseView
+                stage={stage}
+                info={info}
+                invoke={invoke}
+                muted={muted}
+                begun={begun || stage.phase === 'lobby'}
+                soundOn={begun}
+                tv={tv}
+                onBegin={() => {
+                  narrator.speak(' ', null, false)
+                  setBegun(true)
+                }}
+              />
+            )
+            // Keyed on the phase, so a new phase measures afresh rather than starting at the last one's scale.
+            return tv ? <FitToScreen key={`${stage.phase}-${stage.actNumber}-${stage.actStep}`}>{phase}</FitToScreen> : phase
+          })()}
+          {info.isHost && !tv && (
             <div className="mt-10">
               <WatchersPanel code={info.code} refresh={audience} open={stage.phase === 'lobby'} />
             </div>
           )}
         </main>
-        {info.isHost && <HostBar stage={stage} info={info} invoke={invoke} />}
+        {info.isHost && <HostBar stage={stage} info={info} invoke={invoke} tv={tv} />}
         <FeedToasts feed={stage.feed} offset="top-20" />
         <CheerOverlay cheers={cheers.cheers} />
         {watcher && <CheerBar invoke={invoke} name={watcher.name} onLeave={watcher.onLeave} />}
@@ -181,7 +209,19 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
   )
 }
 
-function TopBar({ stage, info, muted, onMute }: { stage: StageView; info: PartyInfo; muted: boolean; onMute: () => void }) {
+function TopBar({
+  stage,
+  info,
+  muted,
+  onMute,
+  watchers,
+}: {
+  stage: StageView
+  info: PartyInfo
+  muted: boolean
+  onMute: () => void
+  watchers?: React.ReactNode
+}) {
   return (
     <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-8">
       <div className="min-w-0">
@@ -192,6 +232,7 @@ function TopBar({ stage, info, muted, onMute }: { stage: StageView; info: PartyI
       </div>
       <div className="flex items-center gap-3">
         {stage.phase === 'act' && stage.actStep === 'mingle' && <Countdown timer={stage.timer} />}
+        {watchers}
         <GuideButton guide={stageGuide(stage, info.isHost)} phase={stage.phase} />
         <span className="hidden rounded-md border border-line px-2 py-1 font-mono text-sm tracking-widest text-accent sm:inline">{info.code}</span>
         <button onClick={onMute} className="rounded-md border border-line px-2 py-1 text-sm text-muted hover:text-ink" aria-label={muted ? 'Unmute' : 'Mute'}>
@@ -209,6 +250,7 @@ function PhaseView({
   muted,
   begun,
   soundOn,
+  tv,
   onBegin,
 }: {
   stage: StageView
@@ -217,47 +259,68 @@ function PhaseView({
   muted: boolean
   begun: boolean
   soundOn: boolean
+  /** The TV layout: everything on one screen (#129). */
+  tv: boolean
   onBegin: () => void
 }) {
   switch (stage.phase) {
     case 'lobby':
-      return <LobbyView stage={stage} info={info} invoke={invoke} soundOn={soundOn} onEnableSound={onBegin} />
+      return <LobbyView stage={stage} info={info} invoke={invoke} soundOn={soundOn} onEnableSound={onBegin} tv={tv} />
     case 'castReveal':
       return <CastView stage={stage} />
     case 'prologue':
-      return <CuePlayer cues={stage.cues} runKey="prologue" muted={muted} enabled={begun} />
+      return (
+        <Cinematic tv={tv}>
+          <CuePlayer cues={stage.cues} runKey="prologue" muted={muted} enabled={begun} />
+        </Cinematic>
+      )
     case 'act':
       return stage.actStep === 'cinematic' ? (
         <div className="space-y-4">
           <h2 className="font-display text-center text-3xl sm:text-4xl">{stage.actTitle}</h2>
-          <CuePlayer cues={stage.cues} runKey={`act-${stage.actNumber}`} muted={muted} enabled={begun} />
+          <Cinematic tv={tv} titled>
+            <CuePlayer cues={stage.cues} runKey={`act-${stage.actNumber}`} muted={muted} enabled={begun} />
+          </Cinematic>
         </div>
       ) : (
-        <MingleView stage={stage} />
+        <MingleView stage={stage} tv={tv} />
       )
     case 'accusation':
       return <AccusationView stage={stage} />
     case 'reveal':
-      return <RevealView stage={stage} muted={muted} begun={begun} />
+      return <RevealView stage={stage} muted={muted} begun={begun} tv={tv} />
     case 'awards':
-      return <AwardsView stage={stage} />
-    case 'finished':
-      return (
+      return <AwardsView stage={stage} tv={tv} />
+    case 'finished': {
+      const after = info.isHost && (
         <>
-          <AwardsView stage={stage} />
-          {info.isHost && (
-            <RecapShare code={info.code} load={api.recap} blurb="A page with the cast, the solution, everyone's secrets, the scores and the costume photos." />
-          )}
-          {info.isHost && (
-            <p className="mt-6 text-center">
-              <Link to="/host/new" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-line bg-surface px-4 py-2 text-sm hover:border-accent">
-                🎭 Host another game
-              </Link>
-            </p>
-          )}
+          <RecapShare code={info.code} load={api.recap} blurb="A page with the cast, the solution, everyone's secrets, the scores and the costume photos." />
+          <p className="mt-6 text-center">
+            <Link to="/host/new" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-line bg-surface px-4 py-2 text-sm hover:border-accent">
+              🎭 Host another game
+            </Link>
+          </p>
         </>
       )
+      return tv ? (
+        <AwardsView stage={stage} tv after={after} />
+      ) : (
+        <>
+          <AwardsView stage={stage} tv={false} />
+          {after}
+        </>
+      )
+    }
   }
+}
+
+/**
+ * A scene on the TV: as wide as the screen allows while its 16:9 picture still fits between the bars, so a wide TV
+ * shows it big without it running off the bottom (#129). `titled` leaves room for the act's title above it.
+ */
+function Cinematic({ tv, titled = false, children }: { tv: boolean; titled?: boolean; children: React.ReactNode }) {
+  if (!tv) return <>{children}</>
+  return <div className={`mx-auto w-full ${titled ? 'max-w-[calc((100dvh-19rem)*16/9)]' : 'max-w-[calc((100dvh-15rem)*16/9)]'}`}>{children}</div>
 }
 
 // ------------------------------------------------------------------ lobby
@@ -268,12 +331,14 @@ function LobbyView({
   invoke,
   soundOn,
   onEnableSound,
+  tv,
 }: {
   stage: StageView
   info: PartyInfo
   invoke: Invoke
   soundOn: boolean
   onEnableSound: () => void
+  tv: boolean
 }) {
   const joinUrl = `${window.location.origin}/join/${info.code}`
   const [error, setError] = useState<string | null>(null)
@@ -298,7 +363,7 @@ function LobbyView({
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+    <div className={`grid gap-8 ${tv ? 'grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]' : 'lg:grid-cols-[1fr_1.2fr]'}`}>
       {stage.tailoring && (
         // Says nothing about who: once the AI is done, one of the guests is the killer either way.
         <div className="candle rounded-2xl border-2 border-accent bg-accent/10 p-5 text-center lg:col-span-2" role="status">
@@ -309,11 +374,11 @@ function LobbyView({
       <section className="space-y-5">
         <div>
           <p className="text-xs tracking-[0.3em] text-accent uppercase">{stage.scenario.era}</p>
-          <h1 className="font-display mt-2 text-4xl leading-tight sm:text-5xl">{stage.scenario.title}</h1>
-          <p className="mt-3 text-muted">{stage.scenario.synopsis}</p>
+          <h1 className={`font-display mt-2 text-4xl leading-tight ${tv ? '2xl:text-5xl' : 'sm:text-5xl'}`}>{stage.scenario.title}</h1>
+          <p className={`mt-3 text-muted ${tv ? 'line-clamp-4' : ''}`}>{stage.scenario.synopsis}</p>
         </div>
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-accent/40 bg-surface p-6 sm:flex-row">
-          <QrCode url={joinUrl} size={180} />
+          <QrCode url={joinUrl} size={tv ? 150 : 180} />
           <div className="text-center sm:text-left">
             <p className="text-sm text-muted">Scan to join, or visit</p>
             <p className="font-medium break-all">{window.location.host}/join</p>
@@ -360,7 +425,7 @@ function LobbyView({
         <h2 className="font-display mb-3 text-2xl">
           The suspects <span className="text-base text-muted">({stage.players.length} of up to {stage.scenario.maxPlayers} guests)</span>
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className={`grid gap-3 sm:grid-cols-2 ${tv ? '2xl:grid-cols-3' : ''}`}>
           {stage.cast.map((c) => {
             const player = stage.players.find((p) => p.characterId === c.characterId)
             return (
@@ -461,7 +526,15 @@ function CastView({ stage }: { stage: StageView }) {
   )
 }
 
-function MingleView({ stage }: { stage: StageView }) {
+/**
+ * On the TV, how much of each list the evening shows: the newest. Every phone keeps the whole of each (#129). A short
+ * screen (a 720p TV) has room for one row of clue cards, a taller one for two.
+ */
+const TV_CLUES = { roomy: 4, short: 2 }
+const TV_SECRETS = 3
+const ROOMY = '(min-height: 860px)'
+
+function MingleView({ stage, tv }: { stage: StageView; tv: boolean }) {
   const [promptIndex, setPromptIndex] = useState(0)
   useEffect(() => {
     if (stage.prompts.length < 2) return
@@ -469,9 +542,16 @@ function MingleView({ stage }: { stage: StageView }) {
     return () => clearInterval(id)
   }, [stage.prompts.length])
 
+  const roomy = useMediaQuery(ROOMY)
   const clues = [...stage.clues].reverse()
+  // The TV shows the newest evidence in full and names the rest; the phones' Clues tab has every one.
+  const cards = roomy ? TV_CLUES.roomy : TV_CLUES.short
+  const shown = tv ? clues.slice(0, cards) : clues
+  const earlier = tv ? clues.slice(cards) : []
+  const secrets = tv ? [...stage.revealedSecrets].reverse().slice(0, TV_SECRETS) : stage.revealedSecrets
+  const moreSecrets = stage.revealedSecrets.length - secrets.length
   return (
-    <div className="space-y-6">
+    <div className={tv ? 'space-y-4' : 'space-y-6'}>
       <div className="text-center">
         <p className="text-xs tracking-[0.3em] text-accent uppercase">{stage.actTitle}</p>
         <div className="mt-2 flex justify-center">
@@ -480,42 +560,52 @@ function MingleView({ stage }: { stage: StageView }) {
         <SpotlightBanner stage={stage} />
         {/* While someone has the floor, their question card is the prompt. */}
         {!stage.spotlight && stage.prompts.length > 0 && (
-          <p key={promptIndex} className="font-display mx-auto mt-4 max-w-3xl text-2xl text-ink/90 italic sm:text-3xl">
+          <p key={promptIndex} className={`font-display mx-auto max-w-3xl text-2xl text-ink/90 italic sm:text-3xl ${tv ? 'mt-2 line-clamp-2' : 'mt-4'}`}>
             “{stage.prompts[promptIndex % stage.prompts.length]}”
           </p>
         )}
       </div>
-      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+      <div className={`grid gap-6 ${tv ? 'grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : 'lg:grid-cols-[2fr_1fr]'}`}>
         <section>
           <h2 className="font-display mb-3 text-2xl">Evidence</h2>
           {clues.length === 0 ? (
             <p className="text-muted">No evidence has come to light yet.</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
-              {clues.map((c) => (
-                <ClueCard key={c.id} clue={c} />
+              {shown.map((c) => (
+                <ClueCard key={c.id} clue={c} compact={tv} />
               ))}
             </div>
           )}
+          {earlier.length > 0 && (
+            <p className="mt-3 text-sm text-muted" data-testid="earlier-evidence">
+              <span className="text-ink/80">Earlier evidence:</span> {earlier.map((c) => c.title).join(' · ')}. Every clue is on your phones.
+            </p>
+          )}
         </section>
-        <section className="space-y-8">
+        <section className={tv ? 'space-y-5' : 'space-y-8'}>
           <SuspicionMeter stage={stage} />
-          {stage.ai.npcQuestions && stage.cast.some((c) => c.isNpc) && <InterrogationRoom stage={stage} />}
+          {stage.ai.npcQuestions && stage.cast.some((c) => c.isNpc) && <InterrogationRoom stage={stage} latest={tv ? 2 : 4} />}
           {stage.options.drinkingPrompts && <Cocktails themeSlug={stage.scenario.themeSlug} />}
           <div>
-          <h2 className="font-display mb-3 text-2xl">Secrets exposed</h2>
-          {stage.revealedSecrets.length === 0 ? (
-            <p className="text-sm text-muted">Nobody has confessed anything… yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {stage.revealedSecrets.map((s) => (
-                <li key={s.text} className="rounded-xl border border-line bg-surface p-3 text-sm">
-                  <span className="text-accent">{s.characterName}</span>
-                  <p className="mt-1">{s.text}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+            <h2 className="font-display mb-3 text-2xl">Secrets exposed</h2>
+            {secrets.length === 0 ? (
+              <p className="text-sm text-muted">Nobody has confessed anything… yet.</p>
+            ) : (
+              <ul className="space-y-3">
+                {secrets.map((s) => (
+                  <li key={s.text} className="rounded-xl border border-line bg-surface p-3 text-sm">
+                    <span className="text-accent">{s.characterName}</span>
+                    <p className="mt-1">{s.text}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {moreSecrets > 0 && (
+              <p className="mt-2 text-xs text-muted">
+                …and {moreSecrets} more. Every secret is on your phones.
+              </p>
+            )}
           </div>
         </section>
       </div>
@@ -524,8 +614,8 @@ function MingleView({ stage }: { stage: StageView }) {
 }
 
 /** The latest questions guests put to NPCs, with the characters' answers. */
-function InterrogationRoom({ stage }: { stage: StageView }) {
-  const latest = [...stage.interrogations].filter((i) => i.act === stage.actNumber).reverse().slice(0, 4)
+function InterrogationRoom({ stage, latest: count }: { stage: StageView; latest: number }) {
+  const latest = [...stage.interrogations].filter((i) => i.act === stage.actNumber).reverse().slice(0, count)
   return (
     <div>
       <h2 className="font-display mb-1 text-2xl">The interrogation room</h2>
@@ -620,7 +710,7 @@ function AccusationView({ stage }: { stage: StageView }) {
   )
 }
 
-function RevealView({ stage, muted, begun }: { stage: StageView; muted: boolean; begun: boolean }) {
+function RevealView({ stage, muted, begun, tv }: { stage: StageView; muted: boolean; begun: boolean; tv: boolean }) {
   const r = stage.reveal!
   const final = r.step === r.stepCount - 1
   const murderer = stage.cast.find((c) => c.characterId === r.murdererId)
@@ -637,20 +727,32 @@ function RevealView({ stage, muted, begun }: { stage: StageView; muted: boolean;
   }, [toSpeak, begun, muted])
 
   if (final) {
-    return (
+    const timeline = (
+      <section>
+        <h2 className="font-display mb-3 text-2xl">What really happened</h2>
+        <ol className={`border-l border-accent/50 pl-5 ${tv ? 'space-y-1 text-sm' : 'space-y-2'}`}>
+          {r.timeline.map((t) => (
+            <li key={t.time + t.event}>
+              <span className="font-mono text-accent">{t.time}</span> <span className="text-ink/90">{t.event}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+    // On the TV the finale plays beside the scores and the timeline, rather than above them (#129).
+    return tv ? (
+      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] items-start gap-8">
+        <CuePlayer cues={stage.cues} runKey="finale" muted={muted} enabled={begun} />
+        <div className="space-y-6">
+          <Scores stage={stage} compact />
+          {timeline}
+        </div>
+      </div>
+    ) : (
       <div className="space-y-8">
         <CuePlayer cues={stage.cues} runKey="finale" muted={muted} enabled={begun} />
         <Scores stage={stage} />
-        <section>
-          <h2 className="font-display mb-3 text-2xl">What really happened</h2>
-          <ol className="space-y-2 border-l border-accent/50 pl-5">
-            {r.timeline.map((t) => (
-              <li key={t.time + t.event}>
-                <span className="font-mono text-accent">{t.time}</span> <span className="text-ink/90">{t.event}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+        {timeline}
       </div>
     )
   }
@@ -678,53 +780,83 @@ function RevealView({ stage, muted, begun }: { stage: StageView; muted: boolean;
           </div>
         </section>
       ) : (
-        <section className="flex flex-col items-center gap-4 text-center">
-          <p className="text-xs tracking-[0.3em] text-accent uppercase">The murderer was</p>
-          {murderer && <Portrait id={murderer.characterId} name={murderer.name} src={murderer.portrait} size={150} />}
-          <h1 className="font-display text-5xl text-red-200 sm:text-6xl">{r.murdererName}</h1>
-          <p className="text-muted">
-            {r.motive}. {r.method}.
-          </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {r.guesses.map((g) => (
-              <span key={g.playerName} className={`rounded-full border px-3 py-1 text-sm ${g.correct ? 'border-accent text-accent' : 'border-line text-muted line-through'}`}>
-                {g.playerName}
-              </span>
-            ))}
-          </div>
-          {r.step === 1 && r.guesses.some((g) => g.verdict) && (
-            <div className="mt-2 grid max-w-4xl gap-3 text-left sm:grid-cols-2">
-              {r.guesses
-                .filter((g) => g.verdict)
-                .map((g) => (
-                  <div key={g.playerName} className="rounded-xl border border-line bg-surface p-3 text-sm">
-                    <p className="text-xs tracking-widest text-accent uppercase">The Inspector on {g.playerName}</p>
-                    <p className="font-display mt-1 text-lg italic">{g.verdict}</p>
-                  </div>
-                ))}
-            </div>
-          )}
-          <div className="mt-4 max-w-3xl space-y-4 text-left">
-            {r.explanation.map((p, i) => (
-              <p key={i} className={`font-display text-xl leading-relaxed ${i === r.explanation.length - 1 ? 'text-ink' : 'text-ink/60'}`}>
-                {p}
-              </p>
-            ))}
-          </div>
-        </section>
+        <Unmasked stage={stage} murderer={murderer} tv={tv} />
       )}
     </div>
   )
 }
 
-function Scores({ stage }: { stage: StageView }) {
+/**
+ * The killer unmasked, then the explanation paragraph by paragraph. On the TV (#129) they sit side by side: the killer
+ * and who guessed right on the left; the Inspector's verdicts, then the explanation, on the right.
+ */
+function Unmasked({ stage, murderer, tv }: { stage: StageView; murderer: StageView['cast'][number] | undefined; tv: boolean }) {
+  const r = stage.reveal!
+  const killer = (
+    <div className="flex flex-col items-center gap-4 text-center">
+      <p className="text-xs tracking-[0.3em] text-accent uppercase">The murderer was</p>
+      {murderer && <Portrait id={murderer.characterId} name={murderer.name} src={murderer.portrait} size={150} />}
+      <h1 className="font-display text-5xl text-red-200 sm:text-6xl">{r.murdererName}</h1>
+      <p className="text-muted">
+        {r.motive}. {r.method}.
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+        {r.guesses.map((g) => (
+          <span key={g.playerName} className={`rounded-full border px-3 py-1 text-sm ${g.correct ? 'border-accent text-accent' : 'border-line text-muted line-through'}`}>
+            {g.playerName}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+  const verdicts = r.step === 1 && r.guesses.some((g) => g.verdict) && (
+    <div className={`grid gap-3 text-left sm:grid-cols-2 ${tv ? '' : 'mt-2 max-w-4xl'}`}>
+      {r.guesses
+        .filter((g) => g.verdict)
+        .map((g) => (
+          <div key={g.playerName} className="rounded-xl border border-line bg-surface p-3 text-sm">
+            <p className="text-xs tracking-widest text-accent uppercase">The Inspector on {g.playerName}</p>
+            <p className="font-display mt-1 text-lg italic">{g.verdict}</p>
+          </div>
+        ))}
+    </div>
+  )
+  const explanation = (
+    <div className={`space-y-4 text-left ${tv ? '' : 'mt-4 max-w-3xl'}`}>
+      {r.explanation.map((p, i) => (
+        <p key={i} className={`font-display text-xl leading-relaxed ${i === r.explanation.length - 1 ? 'text-ink' : 'text-ink/60'}`}>
+          {p}
+        </p>
+      ))}
+    </div>
+  )
+  if (tv)
+    return (
+      <section className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] items-center gap-10">
+        {killer}
+        <div className="space-y-4">
+          {verdicts}
+          {explanation}
+        </div>
+      </section>
+    )
+  return (
+    <section className="flex flex-col items-center gap-4 text-center">
+      {killer}
+      {verdicts}
+      {explanation}
+    </section>
+  )
+}
+
+function Scores({ stage, compact = false }: { stage: StageView; compact?: boolean }) {
   const scores = stage.reveal?.scores ?? []
   return (
     <section>
       <h2 className="font-display mb-3 text-2xl">The detectives' scores</h2>
-      <ol className="space-y-2">
+      <ol className={compact ? 'space-y-1.5' : 'space-y-2'}>
         {scores.map((s, i) => (
-          <li key={s.seatId} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-3">
+          <li key={s.seatId} className={`flex items-center justify-between gap-3 rounded-xl border border-line bg-surface ${compact ? 'px-3 py-2' : 'p-3'}`}>
             <span>
               <span className="font-display mr-3 text-accent">{i + 1}.</span>
               {s.playerName}
@@ -739,7 +871,7 @@ function Scores({ stage }: { stage: StageView }) {
   )
 }
 
-function AwardsView({ stage }: { stage: StageView }) {
+function AwardsView({ stage, tv, after }: { stage: StageView; tv: boolean; after?: React.ReactNode }) {
   const a = stage.awards!
   if (!a.results) {
     return (
@@ -752,10 +884,10 @@ function AwardsView({ stage }: { stage: StageView }) {
       </div>
     )
   }
-  return (
-    <div className="space-y-8 py-6 text-center">
+  const winners = (
+    <>
       <h1 className="font-display text-5xl">And the winners are…</h1>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className={`grid gap-4 ${tv ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
         {a.bestDetective && (
           <Award title="Best Detective" winners={[a.bestDetective.playerName]} detail={`${a.bestDetective.points} points`} />
         )}
@@ -763,8 +895,26 @@ function AwardsView({ stage }: { stage: StageView }) {
           <Award key={r.awardId} title={r.title} winners={r.winners} detail={r.votes ? `${r.votes} vote${r.votes === 1 ? '' : 's'}` : 'No votes'} />
         ))}
       </div>
+    </>
+  )
+  const thanks = <p className="font-display text-2xl text-muted italic">Thank you for a killer evening.</p>
+  // On the TV the winners sit beside the scores (#129); the host's recap and "host another" go under the winners.
+  if (tv)
+    return (
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start gap-10 py-2">
+        <div className="space-y-6 text-center">
+          {winners}
+          {thanks}
+          {after}
+        </div>
+        <Scores stage={stage} compact />
+      </div>
+    )
+  return (
+    <div className="space-y-8 py-6 text-center">
+      {winners}
       <Scores stage={stage} />
-      <p className="font-display text-2xl text-muted italic">Thank you for a killer evening.</p>
+      {thanks}
     </div>
   )
 }
@@ -799,7 +949,7 @@ function writeHidden(code: string, hidden: boolean) {
   }
 }
 
-function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; invoke: Invoke }) {
+function HostBar({ stage, info, invoke, tv }: { stage: StageView; info: PartyInfo; invoke: Invoke; tv: boolean }) {
   const { call, busy, error } = useHostCall(info.code, invoke)
   const [hidden, setHidden] = useState(() => readHidden(info.code))
   const [showRemote, setShowRemote] = useState(false)
@@ -825,9 +975,10 @@ function HostBar({ stage, info, invoke }: { stage: StageView; info: PartyInfo; i
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur sm:px-8">
+    // On the TV it's the frame's bottom row, so the phase above gets the rest of the screen; on a page it floats.
+    <div className={`z-30 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur sm:px-8 ${tv ? 'shrink-0 xl:px-12' : 'fixed inset-x-0 bottom-0'}`}>
       {showRemote && <RemoteQr code={info.code} onClose={() => setShowRemote(false)} onHide={() => hide(true)} />}
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2">
+      <div className={`mx-auto flex flex-wrap items-center justify-between gap-2 ${tv ? '' : 'max-w-6xl'}`}>
         <div className="flex flex-wrap items-center gap-2">
           <span className="mr-1 text-xs tracking-widest text-muted uppercase">Host</span>
           <Button variant="quiet" onClick={() => setShowRemote(true)}>
