@@ -186,6 +186,20 @@ public static class AccountEndpoints
             return Results.NoContent();
         });
 
+        // ---- The host's usual party settings (#102): the host page starts from them.
+        group.MapGet("/preferences", async (ClaimsPrincipal principal, UserManager<AppUser> users) =>
+            await users.GetUserAsync(principal) is { } user ? Results.Ok(HostPreferences.For(user)) : Results.Unauthorized());
+
+        group.MapPut("/preferences", async (HostPreferences req, ClaimsPrincipal principal, UserManager<AppUser> users) =>
+        {
+            var user = await users.GetUserAsync(principal);
+            if (user is null) return Results.Unauthorized();
+            if (req.Problem() is { } problem) return Results.Problem(problem, statusCode: 400);
+            user.Preferences = GameJson.Serialize(req);
+            var saved = await users.UpdateAsync(user);
+            return saved.Succeeded ? Results.Ok(HostPreferences.For(user)) : Results.Problem("Your settings couldn't be saved. Try again.", statusCode: 500);
+        });
+
         // ---- "Download my data": a JSON file of what this account holds. Guests' names and notes aren't
         // included: they belong to the guests, and finished parties drop them anyway (RetentionWorker).
         group.MapGet("/export", async (ClaimsPrincipal principal, UserManager<AppUser> users, AppDbContext db, TimeProvider clock, CancellationToken ct) =>
@@ -208,6 +222,7 @@ public static class AccountEndpoints
             {
                 ExportedAt = clock.GetUtcNow(),
                 Account = new { user.DisplayName, user.Email, user.EmailConfirmed, user.IsAdmin },
+                PartySettings = HostPreferences.For(user),
                 Parties = parties, Mysteries = mysteries, EscapeRooms = rooms, Escapes = escapes, AiUsage = aiUsage,
             };
             var json = JsonSerializer.SerializeToUtf8Bytes(export, new JsonSerializerOptions(GameJson.Options) { WriteIndented = true });

@@ -773,6 +773,36 @@ export interface EscapeLength {
 /** Which puzzles a new escape party plays. */
 export type PuzzleChoice = 'fresh' | 'daily' | 'replay'
 
+/** A host's usual party settings (#102; C# HostPreferences): the host page starts from them. */
+export interface HostPreferences {
+  /** Which game the host page opens on */
+  game: GameKind
+  mystery: MysteryDefaults
+  escape: EscapeDefaults
+}
+
+export interface MysteryDefaults {
+  mode: PartyMode
+  /** The Adults or Family shelf */
+  shelf: ContentRating
+  tone: Tone
+  drinkingPrompts: boolean
+  useAi: boolean
+  /** Let the AI rewrite "Surprise me" so one of tonight's guests is the killer */
+  tailor: boolean
+}
+
+export interface EscapeDefaults {
+  mode: PartyMode
+  shelf: ContentRating
+  /** The game's length when the room offers it; null: each room's own */
+  minutes: number | null
+  difficulty: EscapeDifficulty
+  /** A replay is of one shared set, so it's never a default */
+  puzzles: Exclude<PuzzleChoice, 'replay'>
+  useAi: boolean
+}
+
 export interface LeaderboardEntry {
   rank: number
   /** Seconds taken plus the time hints cost; lower is better */

@@ -10,6 +10,9 @@ public sealed class AppUser : IdentityUser
     public string DisplayName { get; set; } = "";
 
     public bool IsAdmin { get; set; }
+
+    /// <summary>The host's usual party settings as jsonb (see Endpoints.HostPreferences), or null for the defaults.</summary>
+    public string? Preferences { get; set; }
 }
 
 /// <summary>

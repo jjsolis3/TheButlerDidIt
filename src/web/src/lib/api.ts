@@ -7,6 +7,7 @@ import type {
   EscapeRoomSummary,
   Leaderboard,
   PuzzleChoice,
+  HostPreferences,
   GenerationJob,
   MediaJob,
   Me,
@@ -140,6 +141,9 @@ export const api = {
     confirmEmailChange: (userId: string, email: string, token: string) => request<Me>('POST', '/api/account/email/confirm', { userId, email, token }),
     changePassword: (currentPassword: string, newPassword: string) => request<void>('POST', '/api/account/password', { currentPassword, newPassword }),
     signOutEverywhere: () => request<void>('POST', '/api/account/sign-out-everywhere'),
+    /** The host's usual party settings (#102). */
+    preferences: () => request<HostPreferences>('GET', '/api/account/preferences'),
+    savePreferences: (p: HostPreferences) => request<HostPreferences>('PUT', '/api/account/preferences', p),
     /** A file download, so it's a plain link rather than a fetch. */
     exportUrl: '/api/account/export',
     remove: (password: string) => request<void>('POST', '/api/account/delete', { password }),

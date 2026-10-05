@@ -33,6 +33,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     {
         base.OnModelCreating(b);
 
+        // A host's party settings: one small document, read and written whole (#102).
+        b.Entity<AppUser>().Property(u => u.Preferences).HasColumnType("jsonb");
+
         // Leaderboards read one room's escapes, best score first.
         b.Entity<EscapeResult>().HasIndex(r => new { r.RoomId, r.Escaped, r.Score });
         b.Entity<EscapeResult>().HasIndex(r => r.PartyId).IsUnique(); // one result per party
