@@ -1,6 +1,7 @@
 using System.Reflection;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 using ButlerDidIt.Escape.Testing;
 
 namespace ButlerDidIt.Escape.Tests;
@@ -89,6 +90,32 @@ public class AtmosphereTests
         var plain = EscapeProjector.Stage(s, room, T0);
         Assert.Null(plain.IntroVideoUrl);
         Assert.Null(plain.AmbienceUrl);
+    }
+
+    [Fact]
+    public void The_game_master_s_recorded_readings_reach_the_tv_only_when_their_stage_opens()
+    {
+        var room = Workshop;
+        var (first, second) = (room.Stages[0].Id, room.Stages[1].Id);
+        var media = new Dictionary<string, string>
+        {
+            [EscapeArt.IntroVoice] = "/media/intro-voice",
+            [EscapeArt.StageVoice(first)] = "/media/stage-1-voice",
+            [EscapeArt.StageVoice(second)] = "/media/stage-2-voice",
+        };
+        var lobby = EscapeProjector.Stage(EscapeEngine.NewGame(7), room, T0, media);
+        Assert.Equal("/media/intro-voice", lobby.IntroVoiceUrl); // public, like the intro it reads
+        Assert.Null(lobby.StageVoiceUrl);
+
+        var s = Started(room);
+        Assert.Equal("/media/stage-1-voice", EscapeProjector.Stage(s, room, T0, media).StageVoiceUrl);
+        Assert.Equal("/media/stage-2-voice", EscapeProjector.Stage(ToStage(s, room, 1), room, T0, media).StageVoiceUrl);
+        // No later stage's reading on any screen: the phones never get one, and the TV only the current stage's.
+        var phone = System.Text.Json.JsonSerializer.Serialize(EscapeProjector.Player(s, room, s.Players[0].SeatId, T0, media));
+        Assert.DoesNotContain("/media/stage-2-voice", phone);
+        Assert.DoesNotContain("/media/stage-2-voice", System.Text.Json.JsonSerializer.Serialize(EscapeProjector.Stage(s, room, T0, media)));
+        // None recorded: the browser reads the words.
+        Assert.Null(EscapeProjector.Stage(s, room, T0).StageVoiceUrl);
     }
 
     [Fact]

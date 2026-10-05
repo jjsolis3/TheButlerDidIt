@@ -132,7 +132,12 @@ This is the heart of "pay for murder, escape, or both".
 
 ### 7. Settings and admin hubs (#102)
 
-- **`/settings`** (every host): defaults the create-party pages start from: party mode, shelf, tone, drinking prompts, escape length and difficulty, AI on or off, TV sound. They're stored as jsonb on the host, so a new setting needs no migration.
+- **`/settings`** ("Party settings", every host; built): the defaults the create-party pages start from.
+  - **What it covers:** which game the page opens on, and for each game the party mode, the shelf and the AI. Mysteries add the tone, drinking prompts and "rewrite Surprise me". Escape rooms add the length, the difficulty and fresh puzzles or today's challenge.
+  - **Saving them:** the host page has a "Save these as my usual settings" link that saves the current choices for that game.
+  - **Links still win:** a link that names a room, length or difficulty, such as "Play this room again", overrides the saved settings.
+  - **Storage:** `AppUser.Preferences` is one jsonb document (`HostPreferences`), read and written whole, so a new setting needs no migration. The server checks every value (a Family tone on the Family shelf, 30/45/60 minutes), and the data export includes them.
+  - **Not included:** the TV's sound switch stays on each device, because it belongs to the TV, not the host.
 - **`/admin`** (admin only): one hub for an overview (hosts, active plans, parties this week, AI spend), hosts, invites, plans and billing, AI, and the sign-up mode.
 
 ### 8. Ready for paying customers (#103)

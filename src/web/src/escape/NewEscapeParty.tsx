@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Button, ErrorText, inputClass } from '../components/ui'
+import { SaveDefaults } from '../components/SaveDefaults'
 import { api } from '../lib/api'
+import { ESCAPE_MODES } from '../lib/partyOptions'
 import type { AiStatus, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
 import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { RoomCardBody, ShelfControls } from './RoomShelf'
@@ -37,6 +39,21 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
   // The AI game master is offered only when an admin has set up the models it uses.
   const [ai, setAi] = useState<AiStatus | null>(null)
   const [useAi, setUseAi] = useState(true)
+
+  // The host's usual settings (#102) are where the page starts. A link that names a room, length or difficulty
+  // ("Play this room again") still wins for those.
+  const askedMinutes = params.get('minutes')
+  const askedDifficulty = params.get('difficulty')
+  useEffect(() => {
+    api.account.preferences().then((p) => {
+      setMode(p.escape.mode)
+      if (!askedRoom) setShelf(p.escape.shelf)
+      if (!askedMinutes && p.escape.minutes) setChosenMinutes(p.escape.minutes)
+      if (!askedDifficulty) setDifficulty(p.escape.difficulty)
+      setPuzzles(p.escape.puzzles)
+      setUseAi(p.escape.useAi)
+    }, () => {}) // none saved, or offline: the page's own defaults
+  }, [askedRoom, askedMinutes, askedDifficulty, setShelf])
 
   useEffect(() => {
     api.escapeRooms().then((all) => {
@@ -221,12 +238,7 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
       <section className="space-y-3">
         <h2 className="font-display text-xl">3. How will you play?</h2>
         <div className="grid gap-2 sm:grid-cols-2">
-          {(
-            [
-              ['sharedScreen', '📺 Together', 'A TV or laptop shows the room and the clock; everyone uses their phone.'],
-              ['remote', '💻 On a video call', 'Share the room tab on the call; everyone joins on their own device.'],
-            ] as const
-          ).map(([value, label, text]) => (
+          {ESCAPE_MODES.map(({ id: value, title: label, body: text }) => (
             <label key={value} className={`cursor-pointer rounded-xl border p-3 ${mode === value ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}>
               <input type="radio" name="escape-mode" className="sr-only" checked={mode === value} onChange={() => setMode(value)} />
               <span className="font-semibold">{label}</span>
@@ -260,6 +272,23 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
           {busy ? 'Opening the room…' : 'Create the escape room and get the invite code'}
         </Button>
         <ErrorText>{error}</ErrorText>
+        <div className="mt-3">
+          <SaveDefaults
+            change={(saved) => ({
+              ...saved,
+              game: 'escapeRoom',
+              // The length is the room's when it's that room's standard game; a replay is of one shared set, so never a default.
+              escape: {
+                mode,
+                shelf,
+                minutes: minutes && room && minutes !== room.timeLimitMinutes ? minutes : null,
+                difficulty,
+                puzzles: puzzles === 'replay' ? 'fresh' : puzzles,
+                useAi,
+              },
+            })}
+          />
+        </div>
       </div>
     </div>
   )

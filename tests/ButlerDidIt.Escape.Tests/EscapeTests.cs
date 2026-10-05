@@ -268,6 +268,10 @@ public class PrivacyTests
         return data;
     }
 
+    /// <summary>Every file a stage can have: its picture, video, background sound and the game master's reading of it.</summary>
+    private static string[] StageMedia(EscapeStage st) =>
+        [EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id), EscapeArt.StageVoice(st.Id)];
+
     [Theory]
     [MemberData(nameof(RoomsAndLengths))]
     public void Screens_never_see_answers_unpaid_hints_later_stages_or_other_players_clues(string id, int minutes)
@@ -281,14 +285,15 @@ public class PrivacyTests
         var played = EscapeEngine.RoomFor(s, template);
         for (var i = 0; i < seats.Length; i++) s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, seats[i], $"P{i}", i == 0, false));
         s = EscapeEngine.Apply(s, template, new StartEscape(T0));
-        // A picture, a video and a sound for every stage, each with its own address: a later stage's must never be sent.
+        // A picture, a video, a sound and a reading for every stage, each with its own address: a later stage's must never be sent.
         var art = new Dictionary<string, string>
         {
             [EscapeArt.Cover] = $"/media/{Guid.NewGuid()}",
             [EscapeArt.IntroVideo] = $"/media/{Guid.NewGuid()}",
+            [EscapeArt.IntroVoice] = $"/media/{Guid.NewGuid()}",
             [EscapeArt.Ambience] = $"/media/{Guid.NewGuid()}",
         };
-        foreach (var key in template.Stages.SelectMany(st => new[] { EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id) }))
+        foreach (var key in template.Stages.SelectMany(StageMedia))
             art[key] = $"/media/{Guid.NewGuid()}";
 
         for (var step = 0; s.Phase == EscapePhase.Playing; step++)
@@ -297,9 +302,8 @@ public class PrivacyTests
             var shown = EscapeProjector.Stage(s, template, T0, art);
             Assert.Equal(art[EscapeArt.StageVideo(current.Id)], shown.StageVideoUrl);
             Assert.Equal(art[EscapeArt.StageAmbience(current.Id)], shown.AmbienceUrl);
-            var hidden = template.Stages.Where(st => st.Id != current.Id)
-                .SelectMany(st => new[] { EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id) })
-                .Select(key => art[key]).ToList();
+            Assert.Equal(art[EscapeArt.StageVoice(current.Id)], shown.StageVoiceUrl);
+            var hidden = template.Stages.Where(st => st.Id != current.Id).SelectMany(StageMedia).Select(key => art[key]).ToList();
             foreach (var raw in seats.Select(seat => GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0, art))).Prepend(GameJson.Serialize(shown)))
                 foreach (var url in hidden) Assert.DoesNotContain(url, raw);
 

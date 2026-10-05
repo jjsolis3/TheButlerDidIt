@@ -47,6 +47,13 @@ public sealed class MysterySession(GameState state, Scenario scenario) : GameSes
 
     public override string? PhotoUrl(Guid seatId) => State.FindPlayer(seatId)?.PhotoUrl;
 
+    /// <summary>When the reveal starts the accusations are final: record how the table did, for the mystery's insights (#130).</summary>
+    public override void OnSaving(AppDbContext db, Party party, GameSession previous)
+    {
+        if (previous is MysterySession { State.Phase: Phase.Accusation } && State.Phase == Phase.Reveal)
+            db.PlayRecords.Add(ButlerDidIt.Api.Insights.PlayRecords.ForMystery(State, Scenario, party));
+    }
+
     public override GameSession AddPlayer(DateTimeOffset now, Guid seatId, string name, bool isHost, bool isLocal) =>
         Apply(new AddPlayer(now, seatId, name, isHost, isLocal));
     public override GameSession RemovePlayer(DateTimeOffset now, Guid seatId) => Apply(new RemovePlayer(now, seatId));

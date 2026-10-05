@@ -6,6 +6,7 @@ import { RoomMediaPanel } from '../escape/RoomMediaPanel'
 import { api } from '../lib/api'
 import type { EscapeItemDoc, EscapePuzzleDoc, EscapeRoomDoc, EscapeStageDoc } from '../lib/escapeDoc'
 import { newId } from '../lib/newId'
+import { SOUNDSCAPES } from '../lib/sound'
 import { ESCAPE_PALETTE, usePalette } from '../lib/theme'
 import type { PuzzleKind, Soundscape, ValidationResult } from '../lib/types'
 
@@ -17,16 +18,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'items', label: 'Items' },
   { id: 'media', label: '🎬 Pictures, video & sound' },
   { id: 'json', label: 'JSON' },
-]
-
-const SOUNDSCAPES: { value: Soundscape; label: string }[] = [
-  { value: 'drone', label: 'Low hum' },
-  { value: 'workshop', label: 'Workshop' },
-  { value: 'carnival', label: 'Carnival' },
-  { value: 'sea', label: 'Sea' },
-  { value: 'space', label: 'Space' },
-  { value: 'haunted', label: 'Haunted' },
-  { value: 'silence', label: 'Silence' },
 ]
 
 const KINDS: { value: PuzzleKind; label: string }[] = [

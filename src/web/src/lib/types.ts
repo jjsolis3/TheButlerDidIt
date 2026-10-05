@@ -195,6 +195,8 @@ export interface StageView {
   tailoring: boolean
   /** The background track to loop now: the current act's, else the mystery's. Never a later act's; null from the reveal on */
   musicUrl: string | null
+  /** The made-up background sound when there's no track: the current act's, else the mystery's (or its theme's). Silence from the reveal on */
+  soundscape: Soundscape
 }
 
 export interface AiFeatures {
@@ -332,6 +334,8 @@ export interface ThemeDefinition {
   description: string
   palette: ThemePalette
   artStyle: string
+  /** The background sound its mysteries play, unless one (or an act) names its own */
+  soundscape: Soundscape
   cover: string | null
   /** Holidays the theme suits, e.g. "halloween". Drives the seasonal filter on the host's shelf. */
   seasons: string[]
@@ -679,6 +683,8 @@ export interface MyMystery {
   canShare: boolean
   /** A hand-written mystery, for the admin: they can take it off the shelf */
   canHide: boolean
+  /** Games recorded and the guests' average rating, over every version (#130) */
+  insights: PlaySummary | null
 }
 
 /** The admin's switches, for both games. A field left out stays as it is. */
@@ -759,6 +765,8 @@ export interface EscapeLibraryItem {
   timesPlayed: number
   /** A party is using it now, so it can't be edited or deleted until that ends */
   inUse: boolean
+  /** Every group's games and ratings (#130): on the host's own rooms, and on the built-in ones for the admin */
+  insights: PlaySummary | null
 }
 
 export interface EscapeLength {
@@ -768,6 +776,36 @@ export interface EscapeLength {
 
 /** Which puzzles a new escape party plays. */
 export type PuzzleChoice = 'fresh' | 'daily' | 'replay'
+
+/** A host's usual party settings (#102; C# HostPreferences): the host page starts from them. */
+export interface HostPreferences {
+  /** Which game the host page opens on */
+  game: GameKind
+  mystery: MysteryDefaults
+  escape: EscapeDefaults
+}
+
+export interface MysteryDefaults {
+  mode: PartyMode
+  /** The Adults or Family shelf */
+  shelf: ContentRating
+  tone: Tone
+  drinkingPrompts: boolean
+  useAi: boolean
+  /** Let the AI rewrite "Surprise me" so one of tonight's guests is the killer */
+  tailor: boolean
+}
+
+export interface EscapeDefaults {
+  mode: PartyMode
+  shelf: ContentRating
+  /** The game's length when the room offers it; null: each room's own */
+  minutes: number | null
+  difficulty: EscapeDifficulty
+  /** A replay is of one shared set, so it's never a default */
+  puzzles: Exclude<PuzzleChoice, 'replay'>
+  useAi: boolean
+}
 
 export interface LeaderboardEntry {
   rank: number
@@ -948,6 +986,10 @@ export interface EscapeStageView {
   stageVideoUrl: string | null
   /** A recorded background sound to loop now (the current stage's, or the room's), or null for the made-up one */
   ambienceUrl: string | null
+  /** The game master reading the intro (the AI's Voice role), or null: the browser reads it */
+  introVoiceUrl: string | null
+  /** The game master reading the current stage's description, or null. Never a later stage's */
+  stageVoiceUrl: string | null
 }
 
 /** What a room's media place holds (C# MediaKind; a room never holds a "photo", which is a guest's selfie). */
@@ -1014,8 +1056,20 @@ export interface MysteryMediaView {
   limits: MediaLimits
 }
 
-/** Background sound presets, synthesised in the browser by escape/sound.ts. */
-export type Soundscape = 'silence' | 'drone' | 'workshop' | 'carnival' | 'sea' | 'space' | 'haunted'
+/** Background sound presets, synthesised in the browser by lib/sound.ts (both games; C# Soundscape). */
+export type Soundscape =
+  | 'silence'
+  | 'drone'
+  | 'workshop'
+  | 'carnival'
+  | 'sea'
+  | 'space'
+  | 'haunted'
+  | 'manor'
+  | 'storm'
+  | 'train'
+  | 'night'
+  | 'lounge'
 
 export interface EscapeGameMasterView {
   name: string
@@ -1138,4 +1192,67 @@ export interface EscapeRecapSharing {
   shared: boolean
   url: string | null
   page: EscapeRecapPage
+}
+
+// ------------------------------------------------------------------ feedback and insights (#130; C# Insights/*)
+
+export type FeedbackDifficulty = 'justRight' | 'tooEasy' | 'tooHard'
+
+export interface FeedbackRequest {
+  /** 1 to 5 stars */
+  rating: number
+  difficulty: FeedbackDifficulty
+  comment: string | null
+}
+
+/** For the phone: whether it can ask yet, whether a comment box is offered (never on Family games), and the answer given */
+export interface SeatFeedbackView {
+  open: boolean
+  commentsAllowed: boolean
+  given: FeedbackRequest | null
+}
+
+/** A card's summary on My mysteries or My escape rooms */
+export interface PlaySummary {
+  plays: number
+  rating: number | null
+  ratings: number
+}
+
+export interface InsightsView {
+  kind: GameKind
+  contentId: string
+  title: string
+  plays: number
+  lastPlayed: string | null
+  averageMinutes: number
+  averagePlayers: number
+  rating: { average: number | null; count: number; stars: number[] }
+  difficulty: { tooEasy: number; justRight: number; tooHard: number }
+  comments: { rating: number; difficulty: FeedbackDifficulty; comment: string; at: string }[]
+  mystery: MysteryInsights | null
+  escape: EscapeInsights | null
+}
+
+export interface MysteryInsights {
+  /** Guests who accused someone, over every game */
+  accusers: number
+  /** Of them, those who named the killer */
+  correct: number
+  versions: {
+    id: string
+    label: string
+    plays: number
+    accusers: number
+    correct: number
+    killerName: string
+    accused: { characterId: string; name: string; count: number; killer: boolean }[]
+  }[]
+}
+
+export interface EscapeInsights {
+  /** Games the group got out of */
+  escaped: number
+  /** In stage order. averageSeconds: from the stage opening to the solve; hintRate: share of games that bought a hint; stuck: games that ran out of time on it */
+  puzzles: { puzzleId: string; title: string; stageTitle: string; plays: number; solved: number; averageSeconds: number | null; hintRate: number; stuck: number }[]
 }

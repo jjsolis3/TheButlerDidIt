@@ -75,6 +75,7 @@ test('the admin copies a hand-written mystery, edits it with live checks, adds t
   await expect(page.getByRole('img', { name: 'Lady Evelyn Blackwood' }).first()).toHaveAttribute('src', /^\/media\/assets\//)
   const background = page.getByTestId('background-music')
   await expect(background).toHaveAttribute('src', musicUrl!)
+  await expect(page.locator('[data-soundscape]')).toHaveAttribute('data-soundscape', 'music') // theirs, not the made-up one
   await expect.poll(() => background.evaluate((a: HTMLAudioElement) => a.currentTime), { message: 'the background music plays' }).toBeGreaterThan(0)
   await page.getByRole('button', { name: 'Play the prologue' }).click()
   const video = page.locator('video')

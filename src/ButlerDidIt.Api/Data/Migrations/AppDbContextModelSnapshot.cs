@@ -291,6 +291,9 @@ namespace ButlerDidIt.Api.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Preferences")
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -772,6 +775,115 @@ namespace ButlerDidIt.Api.Data.Migrations
                     b.HasIndex("Status", "UpdatedAt");
 
                     b.ToTable("Parties");
+                });
+
+            modelBuilder.Entity("ButlerDidIt.Api.Data.PlayFeedback", b =>
+                {
+                    b.Property<Guid>("PartyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SeatId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(280)
+                        .HasColumnType("character varying(280)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Difficulty")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("HostUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PartyId", "SeatId");
+
+                    b.HasIndex("HostUserId");
+
+                    b.HasIndex("Kind", "ContentId");
+
+                    b.ToTable("PlayFeedback");
+                });
+
+            modelBuilder.Entity("ButlerDidIt.Api.Data.PlayRecord", b =>
+                {
+                    b.Property<Guid>("PartyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Accusers")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<int?>("Correct")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Difficulty")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("Escaped")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("FinishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("HintsUsed")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("HostUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int?>("Minutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PlayerCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PartyId");
+
+                    b.HasIndex("HostUserId");
+
+                    b.HasIndex("Kind", "ContentId");
+
+                    b.ToTable("PlayRecords");
                 });
 
             modelBuilder.Entity("ButlerDidIt.Api.Data.PlayerNote", b =>

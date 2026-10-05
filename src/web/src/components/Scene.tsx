@@ -102,10 +102,13 @@ export function ClueCard({
   clue,
   onShare,
   onSolve,
+  compact = false,
 }: {
   clue: ClueView
   onShare?: () => void
   onSolve?: (answer: string) => Promise<void>
+  /** For the TV (#129): a smaller picture and the text cut to a few lines, so the newest evidence fits on one screen. */
+  compact?: boolean
 }) {
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -128,8 +131,8 @@ export function ClueCard({
         <h3 className="font-display text-lg text-ink">{clue.title}</h3>
         <span className="shrink-0 text-xs text-muted">Act {clue.act}</span>
       </div>
-      {clue.image && <img src={clue.image} alt="" className="mb-2 max-h-48 w-full rounded-lg object-cover" />}
-      <p className="text-sm leading-relaxed text-ink/90">{clue.text}</p>
+      {clue.image && <img src={clue.image} alt="" className={`mb-2 w-full rounded-lg object-cover ${compact ? 'max-h-32' : 'max-h-48'}`} />}
+      <p className={`text-sm leading-relaxed text-ink/90 ${compact ? 'line-clamp-4' : ''}`}>{clue.text}</p>
       {clue.foundAmong && <p className="mt-2 text-xs text-muted italic">Found among {clue.foundAmong}'s belongings.</p>}
       {clue.isPrivate && !clue.sharedPublicly && (
         <div className="mt-3 flex items-center justify-between gap-2">

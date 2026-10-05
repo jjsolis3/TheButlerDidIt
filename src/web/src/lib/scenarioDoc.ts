@@ -1,3 +1,5 @@
+import type { Soundscape } from './types'
+
 /**
  * The full mystery document as the editor sees it: the same shape as the C#
  * `Scenario` class, in camelCase. It contains the solution, so it is only ever
@@ -65,6 +67,8 @@ export interface DocAct {
   prompts: string[]
   /** A background track for this act (set from the media tab) */
   music?: string | null
+  /** A made-up background sound for this act, in place of the mystery's */
+  soundscape?: Soundscape | null
   [key: string]: unknown
 }
 
@@ -99,5 +103,7 @@ export interface ScenarioDoc {
   finale: DocCue[]
   /** A background track for the evening (set from the media tab) */
   music?: string | null
+  /** The made-up background sound when there's no track; null or missing: the theme's */
+  soundscape?: Soundscape | null
   [key: string]: unknown
 }

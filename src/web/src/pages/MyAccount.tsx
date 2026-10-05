@@ -111,6 +111,15 @@ export default function MyAccount() {
         </ul>
       </Section>
 
+      <Section title="Party settings">
+        <p className="text-sm text-muted">
+          How a new party starts: the game, the shelf, the tone, the length and difficulty, the AI.{' '}
+          <Link to="/settings" className="text-accent underline hover:text-ink">
+            Change your party settings
+          </Link>
+        </p>
+      </Section>
+
       <Section title="Your details">
         <div className="space-y-4">
           <NameForm account={account} onChange={(displayName) => setAccount({ ...account, displayName })} />

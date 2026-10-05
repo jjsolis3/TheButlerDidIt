@@ -171,6 +171,18 @@ These rules are checked on the server where a party starts (`EscapeCatalog.FindF
 - **Pages** (`src/web/src/pages`): `Home`, `Login`, `NewParty`, `Join`, `Stage` (TV + host controls), `Play` (phone), `Watch` (the TV on a spectator's phone, with cheers), `PassAndPlay`, and the shared recaps: `Recap` (mysteries) and `EscapeRecap`.
 - **Front doors** (#99): `/` (`Home`) offers both games, with a card for each in that game's colours, plus "Your parties". Each game has its own page for visitors who haven't signed in: `/mystery` (`MysteryLanding`: the themes) and `/escape` (`EscapeLanding`: how it works, then the room shelf with filters and each room's leaderboards). Each also has a printable how-to-play sheet, `/how-to-play` and `/how-to-play/escape`. "Host" links go through sign-in with `?next=`, so a visitor lands on the host page with the room they picked.
 - **`PlayerScreen`** is the whole phone experience. Pass-and-play reuses it for each local seat.
+- **The mystery's TV layout** (#129): nobody scrolls a TV, so on a screen at least 1024×600 (`TV_LAYOUT`, the escape TV's test), `Stage` becomes a full-height frame: the top bar, then the phase, then the host bar (part of the frame rather than floating over it). The watchers panel becomes the top bar's 👀 chip.
+  - **The phase is wrapped in `FitToScreen`.** It measures the content's natural height and scales it down to fit when it's a little too tall, but never below 0.6. Below that it's unreadable from the sofa, so the box scrolls instead, as a last resort that `mystery-tv.spec.ts` checks never happens. `data-fit` says which it did.
+  - **Lists that grow all evening stay short on the TV, because the phones keep everything.**
+    - Evidence shows the newest four clues as compact cards on a 1080p screen, or two on a short one, and names the rest.
+    - Secrets show the latest three.
+    - The NPC interrogation room shows the last two.
+  - **The endings are laid out in two columns:**
+    - the unmasked killer beside the Inspector's verdicts, then beside the explanation;
+    - the finale beside the scores and the timeline;
+    - the winners beside the scores.
+  - **Scenes are sized to fit:** each is as wide as the screen allows while its 16:9 picture fits between the bars.
+  - **Phones and small windows** keep the scrolling page.
 - **`CuePlayer`** plays cinematics: a list of cues (image, narration, NPC line, music, sound, video). Narration uses an audio file when the cue has one, otherwise the browser's built-in speech synthesis. Browsers block sound until the user interacts, which is why the stage starts with a "Tap to begin the evening" button.
 - **Theming**: colours are CSS variables that `useThemePalette` swaps per theme; Tailwind utilities (`bg-surface`, `text-accent`) read those variables. A page can also set a fixed palette with `usePalette`: the escape pages use `ESCAPE_PALETTE` (steel and exit-sign green), so the two games look different. It's a layout effect, so the page never flashes in the default gold first.
 
@@ -256,6 +268,10 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 - **Music:**
   - `Scenario.Music` and `Act.Music` reach the stage as `StageView.MusicUrl`: the current act's, else the evening's, and none from the reveal on. That's never a later act's.
   - The stage loops it in an `<audio>` element (`useBackgroundMusic`), softer while a scene plays.
+- **Background sound without uploads** (#127): a mystery is never silent. `ThemeDefinition.Soundscape` sets each theme's preset (a country house in a storm, a train, a lounge…), and `Scenario.Soundscape` and `Act.Soundscape` can override it.
+  - `ContentCatalog.GetScenarioAsync` fills in the theme's when the mystery names none (`ScenarioDefaults`), so the pure engine never needs the theme, and AI-written mysteries get one for free.
+  - `StageView.Soundscape` follows the same rules as the music: the current act's, else the mystery's, and `silence` from the reveal on.
+  - The stage synthesises it with the escape rooms' `Atmosphere` (`useSoundscape`), quieter during scenes, only when there's no uploaded track.
 - **Versions share the original's uploads.**
   - Uploads are stored under the original mystery's id. `ContentCatalog.GetScenarioAsync` merges them over each version's own AI media, and `InvalidateFamily` forgets every version when they change.
   - The editor warns that a finale video plays in every version, each with a different killer, so it shouldn't name one.
@@ -276,6 +292,36 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 **The printable kit** (`/api/parties/{code}/kit/*.pdf`, host only) is drawn with QuestPDF: invitations with a QR code (QRCoder), name tags, character booklets (with secrets) and clue cards with a sealed solution.
 
 **Toast prompts** are a `toast` cue type. `ViewProjector` drops them unless the host switched on drinking prompts, which is always off for Family parties. Every toast carries a non-alcoholic alternative.
+
+## 11b. Feedback and insights (#130)
+
+**What it's for:** which mysteries and rooms work, and where groups get stuck, so the people who edit them know what to fix.
+
+- **One record per game** (`PlayRecords`): written in the existing `GameSession.OnSaving` hook, in the same save as the moment it records.
+  - **Mysteries:** written when the accusations become final, as the game moves from accusation to reveal. It holds:
+    - how many guests accused, and how many named the killer;
+    - who got accused, by character.
+  - **Escape rooms:** written next to the leaderboard's `EscapeResult` when the clock stops. It holds:
+    - escaped or not, the difficulty, the length and the hints;
+    - for each puzzle played (`RoomFor`), the seconds from its stage opening to its solving, the hints shown, and whether time ran out with it in front of the group.
+  - **Built by a pure function:** `PlayRecords.ForMystery` and `ForEscape`, from state the reveal or the ending already showed the table.
+  - **Kept apart from the party,** which `RetentionWorker` strips, so a mystery's history outlives its parties.
+- **One verdict per guest** (`PlayFeedback`, keyed by party and seat):
+  - **What they give:** 1 to 5 stars, too easy, just right or too hard, and on Adults content only a comment of up to 280 characters.
+  - **Why no comments on Family:** Family games may be played by children, so they're never asked for free text, and the server drops any text sent anyway.
+  - **When it's accepted:**
+    - `POST /api/seat/feedback`, authorised by the seat token, from the reveal on (or once the clock stops);
+    - a guest can change their answer;
+    - a watcher's token has no seat, so watchers can't rate.
+  - **It's anonymous:** no names are stored.
+- **Insights:** `GET /api/insights/{mystery|escape}/{id}`.
+  - **Who can see them:** the same rule as the editors. A mystery's or room's owner sees them, and so does the admin; built-in content is admin only. Anyone else gets 404.
+  - **A mystery's versions add up,** and each version is shown on its own, since each has its own killer.
+  - **For escape rooms:** a per-puzzle table with the average time, the hint rate and where groups ran out of time. The slowest and most-hinted puzzles are badged with an icon and words.
+  - **Library cards:** `PlaySummary` puts ★ and plays on the My mysteries and My escape rooms cards.
+- **Deleting an account:**
+  - records and feedback about their own content go with it;
+  - their games of anyone else's content stay in that content's insights, unnamed and without the guests' comments.
 
 ## 12. Clean-up (retention)
 
@@ -404,8 +450,9 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **AI-written rooms** use every kind (#86). `ShapeErrors` asks for a scene in every stage (with decoys and hiding spots), a search, a closer look or recipe, a cipher, a logic puzzle, a Hard-only part and at most 2 `use` steps, and a puzzle count that fits the clock. It also refuses cipher words or riddle answers already on screen (`EscapeRoomText`, shared with the content tests). `Normalize` places the spots on a grid (the model never writes positions) and drops what only a build or a hand-written room has (lengths, variants, grids, key locations). `Anonymize` renames puzzles and spots, including in `{key:…}`. The blind solver tests riddles with everything their stage's spots and items show, and the logic puzzles as one fixed seed builds them.
 
 **Atmosphere** (the TV only; phones stay quiet):
-- **Sound is synthesised in the browser** (`src/web/src/escape/sound.ts`, Web Audio), so rooms ship no audio files and there's nothing to license.
-  - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted or silence. The view carries the current one.
+- **Sound is synthesised in the browser** (`src/web/src/lib/sound.ts`, Web Audio), so rooms ship no audio files and there's nothing to license.
+  - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night, lounge or silence. The view carries the current one.
+  - The presets are shared with the murder mysteries (#127): the enum lives in `ButlerDidIt.Game/Scenarios/Soundscape.cs`, and the synth in `lib/sound.ts`.
   - `useAtmosphere` works out the stingers from what changed between two views: an unlock, a new stage, a wrong answer, a hint, the escape or the failure. It also sounds a gong at one minute left, then a heartbeat that speeds up. Because the view is its only input, a TV that reconnects just carries on.
   - Browsers only allow sound after a click, so the TV shows a sound switch. Its setting is remembered on the device.
 - **Room art goes through the mystery media pipeline.**
@@ -416,6 +463,7 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - **On the TV:** pressing Start plays the room's intro full screen: the cover with a slow pan, and the welcome read out in the game master's voice with subtitles. The clock starts when it ends or is skipped, so nobody loses time watching it. Each later stage opens with a short reveal of its own picture, name and description; the clock keeps running in the corner, and anyone can skip it.
   - **On the phones:** a card at the top shows the same picture and text and is tapped away. It's a card, not a pop-up, so it never blocks a player mid-puzzle, and phones stay quiet.
   - **Built from the TV's own view** (`escape/reveal.ts`, played by the mystery's `CuePlayer`). So it can't show anything the TV couldn't already: the projector only ever sends the current stage's picture.
+  - **Read aloud by the game master** (#127). With a Voice role set up, `EscapeMediaPlan` also records the intro (`intro-voice`) and each stage's description (`stage-voice:{id}`), in the voice the game master uses for its live lines, in the same once-per-room job as the pictures. `EscapeProjector` sends `IntroVoiceUrl`, and `StageVoiceUrl` only for the stage in front of the group, and the reveal's narration cue plays the clip. Without one, the browser reads the words. The recording is of text the TV already prints, so it says nothing the screen doesn't. A moment with an uploaded video gets no recording, and editing a stage's words re-records only that stage (`StaleArt` compares whole plans).
   - **Once per screen:** each screen remembers the reveals it has shown in `sessionStorage`, so a refresh or a reconnect doesn't replay them.
   - **Reduced motion:** the pan stops under `prefers-reduced-motion`.
   - **Uploaded videos** (step 2, below) play in place of the picture and the read-out text. AI video clips are step 3 of #110.

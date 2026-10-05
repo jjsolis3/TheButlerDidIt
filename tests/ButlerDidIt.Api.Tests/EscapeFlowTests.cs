@@ -4,6 +4,7 @@ using ButlerDidIt.Api.Endpoints;
 using ButlerDidIt.Api.Escape;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;

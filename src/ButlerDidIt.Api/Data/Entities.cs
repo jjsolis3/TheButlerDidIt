@@ -10,6 +10,9 @@ public sealed class AppUser : IdentityUser
     public string DisplayName { get; set; } = "";
 
     public bool IsAdmin { get; set; }
+
+    /// <summary>The host's usual party settings as jsonb (see Endpoints.HostPreferences), or null for the defaults.</summary>
+    public string? Preferences { get; set; }
 }
 
 /// <summary>
@@ -489,6 +492,76 @@ public sealed class EscapeResult
     public DateTimeOffset FinishedAt { get; set; }
 }
 
+
+/// <summary>
+/// What happened in one finished game (#130), for the content's insights: how many named the killer, how long each
+/// escape puzzle took. Written once per party, in the same save as the moment it records (GameSession.OnSaving):
+/// a mystery when its reveal starts, an escape room when the clock stops. Kept apart from the party, which the
+/// retention worker strips, so a mystery's history outlives its parties.
+/// </summary>
+public sealed class PlayRecord
+{
+    public Guid PartyId { get; set; }
+    public GameKind Kind { get; set; }
+
+    /// <summary>What was played: the mystery (a version's own id; insights add a mystery's versions together) or the room.</summary>
+    [MaxLength(120)]
+    public required string ContentId { get; set; }
+
+    [MaxLength(450)]
+    public required string HostUserId { get; set; }
+    public DateTimeOffset FinishedAt { get; set; }
+    public int PlayerCount { get; set; }
+    public int DurationSeconds { get; set; }
+
+    /// <summary>Mysteries: how many guests accused someone, and how many of them named the killer.</summary>
+    public int? Accusers { get; set; }
+    public int? Correct { get; set; }
+
+    /// <summary>Escape rooms: whether the group got out, at what difficulty and length, with how many hints.</summary>
+    public bool? Escaped { get; set; }
+    public ButlerDidIt.Escape.Rooms.EscapeDifficulty? Difficulty { get; set; }
+    public int? Minutes { get; set; }
+    public int? HintsUsed { get; set; }
+
+    /// <summary>The breakdown, as jsonb (PlayDetails): who was accused; each escape puzzle's time and hints.</summary>
+    public string Details { get; set; } = "{}";
+}
+
+/// <summary>A guest's verdict on the game they played (#130): stars, how hard it felt, and a word or two.</summary>
+public sealed class PlayFeedback
+{
+    public Guid PartyId { get; set; }
+
+    /// <summary>One answer per seat; the guest can change it. The seat is random, and goes when the party is cleaned up.</summary>
+    public Guid SeatId { get; set; }
+    public GameKind Kind { get; set; }
+
+    /// <summary>As <see cref="PlayRecord.ContentId"/>.</summary>
+    [MaxLength(120)]
+    public required string ContentId { get; set; }
+
+    /// <summary>Whose party it was, so their feedback goes with their account.</summary>
+    [MaxLength(450)]
+    public required string HostUserId { get; set; }
+
+    /// <summary>1 to 5 stars.</summary>
+    public int Rating { get; set; }
+    public FeedbackDifficulty Difficulty { get; set; }
+
+    /// <summary>Only on Adults content: Family games may be played by children, so they're asked for stars alone.</summary>
+    [MaxLength(280)]
+    public string? Comment { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
+public enum FeedbackDifficulty
+{
+    JustRight,
+    TooEasy,
+    TooHard,
+}
 
 /// <summary>
 /// An escape room written by AI for one host (see EscapeRoomGenerator). Only that host sees it on

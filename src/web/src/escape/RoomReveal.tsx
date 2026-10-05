@@ -72,8 +72,17 @@ export function RoomReveal({
   }
 
   const key = mode === 'intro' ? 'intro' : `stage:${view.stage?.id}`
+  // Who tells it: the host's video, the game master's recording (#127), or the browser reading the words.
+  const telling = video ? 'video' : (mode === 'intro' ? view.introVoiceUrl : view.stageVoiceUrl) ? 'recorded' : 'browser'
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="reveal-title" data-testid="room-reveal" className="fixed inset-0 z-50 overflow-y-auto bg-bg/95 backdrop-blur-sm">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reveal-title"
+      data-testid="room-reveal"
+      data-narration={telling}
+      className="fixed inset-0 z-50 overflow-y-auto bg-bg/95 backdrop-blur-sm"
+    >
       <div className="mx-auto flex min-h-full max-w-5xl flex-col justify-center gap-4 px-4 py-8 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>

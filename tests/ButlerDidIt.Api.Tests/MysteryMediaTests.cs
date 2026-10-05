@@ -167,13 +167,16 @@ public class MysteryMediaTests(MediaFactory app) : IClassFixture<MediaFactory>
     }
 
     [Fact]
-    public async Task A_lobby_already_on_the_tv_gets_new_music_straight_away()
+    public async Task A_lobby_already_on_the_tv_plays_its_theme_s_sound_then_gets_new_music_straight_away()
     {
         var (host, cookie) = await RoomMedia.HostAsync(app);
         var mine = await OwnMysteryAsync(host);
         var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties", new CreatePartyRequest(mine, PartyMode.SharedScreen, null, UseAi: false), GameJson.Options));
         await using var tv = await app.ConnectAsync(cookie: cookie);
-        Assert.Null((await tv.InvokeAsync<StageView>("WatchParty", party.Code)).MusicUrl);
+        var lobby = await tv.InvokeAsync<StageView>("WatchParty", party.Code);
+        Assert.Null(lobby.MusicUrl);
+        // Until then, the theme's made-up background sound (#127): Blackwood's country house in a storm.
+        Assert.Equal(Soundscape.Storm, lobby.Soundscape);
         var pushed = new TaskCompletionSource<StageView>(TaskCreationOptions.RunContinuationsAsynchronously);
         tv.On<StageView>("stage", v => { if (v.MusicUrl is not null) pushed.TrySetResult(v); });
 

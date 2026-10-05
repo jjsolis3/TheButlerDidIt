@@ -1,4 +1,5 @@
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 
 namespace ButlerDidIt.Escape.Engine;
 
@@ -55,7 +56,11 @@ public sealed record EscapeStageView(
     /// <summary>A video the host uploaded for the stage in front of the group (never a later one), or null.</summary>
     string? StageVideoUrl,
     /// <summary>A recorded background sound to loop now (the current stage's, or the room's), or null for the made-up one.</summary>
-    string? AmbienceUrl);
+    string? AmbienceUrl,
+    /// <summary>The game master reading the intro, recorded by the AI's Voice role, or null (the browser reads it). Public, like the intro.</summary>
+    string? IntroVoiceUrl = null,
+    /// <summary>The game master reading the description of the stage in front of the group (never a later one), or null.</summary>
+    string? StageVoiceUrl = null);
 
 public sealed record EscapeSceneView(int Width, int Height, string Backdrop, IReadOnlyList<EscapeSpotView> Objects);
 

@@ -28,7 +28,7 @@ function describe(slot: MysteryMediaSlot, hasVersions: boolean): { label: string
             label: 'Background music',
             title: 'Background music',
             hint: 'Loops quietly on the TV from the lobby to the accusation, and plays softer during scenes. An act can have its own.',
-            empty: 'None: the TV stays quiet between scenes.',
+            empty: 'None: the background sound chosen on the Story tab plays (the theme’s, unless you picked one).',
           }
         : { label: 'Music', title: `Music for ${slot.itemTitle}`, hint: "Loops during this act instead of the evening's music.", empty: "None: the evening's music plays." }
     default: // video

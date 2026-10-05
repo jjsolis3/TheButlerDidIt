@@ -10,27 +10,8 @@ import { useThemes } from '../lib/theme'
 import type { AiStatus, AuthOptions, ContentRating, GameKind, GenerationJob, MysteryLength, PartyMode, ThemeCard, Tone } from '../lib/types'
 import { NewEscapeParty } from '../escape/NewEscapeParty'
 import { useMe } from '../lib/useMe'
-
-const MODES: { id: PartyMode; title: string; body: string }[] = [
-  { id: 'sharedScreen', title: 'Dinner party', body: 'Put the stage on a TV or laptop. Guests use their own phones for secrets and clues.' },
-  { id: 'remote', title: 'Video call', body: 'Screen-share the stage on Zoom, Meet or Teams (share tab audio). Guests join on their own devices.' },
-  { id: 'passAndPlay', title: 'Pass & play', body: 'One device for everyone. Each guest takes a turn to read their private dossier.' },
-]
-
-/**
- * The tones on offer depend on the shelf. The mystery's rating sets the limits (a Family story
- * is always Family); the tone only changes how the AI game master speaks within them.
- */
-const TONES: Record<ContentRating, { id: Tone; title: string; body: string }[]> = {
-  mature: [
-    { id: 'standard', title: '🍷 Mature', body: 'The full adult experience: scandal, dark humour, the odd risqué remark.' },
-    { id: 'clean', title: '👔 Normal', body: 'For mixed company, like work friends or the in-laws: scandal yes, crude no.' },
-  ],
-  family: [
-    { id: 'standard', title: '🧸 Normal', body: 'A proper mystery for all ages: spooky, never scary.' },
-    { id: 'playful', title: '😂 Funny', body: 'Silly and over the top: puns, big reactions and jokes for kids.' },
-  ],
-}
+import { MODES, TONES } from '../lib/partyOptions'
+import { SaveDefaults } from '../components/SaveDefaults'
 
 /** Seasons come from the theme, so every story in a Halloween theme (AI-written ones too) is found by the filter. */
 const isHalloween = (theme: ThemeCard['theme']) => (theme.seasons ?? []).includes('halloween')
@@ -74,6 +55,22 @@ export default function NewParty() {
     if (me) api.aiStatus().then(setAi, () => setAi(null))
     if (me) api.authOptions().then(setAuthOptions, () => setAuthOptions(null))
   }, [me, navigate, here])
+
+  // The host's usual settings (#102) are where the page starts. A link that names the game (?game=escape) still wins.
+  const signedIn = !!me
+  const askedGame = params.get('game')
+  useEffect(() => {
+    if (!signedIn) return
+    api.account.preferences().then((p) => {
+      if (!askedGame) setGame(p.game)
+      setMode(p.mystery.mode)
+      setShelf(p.mystery.shelf)
+      setTone(p.mystery.tone)
+      setDrinking(p.mystery.drinkingPrompts)
+      setUseAi(p.mystery.useAi)
+      setTailor(p.mystery.tailor)
+    }, () => {}) // none saved, or offline: the page's own defaults
+  }, [signedIn, askedGame])
 
   const playable = useMemo(() => themes?.flatMap((t) => t.scenarios.map((s) => ({ theme: t.theme, scenario: s }))) ?? [], [themes])
   const byRating = playable.filter((p) => p.scenario.contentRating === shelf)
@@ -277,6 +274,7 @@ export default function NewParty() {
           {MODES.map((m) => (
             <button
               key={m.id}
+              aria-pressed={mode === m.id}
               onClick={() => setMode(m.id)}
               className={`rounded-xl border p-4 text-left transition ${mode === m.id ? 'border-accent bg-accent/10' : 'border-line bg-surface hover:border-accent/60'}`}
             >
@@ -359,6 +357,13 @@ export default function NewParty() {
         <Button onClick={create} disabled={!scenarioId || busy || locked} className="w-full text-base">
           Create party and get the invite code
         </Button>
+        <SaveDefaults
+          change={(saved) => ({
+            ...saved,
+            game: 'mystery',
+            mystery: { mode, shelf, tone, drinkingPrompts: drinking && shelf === 'mature', useAi, tailor },
+          })}
+        />
       </div>
     </Shell>
   )

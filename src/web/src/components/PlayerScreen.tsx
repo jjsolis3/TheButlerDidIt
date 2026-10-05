@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { playerGuide } from '../lib/guide'
 import { GuideButton } from './Guide'
+import { FeedbackCard } from './FeedbackCard'
 import { NpcTypingContext, useParty } from '../lib/hub'
 import { NpcAnswer } from './NpcAnswer'
 import type { PlayerView, StageView } from '../lib/types'
@@ -61,7 +62,7 @@ function PlayerBody({ view, invoke, token }: { view: PlayerView; invoke: Invoke;
   }
 
   if (stage.phase === 'lobby') return <LobbyPlayer view={view} run={run} error={error} token={token} />
-  return <InGame view={view} run={run} invoke={invoke} error={error} />
+  return <InGame view={view} run={run} invoke={invoke} error={error} token={token} />
 }
 
 // ------------------------------------------------------------------ lobby
@@ -247,11 +248,13 @@ function InGame({
   run,
   invoke,
   error,
+  token,
 }: {
   view: PlayerView
   run: (m: string, ...a: unknown[]) => Promise<unknown>
   invoke: Invoke
   error: string | null
+  token: string
 }) {
   const stage = view.stage
   const dossier = view.dossier
@@ -338,6 +341,10 @@ function InGame({
         {tab === 'accuse' && <AccuseTab view={view} run={run} />}
         {tab === 'vote' && <VoteTab view={view} run={run} />}
         {tab === 'results' && <ResultsTab view={view} />}
+        {/* From the reveal on, under whichever tab: how was it? (#130) */}
+        <div className="mt-6">
+          <FeedbackCard token={token} gameOver={stage.phase === 'reveal' || stage.phase === 'awards' || stage.phase === 'finished'} />
+        </div>
       </main>
     </div>
   )

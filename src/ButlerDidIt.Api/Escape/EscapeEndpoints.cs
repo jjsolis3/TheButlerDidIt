@@ -40,7 +40,9 @@ public enum EscapeRoomSource
 /// <param name="Hidden">Taken off the shelf by the admin (only the admin's library lists these).</param>
 /// <param name="TimesPlayed">How many of this host's parties played it.</param>
 /// <param name="InUse">A party is using it now, so it can't be edited or deleted until that ends.</param>
-public sealed record EscapeLibraryItem(EscapeRoomSummary Room, EscapeRoomSource Source, bool CanEdit, bool CanShare, bool CanHide, bool Hidden, int TimesPlayed, bool InUse);
+/// <param name="Insights">Every group's games and ratings (#130): on the host's own rooms, and on the built-in ones for the admin.</param>
+public sealed record EscapeLibraryItem(EscapeRoomSummary Room, EscapeRoomSource Source, bool CanEdit, bool CanShare, bool CanHide, bool Hidden, int TimesPlayed, bool InUse,
+    ButlerDidIt.Api.Insights.PlaySummary? Insights = null);
 
 /// <summary>The admin's switches, for both games. A field left out stays as it is.</summary>
 /// <param name="Shared">On every host's shelf (the admin's own room or mystery).</param>
@@ -110,14 +112,17 @@ public static class EscapeEndpoints
             var ownIds = mine.Select(o => o.Room.Id).ToList();
             var busy = (await db.Parties.AsNoTracking().Where(p => p.Kind == GameKind.EscapeRoom && p.Status != PartyStatus.Finished && ownIds.Contains(p.ScenarioId))
                 .Select(p => p.ScenarioId).Distinct().ToListAsync(ct)).ToHashSet();
+            // Insights are for whoever looks after a room: its owner, and the admin for the built-in ones.
+            var insightIds = admin ? ownIds.Concat(builtIn.Select(r => r.Id)) : ownIds;
+            var insights = await ButlerDidIt.Api.Insights.InsightsEndpoints.SummariesAsync(db, GameKind.EscapeRoom, insightIds.Distinct().ToDictionary(id => id, id => id), ct);
 
             return Results.Ok(mine.Select(o => new EscapeLibraryItem(cards(o.Room, mine: true, copied: o.Copied, shared: o.Shared),
                     o.Copied ? EscapeRoomSource.Copy : EscapeRoomSource.Generated, CanEdit: true, CanShare: admin, CanHide: false, Hidden: false,
-                    played.GetValueOrDefault(o.Room.Id), InUse: busy.Contains(o.Room.Id)))
+                    played.GetValueOrDefault(o.Room.Id), InUse: busy.Contains(o.Room.Id), insights.GetValueOrDefault(o.Room.Id)))
                 .Concat(shared.Select(r => new EscapeLibraryItem(cards(r, shared: true), EscapeRoomSource.Shared, CanEdit: false, CanShare: false, CanHide: false,
                     Hidden: false, played.GetValueOrDefault(r.Id), InUse: false)))
                 .Concat(builtIn.Select(r => new EscapeLibraryItem(cards(r), EscapeRoomSource.BuiltIn, CanEdit: false, CanShare: false, CanHide: admin,
-                    Hidden: hidden.Contains(r.Id), played.GetValueOrDefault(r.Id), InUse: false))));
+                    Hidden: hidden.Contains(r.Id), played.GetValueOrDefault(r.Id), InUse: false, insights.GetValueOrDefault(r.Id)))));
         }).RequireAuthorization(AuthPolicies.Host);
 
         // The admin shares one of their own rooms with every host, or takes a built-in room off the shelf (or puts it back).

@@ -78,6 +78,8 @@ test('a full dinner party: join, play three acts, accuse, reveal and vote', asyn
   await hostNext(stage, 'Begin the evening')
   await stage.getByRole('button', { name: 'Tap to begin the evening' }).click()
   await expect(stage.getByRole('heading', { name: 'The suspects' })).toBeVisible()
+  // No music uploaded: the theme's made-up background sound plays (#127), a country house in a storm.
+  await expect(stage.locator('[data-soundscape]')).toHaveAttribute('data-soundscape', 'storm')
 
   // Each phone gets only its own private dossier.
   await expect(alice.getByText('You are the murderer.', { exact: true })).toBeVisible()

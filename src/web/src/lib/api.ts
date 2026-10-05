@@ -7,6 +7,10 @@ import type {
   EscapeRoomSummary,
   Leaderboard,
   PuzzleChoice,
+  HostPreferences,
+  SeatFeedbackView,
+  FeedbackRequest,
+  InsightsView,
   GenerationJob,
   MediaJob,
   Me,
@@ -90,12 +94,16 @@ function upload<T>(url: string, file: File, onProgress?: (fraction: number) => v
 /** A media key as a URL path: "clue/c1/ab12" stays three segments, each encoded. */
 const keyPath = (key: string) => key.split('/').map(encodeURIComponent).join('/')
 
-async function request<T>(method: string, url: string, body?: unknown): Promise<T> {
+async function request<T>(method: string, url: string, body?: unknown, seatToken?: string): Promise<T> {
+  const headers: Record<string, string> = {}
+  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // A guest's calls carry their seat token instead of a sign-in (as the phones' SignalR connection does).
+  if (seatToken) headers['X-Seat-Token'] = seatToken
   const res = await fetch(url, {
     method,
     // Same origin, so the host's auth cookie is sent automatically.
     credentials: 'same-origin',
-    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   })
   if (!res.ok) {
@@ -140,6 +148,9 @@ export const api = {
     confirmEmailChange: (userId: string, email: string, token: string) => request<Me>('POST', '/api/account/email/confirm', { userId, email, token }),
     changePassword: (currentPassword: string, newPassword: string) => request<void>('POST', '/api/account/password', { currentPassword, newPassword }),
     signOutEverywhere: () => request<void>('POST', '/api/account/sign-out-everywhere'),
+    /** The host's usual party settings (#102). */
+    preferences: () => request<HostPreferences>('GET', '/api/account/preferences'),
+    savePreferences: (p: HostPreferences) => request<HostPreferences>('PUT', '/api/account/preferences', p),
     /** A file download, so it's a plain link rather than a fetch. */
     exportUrl: '/api/account/export',
     remove: (password: string) => request<void>('POST', '/api/account/delete', { password }),
@@ -235,6 +246,11 @@ export const api = {
     return (await res.json()) as { photoUrl: string }
   },
   removePhoto: (token: string) => fetch('/api/seat/photo', { method: 'DELETE', headers: { 'X-Seat-Token': token } }),
+  /** A guest's verdict on the game, once it's over (#130). */
+  seatFeedback: (token: string) => request<SeatFeedbackView>('GET', '/api/seat/feedback', undefined, token),
+  sendFeedback: (token: string, feedback: FeedbackRequest) => request<SeatFeedbackView>('POST', '/api/seat/feedback', feedback, token),
+  /** What happened in every game of a mystery or room, for its owner or the admin (#130). */
+  insights: (kind: 'mystery' | 'escape', id: string) => request<InsightsView>('GET', `/api/insights/${kind}/${encodeURIComponent(id)}`),
   party: (code: string) => request<PartyInfo>('GET', `/api/parties/${encodeURIComponent(code)}`),
   join: (code: string, name: string) => request<SeatResponse>('POST', `/api/parties/${encodeURIComponent(code)}/join`, { name }),
   addSeat: (code: string, name: string, isLocal: boolean) =>

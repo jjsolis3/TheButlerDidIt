@@ -5,6 +5,7 @@ using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using Microsoft.EntityFrameworkCore;
@@ -263,7 +264,7 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
     public override GameSession SetPlayerPhoto(DateTimeOffset now, Guid seatId, string? url) => Apply(new SetEscapePlayerPhoto(now, seatId, url));
     public override GameSession Tick(DateTimeOffset now) => Apply(new EscapeTick(now));
 
-    /// <summary>The moment the game ends (escaped, or out of time), record the result for the leaderboards.</summary>
+    /// <summary>The moment the game ends (escaped, or out of time), record the result for the leaderboards and the insights.</summary>
     public override void OnSaving(AppDbContext db, Party party, GameSession previous)
     {
         if (previous is not EscapeSession { State.Phase: EscapePhase.Playing }) return;
@@ -289,6 +290,8 @@ public sealed class EscapeSession(EscapeState state, EscapeRoom room, IReadOnlyD
             Team = team.Length <= 400 ? team : team[..400],
             FinishedAt = State.EndedAt!.Value,
         });
+        // And what happened, for the room's insights (#130).
+        db.PlayRecords.Add(ButlerDidIt.Api.Insights.PlayRecords.ForEscape(State, Room, party));
     }
 }
 

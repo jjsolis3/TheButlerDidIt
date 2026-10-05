@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { FeedbackCard } from '../components/FeedbackCard'
 import { Button, ErrorText, StatusPill, inputClass } from '../components/ui'
 import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView } from '../lib/types'
@@ -111,6 +112,8 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
           </Link>
         </div>
       )}
+      {/* How was it? (#130) Anonymous, for whoever made the room. */}
+      <FeedbackCard token={token} gameOver={stage.phase === 'escaped' || stage.phase === 'failed'} />
     </div>
   )
 }

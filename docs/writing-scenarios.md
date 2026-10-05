@@ -29,6 +29,7 @@ When you change words that have a generated voice or picture, only those are mad
 | `accusation` | The multiple-choice `motives` and `methods` players pick from |
 | `solution` | `murdererId`, `motiveId`, `methodId`, the `explanation` paragraphs revealed one by one, and a `timeline` |
 | `finale[]` | Cues played at the very end |
+| `soundscape` | Optional. The background sound the TV makes up between scenes, when the host hasn't uploaded music. Leave it out to use the theme's (see below). An act can have its own `soundscape` too. |
 
 ## Characters
 
@@ -161,6 +162,30 @@ Every mystery sits on one shelf, set by `contentRating`:
 | Language | No swearing | Salty, not crude |
 
 A test checks that no Family mystery mentions alcohol, so keep "rum", "wine" and friends out of pirate stories too.
+
+## Background sound (theme.json)
+
+Every theme names the sound its mysteries play under the evening, made live in the browser, so there are no audio files to add:
+
+```json
+"soundscape": "storm"
+```
+
+The choices:
+- `drone`
+- `manor` (a clock and a fire)
+- `storm` (rain and thunder)
+- `train`
+- `night` (crickets)
+- `lounge` (a murmur and soft chords)
+- `carnival`
+- `sea`
+- `haunted`
+- `workshop`
+- `space`
+- `silence`
+
+A mystery (or one act) can pick its own with the same field, and an uploaded music track always plays instead. The sound goes quiet from the reveal on, so the solution lands in silence.
 
 ## Cocktails (theme.json)
 

@@ -4,6 +4,7 @@ using ButlerDidIt.Api.Endpoints;
 using ButlerDidIt.Api.Escape;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
@@ -109,31 +110,36 @@ public class EscapeGameMasterTests(FakeAiFactory app) : IClassFixture<FakeAiFact
     }
 
     [Fact]
-    public async Task The_room_is_painted_once_and_the_tv_shows_each_stage_picture()
+    public async Task The_room_is_painted_and_read_aloud_once_and_the_tv_gets_each_stage_s_picture_and_reading()
     {
         var (cookie, party, _) = await StartedPartyAsync(useAi: true);
         await using var tv = await app.ConnectAsync(cookie: cookie);
 
-        // The cover shows in the lobby once the (fake) Illustrator has painted it.
-        var lobby = await WaitForAsync(tv, party.Code, s => s.ArtUrl is not null, "the room's cover");
+        // The cover shows in the lobby once the (fake) Illustrator has painted it, and the intro has been read by the
+        // (fake) Voice role (#127).
+        var lobby = await WaitForAsync(tv, party.Code, s => s.ArtUrl is not null && s.IntroVoiceUrl is not null, "the room's cover and intro reading");
         Assert.StartsWith("/media/assets/", lobby.ArtUrl);
+        Assert.StartsWith("/media/assets/", lobby.IntroVoiceUrl);
+        Assert.Null(lobby.StageVoiceUrl);
         Assert.Equal(Soundscape.Workshop, lobby.Soundscape);
 
         await tv.InvokeAsync("EscapeStart", party.Code);
         var playing = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
         Assert.NotEqual(lobby.ArtUrl, playing.ArtUrl); // the first stage's own picture
+        Assert.StartsWith("/media/assets/", playing.StageVoiceUrl); // and its description, read aloud
 
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var room = scope.ServiceProvider.GetRequiredService<EscapeCatalog>().Find("the-workshop")!;
-        Assert.Equal(room.Stages.Count + 1, await db.ScenarioMedia.CountAsync(m => m.ScenarioId == EscapeMedia.JobId("the-workshop")));
+        // A cover and a picture per stage; the intro and each stage read aloud.
+        Assert.Equal(2 * (room.Stages.Count + 1), await db.ScenarioMedia.CountAsync(m => m.ScenarioId == EscapeMedia.JobId("the-workshop")));
 
-        // A second party of the same room reuses the pictures: nothing new is painted.
-        var images = await db.MediaAssets.CountAsync(a => a.Kind == MediaKind.Image);
+        // A second party of the same room reuses the pictures and the readings: nothing new is made.
+        var made = await db.MediaAssets.CountAsync(a => a.Kind == MediaKind.Image || a.Kind == MediaKind.Audio);
         var (secondCookie, second, _) = await StartedPartyAsync(useAi: true); // another host
         await using var tv2 = await app.ConnectAsync(cookie: secondCookie);
-        await WaitForAsync(tv2, second.Code, s => s.ArtUrl is not null, "the second party's cover");
-        Assert.Equal(images, await db.MediaAssets.CountAsync(a => a.Kind == MediaKind.Image));
+        await WaitForAsync(tv2, second.Code, s => s.ArtUrl is not null && s.IntroVoiceUrl is not null, "the second party's cover");
+        Assert.Equal(made, await db.MediaAssets.CountAsync(a => a.Kind == MediaKind.Image || a.Kind == MediaKind.Audio));
     }
 
     [Fact]

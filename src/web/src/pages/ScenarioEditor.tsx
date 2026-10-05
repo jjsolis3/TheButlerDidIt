@@ -4,10 +4,11 @@ import { EditorCard as Card, JsonTab, Lines, ListDetail, Num, Select, Text } fro
 import { MysteryMediaPanel } from '../components/MysteryMediaPanel'
 import { Button, ErrorText, Eyebrow, Shell, inputClass } from '../components/ui'
 import { newId } from '../lib/newId'
+import { SOUNDSCAPES } from '../lib/sound'
 import { api } from '../lib/api'
 import type { CueType, DocAct, DocCharacter, DocClue, DocCue, ScenarioDoc } from '../lib/scenarioDoc'
 import { useThemes } from '../lib/theme'
-import type { ValidationResult } from '../lib/types'
+import type { Soundscape, ValidationResult } from '../lib/types'
 
 type Tab = 'story' | 'characters' | 'clues' | 'acts' | 'solution' | 'media' | 'json'
 const TABS: { id: Tab; label: string }[] = [
@@ -212,6 +213,9 @@ export default function ScenarioEditor() {
 
 // ------------------------------------------------------------------ tabs
 
+/** A preset's name as the pickers show it. */
+const soundLabel = (s: Soundscape | undefined) => SOUNDSCAPES.find((x) => x.value === s)?.label ?? 'Low hum'
+
 function StoryTab({ doc, update }: { doc: ScenarioDoc; update: Update }) {
   const { themes } = useThemes()
   return (
@@ -237,6 +241,12 @@ function StoryTab({ doc, update }: { doc: ScenarioDoc; update: Update }) {
         <Num label="Fewest players" value={doc.minPlayers} onChange={(v) => update((d) => void (d.minPlayers = v))} />
         <Num label="Most players" value={doc.maxPlayers} onChange={(v) => update((d) => void (d.maxPlayers = v))} />
         <Num label="About how many minutes" value={doc.estimatedMinutes} onChange={(v) => update((d) => void (d.estimatedMinutes = v))} />
+        <Select
+          label="Background sound"
+          value={doc.soundscape ?? ''}
+          options={[{ value: '', label: `The theme's (${soundLabel(themes?.find((t) => t.theme.slug === doc.themeSlug)?.theme.soundscape)})` }, ...SOUNDSCAPES]}
+          onChange={(v) => update((d) => void (d.soundscape = v === '' ? null : (v as Soundscape)))}
+        />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Text label="Place" value={doc.setting.place} onChange={(v) => update((d) => void (d.setting.place = v))} />
@@ -465,9 +475,15 @@ function ActsTab({ doc, update }: { doc: ScenarioDoc; update: Update }) {
       </Card>
       {doc.acts.map((act, i) => (
         <Card key={act.id}>
-          <div className="grid gap-3 sm:grid-cols-[1fr_10rem]">
+          <div className="grid gap-3 sm:grid-cols-[1fr_10rem_14rem]">
             <Text label={`Act ${i + 1} title`} value={act.title} onChange={(v) => editAct(i, (a) => void (a.title = v))} />
             <Num label="Mingling minutes" value={act.mingleMinutes} onChange={(v) => editAct(i, (a) => void (a.mingleMinutes = v))} />
+            <Select
+              label="Background sound"
+              value={act.soundscape ?? ''}
+              options={[{ value: '', label: "The mystery's" }, ...SOUNDSCAPES]}
+              onChange={(v) => editAct(i, (a) => void (a.soundscape = v === '' ? null : (v as Soundscape)))}
+            />
           </div>
           <Lines label="Conversation prompts on the big screen" value={act.prompts} onChange={(v) => editAct(i, (a) => void (a.prompts = v))} />
           <Cues cues={act.cues} people={people} onChange={(change) => editAct(i, (a) => change(a.cues))} />

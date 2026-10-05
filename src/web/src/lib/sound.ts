@@ -1,11 +1,28 @@
-import type { Soundscape } from '../lib/types'
+import type { Soundscape } from './types'
 
 /** A one-off sound for something that just happened. */
 export type Sting = 'unlock' | 'stage' | 'wrong' | 'hint' | 'minute' | 'escaped' | 'failed'
 
+/** The presets as the editors offer them (both games), with "Silence" last. */
+export const SOUNDSCAPES: { value: Soundscape; label: string }[] = [
+  { value: 'drone', label: 'Low hum' },
+  { value: 'manor', label: 'Clock and fire' },
+  { value: 'storm', label: 'Rain and thunder' },
+  { value: 'train', label: 'Train' },
+  { value: 'night', label: 'Crickets at night' },
+  { value: 'lounge', label: 'Lounge (murmur and chords)' },
+  { value: 'workshop', label: 'Workshop' },
+  { value: 'carnival', label: 'Carnival' },
+  { value: 'sea', label: 'Sea' },
+  { value: 'space', label: 'Space' },
+  { value: 'haunted', label: 'Haunted' },
+  { value: 'silence', label: 'Silence' },
+]
+
 /**
- * The escape room's sound on the TV: a looping background per room (and stage), short
- * "stingers" when something happens, and a heartbeat in the final minute.
+ * The TV's sound: a looping background, short "stingers" when something happens, and a heartbeat in an escape
+ * room's final minute. Escape rooms name a preset per room and stage; a mystery takes its theme's, or its own, or
+ * one per act (#127).
  *
  * Everything is synthesised live with the Web Audio API rather than played from files: there's
  * nothing to download, host or license, and a new room only has to name a preset. A host can upload
@@ -245,6 +262,61 @@ function startSoundscape(ctx: AudioContext, out: AudioNode, name: Soundscape): L
       stops.push(noiseBed(ctx, bus, 'bandpass', 700, 0.035, 0.05)) // wind
       every(8, 13, (t) => [110, 220.5, 331].forEach((f, k) => tone(ctx, bus, 'sine', f, t, 5, 0.1 / (k + 1)))) // a far bell
       break
+    case 'manor': {
+      stops.push(noiseBed(ctx, bus, 'lowpass', 300, 0.03, 0.01)) // the fire's low roar
+      every(0.12, 0.6, (t) => noiseBurst(ctx, bus, t, 0.008, 1800 + Math.random() * 2500, 0.04 + Math.random() * 0.08)) // crackles
+      // A grandfather clock: tick, tock.
+      let tock = false
+      every(1, 1, (t) => {
+        noiseBurst(ctx, bus, t, 0.02, tock ? 1300 : 1700, 0.1)
+        tock = !tock
+      })
+      break
+    }
+    case 'storm':
+      stops.push(noiseBed(ctx, bus, 'highpass', 2500, 0.03)) // rain on the glass
+      stops.push(noiseBed(ctx, bus, 'lowpass', 900, 0.04, 0.02)) // the downpour, in gusts
+      every(14, 28, (t) => {
+        noiseSwell(ctx, bus, t, 4, 220, 0.3) // distant thunder
+        tone(ctx, bus, 'sine', 48, t + 0.3, 3.5, 0.2, 32)
+      })
+      break
+    case 'train':
+      stops.push(noiseBed(ctx, bus, 'lowpass', 160, 0.08, 0.02)) // the carriage's rumble
+      // Clack-clack… clack-clack: the wheels over the rail joints.
+      every(1.7, 1.7, (t) => {
+        noiseBurst(ctx, bus, t, 0.05, 900, 0.16)
+        noiseBurst(ctx, bus, t + 0.19, 0.05, 820, 0.13)
+      })
+      every(25, 45, (t) => tone(ctx, bus, 'triangle', 660, t, 1.6, 0.03)) // a far whistle
+      break
+    case 'night':
+      stops.push(noiseBed(ctx, bus, 'bandpass', 500, 0.02, 0.02)) // a soft wind
+      // Crickets: quick triplets of high chirps.
+      every(0.5, 1.4, (t) => {
+        const f = 4300 + Math.random() * 300
+        for (let k = 0; k < 3; k++) tone(ctx, bus, 'sine', f, t + k * 0.06, 0.04, 0.025)
+      })
+      // Now and then, an owl.
+      every(20, 40, (t) => {
+        tone(ctx, bus, 'sine', 390, t, 0.5, 0.05, 360)
+        tone(ctx, bus, 'sine', 370, t + 0.7, 0.8, 0.05, 330)
+      })
+      break
+    case 'lounge': {
+      stops.push(noiseBed(ctx, bus, 'bandpass', 500, 0.03, 0.01)) // the crowd's murmur
+      // Slow, soft chords going round: Dm7, G7, Cmaj7, A7.
+      const chords = [
+        [146.8, 174.6, 220, 261.6],
+        [196, 246.9, 293.7, 349.2],
+        [130.8, 164.8, 196, 246.9],
+        [110, 138.6, 164.8, 196],
+      ]
+      let i = 0
+      every(4, 4, (t) => chords[i++ % chords.length].forEach((f, k) => tone(ctx, bus, 'triangle', f, t + k * 0.03, 3.8, 0.022)))
+      every(7, 14, (t) => [2600, 3400].forEach((f) => tone(ctx, bus, 'sine', f, t, 0.4, 0.02))) // a glass, somewhere
+      break
+    }
   }
 
   return {

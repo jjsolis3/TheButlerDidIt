@@ -171,8 +171,9 @@ public static class PartyEndpoints
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);
-            // Paint the room's cover and stages now, so they're ready by the time the clock starts. Made once per room.
-            if (req.UseAi && await media.ImagesConfiguredAsync(ct))
+            // Paint the room's cover and stages, and record the game master reading the intro and each stage, now, so
+            // they're ready by the time the clock starts. Made once per room.
+            if (req.UseAi && (await media.ImagesConfiguredAsync(ct) || await media.VoicesConfiguredAsync(ct)))
                 await ButlerDidIt.Api.Media.MediaWorker.EnqueueAsync(db, ButlerDidIt.Api.Escape.EscapeMedia.JobId(room.Id), party.HostUserId, clock, ct);
             return Results.Ok(await ToInfo(party, db, modules, isHost: true, ct));
         }).RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AuthEndpoints.RequireConfirmedHost).AddEndpointFilter(Access.RequireGame(GameKind.EscapeRoom));
