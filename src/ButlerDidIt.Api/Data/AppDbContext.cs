@@ -28,6 +28,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<InviteEntity> Invites => Set<InviteEntity>();
     public DbSet<AccessGrantEntity> AccessGrants => Set<AccessGrantEntity>();
     public DbSet<HiddenContentEntity> HiddenContent => Set<HiddenContentEntity>();
+    public DbSet<PlayRecord> PlayRecords => Set<PlayRecord>();
+    public DbSet<PlayFeedback> PlayFeedback => Set<PlayFeedback>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -90,6 +92,25 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
             // One row per hidden room or mystery; the key is also the lookup.
             e.HasKey(x => new { x.Kind, x.ContentId });
             e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
+        });
+
+        // Insights (#130): one record per game, one verdict per guest; both read by what was played.
+        b.Entity<PlayRecord>(e =>
+        {
+            e.HasKey(x => x.PartyId);
+            e.HasIndex(x => new { x.Kind, x.ContentId });
+            e.HasIndex(x => x.HostUserId);
+            e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Difficulty).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Details).HasColumnType("jsonb");
+        });
+        b.Entity<PlayFeedback>(e =>
+        {
+            e.HasKey(x => new { x.PartyId, x.SeatId });
+            e.HasIndex(x => new { x.Kind, x.ContentId });
+            e.HasIndex(x => x.HostUserId);
+            e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Difficulty).HasConversion<string>().HasMaxLength(20);
         });
 
         b.Entity<AiProviderEntity>(e =>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Button, ErrorText, Eyebrow, Heading, Shell } from '../components/ui'
+import { InsightsLink } from '../components/InsightsLink'
 import { api } from '../lib/api'
 import type { MyMystery } from '../lib/types'
 import { useMe } from '../lib/useMe'
@@ -86,6 +87,7 @@ export default function MyMysteries() {
                 {m.hidden && ' · 🙈 off the shelf'}
                 {m.inUse && ' · a party is using it now'}
               </p>
+              <InsightsLink summary={m.insights} to={`/insights/mystery/${encodeURIComponent(m.id)}`} />
             </div>
             <div className="flex flex-wrap gap-2">
               <Link to={`/mysteries/${m.id}`} className="inline-flex min-h-11 items-center rounded-lg border border-line px-4 text-sm hover:border-accent">

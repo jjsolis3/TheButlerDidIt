@@ -15,6 +15,7 @@ import PassAndPlay from './pages/PassAndPlay'
 import MyAccount from './pages/MyAccount'
 import MyEscapeRooms from './pages/MyEscapeRooms'
 import Settings from './pages/Settings'
+import Insights from './pages/Insights'
 import MyMysteries from './pages/MyMysteries'
 import MysteryLanding from './pages/MysteryLanding'
 import Play from './pages/Play'
@@ -42,6 +43,7 @@ export default function App() {
       <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/account" element={<MyAccount />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/insights/:kind/:id" element={<Insights />} />
       <Route path="/account/confirm-email" element={<ConfirmEmailChange />} />
       <Route path="/recap/:slug" element={<Recap />} />
       <Route path="/escape/recap/:slug" element={<EscapeRecap />} />

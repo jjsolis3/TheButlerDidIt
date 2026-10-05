@@ -293,6 +293,36 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 
 **Toast prompts** are a `toast` cue type. `ViewProjector` drops them unless the host switched on drinking prompts, which is always off for Family parties. Every toast carries a non-alcoholic alternative.
 
+## 11b. Feedback and insights (#130)
+
+**What it's for:** which mysteries and rooms work, and where groups get stuck, so the people who edit them know what to fix.
+
+- **One record per game** (`PlayRecords`): written in the existing `GameSession.OnSaving` hook, in the same save as the moment it records.
+  - **Mysteries:** written when the accusations become final, as the game moves from accusation to reveal. It holds:
+    - how many guests accused, and how many named the killer;
+    - who got accused, by character.
+  - **Escape rooms:** written next to the leaderboard's `EscapeResult` when the clock stops. It holds:
+    - escaped or not, the difficulty, the length and the hints;
+    - for each puzzle played (`RoomFor`), the seconds from its stage opening to its solving, the hints shown, and whether time ran out with it in front of the group.
+  - **Built by a pure function:** `PlayRecords.ForMystery` and `ForEscape`, from state the reveal or the ending already showed the table.
+  - **Kept apart from the party,** which `RetentionWorker` strips, so a mystery's history outlives its parties.
+- **One verdict per guest** (`PlayFeedback`, keyed by party and seat):
+  - **What they give:** 1 to 5 stars, too easy, just right or too hard, and on Adults content only a comment of up to 280 characters.
+  - **Why no comments on Family:** Family games may be played by children, so they're never asked for free text, and the server drops any text sent anyway.
+  - **When it's accepted:**
+    - `POST /api/seat/feedback`, authorised by the seat token, from the reveal on (or once the clock stops);
+    - a guest can change their answer;
+    - a watcher's token has no seat, so watchers can't rate.
+  - **It's anonymous:** no names are stored.
+- **Insights:** `GET /api/insights/{mystery|escape}/{id}`.
+  - **Who can see them:** the same rule as the editors. A mystery's or room's owner sees them, and so does the admin; built-in content is admin only. Anyone else gets 404.
+  - **A mystery's versions add up,** and each version is shown on its own, since each has its own killer.
+  - **For escape rooms:** a per-puzzle table with the average time, the hint rate and where groups ran out of time. The slowest and most-hinted puzzles are badged with an icon and words.
+  - **Library cards:** `PlaySummary` puts ★ and plays on the My mysteries and My escape rooms cards.
+- **Deleting an account:**
+  - records and feedback about their own content go with it;
+  - their games of anyone else's content stay in that content's insights, unnamed and without the guests' comments.
+
 ## 12. Clean-up (retention)
 
 `RetentionWorker` runs every few hours:

@@ -683,6 +683,8 @@ export interface MyMystery {
   canShare: boolean
   /** A hand-written mystery, for the admin: they can take it off the shelf */
   canHide: boolean
+  /** Games recorded and the guests' average rating, over every version (#130) */
+  insights: PlaySummary | null
 }
 
 /** The admin's switches, for both games. A field left out stays as it is. */
@@ -763,6 +765,8 @@ export interface EscapeLibraryItem {
   timesPlayed: number
   /** A party is using it now, so it can't be edited or deleted until that ends */
   inUse: boolean
+  /** Every group's games and ratings (#130): on the host's own rooms, and on the built-in ones for the admin */
+  insights: PlaySummary | null
 }
 
 export interface EscapeLength {
@@ -1188,4 +1192,67 @@ export interface EscapeRecapSharing {
   shared: boolean
   url: string | null
   page: EscapeRecapPage
+}
+
+// ------------------------------------------------------------------ feedback and insights (#130; C# Insights/*)
+
+export type FeedbackDifficulty = 'justRight' | 'tooEasy' | 'tooHard'
+
+export interface FeedbackRequest {
+  /** 1 to 5 stars */
+  rating: number
+  difficulty: FeedbackDifficulty
+  comment: string | null
+}
+
+/** For the phone: whether it can ask yet, whether a comment box is offered (never on Family games), and the answer given */
+export interface SeatFeedbackView {
+  open: boolean
+  commentsAllowed: boolean
+  given: FeedbackRequest | null
+}
+
+/** A card's summary on My mysteries or My escape rooms */
+export interface PlaySummary {
+  plays: number
+  rating: number | null
+  ratings: number
+}
+
+export interface InsightsView {
+  kind: GameKind
+  contentId: string
+  title: string
+  plays: number
+  lastPlayed: string | null
+  averageMinutes: number
+  averagePlayers: number
+  rating: { average: number | null; count: number; stars: number[] }
+  difficulty: { tooEasy: number; justRight: number; tooHard: number }
+  comments: { rating: number; difficulty: FeedbackDifficulty; comment: string; at: string }[]
+  mystery: MysteryInsights | null
+  escape: EscapeInsights | null
+}
+
+export interface MysteryInsights {
+  /** Guests who accused someone, over every game */
+  accusers: number
+  /** Of them, those who named the killer */
+  correct: number
+  versions: {
+    id: string
+    label: string
+    plays: number
+    accusers: number
+    correct: number
+    killerName: string
+    accused: { characterId: string; name: string; count: number; killer: boolean }[]
+  }[]
+}
+
+export interface EscapeInsights {
+  /** Games the group got out of */
+  escaped: number
+  /** In stage order. averageSeconds: from the stage opening to the solve; hintRate: share of games that bought a hint; stuck: games that ran out of time on it */
+  puzzles: { puzzleId: string; title: string; stageTitle: string; plays: number; solved: number; averageSeconds: number | null; hintRate: number; stuck: number }[]
 }

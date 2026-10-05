@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { buttonClass } from '../components/buttonClass'
 import { Button, ErrorText, Eyebrow, Heading, Shell } from '../components/ui'
+import { InsightsLink } from '../components/InsightsLink'
 import { backdrop, moodIcon } from '../escape/moods'
 import { api } from '../lib/api'
 import type { EscapeLibraryItem, EscapeRoomSource, SharingRequest } from '../lib/types'
@@ -167,6 +168,7 @@ function Row({ item: i, children }: { item: EscapeLibraryItem; children: ReactNo
             {i.hidden && ' · 🙈 off the shelf'}
             {i.inUse && ' · a party is using it now'}
           </p>
+          <InsightsLink summary={i.insights} to={`/insights/escape/${encodeURIComponent(r.id)}`} />
         </div>
       </div>
       <div className="flex flex-wrap gap-2">{children}</div>

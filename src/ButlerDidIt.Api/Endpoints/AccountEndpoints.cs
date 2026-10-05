@@ -223,6 +223,10 @@ public static class AccountEndpoints
                 ExportedAt = clock.GetUtcNow(),
                 Account = new { user.DisplayName, user.Email, user.EmailConfirmed, user.IsAdmin },
                 PartySettings = HostPreferences.For(user),
+                // How their games went (#130): the numbers only. Guests' comments are the guests' words, shown on Insights.
+                Plays = await db.PlayRecords.AsNoTracking().Where(r => r.HostUserId == user.Id).OrderBy(r => r.FinishedAt)
+                    .Select(r => new { r.Kind, r.ContentId, r.FinishedAt, r.PlayerCount, r.DurationSeconds, r.Accusers, r.Correct, r.Escaped, r.HintsUsed })
+                    .ToListAsync(ct),
                 Parties = parties, Mysteries = mysteries, EscapeRooms = rooms, Escapes = escapes, AiUsage = aiUsage,
             };
             var json = JsonSerializer.SerializeToUtf8Bytes(export, new JsonSerializerOptions(GameJson.Options) { WriteIndented = true });
@@ -260,6 +264,14 @@ public static class AccountEndpoints
                 await db.EscapeRooms.Where(r => r.OwnerUserId == user.Id).ExecuteDeleteAsync(ct);
                 await db.GenerationJobs.Where(j => j.HostUserId == user.Id).ExecuteDeleteAsync(ct);
                 await db.EscapeResults.Where(r => r.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(r => r.HostUserId, "").SetProperty(r => r.Team, ""), ct);
+                // Insights (#130): what was played of their own mysteries and rooms goes with them. Their games of anyone
+                // else's (a built-in room, say) stay in that content's insights, unnamed and without the guests' words.
+                var theirContent = scenarioIds.Concat(roomIds).ToList();
+                await db.PlayRecords.Where(r => theirContent.Contains(r.ContentId)).ExecuteDeleteAsync(ct);
+                await db.PlayFeedback.Where(f => theirContent.Contains(f.ContentId)).ExecuteDeleteAsync(ct);
+                await db.PlayRecords.Where(r => r.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(r => r.HostUserId, ""), ct);
+                await db.PlayFeedback.Where(f => f.HostUserId == user.Id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(f => f.HostUserId, "").SetProperty(f => f.Comment, (string?)null), ct);
                 await db.AiUsage.Where(u => u.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(u => u.HostUserId, ""), ct);
                 await db.MediaJobs.Where(j => j.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(j => j.HostUserId, ""), ct);
                 // A file the admin's copy of one of their rooms still uses stays for that copy, no longer theirs.

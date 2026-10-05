@@ -18,10 +18,12 @@ namespace ButlerDidIt.Api.Endpoints;
 /// <param name="Hidden">A hand-written mystery the admin took off the shelf.</param>
 /// <param name="CanShare">The admin's own mystery: they can share it with every host.</param>
 /// <param name="CanHide">A hand-written mystery, for the admin: they can take it off the shelf.</param>
+/// <param name="Insights">Games recorded and the guests' average rating, over every version (#130).</param>
 public sealed record MyMystery(
     string Id, string Title, string ThemeSlug, ScenarioSource Source, ContentRating ContentRating,
     DateTimeOffset UpdatedAt, int TimesPlayed, bool InUse, bool CanEdit,
-    bool Shared = false, bool Hidden = false, bool CanShare = false, bool CanHide = false);
+    bool Shared = false, bool Hidden = false, bool CanShare = false, bool CanHide = false,
+    ButlerDidIt.Api.Insights.PlaySummary? Insights = null);
 
 public sealed record EditableScenario(string Id, ScenarioSource Source, bool CanEdit, JsonElement Document);
 public sealed record ScenarioDocumentRequest(JsonElement Document);
@@ -60,11 +62,18 @@ public static class ScenarioEditorEndpoints
                 .Select(g => new { g.Key, Played = g.Count(p => p.Status == PartyStatus.Finished), Active = g.Count(p => p.Status != PartyStatus.Finished) })
                 .ToDictionaryAsync(x => x.Key, ct);
             var hidden = await ContentVisibility.HiddenAsync(db, GameKind.Mystery, ct);
+            // Each card's games and ratings, its versions' included (#130).
+            var versions = await db.Scenarios.AsNoTracking().Where(s => s.VariantOf != null && ids.Contains(s.VariantOf))
+                .Select(s => new { s.Id, Card = s.VariantOf! }).ToListAsync(ct);
+            var cardOf = ids.ToDictionary(id => id, id => id);
+            foreach (var v in versions) cardOf[v.Id] = v.Card;
+            var insights = await ButlerDidIt.Api.Insights.InsightsEndpoints.SummariesAsync(db, GameKind.Mystery, cardOf, ct);
             return Results.Ok(rows.Select(r => new MyMystery(r.Id, r.Title, r.ThemeSlug, r.Source, r.ContentRating, r.UpdatedAt,
                 plays.GetValueOrDefault(r.Id)?.Played ?? 0, (plays.GetValueOrDefault(r.Id)?.Active ?? 0) > 0,
                 r.Source != ScenarioSource.Handwritten,
                 r.Shared, Hidden: r.Source == ScenarioSource.Handwritten && hidden.Contains(r.Id),
-                CanShare: user.IsAdmin && r.OwnerUserId == user.Id, CanHide: user.IsAdmin && r.Source == ScenarioSource.Handwritten)));
+                CanShare: user.IsAdmin && r.OwnerUserId == user.Id, CanHide: user.IsAdmin && r.Source == ScenarioSource.Handwritten,
+                Insights: insights.GetValueOrDefault(r.Id))));
         });
 
         // The admin shares one of their own mysteries with every host (and its versions with it), or takes a
