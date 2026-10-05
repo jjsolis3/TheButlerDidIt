@@ -16,6 +16,9 @@ public sealed class ThemeDefinition
     /// <summary>Art direction used by image generation in milestone 3 so every picture in a theme matches.</summary>
     public string ArtStyle { get; init; } = "";
 
+    /// <summary>The background sound every mystery in this theme plays, unless it (or an act) names its own.</summary>
+    public Soundscape Soundscape { get; init; } = Soundscape.Drone;
+
     public string? Cover { get; init; }
     public int SortOrder { get; init; } = 100;
 

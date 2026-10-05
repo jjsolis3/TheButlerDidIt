@@ -20,6 +20,7 @@ import { seats, type WatchingAs } from '../lib/seats'
 import { narrator } from '../lib/speech'
 import { useThemePalette, useThemes } from '../lib/theme'
 import { useBackgroundMusic } from '../lib/useBackgroundMusic'
+import { useSoundscape } from '../lib/useSoundscape'
 import type { InterrogationView, MediaJob, PartyInfo, SpotlightView, StageView } from '../lib/types'
 
 
@@ -86,8 +87,11 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
   useThemePalette(info.themeSlug)
   useSpeakNewAnswers(stage?.interrogations ?? [], begun && !muted, stage?.ai.voices ?? false)
   useSpeakNpcSpotlight(stage, begun && !muted)
-  // The host's background music, softer while a scene plays (stage.cues is what the scene plays now).
-  const music = useBackgroundMusic(stage?.musicUrl ?? null, begun && !muted, (stage?.cues.length ?? 0) > 0)
+  // The host's background music, softer while a scene plays (stage.cues is what the scene plays now). Without it, the
+  // mystery's made-up background sound (its theme's, or its own, or the act's) plays the same way.
+  const scene = (stage?.cues.length ?? 0) > 0
+  const music = useBackgroundMusic(stage?.musicUrl ?? null, begun && !muted, scene)
+  useSoundscape(stage && !stage.musicUrl ? stage.soundscape : 'silence', begun && !muted, scene)
 
   // Keep the TV or laptop from going to sleep mid-mystery.
   useEffect(() => {
@@ -145,7 +149,7 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
 
   return (
     <NpcTypingContext.Provider value={typing}>
-      <div className="grain flex min-h-dvh flex-col">
+      <div className="grain flex min-h-dvh flex-col" data-soundscape={stage.musicUrl ? 'music' : stage.soundscape}>
         <StatusPill status={status} />
         <TopBar stage={stage} info={info} muted={muted} onMute={() => setMuted((m) => !m)} />
         <main className={`mx-auto w-full max-w-6xl flex-1 px-4 pt-4 sm:px-8 ${watcher ? 'pb-40' : 'pb-32'}`}>

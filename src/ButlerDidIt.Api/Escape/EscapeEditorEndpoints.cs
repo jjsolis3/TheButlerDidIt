@@ -6,6 +6,7 @@ using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
 using ButlerDidIt.Api.Media;
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -105,11 +106,12 @@ public static class EscapeEditorEndpoints
             row.Document = JsonSerializer.Serialize(room, Tidy);
             row.UpdatedAt = clock.GetUtcNow();
 
-            // Pictures the AI painted from words that changed are now wrong; forget just those. The next game with the
-            // AI on paints the new ones, and anything unchanged keeps its picture. The host's own uploads stay, unless
-            // their stage is gone.
+            // Pictures the AI painted, and lines it read, from words that changed are now wrong; forget just those. The
+            // next game with the AI on makes the new ones, and anything unchanged keeps its file. The host's own uploads
+            // stay, unless their stage is gone.
             var stale = StaleArt(old, room);
-            var slots = EscapeMediaEndpoints.Slots(room).Select(s => s.Key).ToHashSet();
+            // The places that still exist: the ones a host can upload to, and the AI's (its voice clips have no upload place).
+            var slots = EscapeMediaEndpoints.Slots(room).Select(s => s.Key).Concat(EscapeMediaPlan.For(room).Select(i => i.Key)).ToHashSet();
             var jobId = EscapeMedia.JobId(id);
             var art = await db.ScenarioMedia.Where(m => m.ScenarioId == jobId)
                 .Select(m => new { m.Key, m.AssetId, Uploaded = db.MediaAssets.Any(a => a.Id == m.AssetId && a.Provider == MediaService.Upload) })
@@ -220,7 +222,7 @@ public static class EscapeEditorEndpoints
         Stages = room.Stages.Select(s => s with { Title = "", Description = "", Soundscape = null }).ToList(),
     });
 
-    /// <summary>The picture keys whose prompt changed or whose stage went: their pictures no longer match the room.</summary>
+    /// <summary>The picture and voice keys whose prompt or words changed, or whose stage went: their files no longer match the room.</summary>
     internal static HashSet<string> StaleArt(EscapeRoom before, EscapeRoom after)
     {
         var now = EscapeMediaPlan.For(after).ToDictionary(i => i.Key);

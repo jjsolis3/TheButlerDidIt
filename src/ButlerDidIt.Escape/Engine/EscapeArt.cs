@@ -16,6 +16,12 @@ public static class EscapeArt
     /// <summary>A video that plays when a stage opens.</summary>
     public static string StageVideo(string stageId) => $"stage-video:{stageId}";
 
+    /// <summary>The game master reading the room's intro aloud as the clock starts (the AI's Voice role, made once per room).</summary>
+    public const string IntroVoice = "intro-voice";
+
+    /// <summary>The game master reading a stage's description aloud as it opens.</summary>
+    public static string StageVoice(string stageId) => $"stage-voice:{stageId}";
+
     /// <summary>A recorded background sound for the whole room, looped instead of the made-up one.</summary>
     public const string Ambience = "ambience";
 

@@ -256,6 +256,10 @@ Setup instructions: [ai-setup.md](ai-setup.md).
 - **Music:**
   - `Scenario.Music` and `Act.Music` reach the stage as `StageView.MusicUrl`: the current act's, else the evening's, and none from the reveal on. That's never a later act's.
   - The stage loops it in an `<audio>` element (`useBackgroundMusic`), softer while a scene plays.
+- **Background sound without uploads** (#127): a mystery is never silent. `ThemeDefinition.Soundscape` sets each theme's preset (a country house in a storm, a train, a lounge…), and `Scenario.Soundscape` and `Act.Soundscape` can override it.
+  - `ContentCatalog.GetScenarioAsync` fills in the theme's when the mystery names none (`ScenarioDefaults`), so the pure engine never needs the theme, and AI-written mysteries get one for free.
+  - `StageView.Soundscape` follows the same rules as the music: the current act's, else the mystery's, and `silence` from the reveal on.
+  - The stage synthesises it with the escape rooms' `Atmosphere` (`useSoundscape`), quieter during scenes, only when there's no uploaded track.
 - **Versions share the original's uploads.**
   - Uploads are stored under the original mystery's id. `ContentCatalog.GetScenarioAsync` merges them over each version's own AI media, and `InvalidateFamily` forgets every version when they change.
   - The editor warns that a finale video plays in every version, each with a different killer, so it shouldn't name one.
@@ -404,8 +408,9 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 - **AI-written rooms** use every kind (#86). `ShapeErrors` asks for a scene in every stage (with decoys and hiding spots), a search, a closer look or recipe, a cipher, a logic puzzle, a Hard-only part and at most 2 `use` steps, and a puzzle count that fits the clock. It also refuses cipher words or riddle answers already on screen (`EscapeRoomText`, shared with the content tests). `Normalize` places the spots on a grid (the model never writes positions) and drops what only a build or a hand-written room has (lengths, variants, grids, key locations). `Anonymize` renames puzzles and spots, including in `{key:…}`. The blind solver tests riddles with everything their stage's spots and items show, and the logic puzzles as one fixed seed builds them.
 
 **Atmosphere** (the TV only; phones stay quiet):
-- **Sound is synthesised in the browser** (`src/web/src/escape/sound.ts`, Web Audio), so rooms ship no audio files and there's nothing to license.
-  - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted or silence. The view carries the current one.
+- **Sound is synthesised in the browser** (`src/web/src/lib/sound.ts`, Web Audio), so rooms ship no audio files and there's nothing to license.
+  - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night, lounge or silence. The view carries the current one.
+  - The presets are shared with the murder mysteries (#127): the enum lives in `ButlerDidIt.Game/Scenarios/Soundscape.cs`, and the synth in `lib/sound.ts`.
   - `useAtmosphere` works out the stingers from what changed between two views: an unlock, a new stage, a wrong answer, a hint, the escape or the failure. It also sounds a gong at one minute left, then a heartbeat that speeds up. Because the view is its only input, a TV that reconnects just carries on.
   - Browsers only allow sound after a click, so the TV shows a sound switch. Its setting is remembered on the device.
 - **Room art goes through the mystery media pipeline.**
@@ -416,6 +421,7 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
   - **On the TV:** pressing Start plays the room's intro full screen: the cover with a slow pan, and the welcome read out in the game master's voice with subtitles. The clock starts when it ends or is skipped, so nobody loses time watching it. Each later stage opens with a short reveal of its own picture, name and description; the clock keeps running in the corner, and anyone can skip it.
   - **On the phones:** a card at the top shows the same picture and text and is tapped away. It's a card, not a pop-up, so it never blocks a player mid-puzzle, and phones stay quiet.
   - **Built from the TV's own view** (`escape/reveal.ts`, played by the mystery's `CuePlayer`). So it can't show anything the TV couldn't already: the projector only ever sends the current stage's picture.
+  - **Read aloud by the game master** (#127). With a Voice role set up, `EscapeMediaPlan` also records the intro (`intro-voice`) and each stage's description (`stage-voice:{id}`), in the voice the game master uses for its live lines, in the same once-per-room job as the pictures. `EscapeProjector` sends `IntroVoiceUrl`, and `StageVoiceUrl` only for the stage in front of the group, and the reveal's narration cue plays the clip. Without one, the browser reads the words. The recording is of text the TV already prints, so it says nothing the screen doesn't. A moment with an uploaded video gets no recording, and editing a stage's words re-records only that stage (`StaleArt` compares whole plans).
   - **Once per screen:** each screen remembers the reveals it has shown in `sessionStorage`, so a refresh or a reconnect doesn't replay them.
   - **Reduced motion:** the pan stops under `prefers-reduced-motion`.
   - **Uploaded videos** (step 2, below) play in place of the picture and the read-out text. AI video clips are step 3 of #110.

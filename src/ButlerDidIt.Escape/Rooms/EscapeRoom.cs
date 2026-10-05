@@ -200,34 +200,6 @@ public sealed record EscapeRecipe
     public string Text { get; init; } = "";
 }
 
-/// <summary>
-/// Background sound presets, synthesised live on the TV (src/web/src/escape/sound.ts), so rooms
-/// need no audio files and nothing to license. New presets need a matching one there.
-/// </summary>
-public enum Soundscape
-{
-    /// <summary>No background sound.</summary>
-    Silence,
-
-    /// <summary>A low, uneasy hum: fits anywhere.</summary>
-    Drone,
-
-    /// <summary>Machinery hum, a ticking clock and the odd drip.</summary>
-    Workshop,
-
-    /// <summary>A slightly out-of-tune music box over a crowd murmur.</summary>
-    Carnival,
-
-    /// <summary>Waves and wind.</summary>
-    Sea,
-
-    /// <summary>A slow, pulsing synth pad and faint beeps.</summary>
-    Space,
-
-    /// <summary>Wind and distant, low bells.</summary>
-    Haunted,
-}
-
 public enum PuzzleKind
 {
     /// <summary>A number keypad. Answers are digits.</summary>

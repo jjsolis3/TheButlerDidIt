@@ -7,6 +7,7 @@ using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Api.Scale;
+using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Scenarios;
 using Microsoft.EntityFrameworkCore;
@@ -174,7 +175,17 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         if (roomId is not null)
         {
             var room = await sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().FindAsync(db, roomId, ct);
-            wanted = room is not null && await gateway.ImagesConfiguredAsync(ct) ? EscapeMediaPlan.For(room) : [];
+            wanted = room is null ? [] : EscapeMediaPlan.For(room, await gateway.VoicesConfiguredAsync(ct), await gateway.ImagesConfiguredAsync(ct));
+            if (room is not null)
+            {
+                // A moment with the host's own video needs no reading: the video is their telling of it. (Their uploads
+                // themselves are rows under this job's id already, so they count as done below.)
+                var placed = await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == job.ScenarioId).Select(m => m.Key).ToHashSetAsync(ct);
+                var told = new HashSet<string>();
+                if (placed.Contains(EscapeArt.IntroVideo)) told.Add(EscapeArt.IntroVoice);
+                foreach (var stage in room.Stages.Where(s => placed.Contains(EscapeArt.StageVideo(s.Id)))) told.Add(EscapeArt.StageVoice(stage.Id));
+                wanted = wanted.Where(i => !told.Contains(i.Key)).ToList();
+            }
         }
         else
         {

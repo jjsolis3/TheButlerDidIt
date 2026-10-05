@@ -3,7 +3,7 @@ import type { CueView, EscapeStageView } from '../lib/types'
 /**
  * Cinematic room reveals (#110). The cues are built from the TV's own view, so a reveal can only show what
  * the TV may show: the picture (or the host's video) of the stage in front of the group (the projector never
- * sends a later one) and text the TV already prints. There's nothing new for the server to send, and nothing to leak.
+ * sends a later one), text the TV already prints, and the game master's recording of that same text. Nothing to leak.
  */
 export type RevealMode = 'intro' | 'stage'
 
@@ -23,7 +23,9 @@ export function revealCues(view: EscapeStageView, mode: RevealMode): CueView[] {
   if (video) return [cue({ type: 'video', src: video })]
   const voice = view.gameMaster?.voice ?? null
   const text = mode === 'intro' ? view.intro : (view.stage?.description ?? '')
-  return [cue({ type: 'image', src: view.artUrl, effect: 'kenburns' }), cue({ type: 'narration', text, voice })]
+  // The game master's recorded reading (#127) when the AI has made one; otherwise the browser reads the words.
+  const clip = mode === 'intro' ? view.introVoiceUrl : view.stageVoiceUrl
+  return [cue({ type: 'image', src: view.artUrl, effect: 'kenburns' }), cue({ type: 'narration', text, voice, src: clip })]
 }
 
 // Which reveals this device has already shown, per party, so a refresh or a reconnect doesn't play one again.

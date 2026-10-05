@@ -81,6 +81,8 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   const intro = tv.getByTestId('room-reveal')
   await expect(intro.getByRole('heading', { name: 'The Workshop' })).toBeVisible()
   await expect(intro).toContainText('You have wasted every hour you were given')
+  // Read by the game master in the (fake) Voice role's recording, made with the room's pictures (#127), not the browser.
+  await expect(intro).toHaveAttribute('data-narration', 'recorded')
   await tv.screenshot({ path: `${SHOTS}/90b-escape-intro.png` })
   // Skipping it starts the clock; every phone gets its own clues, under a card for the first room.
   await intro.getByRole('button', { name: /Skip and start the clock/ }).click()

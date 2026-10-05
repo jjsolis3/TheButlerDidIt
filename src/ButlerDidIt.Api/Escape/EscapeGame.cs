@@ -5,6 +5,7 @@ using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
 using Microsoft.EntityFrameworkCore;

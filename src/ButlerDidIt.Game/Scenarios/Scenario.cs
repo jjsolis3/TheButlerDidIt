@@ -55,6 +55,12 @@ public sealed class Scenario
     /// <summary>A background track that loops quietly on the stage until the reveal (an act can have its own). Optional.</summary>
     public string? Music { get; init; }
 
+    /// <summary>
+    /// The background sound the stage makes up when there's no <see cref="Music"/>: a preset, synthesised live (an act
+    /// can have its own). Null takes the theme's (see ThemeDefinition.Soundscape), filled in when the mystery is loaded.
+    /// </summary>
+    public Soundscape? Soundscape { get; init; }
+
     public Character? FindCharacter(string id) => Characters.FirstOrDefault(c => c.Id == id);
     public Clue? FindClue(string id) => Clues.FirstOrDefault(c => c.Id == id);
 }
@@ -205,6 +211,9 @@ public sealed class Act
 
     /// <summary>A background track for this act, in place of the mystery's. Optional.</summary>
     public string? Music { get; init; }
+
+    /// <summary>A background sound for this act, in place of the mystery's. Optional.</summary>
+    public Soundscape? Soundscape { get; init; }
 }
 
 public enum CueType

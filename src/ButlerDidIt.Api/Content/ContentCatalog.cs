@@ -104,6 +104,12 @@ public sealed class ContentCatalog(IServiceScopeFactory scopes, ILogger<ContentC
         var uploaded = rows.Where(r => r.ScenarioId == original && uploads.Contains(r.AssetId)).ToList();
         foreach (var r in uploaded) media[r.Key] = Media.MediaStore.Url(r.AssetId); // the host's choice wins
         var playable = MediaOverlay.Apply(scenario, media, uploaded.Select(r => r.Key).ToHashSet());
+        // A mystery that names no background sound plays its theme's.
+        if (playable.Soundscape is null)
+        {
+            var themeDoc = await db.Themes.AsNoTracking().Where(t => t.Slug == playable.ThemeSlug).Select(t => t.Document).FirstOrDefaultAsync(ct);
+            playable = ScenarioDefaults.Apply(playable, themeDoc is null ? null : GameJson.Deserialize<ThemeDefinition>(themeDoc));
+        }
         _originalOf[id] = original;
         _scenarioCache[id] = playable;
         return playable;

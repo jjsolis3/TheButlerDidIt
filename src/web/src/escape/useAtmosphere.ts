@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { EscapeStageView } from '../lib/types'
-import { Atmosphere } from './sound'
+import { Atmosphere } from '../lib/sound'
 
 const STORAGE_KEY = 'escape-sound'
 

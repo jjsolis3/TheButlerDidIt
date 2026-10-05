@@ -195,6 +195,8 @@ export interface StageView {
   tailoring: boolean
   /** The background track to loop now: the current act's, else the mystery's. Never a later act's; null from the reveal on */
   musicUrl: string | null
+  /** The made-up background sound when there's no track: the current act's, else the mystery's (or its theme's). Silence from the reveal on */
+  soundscape: Soundscape
 }
 
 export interface AiFeatures {
@@ -332,6 +334,8 @@ export interface ThemeDefinition {
   description: string
   palette: ThemePalette
   artStyle: string
+  /** The background sound its mysteries play, unless one (or an act) names its own */
+  soundscape: Soundscape
   cover: string | null
   /** Holidays the theme suits, e.g. "halloween". Drives the seasonal filter on the host's shelf. */
   seasons: string[]
@@ -948,6 +952,10 @@ export interface EscapeStageView {
   stageVideoUrl: string | null
   /** A recorded background sound to loop now (the current stage's, or the room's), or null for the made-up one */
   ambienceUrl: string | null
+  /** The game master reading the intro (the AI's Voice role), or null: the browser reads it */
+  introVoiceUrl: string | null
+  /** The game master reading the current stage's description, or null. Never a later stage's */
+  stageVoiceUrl: string | null
 }
 
 /** What a room's media place holds (C# MediaKind; a room never holds a "photo", which is a guest's selfie). */
@@ -1014,8 +1022,20 @@ export interface MysteryMediaView {
   limits: MediaLimits
 }
 
-/** Background sound presets, synthesised in the browser by escape/sound.ts. */
-export type Soundscape = 'silence' | 'drone' | 'workshop' | 'carnival' | 'sea' | 'space' | 'haunted'
+/** Background sound presets, synthesised in the browser by lib/sound.ts (both games; C# Soundscape). */
+export type Soundscape =
+  | 'silence'
+  | 'drone'
+  | 'workshop'
+  | 'carnival'
+  | 'sea'
+  | 'space'
+  | 'haunted'
+  | 'manor'
+  | 'storm'
+  | 'train'
+  | 'night'
+  | 'lounge'
 
 export interface EscapeGameMasterView {
   name: string

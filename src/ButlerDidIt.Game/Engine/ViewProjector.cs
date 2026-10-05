@@ -65,7 +65,9 @@ public static class ViewProjector
             Tailoring: s.Tailoring,
             // Like the cues, only what belongs to now: a later act's track could say how the evening turns.
             // The reveal and the finale are left in silence (or the finale's own video).
-            MusicUrl: s.Phase is Phase.Reveal or Phase.Awards or Phase.Finished ? null : act?.Music ?? scenario.Music);
+            MusicUrl: s.Phase is Phase.Reveal or Phase.Awards or Phase.Finished ? null : act?.Music ?? scenario.Music,
+            Soundscape: s.Phase is Phase.Reveal or Phase.Awards or Phase.Finished ? Soundscape.Silence
+                : act?.Soundscape ?? scenario.Soundscape ?? Soundscape.Drone);
     }
 
     /// <summary>The recap of a finished game. Throws for a game still in progress, so the solution can't leak early.</summary>

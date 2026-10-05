@@ -1,4 +1,5 @@
 using ButlerDidIt.Escape.Rooms;
+using Soundscape = ButlerDidIt.Game.Scenarios.Soundscape;
 
 namespace ButlerDidIt.Escape.Engine;
 
@@ -53,7 +54,10 @@ public static class EscapeProjector
             IntroVideoUrl: art?.GetValueOrDefault(EscapeArt.IntroVideo),
             // Like the pictures: only the stage in front of the group, so a later stage's video can't give it away.
             StageVideoUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageVideo(stage.Id)),
-            AmbienceUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageAmbience(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Ambience));
+            AmbienceUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageAmbience(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Ambience),
+            IntroVoiceUrl: art?.GetValueOrDefault(EscapeArt.IntroVoice),
+            // Like the stage's picture and video: a later stage's description stays unheard until it opens.
+            StageVoiceUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageVoice(stage.Id)));
     }
 
     private static EscapeSceneView Scene(EscapeState s, EscapeScene scene) => new(

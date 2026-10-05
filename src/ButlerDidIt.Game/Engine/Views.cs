@@ -37,7 +37,9 @@ public sealed record StageView(
     // True while the AI writes a version of the mystery for tonight's cast; the lobby is frozen meanwhile.
     bool Tailoring,
     // The background track to loop now: the current act's, else the mystery's. Never a later act's; null from the reveal on.
-    string? MusicUrl = null);
+    string? MusicUrl = null,
+    // The made-up background sound when there's no track: the current act's, else the mystery's. Silence from the reveal on.
+    Soundscape Soundscape = Soundscape.Drone);
 
 /// <summary>
 /// Whose turn it is to speak (see GameState.SpotlightCharacterId). SeatId and PlayerName are set when a
