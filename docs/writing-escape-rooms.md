@@ -242,7 +242,7 @@ The Family rooms (edition 2) follow the same shape with gentler parts: the Pirat
 
 ## Themed rooms
 
-The five themed Family rooms (#137) show how to make every puzzle belong to its world, rather than a riddle that could sit in any room. Each generator becomes something the world already has:
+The themed rooms (#137), five for Families and three for Adults, show how to make every puzzle belong to its world, rather than a riddle that could sit in any room. Each generator becomes something the world already has:
 
 | Room | Number pattern | Colours | Logic | Lights | Words across phones | Crafting |
 |---|---|---|---|---|---|---|
@@ -251,10 +251,15 @@ The five themed Family rooms (#137) show how to make every puzzle belong to its 
 | The Hero Exam | the rescue siren | the rescue teams' scoreboard | the class roll call | the gadget charging dock | the Hero Oath | the power-down gadget |
 | The Last Round (🎃) | a generator's fuel gauge | a generator's wires | the survivors on their spawn pads | a generator's switch panel | the server password | the exit gate's fuse |
 | The Blocklands | the mine's depth sign | the ore wall | the crafting table's block shelf | the ruin's glow lamps | the portal spell | a pickaxe, a torch, flint and steel |
+| The Black Notebook (Adults, 🎃) | the Scribe's numbers by the TV | evidence tags | the passengers in the lift footage | the CCTV wall | the Scribe's true name | a torn black page |
+| The Graveyard Shift (Adults, 🎃) | the Maestro's parts log | table six's balloons | table six's seating plan | the relays | Walt's last tape | a hand crank for the Maestro's chest |
+| The Last Login (Adults, 🎃) | Nil's leaderboard | generator fuel cans | the still avatars on their pads | the generator breakers | the admin password | an admin keycard |
 
-The tools are the world's tools too: the night guard's flashlight for the dark vent, a UV hairclip for glow-in-the-dark writing, power gloves and X-ray goggles, a wrench for the server box, and a pickaxe and bucket (water on lava makes obsidian). Each final lock needs something carried from every stage.
+The tools are the world's tools too: the night guard's flashlight for the dark vent, a UV hairclip for glow-in-the-dark writing, power gloves and X-ray goggles, a wrench for the server box, and a pickaxe and bucket (water on lava makes obsidian). The Adult rooms use a kettle for a key frozen in ice, a torch for under the water tank, a crowbar for boarded hatches and a wireframe lens that sees inside a game's walls. Each final lock needs something carried from every stage.
 
-**Inspired by, never the real names.** The built-in shelf is public, so a room can borrow a genre and its moods (an animatronic pizzeria, a virtual pop idol, a hero academy, a survivors' game, a world of blocks) but never another company's characters, names, logos or catchphrases. A host who wants the real names for their own family night can type the theme into *Write a room with AI*, or use the room editor: those rooms stay on their own shelf.
+**Adults, not gore.** The Adult cuts keep the tone of the Asylum and the Bunker: dread, suspense and death on the table, but nothing graphic. Family rooms can't mention death at all (the validator refuses it), which is why the notebook thriller is Adults only.
+
+**Inspired by, never the real names.** The built-in shelf is public, so a room can borrow a genre and its moods (an animatronic pizzeria, a virtual pop idol, a hero academy, a survivors' game, a world of blocks, a killer's notebook) but never another company's characters, names, logos or catchphrases. A host who wants the real names for their own family night can type the theme into *Write a room with AI*, or use the room editor: those rooms stay on their own shelf.
 
 ## Leaderboards
 
@@ -263,6 +268,7 @@ When a game ends, its result is saved in the same step that ends the game. The *
 ## Tips
 
 - **Keep cipher words out of the room's own text.** If "shelter" is in the synopsis, a cipher that spells SHELTER is answered before it's decoded (and the AI's prompts would carry it too). The content tests catch this.
+- **Keep number words out of descriptions.** The picture prompts (title, synopsis, art style and stage descriptions) are checked against every dealt code, digits and number words alike, so "two generators" and "one night" can spell a code by accident. And a cipher's or riddle's answer can't be a word the game master's prompts always use ("clock", "watch"), a field name in the views ("name", "notebook"), or a word in the fixed picture-prompt lines ("Family friendly").
 - **Keep answers out of the screens' words.** A riddle whose answer is "clock" can't have a spot drawn as a `clock` prop, and one answered "table" collides with the `"table"` a cipher's view carries. Nor can a hint repeat a prompt word for word. The privacy tests catch all three.
 - **Make them search.** A scene with a few decoys, a tool that reveals something, and a key written somewhere unexpected feels like a real room. Codes the group has to work out (a cipher, a pattern, a logic puzzle) beat codes read off a phone.
 - **Make the phones matter.** Put at least one puzzle with 3–4 `pieces` in each room. Write every piece so it only makes sense together with the others, for example "the SECOND digit is…".
