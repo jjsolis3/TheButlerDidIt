@@ -1,0 +1,1040 @@
+{
+  "id": "the-last-round",
+  "title": "The Last Round",
+  "synopsis": "You've been pulled into The Last Round, a blocky online survival game, and the server won't let anyone log off until the survivors win. Start the round, fix the generators and reach the exit gates, all while Tagalong, a grinning blocky hunter, roams the map looking for someone to play with.",
+  "contentRating": "family",
+  "theme": "survival-game",
+  "artStyle": "a blocky online survival game: a bright lobby with glowing spawn pads, a foggy blocky town at night with generators and floodlights, and a tall grinning blocky hunter, colourful video-game style, spooky-fun and never scary",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 90,
+  "soundscape": "tension",
+  "intro": "Hee hee! A new round! Welcome to The Last Round, survivors. I'm Tagalong, and I LOVE playing tag. The rules are easy: you fix the generators and run for the exit gates, and I... come and find you! The server won't let you log off until you win. Ready? I'll count to ten! One... two...",
+  "escapedText": "You burst through the gates in a shower of pixels as YOU SURVIVED! flashes across the sky, and the server finally lets you log off. On top of the gate, Tagalong waves a blocky hand: 'Same time next round? Pleeease?'",
+  "failedText": "The round timer hits zero and a blocky hand taps your shoulder. 'TAG! You're it!' giggles Tagalong. Looks like you'll be playing until the next round...",
+  "gameMaster": {
+    "name": "Tagalong",
+    "persona": "A tall, blocky hunter with a huge glowing grin who roams the game looking for someone to play tag with. Giggly, bouncy and a bit spooky: counts out loud, says 'Tag, you're it!' a lot and sulks when survivors fix things. Secretly just wants someone to play with. Spooky-fun, never truly scary.",
+    "voice": {
+      "accent": "en-US",
+      "pitch": 1.2,
+      "rate": 1.0,
+      "style": "giggly, sing-song, a little spooky"
+    }
+  },
+  "stages": [
+    {
+      "id": "lobby",
+      "soundscape": "space",
+      "title": "The Lobby",
+      "description": "You spawn in the game's lobby: a bright, blocky hall with five glowing spawn pads, an item shop, a trophy wall and a leaderboard. A swirling portal waits to start the round, but it needs the server key. On the leaderboard, one name is at the top: TAGALONG.",
+      "puzzles": [
+        "spawn-pads",
+        "lobby-search",
+        "admin-message",
+        "skin-shop",
+        "round-portal"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "server-box",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "server box",
+            "look": "You unscrew the server box with the wrench. Inside: blinking lights and a sticky note: 'Slide back {key:admin-message}. Admin.'",
+            "requires": "wrench",
+            "lockedText": "A humming metal box, screwed shut. A sticker says ADMIN ONLY."
+          },
+          {
+            "id": "lobby-vent",
+            "prop": "vent",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lobby vent",
+            "look": "You unscrew the vent cover. Inside, glowing gold: the SERVER KEY!",
+            "gives": "server-key",
+            "requires": "wrench",
+            "lockedText": "A vent with four big screws. Something glows inside."
+          },
+          {
+            "id": "portal",
+            "prop": "door",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "round portal",
+            "look": "A swirling portal with a keyhole: INSERT SERVER KEY TO START THE ROUND."
+          },
+          {
+            "id": "leaderboard",
+            "prop": "sign",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "leaderboard",
+            "look": "TOP SURVIVORS: nobody yet. TOP HUNTER: TAGALONG."
+          },
+          {
+            "id": "spawn-pads-spot",
+            "prop": "rug",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "spawn pads",
+            "look": "Glowing pads in a row, with a keypad: READY UP!"
+          },
+          {
+            "id": "item-shop",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "item shop",
+            "look": "Fizzy colas, medkits and a sign: SHOP CLOSED DURING ROUNDS.",
+            "hidesPieces": true
+          },
+          {
+            "id": "trophy-wall",
+            "prop": "shelf",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "trophy wall",
+            "look": "Badges for every round survived. There aren't many.",
+            "hidesPieces": true
+          },
+          {
+            "id": "spawn-crates",
+            "prop": "crate",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "spawn crates",
+            "look": "Crates full of starter gear: hats, capes and a squeaky hammer.",
+            "hidesPieces": true
+          },
+          {
+            "id": "emote-screen",
+            "prop": "machine",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "emote screen",
+            "look": "A screen of dance moves. You try one. Nailed it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "avatar-mirror",
+            "prop": "mirror",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "avatar mirror",
+            "look": "Your blocky reflection waves back at you. A second later.",
+            "hidesPieces": true
+          },
+          {
+            "id": "chat-screen",
+            "prop": "sign",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "chat screen",
+            "look": "In the lobby chat, between lots of 'hi' and 'gg': back {key:admin-message}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "skin-rack",
+            "prop": "statue",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "skin rack",
+            "look": "Pinned to a banana costume, a note: back {key:admin-message}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "afk-corner",
+            "prop": "bed",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "AFK corner",
+            "look": "Someone's avatar has been standing here for three days. Zzz.",
+            "hidesPieces": true
+          },
+          {
+            "id": "hat-bin",
+            "prop": "box",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "lost hats bin",
+            "look": "A traffic-cone hat, a crown and one shoe.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cola-fridge",
+            "prop": "cabinet",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "cola fridge",
+            "look": "Fizzy blocky cola, the kind that makes you run faster.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "foggy-town",
+      "soundscape": "night",
+      "title": "Foggy Town",
+      "description": "The round begins! You land in a blocky little town at night, wrapped in thick fog. Wooden houses creak, a swing squeaks in the playground, and three silent generators sit in the gloom, waiting to be fixed. Somewhere in the fog, a giggly voice is counting: '...eight... nine... TEN!'",
+      "puzzles": [
+        "generator-wires",
+        "generator-fuel",
+        "town-search",
+        "generator-panel",
+        "hunter-scribbles",
+        "lost-pet"
+      ],
+      "scene": {
+        "backdrop": "night",
+        "objects": [
+          {
+            "id": "gen-wires",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "generator 1",
+            "look": "A silent generator with a wire box on the side. Inside, the wires are all jumbled."
+          },
+          {
+            "id": "gen-fuel",
+            "prop": "machine",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "generator 2",
+            "look": "A silent generator. Its fuel gauge flickers."
+          },
+          {
+            "id": "gen-panel",
+            "prop": "machine",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "generator 3",
+            "look": "A silent generator with a grid of switch lights on the front."
+          },
+          {
+            "id": "playground",
+            "prop": "statue",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "playground",
+            "look": "A blocky slide and a creaky swing. Something's taped under the slide.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mailbox",
+            "prop": "box",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "mailbox",
+            "look": "Letters addressed to SURVIVORS. Most of them just say RUN.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bus-stop",
+            "prop": "sign",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "bus stop",
+            "look": "A bus timetable. The next bus is in... never.",
+            "hidesPieces": true
+          },
+          {
+            "id": "wooden-house",
+            "prop": "door",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "wooden house",
+            "look": "You knock. Nobody answers. Then somebody giggles.",
+            "hidesPieces": true
+          },
+          {
+            "id": "foggy-park",
+            "prop": "plant",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "foggy park",
+            "look": "Trees in the fog. One of them has a face. No, wait, it's just bark.",
+            "hidesPieces": true
+          },
+          {
+            "id": "old-well",
+            "prop": "barrel",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "old well",
+            "look": "You drop a block in. Plink. Very deep. There's a lockbox with a word lock on the rim.",
+            "hidesPieces": true
+          },
+          {
+            "id": "lamppost",
+            "prop": "lamp",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "flickering lamppost",
+            "look": "It flickers on and off, on and off, on and off.",
+            "hidesPieces": true
+          },
+          {
+            "id": "graffiti-wall",
+            "prop": "poster",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "graffiti wall",
+            "look": "Tagalong's scribbles all over the wall, and a symbol card: {key:hunter-scribbles}"
+          },
+          {
+            "id": "dropped-hat",
+            "prop": "box",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "dropped party hat",
+            "look": "Tagalong's party hat, dropped in the road. Inside, a symbol card: {key:hunter-scribbles}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "doghouse",
+            "prop": "crate",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "doghouse",
+            "look": "No dog. Just a symbol card on the wall: {key:hunter-scribbles}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "notice-board",
+            "prop": "painting",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "notice board",
+            "look": "LOST PET posters, every one of them written in numbers."
+          }
+        ]
+      }
+    },
+    {
+      "id": "exit-gates",
+      "title": "The Exit Gates",
+      "description": "With the generators roaring, floodlights blaze across the edge of the map. The exit gates hum with power, but they're still locked: the control box needs a fuse, the keypad needs a code, and Tagalong sits on top of the gate, swinging his blocky legs and grinning down at you.",
+      "puzzles": [
+        "server-password",
+        "gate-riddle",
+        "tag-sign",
+        "grin-code",
+        "gate-fuse",
+        "exit-gate"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "gate-control",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "gate control box",
+            "look": "A box with an empty fuse slot and a big lever with a word lock."
+          },
+          {
+            "id": "gates-spot",
+            "prop": "door",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "exit gates",
+            "look": "Huge metal gates with a keypad and a card slot. Through the bars: the way out."
+          },
+          {
+            "id": "tagalong",
+            "prop": "statue",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "Tagalong",
+            "look": "A tall, blocky figure with a huge glowing grin, sitting on the gate. 'Wanna play?'"
+          },
+          {
+            "id": "floodlights",
+            "prop": "lamp",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "floodlights",
+            "look": "Blinding white lights. Tagalong squints at them."
+          },
+          {
+            "id": "gate-sign",
+            "prop": "sign",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "scribbled sign",
+            "look": "Words on the sign, written in a back-to-front alphabet."
+          },
+          {
+            "id": "tool-shed",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "tool shed",
+            "look": "Spades, a rake and a flock of very surprised blocky chickens.",
+            "hidesPieces": true
+          },
+          {
+            "id": "watchtower",
+            "prop": "statue",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "watchtower",
+            "look": "A wobbly wooden tower. From the top, you can see the whole map.",
+            "hidesPieces": true
+          },
+          {
+            "id": "supply-crates",
+            "prop": "crate",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "supply crates",
+            "look": "Medkits and fizzy cola. Someone has written THANKS SURVIVORS on the lid.",
+            "hidesPieces": true
+          },
+          {
+            "id": "generator-four",
+            "prop": "machine",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "generator 4",
+            "look": "Already running. Someone fixed it before you. Thanks, someone!",
+            "hidesPieces": true
+          },
+          {
+            "id": "puddle",
+            "prop": "rug",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "muddy puddle",
+            "look": "SPLOSH. Your blocky shoes are soaked.",
+            "hidesPieces": true
+          },
+          {
+            "id": "radio-mast",
+            "prop": "machine",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "radio mast",
+            "look": "A code card tied to the mast: {key:grin-code}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "survivor-notes",
+            "prop": "bookshelf",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "survivors' notebook",
+            "look": "On the last page: a table of dots and dashes: {key:grin-code}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "fence-post",
+            "prop": "sign",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "fence post",
+            "look": "A code card nailed to the fence: {key:grin-code}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "backpack",
+            "prop": "box",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "abandoned backpack",
+            "look": "Snacks, a map of the lobby and a shiny coin.",
+            "gives": "lucky-coin",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "spawn-pads",
+      "title": "The Spawn Pads",
+      "kind": "code",
+      "prompt": "Every survivor has to stand on their own spawn pad before the round, but the server has mixed everyone up: {items}. The ready-up keypad wants each one's pad, far left is 1, in the order listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "pizza courier",
+          "builder",
+          "hacker",
+          "medic",
+          "swordfighter"
+        ],
+        "pieceTemplate": "From the lobby chat: {clue}"
+      },
+      "rewards": [
+        "fuse"
+      ],
+      "hints": [
+        "Every phone has a line from the lobby chat. Read them all out loud.",
+        "Start with the line you're surest about, and try each pad in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The pads glow green: READY! A little drawer pops out of the last pad, with a spare fuse inside, labelled EXIT GATE."
+    },
+    {
+      "id": "lobby-search",
+      "title": "The Survivor's Tool",
+      "kind": "search",
+      "prompt": "Every survivor needs a tool for fixing generators, and the lobby has hidden one somewhere. Search the item shop, the trophy wall and the spawn crates.",
+      "finds": [
+        "item-shop",
+        "trophy-wall",
+        "spawn-crates"
+      ],
+      "rewards": [
+        "wrench"
+      ],
+      "hints": [
+        "Three spots in the lobby are worth a proper look.",
+        "Look behind the shop counter, among the badges and in the starter gear."
+      ],
+      "solvedText": "Under the squeaky hammer in a spawn crate: a big blocky wrench! Perfect for unscrewing things."
+    },
+    {
+      "id": "admin-message",
+      "title": "The Admin's Message",
+      "kind": "text",
+      "prompt": "A message from the server admin flashes up in the chat, scrambled so the hunter can't read it: {cipher}. It's the one thing a survivor has to do to win. The ready-up board's word lock wants it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "survive",
+          "repair",
+          "hide",
+          "outrun",
+          "sneak",
+          "dodge"
+        ]
+      },
+      "hints": [
+        "The admin wrote a number in more than one place, and one of them is screwed shut.",
+        "Try each number you found: only one turns this into something a survivor does.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "The chat lights up: ADMIN: GOOD LUCK, SURVIVORS. DON'T GET CAUGHT. The ready-up board blinks green."
+    },
+    {
+      "id": "skin-shop",
+      "minMinutes": 60,
+      "title": "The Mystery Box",
+      "kind": "code",
+      "prompt": "The skin shop's mystery box has a {count}-digit lock, and the shopkeeper bot has turned the code into a quiz.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "The shopkeeper bot whispers to you: the {ordinal} digit is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The mystery box opens: a glittery top hat skin! It does nothing at all. You wear it anyway."
+    },
+    {
+      "id": "round-portal",
+      "title": "The Round Portal",
+      "kind": "use",
+      "prompt": "The round portal swirls, but it won't start the round without the server key.",
+      "requires": [
+        "server-key"
+      ],
+      "hints": [
+        "The server key is glowing somewhere behind some screws.",
+        "Unscrew the lobby vent with the wrench, then put the server key in the portal."
+      ],
+      "solvedText": "The key clicks in, the portal roars, and a voice booms: 'ROUND STARTING! SURVIVORS, FIX THE GENERATORS!' Everything goes white..."
+    },
+    {
+      "id": "generator-wires",
+      "title": "Generator 1: The Wires",
+      "kind": "code",
+      "prompt": "Generator 1 has a wire box with a {count}-digit lock. Its label says: '{order}!' Each of you peeked under the cover and counted one colour of wire.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "purple",
+          "orange",
+          "white"
+        ],
+        "thing": "wire",
+        "pieceTemplate": "You peeked under the cover and counted the {color} wires: there were {digit}."
+      },
+      "hints": [
+        "Each phone counted one colour of wire. Say your colour and your number.",
+        "Read them in the label's order: {order}."
+      ],
+      "solvedText": "BRRRUMMM! Generator 1 roars into life and a floodlight blazes on. Somewhere in the fog, a voice giggles: 'Ooh! I heard that!'"
+    },
+    {
+      "id": "generator-fuel",
+      "title": "Generator 2: The Fuel Gauge",
+      "kind": "code",
+      "prompt": "Generator 2's fuel gauge flickers through a pattern: {sequence}. The fuel pump wants the next number.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "Glug, glug, BRRRUMMM! Generator 2 is running. Two floodlights now!"
+    },
+    {
+      "id": "town-search",
+      "title": "The Survivors' Stash",
+      "kind": "search",
+      "prompt": "Survivors from the last round left supplies around town. Search the playground, the mailbox and the bus stop.",
+      "finds": [
+        "playground",
+        "mailbox",
+        "bus-stop"
+      ],
+      "rewards": [
+        "fuse-cap"
+      ],
+      "hints": [
+        "Three spots in town are worth checking before the hunter finds you.",
+        "Look under the slide, through the letters and behind the timetable."
+      ],
+      "solvedText": "Taped under the slide, in a bag marked FOR THE NEXT SURVIVORS: a fuse cap and a note: 'You'll need this at the gate. Good luck!'"
+    },
+    {
+      "id": "generator-panel",
+      "minMinutes": 45,
+      "title": "Generator 3: The Switch Panel",
+      "kind": "switches",
+      "prompt": "Generator 3 has a grid of switch lights, wired together: flip one and the ones beside it flip too. Turn them all on to start it!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the switches in the row below it.",
+        "Flip {answer}."
+      ],
+      "solvedText": "Every light glows and generator 3 shudders into life. That's three!"
+    },
+    {
+      "id": "hunter-scribbles",
+      "minMinutes": 45,
+      "title": "The Hunter's Scribbles",
+      "kind": "text",
+      "prompt": "Tagalong has scribbled his favourite playground game all over town, in his blocky symbols: {cipher}. The lockbox on the old well wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "chase",
+          "conkers",
+          "marbles",
+          "leapfrog"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "blanket",
+          "kitchen",
+          "dolphin",
+          "cabinet",
+          "triangle",
+          "hospital",
+          "dolphins"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in town. Only one is Tagalong's real key.",
+        "Try each card: only one turns the symbols into a playground game.",
+        "It says {answer}."
+      ],
+      "solvedText": "The lockbox opens. Inside: a drawing of Tagalong all alone in a playground, with a sad little face. Huh."
+    },
+    {
+      "id": "lost-pet",
+      "minMinutes": 60,
+      "title": "The Lost Pet",
+      "kind": "text",
+      "prompt": "Every LOST PET poster on the notice board is written in numbers, where A is 1 and B is 2: {cipher}. The poster's tear-off strip has a word lock. What's lost?",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "kitten",
+          "puppy",
+          "hamster",
+          "goldfish",
+          "parrot",
+          "tortoise"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "You find it curled up asleep under the swing. Aww. You leave a note so its owner can find it after the round."
+    },
+    {
+      "id": "server-password",
+      "minMinutes": 45,
+      "title": "The Server Password",
+      "kind": "text",
+      "prompt": "The gate's chat lock wants the server password, and the admin has sent each of you one word of it in a private message.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "respawn",
+          "lobby",
+          "server",
+          "avatar",
+          "emote",
+          "badge",
+          "pixel",
+          "spawn",
+          "teleport",
+          "checkpoint",
+          "jump",
+          "block"
+        ],
+        "pieceTemplate": "A private message pops up on your screen: the {ordinal} word of the password is '{word}'."
+      },
+      "hints": [
+        "Each of you has one word of the password. Say them in order: first, second, third...",
+        "Put them together in order, like: word word word."
+      ],
+      "solvedText": "You type '{answer}' and the chat lock turns green: PASSWORD ACCEPTED."
+    },
+    {
+      "id": "gate-riddle",
+      "minMinutes": 45,
+      "title": "The Gate Lever",
+      "kind": "text",
+      "prompt": "The gate control box's lever has a word lock and a riddle from Tagalong: 'I'm always running but I never get tired, and when I reach zero, the round is over!'",
+      "answers": [
+        "timer",
+        "the timer",
+        "countdown",
+        "clock"
+      ],
+      "hints": [
+        "Think about how a round ends.",
+        "It counts down the seconds until the round is over."
+      ],
+      "solvedText": "The lever clunks down. Tagalong claps his blocky hands: 'You're good at riddles! Will you play with me now?'",
+      "variants": [
+        {},
+        {
+          "prompt": "The gate control box's lever has a word lock and a riddle from Tagalong: 'I follow you everywhere in the sunshine, but in the dark I disappear.'",
+          "answers": [
+            "shadow",
+            "your shadow",
+            "shadows"
+          ],
+          "hints": [
+            "Look down at your feet on a sunny day.",
+            "It's the dark shape you make when you block the light."
+          ]
+        },
+        {
+          "prompt": "The gate control box's lever has a word lock and a riddle from Tagalong: 'I've got keys and a mouse and a screen, but I can't open a door or catch a cheese thief.'",
+          "answers": [
+            "computer",
+            "a computer",
+            "laptop",
+            "pc"
+          ],
+          "hints": [
+            "Think about how you'd play this game at home.",
+            "You type on it and click with a mouse."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tag-sign",
+      "minMinutes": 60,
+      "title": "The Scribbled Sign",
+      "kind": "text",
+      "prompt": "Tagalong's sign says what he shouts when he finds someone, written in a back-to-front alphabet where A swaps with Z: {cipher}. The sign's word lock wants it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "gotcha",
+          "peekaboo",
+          "boo",
+          "yoohoo",
+          "surprise"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "You read it out loud, and Tagalong giggles so hard he nearly falls off the gate."
+    },
+    {
+      "id": "grin-code",
+      "minDifficulty": "hard",
+      "title": "The Glowing Grin",
+      "kind": "text",
+      "prompt": "Tagalong's glowing grin flickers long and short, over and over. It's spelling the one thing he really wants: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "pal",
+          "friend",
+          "playtime"
+        ],
+        "decoyWords": [
+          "pen",
+          "cup",
+          "hat",
+          "mud",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey",
+          "triangle",
+          "hospital",
+          "dolphins"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden round the gates. Only one reads something Tagalong would want.",
+        "Look at the radio mast, the survivors' notebook and the fence post.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "Oh. So that's what Tagalong really wants. You promise to come back after the round and play with him, and his grin gets even bigger."
+    },
+    {
+      "id": "gate-fuse",
+      "title": "The Gate Fuse",
+      "kind": "use",
+      "prompt": "The gate control box has an empty fuse slot. Without a fuse, the gates stay shut, however many generators are running.",
+      "requires": [
+        "exit-fuse"
+      ],
+      "rewards": [
+        "gate-keycard"
+      ],
+      "hints": [
+        "You've found a spare fuse and a fuse cap. Try putting them together.",
+        "Twist the cap onto the fuse, then put it in the gate control box."
+      ],
+      "solvedText": "The fuse clicks in, the gates hum louder, and a card slides out of the box: EXIT GATE KEYCARD."
+    },
+    {
+      "id": "exit-gate",
+      "title": "The Exit Gate",
+      "kind": "code",
+      "prompt": "The exit gates need the keycard AND a 3-digit code. The admin's last message: 'Chickens by the shed, then floodlights on, then crates at the gate!'",
+      "answers": [
+        "472"
+      ],
+      "requires": [
+        "gate-keycard"
+      ],
+      "pieces": [
+        "You counted the blocky chickens by the tool shed: 4.",
+        "You counted the floodlights at the gate: 7.",
+        "You counted the supply crates by the gate: 2."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order of the admin's message.",
+        "Chickens, then floodlights, then crates."
+      ],
+      "solvedText": "BEEP! The gates swing open with a mighty CLANG, and the way out of the map shines in front of you.",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "815"
+          ],
+          "pieces": [
+            "You counted the blocky chickens by the tool shed: 8.",
+            "You counted the floodlights at the gate: 1.",
+            "You counted the supply crates by the gate: 5."
+          ]
+        },
+        {
+          "answers": [
+            "369"
+          ],
+          "pieces": [
+            "You counted the blocky chickens by the tool shed: 3.",
+            "You counted the floodlights at the gate: 6.",
+            "You counted the supply crates by the gate: 9."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "fuse",
+      "name": "Spare fuse",
+      "description": "A glass fuse labelled EXIT GATE. Its metal cap is missing."
+    },
+    {
+      "id": "wrench",
+      "name": "Blocky wrench",
+      "description": "A big blocky wrench. Perfect for unscrewing vents, boxes and panels."
+    },
+    {
+      "id": "server-key",
+      "name": "Server key",
+      "description": "A glowing gold key. It hums with the sound of a thousand players."
+    },
+    {
+      "id": "fuse-cap",
+      "name": "Fuse cap",
+      "description": "A metal cap from a fuse, in a bag marked FOR THE NEXT SURVIVORS."
+    },
+    {
+      "id": "exit-fuse",
+      "name": "Exit gate fuse",
+      "description": "The spare fuse with its cap on. Ready for the gate control box."
+    },
+    {
+      "id": "gate-keycard",
+      "name": "Exit gate keycard",
+      "description": "A card that slid out of the gate control box: EXIT GATE."
+    },
+    {
+      "id": "lucky-coin",
+      "name": "Shiny coin",
+      "description": "A shiny game coin. It doesn't open anything, but it might be lucky."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "fuse",
+        "fuse-cap"
+      ],
+      "makes": "exit-fuse",
+      "text": "The cap twists onto the fuse with a click. Ready for the gate!"
+    }
+  ]
+}
