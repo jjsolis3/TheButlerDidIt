@@ -1,0 +1,1116 @@
+{
+  "id": "the-last-login",
+  "title": "The Last Login",
+  "synopsis": "Nobody has played Hollow Hill since its last eleven players logged in on the same night and never logged out. Their avatars are still standing in the lobby. Tonight the server came back online and pulled your group in, and somewhere on the map a killer called Nil is waiting for the round to start. Restore the generators, reach the admin room and get out before it finds you.",
+  "contentRating": "mature",
+  "theme": "survival-game",
+  "artStyle": "a corrupted blocky online survival game at night: a silent lobby of motionless avatars, an abandoned campground in a white haze with dead generators, red system text, a tall faceless figure far away in the trees, dark and unsettling, CRT scanlines",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 120,
+  "soundscape": "tension",
+  "intro": "SYSTEM: NEW PLAYERS CONNECTED. Hello, survivors. I am Nil. I used to keep this server clean, and I still do. Eleven survivors tried to leave before you. They are still in the lobby, if you would like to say hello. The generators are off. The exit is locked. You may run. Everybody runs.",
+  "escapedText": "The exit gate shudders open and the screen goes white: SURVIVORS ESCAPED. You pull the headset off. Your room is quiet, and real. On the monitor, one line of text appears before the server goes dark for good: 'NEXT ROUND?'",
+  "failedText": "The last generator sputters out. Somewhere close, something is walking, very evenly. 'ROUND OVER,' says Nil. 'SURVIVORS REMAINING: ZERO.' In the lobby, new avatars appear beside the others, standing very still.",
+  "gameMaster": {
+    "name": "Nil",
+    "persona": "A corrupted admin account that became the server's killer: faceless, glitching, speaking in flat system messages and error codes. Never angry, never hurried. It has all the time in the world, and it has never lost a round. Treats survivors as errors to be cleaned up, and is quietly curious about why they keep trying.",
+    "voice": {
+      "accent": "en-US",
+      "pitch": 0.6,
+      "rate": 0.85,
+      "style": "flat, glitching, synthetic"
+    }
+  },
+  "stages": [
+    {
+      "id": "silent-lobby",
+      "soundscape": "drone",
+      "title": "The Silent Lobby",
+      "description": "The game's lobby is cold and silent. Eleven avatars stand on the spawn pads, perfectly still, their name tags greyed out. The chat log scrolls by itself, and the leaderboard lists a single name a thousand times: NIL. The portal to the map is dark, waiting for a round key.",
+      "puzzles": [
+        "avatar-lineup",
+        "lobby-search",
+        "chat-log",
+        "leaderboard",
+        "dev-locker",
+        "map-portal"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "lobby-wall",
+            "prop": "painting",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lobby wall",
+            "look": "Through the wireframe lens, text appears inside the wall, in a developer's console font: 'slide back {key:chat-log}'",
+            "requires": "wireframe-lens",
+            "lockedText": "A plain grey wall. In the corner of your eye, something flickers inside it."
+          },
+          {
+            "id": "leaderboard-screen",
+            "prop": "screen",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "leaderboard",
+            "look": "NIL, NIL, NIL, NIL, one name a thousand times. Under it, an admin panel with a keypad."
+          },
+          {
+            "id": "avatar-pads",
+            "prop": "robot",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "still avatars",
+            "look": "Eleven avatars on the spawn pads, not moving. Their name tags are grey. One of them has turned its head to watch you."
+          },
+          {
+            "id": "chat-screen",
+            "prop": "screen",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "chat log",
+            "look": "The chat scrolls by itself, though nobody is typing: hello? hello? is anyone there?",
+            "hidesPieces": true
+          },
+          {
+            "id": "portal",
+            "prop": "portal",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "map portal",
+            "look": "A dark portal frame with a keyhole: INSERT ROUND KEY."
+          },
+          {
+            "id": "item-shop",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "item shop",
+            "look": "Medkits and fizzy cola, all marked SOLD OUT. The till is still open.",
+            "hidesPieces": true
+          },
+          {
+            "id": "trophy-case",
+            "prop": "trophy",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "trophy case",
+            "look": "Badges for surviving a round. Not one of them has been won.",
+            "hidesPieces": true
+          },
+          {
+            "id": "dev-desk",
+            "prop": "desk",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "dev's desk",
+            "look": "A developer's desk in the corner of the map, the kind they leave in as a joke. The drawers are full of junk.",
+            "hidesPieces": true
+          },
+          {
+            "id": "emote-machine",
+            "prop": "arcade",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "emote machine",
+            "look": "A cabinet of dance emotes. You press one. Every still avatar in the lobby does the dance with you.",
+            "hidesPieces": true
+          },
+          {
+            "id": "lost-items",
+            "prop": "box",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "lost items",
+            "look": "Hats, capes and a sword with someone's name engraved on it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "shop-backroom",
+            "prop": "door",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "shop back room",
+            "look": "Through the wireframe lens, the back wall is only wire. Behind it, stuck in the geometry: a key with a red R on it. You pull it free.",
+            "gives": "round-key",
+            "requires": "wireframe-lens",
+            "lockedText": "A door that opens onto a painted wall. There's nothing behind it. Is there?"
+          },
+          {
+            "id": "spawn-crate",
+            "prop": "crate",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "spawn crate",
+            "look": "Starter gear, and a note in the lid: back {key:chat-log}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "grey-tag",
+            "prop": "sign",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "grey name tag",
+            "look": "A name tag fallen off one of the avatars. On the back: back {key:chat-log}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "afk-bench",
+            "prop": "table",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "AFK bench",
+            "look": "A bench where players wait out a round. It's still warm.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cola-machine",
+            "prop": "machine",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "cola machine",
+            "look": "It hums. Every can inside is the same flavour: ERROR.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "campground",
+      "soundscape": "night",
+      "title": "Hollow Hill Campground",
+      "description": "The portal drops you onto a campground in a thick white haze. Log cabins sag around a cold campfire, canoes rot beside a black lake, and a ranger tower creaks on the hill. A pair of generators sit silent among the trees, and the gate to the ranger station is locked. Somewhere in the haze, something walks, very evenly.",
+      "puzzles": [
+        "fuel-cans",
+        "cabin-search",
+        "breaker-grid",
+        "survivor-carvings",
+        "ranger-log",
+        "ranger-gate"
+      ],
+      "scene": {
+        "backdrop": "night",
+        "objects": [
+          {
+            "id": "generator-one",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "generator one",
+            "look": "Silent. Its fuel tank is empty, and a fuel log with a number lock is taped to the side."
+          },
+          {
+            "id": "generator-two",
+            "prop": "machine",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "generator two",
+            "look": "Silent, with a grid of breaker lights on the front."
+          },
+          {
+            "id": "black-lake",
+            "prop": "water",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "black lake",
+            "look": "Through the wireframe lens, you can see the lake bed: a gate key, resting in the geometry. You fish it out.",
+            "gives": "gate-key",
+            "requires": "wireframe-lens",
+            "lockedText": "Black and perfectly still. Something glints, far below."
+          },
+          {
+            "id": "ranger-gate-spot",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "ranger station gate",
+            "look": "A gate with a keyhole and a word lock. A riddle is carved into the post."
+          },
+          {
+            "id": "ranger-tower",
+            "prop": "statue",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "ranger tower",
+            "look": "At the top of the tower, carved into the railing, a card of symbols: {key:survivor-carvings}"
+          },
+          {
+            "id": "cabin-bunks",
+            "prop": "bed",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cabin bunks",
+            "look": "Bunk beds with the sheets thrown back, as if everyone got up in a hurry.",
+            "hidesPieces": true
+          },
+          {
+            "id": "canoe-rack",
+            "prop": "vehicle",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "canoe rack",
+            "look": "Canoes rotting on their racks. One has eleven tally marks scratched into the hull.",
+            "hidesPieces": true
+          },
+          {
+            "id": "ranger-hut",
+            "prop": "cabinet",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "ranger's hut",
+            "look": "Maps, a radio and a mug of coffee gone cold years ago.",
+            "hidesPieces": true
+          },
+          {
+            "id": "campfire",
+            "prop": "lava",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "campfire ring",
+            "look": "Cold ashes, and eleven marshmallow sticks laid in a neat row.",
+            "hidesPieces": true
+          },
+          {
+            "id": "picnic-table",
+            "prop": "table",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "picnic table",
+            "look": "Initials carved all over it. The newest ones are yours.",
+            "hidesPieces": true
+          },
+          {
+            "id": "carved-tree",
+            "prop": "tree",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "carved tree",
+            "look": "A card of symbols nailed to the bark: {key:survivor-carvings}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "outhouse",
+            "prop": "door",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "outhouse",
+            "look": "Inside the door, a card of symbols: {key:survivor-carvings}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "ranger-logbook",
+            "prop": "bookshelf",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "ranger's logbook",
+            "look": "Eleven names, and the same word in numbers written beside every one."
+          },
+          {
+            "id": "fuel-shed",
+            "prop": "crate",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "fuel shed",
+            "look": "Fuel cans in every colour, most of them empty.",
+            "hidesPieces": true
+          },
+          {
+            "id": "trail-sign",
+            "prop": "sign",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "trail sign",
+            "look": "HOLLOW HILL, POPULATION 0. Someone has scratched out the 0 and written 11.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "admin-room",
+      "title": "The Admin Room",
+      "description": "Behind the ranger station is a door that shouldn't be in the map. Inside, server racks hum in the dark, a console glows red, and a wall of screens shows every survivor who ever played, each of them a still frame. A single chair faces the screens, as if someone has been watching them all. The exit gate blinks on the far wall.",
+      "puzzles": [
+        "admin-password",
+        "readme",
+        "error-log",
+        "status-light",
+        "server-rack",
+        "exit-gate"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "console",
+            "prop": "screen",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "admin console",
+            "look": "A terminal glowing red: ENTER ADMIN PASSWORD. Beside it, a text file called README with a word lock."
+          },
+          {
+            "id": "rack-spot",
+            "prop": "machine",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "server rack",
+            "look": "A rack of humming servers with a keycard slot: ADMIN ONLY."
+          },
+          {
+            "id": "screen-wall",
+            "prop": "screen",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "wall of screens",
+            "look": "Every survivor who ever played, caught mid-run. In the last row, eleven faces you recognise from the lobby."
+          },
+          {
+            "id": "watching-chair",
+            "prop": "table",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "the chair",
+            "look": "Still warm. On the armrest, one word is scratched over and over: NEXT."
+          },
+          {
+            "id": "exit-gate-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "exit gate",
+            "look": "A heavy gate in the back wall, with a fob reader and a 3-digit keypad."
+          },
+          {
+            "id": "cable-tray",
+            "prop": "pipe",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cable tray",
+            "look": "Cables, and a lot of dust. Something has been chewing them.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cooling-fans",
+            "prop": "vent",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cooling fans",
+            "look": "Warm air, and under the hum, what sounds like voices.",
+            "hidesPieces": true
+          },
+          {
+            "id": "backup-drives",
+            "prop": "box",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "backup drives",
+            "look": "Drives labelled with dates. The last one is labelled with today's.",
+            "hidesPieces": true
+          },
+          {
+            "id": "dev-whiteboard",
+            "prop": "sign",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "dev whiteboard",
+            "look": "LAUNCH DAY! in faded marker, and a to-do list: FIX NIL. It isn't crossed out.",
+            "hidesPieces": true
+          },
+          {
+            "id": "snack-wrappers",
+            "prop": "food",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "snack wrappers",
+            "look": "Energy-drink cans and crisp packets, from the night the developers stopped coming in.",
+            "hidesPieces": true
+          },
+          {
+            "id": "rack-label",
+            "prop": "sign",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "rack label",
+            "look": "A code card stuck to the rack: {key:status-light}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "dev-notes",
+            "prop": "bookshelf",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "dev notes",
+            "look": "On the last page, a table of dots and dashes: {key:status-light}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "power-backup",
+            "prop": "machine",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "power backup",
+            "look": "A code card taped to the battery: {key:status-light}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "error-screen",
+            "prop": "screen",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "error log",
+            "look": "The last line of the error log, written back to front."
+          },
+          {
+            "id": "lost-headset",
+            "prop": "box",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "lost headset",
+            "look": "A cracked headset. Through it, very faintly, someone is still whispering.",
+            "gives": "headset",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "avatar-lineup",
+      "title": "The Still Avatars",
+      "kind": "code",
+      "prompt": "Some of the still avatars stand on the front row of spawn pads, their names greyed out, so you can only tell them apart by their gear: {items}. The ready-up panel wants each one's pad, far left is 1, in the order listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "medic",
+          "gambler",
+          "builder",
+          "hacker",
+          "courier"
+        ],
+        "pieceTemplate": "From the chat log, the night they logged in: {clue}"
+      },
+      "hints": [
+        "Every phone holds a line from the old chat log. Read them all out loud.",
+        "Start with the line you're surest about, and try each pad in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The panel turns green: READY. All at once, the avatars on the front row turn their heads to look at the portal."
+    },
+    {
+      "id": "lobby-search",
+      "title": "The Debug Tools",
+      "kind": "search",
+      "prompt": "The developers left debug tools lying around before the server died. Search the item shop, the trophy case and the dev's desk.",
+      "finds": [
+        "item-shop",
+        "trophy-case",
+        "dev-desk"
+      ],
+      "rewards": [
+        "wireframe-lens"
+      ],
+      "hints": [
+        "Three places in the lobby are worth a careful look.",
+        "Look behind the shop counter, among the badges and in the desk drawers."
+      ],
+      "solvedText": "In the dev's desk drawer: a wireframe lens, a debug tool that shows the game's hidden geometry. There are things inside the walls."
+    },
+    {
+      "id": "chat-log",
+      "title": "The Last Message",
+      "kind": "text",
+      "prompt": "The chat log's last message before the server went dark is scrambled: {cipher}. It's the last thing one of the eleven typed. The ready-up panel's word lock wants it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "running",
+          "hiding",
+          "trapped",
+          "listen",
+          "sorry",
+          "goodbye"
+        ]
+      },
+      "hints": [
+        "A number is written in more than one place, and one of them is hidden inside a wall.",
+        "Try each number you found: only one turns this into a real word.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "The chat freezes on the word. Then, slowly, a new line types itself out: nil is typing..."
+    },
+    {
+      "id": "leaderboard",
+      "title": "The Leaderboard",
+      "kind": "code",
+      "prompt": "The leaderboard counts Nil's wins, round after round: {sequence}. The admin panel under it wants the next number.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "The count updates. A new line appears at the bottom of the leaderboard: NEXT ROUND: YOU."
+    },
+    {
+      "id": "dev-locker",
+      "minMinutes": 60,
+      "title": "The Developer's Locker",
+      "kind": "code",
+      "prompt": "The developer's locker has a {count}-digit lock. Their sticky notes turned every digit into a quiz question, and you've each found one.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "A developer's sticky note: the {ordinal} digit is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "Inside the locker: a hoodie, a flat energy drink and a printed email. SUBJECT: DO NOT RELAUNCH HOLLOW HILL."
+    },
+    {
+      "id": "map-portal",
+      "title": "The Map Portal",
+      "kind": "use",
+      "prompt": "The portal to the map is dark. INSERT ROUND KEY, it says, and the keyhole waits.",
+      "requires": [
+        "round-key"
+      ],
+      "hints": [
+        "The round key is somewhere you can't see without help.",
+        "Look into the shop's back room through the wireframe lens, then put the round key in the portal."
+      ],
+      "solvedText": "The key turns, the portal floods with red light, and the lobby speaker crackles: ROUND STARTING. Behind you, the still avatars take one step forward."
+    },
+    {
+      "id": "fuel-cans",
+      "title": "Generator One",
+      "kind": "code",
+      "prompt": "Generator one's fuel log has a {count}-digit lock and a note: '{order}.' Each of you counted one colour of fuel can in the shed.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "black",
+          "white",
+          "orange"
+        ],
+        "thing": "fuel can",
+        "pieceTemplate": "You counted the {color} fuel cans in the shed: there were {digit}."
+      },
+      "rewards": [
+        "keycard-chip"
+      ],
+      "hints": [
+        "Each phone counted one colour of can. Say your colour and your number.",
+        "Read them in the note's order: {order}."
+      ],
+      "solvedText": "Generator one coughs, then roars, and a floodlight snaps on over the campground. Taped inside the fuel log's cover: a keycard chip, labelled ADMIN."
+    },
+    {
+      "id": "cabin-search",
+      "title": "The Stash",
+      "kind": "search",
+      "prompt": "The eleven left a stash for whoever came next. Search the cabin bunks, the canoe rack and the ranger's hut.",
+      "finds": [
+        "cabin-bunks",
+        "canoe-rack",
+        "ranger-hut"
+      ],
+      "rewards": [
+        "blank-keycard"
+      ],
+      "hints": [
+        "Three places in the camp are worth a careful search.",
+        "Look under the bunks, along the canoes and through the hut."
+      ],
+      "solvedText": "Under a bunk mattress, a bag with a note: FOR WHOEVER'S NEXT. Inside are a blank keycard and a list of eleven names, every one of them crossed out."
+    },
+    {
+      "id": "breaker-grid",
+      "minMinutes": 45,
+      "title": "Generator Two",
+      "kind": "switches",
+      "prompt": "Generator two's breaker lights are linked: flip one and the ones beside it flip too. Light them all to start it.",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the breakers in the row below it.",
+        "Flip {answer}."
+      ],
+      "solvedText": "Generator two shudders into life. In the new light, you see footprints in the haze around you, very evenly spaced. None of them are yours."
+    },
+    {
+      "id": "survivor-carvings",
+      "minMinutes": 45,
+      "title": "The Survivors' Code",
+      "kind": "text",
+      "prompt": "The eleven carved messages around the camp in a code of symbols, so Nil couldn't read them in chat. The last one says what Nil can't see through: {cipher}. A lockbox on the tower has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "fog",
+          "mist",
+          "rain",
+          "smoke"
+        ],
+        "decoyWords": [
+          "pen",
+          "cup",
+          "hat",
+          "mud",
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in the camp. Only one is the survivors' real key.",
+        "Try each card: only one turns the symbols into something you can't see through.",
+        "It says {answer}."
+      ],
+      "solvedText": "The lockbox opens. Inside, a survivor's last note: IT CAN'T SEE THROUGH IT. BUT IT CAN WAIT."
+    },
+    {
+      "id": "ranger-log",
+      "minMinutes": 60,
+      "title": "The Ranger's Logbook",
+      "kind": "text",
+      "prompt": "The ranger's logbook lists the eleven names, with the same word written beside each one, in numbers where A is 1 and B is 2: {cipher}. The logbook's strap has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "missing",
+          "offline",
+          "silenced",
+          "unplugged",
+          "forgotten"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "The strap opens. On the next blank line, in the same handwriting, someone has started to write your names."
+    },
+    {
+      "id": "ranger-gate",
+      "title": "The Ranger Station Gate",
+      "kind": "text",
+      "prompt": "The gate to the ranger station has a keyhole and a word lock, with a riddle carved into the post: 'What gets shorter the longer it burns?'",
+      "answers": [
+        "candle",
+        "a candle",
+        "candles"
+      ],
+      "requires": [
+        "gate-key"
+      ],
+      "hints": [
+        "Think about what you'd light in a cabin with no power.",
+        "It has a wick, and it melts as it burns."
+      ],
+      "solvedText": "The key turns and the gate swings open. Behind the ranger station there's a door that shouldn't be there, standing ajar.",
+      "variants": [
+        {},
+        {
+          "prompt": "The gate to the ranger station has a keyhole and a word lock, with a riddle carved into the post: 'What can you hold without ever touching it?'",
+          "answers": [
+            "breath",
+            "your breath",
+            "a breath"
+          ],
+          "hints": [
+            "Think about keeping very, very quiet.",
+            "You hold it so nobody can hear you."
+          ]
+        },
+        {
+          "prompt": "The gate to the ranger station has a keyhole and a word lock, with a riddle carved into the post: 'What has one eye, but cannot see?'",
+          "answers": [
+            "needle",
+            "a needle",
+            "needles"
+          ],
+          "hints": [
+            "Think about sewing.",
+            "You push thread through its eye."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-password",
+      "minMinutes": 45,
+      "title": "The Admin Password",
+      "kind": "text",
+      "prompt": "The admin console wants Nil's password. The eleven pieced it together before the end, and each of you has found one of their notes.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "hollow",
+          "signal",
+          "static",
+          "lantern",
+          "orbit",
+          "ember",
+          "pixel",
+          "vector",
+          "kernel",
+          "packet",
+          "beacon",
+          "cinder"
+        ],
+        "pieceTemplate": "A survivor's note, crumpled in your pocket: the {ordinal} word of the admin password is '{word}'."
+      },
+      "hints": [
+        "Each of you has one word of the password. Say them in order: first, second, third...",
+        "Put them together in order, like: word word word."
+      ],
+      "solvedText": "ACCESS GRANTED. On every screen at once, Nil's faceless avatar turns to look at you."
+    },
+    {
+      "id": "readme",
+      "minMinutes": 45,
+      "title": "The README",
+      "kind": "text",
+      "prompt": "The README file on the console has a word lock and a riddle: 'I have keys but no locks. I have space but no room. You can enter, but you can't go inside.'",
+      "answers": [
+        "keyboard",
+        "a keyboard",
+        "keyboards"
+      ],
+      "hints": [
+        "Look at what you'd type on.",
+        "It's under your fingers whenever you chat."
+      ],
+      "solvedText": "The README opens. It's a single line from the lead developer: I TRIED TO SHUT IT DOWN. IT WOULDN'T LET ME.",
+      "variants": [
+        {},
+        {
+          "prompt": "The README file on the console has a word lock and a riddle: 'I can be cracked, made, told and played. What am I?'",
+          "answers": [
+            "joke",
+            "a joke",
+            "jokes"
+          ],
+          "hints": [
+            "Think about something that makes people laugh.",
+            "You tell one and hope for a laugh."
+          ]
+        },
+        {
+          "prompt": "The README file on the console has a word lock and a riddle: 'I speak without a mouth and I hear without ears. Shout into the empty server, and I answer you.'",
+          "answers": [
+            "echo",
+            "an echo",
+            "echoes"
+          ],
+          "hints": [
+            "Think about shouting into a cave, or an empty room.",
+            "It's your own voice, coming back to you."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "error-log",
+      "minMinutes": 60,
+      "title": "The Error Log",
+      "kind": "text",
+      "prompt": "The error log's last line is written in a back-to-front alphabet where A swaps with Z: {cipher}. It's what Nil says it will be. The log file has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "endless",
+          "eternal",
+          "undying",
+          "infinite",
+          "everlasting"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "The screen flickers, and a correction appears underneath: ...FOR NOW."
+    },
+    {
+      "id": "status-light",
+      "minDifficulty": "hard",
+      "title": "The Status Light",
+      "kind": "text",
+      "prompt": "A status light on the server rack blinks long and short, over and over. It's spelling out what Nil really is: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "bug",
+          "virus",
+          "glitch"
+        ],
+        "decoyWords": [
+          "pen",
+          "cup",
+          "hat",
+          "mud",
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden round the room. Only one reads what Nil really is.",
+        "Look at the rack label, the dev notes and the power backup.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "The status light stops blinking and turns a steady, furious red."
+    },
+    {
+      "id": "server-rack",
+      "title": "The Server Rack",
+      "kind": "use",
+      "prompt": "Nil runs on the server rack, and its keycard slot only takes an admin card.",
+      "requires": [
+        "admin-keycard"
+      ],
+      "rewards": [
+        "exit-fob"
+      ],
+      "hints": [
+        "You've found a chip labelled ADMIN and a blank keycard. Try putting them together.",
+        "Press the chip into the blank card, then swipe the admin card in the server rack."
+      ],
+      "solvedText": "The card slides in. The servers stutter, and on every screen Nil's avatar freezes mid-step. A drawer slides out of the rack with an exit gate fob inside."
+    },
+    {
+      "id": "exit-gate",
+      "title": "The Exit Gate",
+      "kind": "code",
+      "prompt": "The exit gate needs the fob AND a 3-digit code. Taped to the keypad, in the lead developer's handwriting: 'Avatars on the back row, then canoes on the rack, then screens on the bottom row.'",
+      "answers": [
+        "648"
+      ],
+      "requires": [
+        "exit-fob"
+      ],
+      "pieces": [
+        "You counted the avatars on the lobby's back row: 6.",
+        "You counted the canoes on the campground rack: 4.",
+        "You counted the screens on the bottom row of the wall: 8."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on the developer's note.",
+        "Avatars, then canoes, then screens."
+      ],
+      "solvedText": "The fob beeps, the keypad turns green, and the gate begins to grind open. Behind you, very evenly, something starts to walk.",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "927"
+          ],
+          "pieces": [
+            "You counted the avatars on the lobby's back row: 9.",
+            "You counted the canoes on the campground rack: 2.",
+            "You counted the screens on the bottom row of the wall: 7."
+          ]
+        },
+        {
+          "answers": [
+            "351"
+          ],
+          "pieces": [
+            "You counted the avatars on the lobby's back row: 3.",
+            "You counted the canoes on the campground rack: 5.",
+            "You counted the screens on the bottom row of the wall: 1."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "wireframe-lens",
+      "name": "Wireframe lens",
+      "description": "A developer's debug tool. Through it, the game shows its hidden geometry: things inside walls and at the bottom of the lake."
+    },
+    {
+      "id": "round-key",
+      "name": "Round key",
+      "description": "A key with a red R on it, pulled out of the map's geometry."
+    },
+    {
+      "id": "keycard-chip",
+      "name": "Admin chip",
+      "description": "A small chip labelled ADMIN, from generator one's fuel log."
+    },
+    {
+      "id": "blank-keycard",
+      "name": "Blank keycard",
+      "description": "A white keycard with an empty slot for a chip, left FOR WHOEVER'S NEXT."
+    },
+    {
+      "id": "admin-keycard",
+      "name": "Admin keycard",
+      "description": "The blank card with the admin chip pressed in. It's warm, as if something is reading it."
+    },
+    {
+      "id": "gate-key",
+      "name": "Gate key",
+      "description": "A key fished out of the black lake. It's still dripping."
+    },
+    {
+      "id": "exit-fob",
+      "name": "Exit gate fob",
+      "description": "A plastic fob from the server rack, labelled EXIT."
+    },
+    {
+      "id": "headset",
+      "name": "Cracked headset",
+      "description": "Someone's old headset. It doesn't fit anything. You can still hear the whispering when you hold it close."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "keycard-chip",
+        "blank-keycard"
+      ],
+      "makes": "admin-keycard",
+      "text": "The chip clicks into the blank card, and a tiny light on it turns red: ADMIN."
+    }
+  ]
+}
