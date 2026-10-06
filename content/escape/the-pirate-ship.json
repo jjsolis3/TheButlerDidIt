@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "sea",
   "intro": "Ahoy, stowaways! Captain Salty Sal here, and this is MY ship. You want to go ashore? Then earn it, me hearties! Every hatch is locked, every chest is sealed, and the gangplank key is hidden. Work together like a proper crew, and be quick about it before the tide turns. Yo ho!",
@@ -34,7 +34,7 @@
       "id": "galley",
       "soundscape": "workshop",
       "title": "The Galley",
-      "description": "Pots and pans swing from hooks, barrels of apples are stacked by the stove, a stew pot bubbles, and bunks sway in the corner. Through a far porthole something bobs out at sea. The hatch up to the captain's cabin is padlocked, and the cook's spice rack has a lock of its own.",
+      "description": "Pots and pans swing from hooks, barrels of apples are stacked by the stove, a stew pot bubbles, and bunks sway in the corner. Through a far porthole something bobs out at sea. The hatch up to the captain's cabin is padlocked, and who knows what else the cook has locked away?",
       "puzzles": [
         "apple-barrel",
         "galley-search",
@@ -89,7 +89,7 @@
             "w": 170,
             "h": 160,
             "label": "stove",
-            "look": "A big iron stove, still warm. It smells of toast and seaweed."
+            "look": "A big iron stove, still warm. Tucked behind it: a cupboard with a keypad, and a row of pots hanging above it."
           },
           {
             "id": "apple-barrels",
@@ -154,7 +154,7 @@
             "w": 170,
             "h": 160,
             "label": "spice rack",
-            "look": "Tiny jars of pepper, salt and something labelled 'DRAGON DUST'.",
+            "look": "Tiny jars of pepper, salt and something labelled 'DRAGON DUST'. Behind them: a little spice chest with a lock.",
             "hidesPieces": true
           },
           {
@@ -246,7 +246,7 @@
             "w": 220,
             "h": 160,
             "label": "letters on the wall",
-            "look": "Letters to the captain, all written in numbers."
+            "look": "Letters to the captain, all signed in secret symbols. The newest sits in a letter box with a word lock."
           },
           {
             "id": "lantern-hooks",
@@ -256,7 +256,7 @@
             "w": 220,
             "h": 160,
             "label": "lanterns",
-            "look": "A row of lanterns on hooks, all dark."
+            "look": "A row of lanterns on hooks, all dark. Each one has a little switch on its side."
           },
           {
             "id": "map-table",
@@ -340,7 +340,7 @@
     {
       "id": "deck",
       "title": "The Deck",
-      "description": "Sea spray and sunshine! Flags flap from the mast, seagulls squawk overhead, a message in a bottle is wedged in the rail, and the gangplank is pulled up tight, with a lock and a three-digit keypad.",
+      "description": "Sea spray and sunshine! Flags flap from the mast, seagulls squawk overhead, and the gangplank is pulled up tight. Captain Sal shouts down from the wheel: 'Every lock on my deck leaves a mark. Open them all, and the gangplank's yours!'",
       "puzzles": [
         "knots-log",
         "flag-locker",
@@ -359,7 +359,7 @@
             "w": 220,
             "h": 160,
             "label": "gangplank",
-            "look": "Pulled up tight, with a lock and a three-digit keypad."
+            "look": "Pulled up tight, with a lock and a keypad. It won't budge until every other lock on deck is open."
           },
           {
             "id": "knot-board",
@@ -372,14 +372,14 @@
             "look": "Knots tied in rows, each row with more knots than the last."
           },
           {
-            "id": "bottle-rail",
+            "id": "rail",
             "prop": "shelf",
             "x": 515,
             "y": 20,
             "w": 220,
             "h": 160,
-            "label": "message in a bottle",
-            "look": "A bottle wedged in the rail, with a message in the captain's back-to-front alphabet."
+            "label": "ship's rail",
+            "look": "Smooth wood, polished by a thousand salty hands. A seagull glares at you from it."
           },
           {
             "id": "mast",
@@ -389,7 +389,7 @@
             "w": 220,
             "h": 160,
             "label": "mast",
-            "look": "Flags flap high above. Seagulls squawk at you from the top.",
+            "look": "Flags flap high above. At its foot: the flag locker, sealed with a word lock.",
             "hidesPieces": true
           },
           {
@@ -411,7 +411,7 @@
             "w": 220,
             "h": 160,
             "label": "lifeboat",
-            "look": "A little lifeboat with two oars and a bucket.",
+            "look": "A little lifeboat with two oars and a bucket. Painted on its side, in the captain's curly writing: {order:gangplank}.",
             "hidesPieces": true
           },
           {
@@ -444,7 +444,7 @@
             "w": 220,
             "h": 160,
             "label": "crow's nest",
-            "look": "Through the spyglass, you spot a lighthouse. Painted on its wall is a table of dots and dashes: {key:lighthouse}",
+            "look": "Through the spyglass, you spot a lighthouse flashing a signal at the ship. Painted on its wall is a table of dots and dashes: {key:lighthouse}",
             "requires": "spyglass",
             "lockedText": "Up in the crow's nest, you can see a lighthouse far away. Too far to make anything out.",
             "minDifficulty": "hard"
@@ -559,7 +559,8 @@
       "id": "cooking-pots",
       "title": "The Cook's Pots",
       "kind": "code",
-      "prompt": "Five pots hang over the stove: {items}. The cook's cupboard has a keypad: 'Each pot's place, far left is 1, in the order I list them!'",
+      "revealedBy": "spot:stove",
+      "prompt": "Pots hang in a row over the stove: {items}. The cook's cupboard has a keypad: 'Each pot's place, far left is 1, in the order I list them!'",
       "generator": {
         "type": "deduction",
         "words": [
@@ -586,6 +587,7 @@
       "minMinutes": 45,
       "title": "The Spice Chest",
       "kind": "code",
+      "revealedBy": "spot:spice-rack",
       "prompt": "The cook's spice chest has a {count}-digit lock. Each of you grabbed a different recipe card from the wall.",
       "hints": [
         "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
@@ -603,7 +605,7 @@
       "minMinutes": 45,
       "title": "The Sea Shanty",
       "kind": "text",
-      "prompt": "The cook's favourite shanty is written in code on the wall: {cipher}. The spice rack's lock wants the missing word.",
+      "prompt": "The cook's favourite shanty is chalked on the wall in code: {cipher}. The flour bin's lock wants the missing word.",
       "generator": {
         "type": "cipher",
         "cipher": "shift",
@@ -621,7 +623,7 @@
         "How far to slide the letters is written somewhere. Look far out to sea through the right thing.",
         "Slide every letter back along the alphabet by that many places."
       ],
-      "solvedText": "You sing the word and the spice rack springs open. The cook would be proud!"
+      "solvedText": "You sing the word and the flour bin springs open. Puff! The cook would be proud!"
     },
     {
       "id": "galley-hatch",
@@ -669,6 +671,7 @@
       "id": "captains-letters",
       "title": "The Captain's Letters",
       "kind": "text",
+      "revealedBy": "spot:letters-wall",
       "prompt": "The captain signs her letters in secret symbols. The newest one ends with a word from a pirate's life: {cipher}. The letter box lock wants the word.",
       "generator": {
         "type": "cipher",
@@ -701,13 +704,14 @@
         "Try each card: only one turns the symbols into a word a pirate would use.",
         "It says {answer}."
       ],
-      "solvedText": "The letter box opens. Inside: a lot more letters, and a biscuit."
+      "solvedText": "The letter box opens. Inside: a lot more letters, a biscuit, and a note about the captain's desk."
     },
     {
       "id": "lanterns",
       "minMinutes": 45,
       "title": "The Lanterns",
       "kind": "switches",
+      "revealedBy": "spot:lantern-hooks",
       "prompt": "The lanterns flicker. Tap one and it lights, and flips the ones beside it. Light every lantern!",
       "generator": {
         "type": "switches"
@@ -723,7 +727,8 @@
       "minMinutes": 60,
       "title": "The Captain's Desk",
       "kind": "text",
-      "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I start with T, I end with T, and I'm full of T.'",
+      "revealedBy": "puzzle:captains-letters",
+      "prompt": "The note in the letter box says the captain's desk drawer has a word lock, with her riddle painted on it: 'I start with T, I end with T, and I'm full of T.'",
       "answers": [
         "teapot",
         "a teapot"
@@ -736,7 +741,7 @@
       "variants": [
         {},
         {
-          "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I'm full of holes, but I still hold water.'",
+          "prompt": "The note in the letter box says the captain's desk drawer has a word lock, with her riddle painted on it: 'I'm full of holes, but I still hold water.'",
           "answers": [
             "sponge",
             "a sponge"
@@ -747,7 +752,7 @@
           ]
         },
         {
-          "prompt": "A drawer in the captain's desk has a word lock. Captain Sal's riddle is painted on it: 'I begin with E, I end with E, and I usually hold just one letter.'",
+          "prompt": "The note in the letter box says the captain's desk drawer has a word lock, with her riddle painted on it: 'I begin with E, I end with E, and I usually hold just one letter.'",
           "answers": [
             "envelope",
             "an envelope"
@@ -788,13 +793,13 @@
         "Look at how each number changes to get the next one.",
         "The next number is {answer}."
       ],
-      "solvedText": "Beep! The keypad lights up and the seagulls cheer. Or squawk. Hard to tell."
+      "solvedText": "Beep! A hatch under the knot board pops open, and out rolls a bottle with a message inside!"
     },
     {
       "id": "flag-locker",
-      "minMinutes": 45,
       "title": "The Flag Locker",
       "kind": "text",
+      "revealedBy": "spot:mast",
       "prompt": "The flag locker is sealed with a word lock. Captain Sal's note: 'Hoist the {count} flag words, first to last!'",
       "hints": [
         "Each of {count} phones remembers one flag word the lookout shouted.",
@@ -823,9 +828,9 @@
     },
     {
       "id": "bottle-message",
-      "minMinutes": 60,
       "title": "The Message in a Bottle",
       "kind": "text",
+      "revealedBy": "puzzle:knots-log",
       "prompt": "The message in the bottle is in the captain's back-to-front alphabet: {cipher}",
       "generator": {
         "type": "cipher",
@@ -850,6 +855,7 @@
       "minDifficulty": "hard",
       "title": "The Lighthouse Signal",
       "kind": "text",
+      "revealedBy": "spot:crows-nest",
       "prompt": "The lighthouse flashes, long and short, over and over, something from the sea: {cipher}",
       "generator": {
         "type": "cipher",
@@ -878,46 +884,27 @@
       "id": "gangplank",
       "title": "The Gangplank",
       "kind": "code",
-      "prompt": "The gangplank needs its key AND a 3-digit code. Captain Sal's note: 'Hammocks in the galley, then portholes in my cabin, then seagulls on the mast!'",
-      "answers": [
-        "685"
-      ],
+      "prompt": "The gangplank needs its key AND a {count}-digit code. Captain Sal's note: 'Every lock on my deck left ye a mark and a number. Read 'em in the order I painted where ye'd hop in if the ship ever sank!'",
       "requires": [
         "gangplank-key"
       ],
-      "pieces": [
-        "You counted the hammocks in the galley: 6.",
-        "You counted the portholes in the captain's cabin: 8.",
-        "You counted the seagulls on the mast: 5."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on Captain Sal's note.",
-        "Hammocks, then portholes, then seagulls."
+        "Every lock you opened on deck shows a mark and a number. The order to read them in is painted somewhere on deck.",
+        "Search the lifeboat.",
+        "The code is {answer}."
       ],
-      "solvedText": "The key turns, the keypad plays a sea shanty, and the gangplank starts to swing down towards the beach.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "342"
-          ],
-          "pieces": [
-            "You counted the hammocks in the galley: 3.",
-            "You counted the portholes in the captain's cabin: 4.",
-            "You counted the seagulls on the mast: 2."
-          ]
-        },
-        {
-          "answers": [
-            "974"
-          ],
-          "pieces": [
-            "You counted the hammocks in the galley: 9.",
-            "You counted the portholes in the captain's cabin: 7.",
-            "You counted the seagulls on the mast: 4."
-          ]
-        }
-      ]
+      "solvedText": "The key turns, the keypad plays a sea shanty, and the gangplank swings down onto the sandy beach.",
+      "generator": {
+        "type": "final",
+        "marks": [
+          "⚓",
+          "🦜",
+          "🐚",
+          "⭐",
+          "🦀",
+          "🌊"
+        ]
+      }
     }
   ],
   "items": [
