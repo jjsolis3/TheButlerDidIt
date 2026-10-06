@@ -479,7 +479,7 @@ A party has a `GameKind`: `Mystery` or `EscapeRoom` (#67). Everything around the
 
 **Atmosphere** (the TV only; phones stay quiet):
 - **Sound is synthesised in the browser** (`src/web/src/lib/sound.ts`, Web Audio), so rooms ship no audio files and there's nothing to license.
-  - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night, lounge or silence. The view carries the current one.
+  - A room, and optionally each stage, names a `Soundscape` preset: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night, lounge, arcade, concert, stadium, meadow, cave, tension or silence. The view carries the current one.
   - The presets are shared with the murder mysteries (#127): the enum lives in `ButlerDidIt.Game/Scenarios/Soundscape.cs`, and the synth in `lib/sound.ts`.
   - `useAtmosphere` works out the stingers from what changed between two views: an unlock, a new stage, a wrong answer, a hint, the escape or the failure. It also sounds a gong at one minute left, then a heartbeat that speeds up. Because the view is its only input, a TV that reconnects just carries on.
   - Browsers only allow sound after a click, so the TV shows a sound switch. Its setting is remembered on the device.

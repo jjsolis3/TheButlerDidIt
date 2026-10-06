@@ -183,6 +183,12 @@ The choices:
 - `haunted`
 - `workshop`
 - `space`
+- `arcade` (a games hall after hours: a buzzing light, blips and a far-off music box)
+- `concert` (a waiting crowd and the beat through the wall)
+- `stadium` (a crowd that cheers and claps)
+- `meadow` (birdsong and soft piano)
+- `cave` (echoing drips and a rumble)
+- `tension` (a slow pulse and distant footsteps)
 - `silence`
 
 A mystery (or one act) can pick its own with the same field, and an uploaded music track always plays instead. The sound goes quiet from the reveal on, so the solution lands in silence.
