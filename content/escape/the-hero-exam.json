@@ -903,16 +903,15 @@
           ]
         },
         {
-          "prompt": "The big lever marked DO NOT PULL has a word lock, and one of Doctor Dilemma's riddles: 'It belongs to you, but everybody else uses it more than you do.'",
+          "prompt": "The big lever marked DO NOT PULL has a word lock, and one of Doctor Dilemma's riddles: 'I have a neck but no head, and I wear a cap.'",
           "answers": [
-            "name",
-            "your name",
-            "names",
-            "hero name"
+            "bottle",
+            "a bottle",
+            "bottles"
           ],
           "hints": [
-            "Think about what people call you.",
-            "Every hero has one, and so do you."
+            "Think about what you drink from.",
+            "You twist its cap off to take a sip."
           ]
         }
       ]

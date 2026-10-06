@@ -152,4 +152,19 @@ public class ContentBarTests
     [MemberData(nameof(RebuiltRooms))]
     public void Riddle_answers_are_not_names_on_screen(string id) =>
         Assert.Empty(EscapeRoomText.AnswersOnScreen(Rooms.Get(id)));
+
+    /// <summary>
+    /// Nor can it be a field name in what the screens are sent ("name", "notebook"): the privacy checks look for an answer
+    /// as a whole word in the views, and they play one puzzle set, so a riddle variant only some sets pick slips past them.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(RebuiltRooms))]
+    public void Riddle_answers_are_not_field_names_in_the_views(string id)
+    {
+        var views = typeof(Engine.EscapeProjector).Assembly.GetTypes().Where(t => t.Namespace == typeof(Engine.EscapeProjector).Namespace && t.Name.EndsWith("View"));
+        var fields = views.SelectMany(t => t.GetProperties()).Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var answers = Rooms.Get(id).Puzzles.Where(p => p.Kind == PuzzleKind.Text && p.Generator is null)
+            .SelectMany(p => p.Variants.SelectMany(v => v.Answers ?? []).Concat(p.Answers).Select(a => $"{p.Id}: {a}"));
+        Assert.DoesNotContain(answers, a => fields.Contains(a[(a.IndexOf(": ") + 2)..]));
+    }
 }

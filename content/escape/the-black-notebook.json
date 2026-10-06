@@ -1,0 +1,1114 @@
+{
+  "id": "the-black-notebook",
+  "title": "The Black Notebook",
+  "synopsis": "Thirty-one people have died of sudden heart failure, and every one of their names was written in a black notebook first. The killer the press calls the Scribe has led your task force to an empty rented flat, and the door has just locked behind you. Find the notebook and the Scribe's true name before the last page fills with yours.",
+  "contentRating": "mature",
+  "theme": "thriller",
+  "artStyle": "noir anime thriller: a rain-streaked city at night, a cramped rented flat lit by a television, a police incident room covered in photographs and red string, a rooftop in a storm, a tall grinning spirit in silhouette, cinematic, film grain",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 120,
+  "soundscape": "storm",
+  "intro": "Well, well. Detectives. I'm Sable, and that notebook was mine before the Scribe picked it up. I don't take sides. I only watch. The Scribe has locked you in and left you a game, and when the clock runs out, your names go on the last page. Find the notebook, and the name of the hand that writes in it. I'll be on the windowsill, eating plums. Begin.",
+  "escapedText": "You write the Scribe's true name on the warrant, and across the city a door is kicked in. The black notebook goes into an evidence bag. On the railing, Sable sighs and stretches: 'Pity. It was such a good game.' When you look again, it's gone.",
+  "failedText": "The clock stops, and somewhere a pen scratches across paper. One by one, your names appear on the last page in neat, careful handwriting. Sable leans close and smiles: 'Shall we start the clock again?'",
+  "gameMaster": {
+    "name": "Sable",
+    "persona": "A tall, grinning spirit of endings who dropped the notebook into the human world because the afterlife was dull. Watches the detectives and the killer like a game it can't lose, comments with dry, delighted malice, never takes sides and never helps for free. Has a weakness for sugared plums.",
+    "voice": {
+      "accent": "en-GB",
+      "pitch": 0.7,
+      "rate": 0.9,
+      "style": "low, amused, unhurried"
+    }
+  },
+  "stages": [
+    {
+      "id": "the-flat",
+      "title": "The Scribe's Flat",
+      "description": "A cramped rented flat on the ninth floor. Rain streaks the window, a muted television flickers with the news, and the desk is too tidy, as if nobody really lived here. The front door has locked itself behind you, and the hook by the frame where a spare key should hang is empty.",
+      "puzzles": [
+        "news-ticker",
+        "flat-search",
+        "scribe-diary",
+        "scribe-riddle",
+        "wall-safe",
+        "flat-door"
+      ],
+      "scene": {
+        "backdrop": "storm",
+        "objects": [
+          {
+            "id": "television",
+            "prop": "screen",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "television",
+            "look": "The news, muted: another victim, another sudden heart failure. A sticky note on the screen: 'Tomorrow's number opens my desk.'"
+          },
+          {
+            "id": "writing-desk",
+            "prop": "desk",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "writing desk",
+            "look": "A desk so tidy it looks staged. A small brass keyhole sits under the top drawer."
+          },
+          {
+            "id": "top-drawer",
+            "prop": "drawer",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "top drawer",
+            "look": "Inside: a diary full of dull school timetables. But the drawer is too shallow for its size. You lift the false bottom, and underneath lies the left half of a torn page of thick black paper.",
+            "gives": "page-left",
+            "requires": "desk-key",
+            "lockedText": "The top drawer is locked. The keyhole is small and brass."
+          },
+          {
+            "id": "front-door-spot",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "front door",
+            "look": "Locked from the outside. The hook for the spare key is empty."
+          },
+          {
+            "id": "window",
+            "prop": "window",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "rain-streaked window",
+            "look": "Nine floors down, the street glistens. On the sill outside, something tall sits in the rain, watching you. When you blink, it's gone."
+          },
+          {
+            "id": "wastebasket",
+            "prop": "barrel",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "wastebasket",
+            "look": "Shredded paper, a broken pen and a crumpled train ticket.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bookshelf",
+            "prop": "bookshelf",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "bookshelf",
+            "look": "Law books, every margin annotated in tiny, careful handwriting.",
+            "hidesPieces": true
+          },
+          {
+            "id": "coat-stand",
+            "prop": "clothes",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "coat stand",
+            "look": "A raincoat, still damp. Whoever wore it left minutes before you arrived.",
+            "hidesPieces": true
+          },
+          {
+            "id": "stove",
+            "prop": "machine",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "stove",
+            "look": "A cold stove, and an old kettle on the back ring. You fill it and set it boiling.",
+            "gives": "kettle"
+          },
+          {
+            "id": "bed",
+            "prop": "bed",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "bed",
+            "look": "Made with military neatness. Nothing under the pillow, nothing under the mattress. That's what bothers you.",
+            "hidesPieces": true
+          },
+          {
+            "id": "calendar",
+            "prop": "sign",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "calendar",
+            "look": "Every day this month has a name written on it, and every name is crossed out. In the margin: 'back {key:scribe-diary}'",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "bathroom-mirror",
+            "prop": "mirror",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "bathroom mirror",
+            "look": "Fog on the glass, and a line traced by a finger: back {key:scribe-diary}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "freezer",
+            "prop": "cabinet",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "freezer",
+            "look": "You pour boiling water over the ice. It cracks, and out slides the spare key to the front door.",
+            "gives": "spare-key",
+            "requires": "kettle",
+            "lockedText": "Something metal is frozen inside a solid block of ice. You'd need something hot."
+          },
+          {
+            "id": "hall-cupboard",
+            "prop": "cabinet",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "hall cupboard",
+            "look": "Umbrellas, a toolbox and a heavy torch on a hook. You take the torch.",
+            "gives": "torch"
+          },
+          {
+            "id": "houseplant",
+            "prop": "plant",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "houseplant",
+            "look": "A houseplant, long since dead. The soil is as dry as dust.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "incident-room",
+      "soundscape": "tension",
+      "title": "The Incident Room",
+      "description": "Back at headquarters, the incident room hums under strip lights. One wall is covered in victims' photographs joined by red string, a bank of CCTV screens shows the city in grey, and the evidence lockers stand in a row. Someone has slipped an envelope under the door, addressed to the task force in the Scribe's handwriting. The stairwell to the roof is locked.",
+      "puzzles": [
+        "suspect-lineup",
+        "evidence-tags",
+        "taunting-letter",
+        "cctv-wall",
+        "victim-files",
+        "stairwell-door"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "murder-board",
+            "prop": "painting",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "murder board",
+            "look": "Thirty-one photographs joined by red string. Pinned in the middle, a symbol card that came in the Scribe's last letter: {key:taunting-letter}"
+          },
+          {
+            "id": "cctv-screens",
+            "prop": "screen",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "CCTV wall",
+            "look": "Grey city streets, frozen. Half of the camera feeds are dark."
+          },
+          {
+            "id": "lift-still",
+            "prop": "sign",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lift footage",
+            "look": "A frozen CCTV frame: the passengers in a lift, the night the notebook changed hands."
+          },
+          {
+            "id": "evidence-locker",
+            "prop": "cabinet",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "evidence locker",
+            "look": "Locker 31 holds a single item, sealed in a bag: a key labelled ROOF ACCESS.",
+            "gives": "roof-key",
+            "requires": "locker-key",
+            "lockedText": "Steel lockers, each with its own lock. Locker 31 has a fresh label: ROOF."
+          },
+          {
+            "id": "stairwell-door-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "stairwell door",
+            "look": "The door to the roof stairs. A keyhole, and a word lock somebody fitted recently."
+          },
+          {
+            "id": "case-files",
+            "prop": "bookshelf",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "case files",
+            "look": "Boxes of case files. Every one ends the same way: CAUSE OF DEATH, HEART FAILURE.",
+            "hidesPieces": true
+          },
+          {
+            "id": "detective-desks",
+            "prop": "desk",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "detectives' desks",
+            "look": "Cold coffee, a stress ball and a photo of someone's dog.",
+            "hidesPieces": true
+          },
+          {
+            "id": "whiteboard",
+            "prop": "sign",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "whiteboard",
+            "look": "THEORIES, in three different handwritings. Most of them are crossed out.",
+            "hidesPieces": true
+          },
+          {
+            "id": "interview-tapes",
+            "prop": "box",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "interview tapes",
+            "look": "Cassette tapes of every suspect interview, labelled and dated.",
+            "hidesPieces": true
+          },
+          {
+            "id": "phone-bank",
+            "prop": "machine",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "phone bank",
+            "look": "Every line is blinking. Nobody is on any of them.",
+            "hidesPieces": true
+          },
+          {
+            "id": "coffee-machine",
+            "prop": "machine",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "coffee machine",
+            "look": "Taped to the side, a symbol card: {key:taunting-letter}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "chief-office",
+            "prop": "door",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "chief's office",
+            "look": "On the chief's desk, under a mug, a symbol card: {key:taunting-letter}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "city-map",
+            "prop": "table",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "city map",
+            "look": "A pin in the map for every victim. They make no pattern you can see.",
+            "hidesPieces": true
+          },
+          {
+            "id": "evidence-bags",
+            "prop": "box",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "evidence bags",
+            "look": "Bags of seized belongings: wallets, watches, a pair of cracked glasses.",
+            "hidesPieces": true
+          },
+          {
+            "id": "filing-cabinet",
+            "prop": "cabinet",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "filing cabinet",
+            "look": "Drawer after drawer of statements. One drawer is stuck.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "rooftop",
+      "title": "The Rooftop",
+      "description": "The roof is slick with rain. A water tank looms in the dark, an aircraft warning light blinks red on its mast, and a steel lockbox is chained to the railing. On the edge of the roof, a tall, thin figure with a too-wide grin sits swinging its legs, eating sugared plums. The Scribe is nowhere to be seen, but the Scribe's phone lies in a puddle, still ringing.",
+      "puzzles": [
+        "rooftop-lockbox",
+        "true-name",
+        "spirit-riddle",
+        "railing-word",
+        "phone-flashes"
+      ],
+      "scene": {
+        "backdrop": "storm",
+        "objects": [
+          {
+            "id": "water-tank",
+            "prop": "barrel",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "water tank",
+            "look": "You shine the torch under the tank. Taped to the metal: a small key on a black ribbon.",
+            "gives": "lockbox-key",
+            "requires": "torch",
+            "lockedText": "A rusted water tank. Something is taped to the underside, but it's pitch black under there."
+          },
+          {
+            "id": "lockbox-spot",
+            "prop": "chest",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lockbox",
+            "look": "A steel lockbox chained to the railing. Something inside slides when you tilt it."
+          },
+          {
+            "id": "grinning-figure",
+            "prop": "statue",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "grinning figure",
+            "look": "It turns its head all the way round to look at you, and grins wider. 'Don't mind me. I'm only watching.'"
+          },
+          {
+            "id": "warning-light",
+            "prop": "lamp",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "warning light",
+            "look": "A red aircraft light on a mast, blinking in a pattern that isn't quite regular."
+          },
+          {
+            "id": "scribe-phone",
+            "prop": "screen",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "ringing phone",
+            "look": "The Scribe's phone, face up in a puddle. Seven missed calls from a number with no name."
+          },
+          {
+            "id": "air-vents",
+            "prop": "vent",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "air vents",
+            "look": "Warm air and the hum of the building below.",
+            "hidesPieces": true
+          },
+          {
+            "id": "satellite-dish",
+            "prop": "machine",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "satellite dish",
+            "look": "Bent out of shape. Pigeons have nested in it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "puddles",
+            "prop": "water",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "puddles",
+            "look": "Rain pools on the roof. In one of them, your reflection looks back a second too late.",
+            "hidesPieces": true
+          },
+          {
+            "id": "railing",
+            "prop": "pipe",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "railing",
+            "look": "Cold, wet iron, with letters scratched into it. A long way down.",
+            "hidesPieces": true
+          },
+          {
+            "id": "deckchair",
+            "prop": "table",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "deckchair",
+            "look": "A deckchair, soaked through. Someone sat here for a long time, watching the city.",
+            "hidesPieces": true
+          },
+          {
+            "id": "roof-hatch",
+            "prop": "door",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "roof hatch",
+            "look": "A code card taped inside the hatch: {key:phone-flashes}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "radio-aerial",
+            "prop": "machine",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "radio aerial",
+            "look": "A code card wrapped round the aerial: {key:phone-flashes}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "plant-pots",
+            "prop": "plant",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "plant pots",
+            "look": "Under a cracked pot, a code card: {key:phone-flashes}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "pigeon-loft",
+            "prop": "crate",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "pigeon loft",
+            "look": "Pigeons, and a single long black feather that didn't come from any pigeon.",
+            "gives": "black-feather",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "news-ticker",
+      "title": "The News Ticker",
+      "kind": "code",
+      "prompt": "On a notepad by the muted television, the Scribe has written one number for each day this week: {sequence}. The sticky note on the screen, in the same careful handwriting: 'Tomorrow's number opens my desk.'",
+      "generator": {
+        "type": "sequence"
+      },
+      "rewards": [
+        "desk-key"
+      ],
+      "hints": [
+        "Look at how each day's number changes to get the next one.",
+        "Tomorrow's number is {answer}."
+      ],
+      "solvedText": "A keypad box under the television clicks open. Inside: a small brass key. Behind you, Sable chuckles: 'Tomorrow. How optimistic.'"
+    },
+    {
+      "id": "flat-search",
+      "title": "The Search",
+      "kind": "search",
+      "prompt": "Search the flat the way your training taught you: the wastebasket, the bookshelf and the coat stand.",
+      "finds": [
+        "wastebasket",
+        "bookshelf",
+        "coat-stand"
+      ],
+      "rewards": [
+        "page-right"
+      ],
+      "hints": [
+        "Three places in the flat are worth a careful search.",
+        "Go through the rubbish, the books and the coat's pockets."
+      ],
+      "solvedText": "In the damp raincoat's inner pocket: the right half of a torn page of thick black paper. It's cold to the touch."
+    },
+    {
+      "id": "scribe-diary",
+      "title": "The Scribe's Diary",
+      "kind": "text",
+      "prompt": "The last line of the Scribe's diary is in code: {cipher}. It's the Scribe's own word for what they're doing to the city. The diary's clasp has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "cleansing",
+          "judgement",
+          "purpose",
+          "verdict",
+          "mercy",
+          "justice"
+        ]
+      },
+      "hints": [
+        "The Scribe wrote a number in more than one place, and one of them is on the torn black page.",
+        "Try each number you found: only one turns this into a real word.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "The clasp springs open. The diary's last page holds a single sentence, underlined twice: SOMEONE HAS TO DO IT."
+    },
+    {
+      "id": "scribe-riddle",
+      "minMinutes": 45,
+      "title": "The Wardrobe",
+      "kind": "text",
+      "prompt": "The wardrobe has a word lock, and on its door, in the Scribe's careful hand: 'I am taken from a mine and shut up in a wooden case, from which I am never released, and yet I am used by almost everyone.'",
+      "answers": [
+        "pencil",
+        "lead",
+        "pencil lead",
+        "graphite"
+      ],
+      "hints": [
+        "Think about what the Scribe writes with.",
+        "It's the grey stuff inside a pencil."
+      ],
+      "solvedText": "The wardrobe swings open. It's empty, except for a row of black pens, every one of them chewed.",
+      "variants": [
+        {},
+        {
+          "prompt": "The wardrobe has a word lock, and on its door, in the Scribe's careful hand: 'The one who makes me sells me. The one who buys me never uses me. The one who uses me never knows.'",
+          "answers": [
+            "coffin",
+            "a coffin",
+            "casket"
+          ],
+          "hints": [
+            "Think about the end of a life.",
+            "It's what you're buried in."
+          ]
+        },
+        {
+          "prompt": "The wardrobe has a word lock, and on its door, in the Scribe's careful hand: 'What can travel all around the world while staying in one corner?'",
+          "answers": [
+            "stamp",
+            "a stamp",
+            "postage stamp"
+          ],
+          "hints": [
+            "Think about the Scribe's letters to the task force.",
+            "You stick it on an envelope."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wall-safe",
+      "minMinutes": 60,
+      "title": "The Wall Safe",
+      "kind": "code",
+      "prompt": "Behind a framed print, a wall safe with a {count}-digit dial. The Scribe has left a note: 'For the detectives. Facts only.' Each of you found one card.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "One of the Scribe's cards: the {ordinal} digit is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit as a plain fact. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "Inside the safe: newspaper clippings about every victim, filed one after another. At the end of the row is an empty space, with room for several more."
+    },
+    {
+      "id": "flat-door",
+      "title": "The Front Door",
+      "kind": "use",
+      "prompt": "The front door has locked itself from the outside. There's a hook for a spare key, but it's empty.",
+      "requires": [
+        "spare-key"
+      ],
+      "hints": [
+        "Where would you hide a spare key so nobody could just pick it up?",
+        "Something is frozen in the freezer: melt the ice with the kettle, then use the key on the door."
+      ],
+      "solvedText": "The lock turns. Outside, the corridor lights flicker, and every phone buzzes at once: the task force wants you back at the incident room. Now."
+    },
+    {
+      "id": "suspect-lineup",
+      "title": "The Lift Footage",
+      "kind": "code",
+      "prompt": "The CCTV still from the night the notebook changed hands shows the passengers in a lift, standing in a row: {items}. The incident board's keypad wants each one's place, far left is 1, in the order listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "student",
+          "actress",
+          "officer",
+          "heir",
+          "priest"
+        ],
+        "pieceTemplate": "From a witness statement: {clue}"
+      },
+      "hints": [
+        "Every phone holds a line from a witness statement. Read them all out loud.",
+        "Start with the line you're surest about, and try each place in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The board beeps, and a printout slides out: the lift's log. One passenger swiped a staff pass that was cancelled years ago."
+    },
+    {
+      "id": "evidence-tags",
+      "title": "The Evidence Tags",
+      "kind": "code",
+      "prompt": "The evidence clerk's cabinet has a {count}-digit lock and a note: '{order}.' Each of you counted one colour of evidence tag on the bags.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "white",
+          "black",
+          "orange"
+        ],
+        "thing": "tag",
+        "pieceTemplate": "You counted the {color} evidence tags on the bags: there were {digit}."
+      },
+      "rewards": [
+        "locker-key"
+      ],
+      "hints": [
+        "Each phone counted one colour of tag. Say your colour and your number.",
+        "Read them in the note's order: {order}."
+      ],
+      "solvedText": "The cabinet opens. Inside, on a hook: the master key to the evidence lockers."
+    },
+    {
+      "id": "taunting-letter",
+      "minMinutes": 45,
+      "title": "The Scribe's Letter",
+      "kind": "text",
+      "prompt": "The envelope under the door holds a letter in the Scribe's own symbols: {cipher}. It names what the Scribe means to take from the task force next. The envelope's tab has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "hope",
+          "badge",
+          "faith",
+          "reason"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in the room. Only one is the Scribe's real key.",
+        "Try each card: only one turns the symbols into something the Scribe could take from you.",
+        "It says {answer}."
+      ],
+      "solvedText": "The letter ends: SEE YOU ON THE ROOF. Sable laughs softly: 'Oh, the Scribe is enjoying this.'"
+    },
+    {
+      "id": "cctv-wall",
+      "minMinutes": 45,
+      "title": "The CCTV Wall",
+      "kind": "switches",
+      "prompt": "Half the CCTV feeds are dark. The screens are linked: switch one and the ones beside it switch too. Bring every camera back online.",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the screens in the row below it.",
+        "Switch {answer}."
+      ],
+      "solvedText": "Every screen lights up. On one of them, a figure in a damp raincoat is climbing the stairs to the roof of this very building."
+    },
+    {
+      "id": "victim-files",
+      "minMinutes": 60,
+      "title": "The Victims' Files",
+      "kind": "text",
+      "prompt": "Every victim's file is stamped with the same word, written in numbers where A is 1 and B is 2: {cipher}. It's the time of day each name was written. The file box has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "midnight",
+          "noon",
+          "dawn",
+          "dusk",
+          "teatime"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "Every name, written at the same time of day. Whoever the Scribe is, they keep a very regular routine."
+    },
+    {
+      "id": "stairwell-door",
+      "title": "The Stairwell Door",
+      "kind": "text",
+      "prompt": "The door to the roof stairs has a keyhole and a new word lock, with a riddle in the Scribe's handwriting: 'I have cities, but no houses. I have forests, but no trees. I have rivers, but no water.'",
+      "answers": [
+        "map",
+        "a map",
+        "maps",
+        "atlas"
+      ],
+      "requires": [
+        "roof-key"
+      ],
+      "hints": [
+        "Look at the wall with the pins in it.",
+        "You unfold it to find your way."
+      ],
+      "solvedText": "The lock clicks and the door swings open onto a stairwell. Rain is falling through the open hatch at the top.",
+      "variants": [
+        {},
+        {
+          "prompt": "The door to the roof stairs has a keyhole and a new word lock, with a riddle in the Scribe's handwriting: 'What gets broken without ever being held?'",
+          "answers": [
+            "promise",
+            "a promise",
+            "promises",
+            "your word"
+          ],
+          "hints": [
+            "Think about what the Scribe swore to the city.",
+            "You make one, and then you keep it. Or you don't."
+          ]
+        },
+        {
+          "prompt": "The door to the roof stairs has a keyhole and a new word lock, with a riddle in the Scribe's handwriting: 'Forward I am heavy, but backward I am not.'",
+          "answers": [
+            "ton",
+            "a ton",
+            "tons"
+          ],
+          "hints": [
+            "Read the word backwards.",
+            "It's a very big weight, and backwards it spells a word for no."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rooftop-lockbox",
+      "title": "The Lockbox",
+      "kind": "use",
+      "prompt": "The steel lockbox chained to the railing is locked. Whatever slides about inside, the Scribe wanted it kept dry.",
+      "requires": [
+        "lockbox-key"
+      ],
+      "rewards": [
+        "black-notebook"
+      ],
+      "hints": [
+        "The key is hidden somewhere dark on this roof.",
+        "Shine the torch under the water tank, then open the lockbox with the key you find."
+      ],
+      "solvedText": "Inside, wrapped in plastic: a black notebook. The cover is blank. The pages are full of names in the same careful handwriting, and the last few pages are empty. Waiting."
+    },
+    {
+      "id": "true-name",
+      "title": "The True Name",
+      "kind": "text",
+      "prompt": "The notebook's owner is the Scribe, and the arrest warrant needs the Scribe's true name. Each of you has pieced together one part of it from the evidence. Say it in order, and the case is closed.",
+      "requires": [
+        "black-notebook"
+      ],
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "Elias",
+          "Mara",
+          "Corvin",
+          "Lysander",
+          "Vale",
+          "Hollis",
+          "Ashby",
+          "Thorne",
+          "Wren",
+          "Sterling",
+          "Marlow",
+          "Kestrel"
+        ],
+        "pieceTemplate": "You pieced it together from the evidence: the {ordinal} part of the Scribe's true name is '{word}'."
+      },
+      "hints": [
+        "Each of you holds one part of the name. Say them in order: first, second, third...",
+        "Put them together in order, like: name name name."
+      ],
+      "solvedText": "You write '{answer}' on the warrant. Across the city, sirens begin to wail. Sable stands, stretches and smiles: 'Well played, detectives.'"
+    },
+    {
+      "id": "spirit-riddle",
+      "minMinutes": 45,
+      "title": "Sable's Riddle",
+      "kind": "text",
+      "prompt": "The padlock on the water tank's ladder has a word lock. Sable leans over your shoulder, sticky with plum sugar: 'Let me give you one. What is always coming, but never arrives?'",
+      "answers": [
+        "tomorrow",
+        "the future"
+      ],
+      "hints": [
+        "Think about the note on the television.",
+        "It's the day after today, and it never quite gets here."
+      ],
+      "solvedText": "The padlock falls open. Sable claps, slowly: 'Very good. I was beginning to get bored.'",
+      "variants": [
+        {},
+        {
+          "prompt": "The padlock on the water tank's ladder has a word lock. Sable leans over your shoulder, sticky with plum sugar: 'Let me give you one. I have no voice, yet I speak to you, and I tell of all the things that people do.'",
+          "answers": [
+            "book",
+            "books",
+            "a book"
+          ],
+          "hints": [
+            "Think about what the Scribe keeps.",
+            "It has pages, a cover and a spine."
+          ]
+        },
+        {
+          "prompt": "The padlock on the water tank's ladder has a word lock. Sable leans over your shoulder, sticky with plum sugar: 'Let me give you one. What do you lose every single time you stand up?'",
+          "answers": [
+            "lap",
+            "your lap",
+            "a lap"
+          ],
+          "hints": [
+            "Sit down, then look down.",
+            "It's where a cat curls up when you're sitting."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "railing-word",
+      "minMinutes": 60,
+      "title": "The Railing",
+      "kind": "text",
+      "prompt": "Scratched into the wet railing, in a back-to-front alphabet where A swaps with Z: {cipher}. It's the word the Scribe left for whoever came up here. The chain on the railing has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "epitaph",
+          "requiem",
+          "eulogy",
+          "lament",
+          "elegy"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "Sable reads it over your shoulder and sighs happily: 'So dramatic. I do love humans.'"
+    },
+    {
+      "id": "phone-flashes",
+      "minDifficulty": "hard",
+      "title": "The Scribe's Phone",
+      "kind": "text",
+      "prompt": "The Scribe's phone screen flashes long and short, over and over. It's spelling out the place on this roof where the Scribe hid the notebook's spare page, and the phone's lock wants the word: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "spire",
+          "chimney",
+          "skylight"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "blanket",
+          "kitchen",
+          "dolphin",
+          "cabinet",
+          "triangle",
+          "hospital",
+          "dolphins"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden round the roof. Only one reads a place on a rooftop.",
+        "Look in the roof hatch, round the radio aerial and under the plant pots.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "The phone unlocks. Its last message, sent to nobody: I KNEW YOU'D COME UP HERE."
+    }
+  ],
+  "items": [
+    {
+      "id": "desk-key",
+      "name": "Brass desk key",
+      "description": "A small brass key from the box under the television."
+    },
+    {
+      "id": "page-left",
+      "name": "Left half of a black page",
+      "description": "Thick black paper, torn down the middle. Half of a list of names."
+    },
+    {
+      "id": "page-right",
+      "name": "Right half of a black page",
+      "description": "Thick black paper, torn down the middle, cold to the touch."
+    },
+    {
+      "id": "black-page",
+      "name": "Torn black page",
+      "description": "A page torn from the black notebook, taped back together. Four names are written on it and crossed out. In the margin, in red ink: back {key:scribe-diary}"
+    },
+    {
+      "id": "kettle",
+      "name": "Boiling kettle",
+      "description": "An old kettle, full of boiling water."
+    },
+    {
+      "id": "spare-key",
+      "name": "Spare door key",
+      "description": "The flat's spare key, still cold from the ice."
+    },
+    {
+      "id": "torch",
+      "name": "Heavy torch",
+      "description": "A long, heavy torch from the hall cupboard. Its beam is bright and steady."
+    },
+    {
+      "id": "locker-key",
+      "name": "Evidence locker key",
+      "description": "The master key to the evidence lockers."
+    },
+    {
+      "id": "roof-key",
+      "name": "Roof access key",
+      "description": "A key in an evidence bag, labelled ROOF ACCESS."
+    },
+    {
+      "id": "lockbox-key",
+      "name": "Key on a black ribbon",
+      "description": "A small key on a black ribbon, taped under the water tank."
+    },
+    {
+      "id": "black-notebook",
+      "name": "The black notebook",
+      "description": "A plain black notebook, full of names in careful handwriting. It's colder than it should be."
+    },
+    {
+      "id": "black-feather",
+      "name": "Black feather",
+      "description": "A long black feather. It doesn't fit anything. When you look up, Sable is grinning."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "page-left",
+        "page-right"
+      ],
+      "makes": "black-page",
+      "text": "The two halves fit along the tear. Taped together, they make a whole page from the black notebook."
+    }
+  ]
+}
