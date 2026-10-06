@@ -74,7 +74,11 @@ public static class EscapeEngine
             case BeginEscapeHint c: BeginAiHint(s, room, c); break;
             case CompleteEscapeHint c: CompleteAiHint(s, room, c); break;
             case CancelEscapeHint c: s.AiHints.RemoveAll(h => h.Id == c.HintId); break;
-            case SetCueNarration c: FindCue(s, c.CueId)!.Text = Cut(c.Text); break;
+            case SetCueNarration c:
+                var spoken = FindCue(s, c.CueId)!;
+                spoken.Text = CutLine(c.Text);
+                spoken.AudioUrl = c.AudioUrl;
+                break;
             case SetCueAudio c: FindCue(s, c.CueId)!.AudioUrl = c.Url; break;
             case SkipCues c: foreach (var cue in s.Cues.Where(x => x.Id < c.BeforeCueId && x.Text is null)) cue.Skipped = true; break;
             default: throw new GameRuleException($"Unknown command {command.GetType().Name}.");
@@ -495,7 +499,8 @@ public static class EscapeEngine
 
     private static EscapeCue? FindCue(EscapeState s, int id) => s.Cues.FirstOrDefault(c => c.Id == id);
 
-    private static string Cut(string text)
+    /// <summary>A line as the game master's panel keeps it: trimmed, and cut at <see cref="MaxAiText"/>. Its recording reads the same.</summary>
+    public static string CutLine(string text)
     {
         var t = text.Trim();
         return t.Length <= MaxAiText ? t : t[..MaxAiText].TrimEnd() + "…";

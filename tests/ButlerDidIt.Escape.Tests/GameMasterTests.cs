@@ -134,6 +134,22 @@ public class GameMasterTests
         Assert.Same(s, EscapeEngine.Apply(s, Workshop, new SetCueAudio(T0, s.Cues[0].Id, "/media/late.mp3")));
     }
 
+    [Fact]
+    public void A_line_and_its_recording_can_arrive_together_so_the_words_never_run_ahead_of_the_voice()
+    {
+        var s = Started(AllOn);
+        var start = s.Cues.Single(c => c.Kind == CueKind.Start).Id;
+        var line = new string('a', EscapeEngine.MaxAiText + 50);
+
+        s = EscapeEngine.Apply(s, Workshop, new SetCueNarration(T0, start, line, "/media/welcome.mp3"));
+
+        var shown = Assert.Single(EscapeProjector.Stage(s, Workshop, T0).Narration);
+        Assert.Equal("/media/welcome.mp3", shown.AudioUrl);
+        // Cut exactly as the server cuts what it records, so the voice says what the panel shows.
+        Assert.Equal(EscapeEngine.CutLine(line), shown.Text);
+        Assert.Equal(EscapeEngine.MaxAiText + 1, shown.Text.Length);
+    }
+
     // ------------------------------------------------------------------ AI hints
 
     [Fact]

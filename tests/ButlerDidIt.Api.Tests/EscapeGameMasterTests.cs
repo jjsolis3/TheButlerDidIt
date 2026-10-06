@@ -47,6 +47,9 @@ public class EscapeGameMasterTests(FakeAiFactory app) : IClassFixture<FakeAiFact
     {
         var (cookie, party, _) = await StartedPartyAsync(useAi: true);
         await using var tv = await app.ConnectAsync(cookie: cookie);
+        // Every update the TV is sent, to check none shows a line before its voice (#132).
+        var pushed = new System.Collections.Concurrent.ConcurrentQueue<EscapeStageView>();
+        tv.On<EscapeStageView>("stage", pushed.Enqueue);
 
         var lobby = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
         Assert.Equal("The Tinkerer", lobby.GameMaster?.Name);
@@ -56,6 +59,8 @@ public class EscapeGameMasterTests(FakeAiFactory app) : IClassFixture<FakeAiFact
         var stage = await WaitForAsync(tv, party.Code, s => s.Narration.Any(n => n.AudioUrl is not null), "the welcome line and its recording");
         var line = Assert.Single(stage.Narration);
         Assert.Equal("Fake game master line for Start: tick tock, my little guests.", line.Text);
+        Assert.Contains(pushed, v => v.Narration.Count > 0);
+        Assert.DoesNotContain(pushed, v => v.Narration.Any(n => n.AudioUrl is null)); // words and voice arrive together
 
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

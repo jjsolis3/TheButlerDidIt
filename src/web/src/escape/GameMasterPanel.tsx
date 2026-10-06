@@ -3,9 +3,9 @@ import { narrator } from '../lib/speech'
 import type { EscapeGameMasterView, EscapeNarrationView } from '../lib/types'
 
 /**
- * The AI game master on the TV: its latest line as a caption, spoken out loud. With a Voice
- * provider the line comes with a recording, which usually arrives a moment after the text,
- * so it waits briefly for that before falling back to the browser's own voice.
+ * The AI game master on the TV: its latest line as a caption, spoken out loud. With a Voice provider the server
+ * holds each line until its recording is ready, so the words and the voice arrive together (#132). A voiced line
+ * without a recording means it failed or took too long, so the browser's own voice reads it straight away.
  */
 export function GameMasterPanel({ gameMaster, narration }: { gameMaster: EscapeGameMasterView | null; narration: EscapeNarrationView[] }) {
   const [muted, setMuted] = useState(false)
@@ -40,11 +40,6 @@ export function GameMasterPanel({ gameMaster, narration }: { gameMaster: EscapeG
 
 function useSpeakNewLines(narration: EscapeNarrationView[], gameMaster: EscapeGameMasterView | null, muted: boolean) {
   const spoken = useRef<Set<number> | null>(null)
-  const waiting = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map())
-  const latest = useRef(narration)
-  useEffect(() => {
-    latest.current = narration
-  }, [narration])
 
   useEffect(() => {
     // Lines already there when the page opened were heard before (or missed): don't replay them.
@@ -53,26 +48,12 @@ function useSpeakNewLines(narration: EscapeNarrationView[], gameMaster: EscapeGa
       return
     }
     const heard = spoken.current
-    const say = (n: EscapeNarrationView) => {
-      heard.add(n.id)
-      clearTimeout(waiting.current.get(n.id))
-      waiting.current.delete(n.id)
-      if (muted || !gameMaster?.narrates) return
-      if (n.audioUrl) void new Audio(n.audioUrl).play().catch(() => narrator.speak(n.text, gameMaster.voice))
-      else void narrator.speak(n.text, gameMaster.voice)
-    }
     for (const n of narration) {
       if (heard.has(n.id)) continue
-      if (n.audioUrl || !gameMaster?.voiced) say(n)
-      else if (!waiting.current.has(n.id)) {
-        waiting.current.set(
-          n.id,
-          setTimeout(() => {
-            const current = latest.current.find((x) => x.id === n.id) ?? n
-            if (!heard.has(n.id)) say(current)
-          }, 8000),
-        )
-      }
+      heard.add(n.id)
+      if (muted || !gameMaster?.narrates) continue
+      if (n.audioUrl) void new Audio(n.audioUrl).play().catch(() => narrator.speak(n.text, gameMaster.voice))
+      else void narrator.speak(n.text, gameMaster.voice)
     }
   }, [narration, gameMaster, muted])
 }
