@@ -23,9 +23,14 @@ public static partial class RoomVariants
 
     public static bool IsTemplated(EscapeRoom room) => room.Puzzles.Any(p => p.Variants.Count > 0 || p.Generator is not null);
 
-    public static EscapeRoom Build(EscapeRoom room, long seed, EscapeDifficulty difficulty = EscapeDifficulty.Normal)
+    /// <param name="cache">
+    /// Keep the built room for the next command of the same game (the default). The validator passes false: it builds
+    /// hundreds of puzzle sets nobody will play, and keeping them would hold hundreds of megabytes for as long as the room lives.
+    /// </param>
+    public static EscapeRoom Build(EscapeRoom room, long seed, EscapeDifficulty difficulty = EscapeDifficulty.Normal, bool cache = true)
     {
         if (!IsTemplated(room) && difficulty == EscapeDifficulty.Normal) return room;
+        if (!cache) return Cache.TryGetValue(room, out var built) && built.TryGetValue((seed, difficulty), out var hit) ? hit : Make(room, seed, difficulty);
         return Cache.GetOrCreateValue(room).GetOrAdd((seed, difficulty), key => Make(room, key.Item1, key.Item2));
     }
 

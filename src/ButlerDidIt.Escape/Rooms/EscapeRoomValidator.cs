@@ -38,23 +38,21 @@ public static class EscapeRoomValidator
         if (template.Count > 0) return template;
 
         // Every length and difficulty is its own room to escape: a shorter or easier game must never
-        // need a key from a puzzle it leaves out.
+        // need a key from a puzzle it leaves out. Each puzzle set is built once and cut to every length; none is
+        // kept, since nobody will play them (see RoomVariants.Build).
         var lengths = room.PlayableLengths;
-        foreach (var minutes in lengths)
+        string At(int minutes, EscapeDifficulty difficulty) =>
+            (lengths.Count > 1 ? $"At {minutes} minutes: " : "") + (difficulty == EscapeDifficulty.Normal ? "" : $"On {difficulty}: ");
+        var templated = RoomVariants.IsTemplated(room);
+        foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
         {
-            foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
+            for (var seed = 0; seed < (templated ? seeds : 1); seed++)
             {
-                var at = (lengths.Count > 1 ? $"At {minutes} minutes: " : "") + (difficulty == EscapeDifficulty.Normal ? "" : $"On {difficulty}: ");
-                if (!RoomVariants.IsTemplated(room))
+                var built = RoomVariants.Build(room, seed, difficulty, cache: false);
+                foreach (var minutes in lengths)
                 {
-                    var errors = ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, 0, difficulty), minutes, difficulty));
-                    if (errors.Count > 0) return errors.Select(e => at + e).ToList();
-                    continue;
-                }
-                for (var seed = 0; seed < seeds; seed++)
-                {
-                    var errors = ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty));
-                    if (errors.Count > 0) return errors.Select(e => $"{at}With puzzle set {seed}: {e}").ToList();
+                    var errors = ValidateConcrete(RoomLengths.Cut(built, minutes, difficulty));
+                    if (errors.Count > 0) return errors.Select(e => At(minutes, difficulty) + (templated ? $"With puzzle set {seed}: " : "") + e).ToList();
                 }
             }
         }
@@ -69,10 +67,12 @@ public static class EscapeRoomValidator
     public static List<string> ValidateGame(EscapeRoom room, long seed)
     {
         var errors = new List<string>();
-        foreach (var minutes in room.PlayableLengths)
-            foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
-                errors.AddRange(ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty))
-                    .Select(e => $"At {minutes} minutes on {difficulty}: {e}"));
+        foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
+        {
+            var built = RoomVariants.Build(room, seed, difficulty, cache: false);
+            foreach (var minutes in room.PlayableLengths)
+                errors.AddRange(ValidateConcrete(RoomLengths.Cut(built, minutes, difficulty)).Select(e => $"At {minutes} minutes on {difficulty}: {e}"));
+        }
         return errors;
     }
 
