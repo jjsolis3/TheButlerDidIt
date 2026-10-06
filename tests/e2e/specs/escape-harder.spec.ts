@@ -69,11 +69,11 @@ test('harder rooms: a solo player searches, decodes and reasons their way out of
   await expect(ada.getByTestId('phone-puzzle-formula')).toContainText('🔒 A decoder unlocks once you find')
   await ada.screenshot({ path: `${SHOTS}/97-escape-scene-phone.png`, fullPage: true })
 
-  // A tool-locked spot says so in the room's own words; a decoy costs time on Hard.
+  // A tool-locked spot says so in the room's own words; an empty search costs time (20 s on Hard, #132).
   await ada.getByRole('button', { name: 'Search the poster' }).click()
   await expect(ada.getByRole('status').filter({ hasText: 'Maybe in a different light?' })).toBeVisible()
   await ada.getByRole('button', { name: 'Search the plant' }).click()
-  await expect(ada.getByRole('status').filter({ hasText: '(−10 s)' })).toBeVisible()
+  await expect(ada.getByRole('status').filter({ hasText: '(−20 s)' })).toBeVisible()
   // Zoom in on the scene.
   await ada.getByRole('group', { name: 'Zoom' }).getByRole('button', { name: '2×' }).click()
   await expect(ada.getByRole('group', { name: 'Zoom' }).getByRole('button', { name: '2×' })).toHaveAttribute('aria-pressed', 'true')
