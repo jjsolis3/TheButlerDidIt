@@ -164,7 +164,8 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
     public static bool IsRiddle(EscapePuzzle p) => p.Kind == PuzzleKind.Text && p.Generator is null;
 
     /// <summary>The backgrounds the screens can draw, picked from the room's (or stage's) sound.</summary>
-    private static readonly Dictionary<string, string> Backdrops = new() { ["workshop"] = "workshop", ["carnival"] = "carnival", ["sea"] = "sea", ["space"] = "space", ["haunted"] = "haunted" };
+    private static readonly Dictionary<string, string> Backdrops = new[] { "workshop", "carnival", "sea", "space", "haunted", "arcade", "concert", "stadium", "meadow", "cave", "tension" }
+        .ToDictionary(b => b, b => b);
 
     /// <summary>Server-side facts the model doesn't get to choose.</summary>
     public static EscapeRoom Normalize(EscapeRoom room, EscapeRoomRequest request)
@@ -289,7 +290,7 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         Reply with a single JSON object in exactly this format (camelCase keys):
         {
           "id": "draft", "title": "...", "synopsis": "2 sentences for the shelf", "contentRating": "{{{(r.ContentRating == ContentRating.Family ? "family" : "mature")}}}",
-          "artStyle": "a few words describing the look", "soundscape": "the background sound: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night or lounge", "minPlayers": 2, "maxPlayers": 8, "timeLimitMinutes": {{{r.Minutes}}},
+          "artStyle": "a few words describing the look", "soundscape": "the background sound: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night, lounge, arcade, concert, stadium, meadow, cave or tension", "minPlayers": 2, "maxPlayers": 8, "timeLimitMinutes": {{{r.Minutes}}},
           "intro": "read on the TV when the clock starts, in the game master's voice",
           "escapedText": "read when they escape", "failedText": "read when time runs out",
           "gameMaster": {"name": "...", "persona": "how they talk, 1-2 sentences", "voice": {"accent": "en-GB", "pitch": 1.0, "rate": 1.0, "style": "two or three words"} },

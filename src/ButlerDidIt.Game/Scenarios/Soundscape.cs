@@ -44,4 +44,22 @@ public enum Soundscape
 
     /// <summary>A crowd's murmur and slow, soft chords: a club, a party, a premiere.</summary>
     Lounge,
+
+    /// <summary>After hours in a games hall: a buzzing light, a fan, the odd game blip and a far-off music box.</summary>
+    Arcade,
+
+    /// <summary>A crowd waiting for the show, with the beat thumping through the wall and a synth sparkling over it.</summary>
+    Concert,
+
+    /// <summary>A big crowd that swells and cheers, and a horn now and then: a stadium, a tournament.</summary>
+    Stadium,
+
+    /// <summary>A breeze, birdsong and a few soft piano notes: fields and woods on a calm day.</summary>
+    Meadow,
+
+    /// <summary>Drips that echo, a low rumble and the odd tumble of stones: a cave, a mine.</summary>
+    Cave,
+
+    /// <summary>A slow, steady pulse under a low hum, and an eerie glide now and then: someone's coming.</summary>
+    Tension,
 }

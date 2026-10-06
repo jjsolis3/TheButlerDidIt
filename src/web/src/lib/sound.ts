@@ -16,6 +16,12 @@ export const SOUNDSCAPES: { value: Soundscape; label: string }[] = [
   { value: 'sea', label: 'Sea' },
   { value: 'space', label: 'Space' },
   { value: 'haunted', label: 'Haunted' },
+  { value: 'arcade', label: 'Arcade after hours' },
+  { value: 'concert', label: 'Concert (crowd and beat)' },
+  { value: 'stadium', label: 'Stadium crowd' },
+  { value: 'meadow', label: 'Meadow (birds and piano)' },
+  { value: 'cave', label: 'Cave (drips and rumble)' },
+  { value: 'tension', label: 'Tension (a slow pulse)' },
   { value: 'silence', label: 'Silence' },
 ]
 
@@ -315,6 +321,82 @@ function startSoundscape(ctx: AudioContext, out: AudioNode, name: Soundscape): L
       let i = 0
       every(4, 4, (t) => chords[i++ % chords.length].forEach((f, k) => tone(ctx, bus, 'triangle', f, t + k * 0.03, 3.8, 0.022)))
       every(7, 14, (t) => [2600, 3400].forEach((f) => tone(ctx, bus, 'sine', f, t, 0.4, 0.02))) // a glass, somewhere
+      break
+    }
+    case 'arcade': {
+      stops.push(drone(ctx, bus, [120, 240.4], 0.012, 900, 'square')) // a strip light's buzz
+      stops.push(noiseBed(ctx, bus, 'lowpass', 350, 0.035, 0.01)) // a fan turning somewhere
+      // A game in the corner, still running its demo: three quick 8-bit notes.
+      every(4, 9, (t) => {
+        const base = [523.3, 659.3, 784, 880][Math.floor(Math.random() * 4)]
+        for (let k = 0; k < 3; k++) tone(ctx, bus, 'square', base * [1, 1.25, 1.5][k], t + k * 0.08, 0.07, 0.012)
+      })
+      // Far off, a music box winding down: a slow, slightly flat lullaby.
+      const lullaby = [784, 659.3, 698.5, 587.3, 523.3, 587.3, 659.3, 523.3]
+      every(30, 50, (t) => lullaby.forEach((f, k) => tone(ctx, bus, 'triangle', f * 0.985, t + k * (0.55 + k * 0.04), 0.7, 0.03)))
+      break
+    }
+    case 'concert': {
+      stops.push(noiseBed(ctx, bus, 'bandpass', 650, 0.03, 0.02)) // the crowd, waiting
+      every(0.5, 0.5, (t) => tone(ctx, bus, 'sine', 110, t, 0.22, 0.1, 42)) // the beat through the wall, 120 a minute
+      // A synth sparkles over it, up and down a bright chord.
+      const arpeggio = [880, 1108.7, 1318.5, 1760, 1318.5, 1108.7]
+      every(4, 4, (t) => arpeggio.forEach((f, k) => tone(ctx, bus, 'triangle', f, t + k * 0.125, 0.2, 0.012)))
+      every(15, 30, (t) => noiseSwell(ctx, bus, t, 3, 1500, 0.05)) // a cheer when the lights flicker
+      break
+    }
+    case 'stadium':
+      stops.push(noiseBed(ctx, bus, 'bandpass', 800, 0.04, 0.03)) // the crowd, rising and falling
+      every(9, 18, (t) => noiseSwell(ctx, bus, t, 3, 2200, 0.08)) // a cheer goes round
+      every(20, 35, (t) => [233.1, 293.7, 349.2].forEach((f) => tone(ctx, bus, 'sawtooth', f, t, 1.2, 0.015))) // a horn
+      // Clap, clap, clap-clap-clap: the crowd keeps time.
+      every(12, 20, (t) => [0, 0.5, 1, 1.25, 1.5].forEach((d) => noiseBurst(ctx, bus, t + d, 0.04, 1600, 0.06)))
+      break
+    case 'meadow': {
+      stops.push(noiseBed(ctx, bus, 'lowpass', 500, 0.02, 0.02)) // a breeze in the grass
+      // Birdsong: a few quick, rising chirps.
+      every(1.5, 5, (t) => {
+        const f = 2400 + Math.random() * 1200
+        const chirps = 2 + Math.floor(Math.random() * 3)
+        for (let k = 0; k < chirps; k++) tone(ctx, bus, 'sine', f + k * 150, t + k * 0.09, 0.07, 0.015, f + k * 150 + 400)
+      })
+      // Now and then a few soft piano notes, wandering up and down a calm scale.
+      const scale = [261.6, 293.7, 329.6, 392, 440, 523.3, 587.3]
+      every(5, 9, (t) => {
+        let k = Math.floor(Math.random() * scale.length)
+        for (let n = 0; n < 3; n++) {
+          tone(ctx, bus, 'triangle', scale[k], t + n * 0.9, 2.5, 0.035)
+          k = Math.max(0, Math.min(scale.length - 1, k + (Math.random() < 0.5 ? -1 : 1) * (1 + Math.floor(Math.random() * 2))))
+        }
+      })
+      break
+    }
+    case 'cave':
+      stops.push(noiseBed(ctx, bus, 'lowpass', 120, 0.07, 0.03)) // the mountain's low rumble
+      // A drip, and its echo off the rock.
+      every(1.5, 4, (t) => {
+        const f = 700 + Math.random() * 500
+        tone(ctx, bus, 'sine', f, t, 0.12, 0.06, f * 0.45)
+        tone(ctx, bus, 'sine', f, t + 0.35, 0.12, 0.02, f * 0.45)
+      })
+      // Stones tumbling somewhere deeper in.
+      every(20, 40, (t) => {
+        for (let k = 0; k < 5; k++) noiseBurst(ctx, bus, t + k * 0.11 + Math.random() * 0.05, 0.06, 300 + Math.random() * 300, 0.07)
+      })
+      break
+    case 'tension': {
+      stops.push(drone(ctx, bus, [49, 49.4, 73.5], 0.04, 180)) // a low hum
+      // A ticking pulse under it, heavier on the first of every four.
+      let beat = 0
+      every(0.75, 0.75, (t) => {
+        const first = beat++ % 4 === 0
+        noiseBurst(ctx, bus, t, 0.03, first ? 500 : 900, first ? 0.09 : 0.05)
+      })
+      every(15, 30, (t) => tone(ctx, bus, 'sine', 1400, t, 3, 0.02, 900)) // an eerie glide
+      // Footsteps, far off, coming closer… then stopping.
+      every(25, 45, (t) => {
+        for (let k = 0; k < 4; k++) noiseBurst(ctx, bus, t + k * 0.6, 0.08, 180, 0.08 + k * 0.02)
+      })
       break
     }
   }
