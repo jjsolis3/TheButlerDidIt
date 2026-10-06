@@ -1,0 +1,1111 @@
+{
+  "id": "the-hero-exam",
+  "title": "The Hero Exam",
+  "synopsis": "It's exam day at Skyline Hero Academy! Your class is locked in the training building with three trials to pass before the bell: rescue the stranded training dummies, prove you work as a team, and stop Doctor Dilemma, a villain robot the support class built a little too well. Heroes help first!",
+  "contentRating": "family",
+  "theme": "heroes",
+  "artStyle": "a bright superhero academy: a locker room full of colourful hero costumes, a pretend cardboard city for rescue training, and a cartoon villain robot's lair with flashing screens, bold comic-book colours, dynamic anime-inspired cartoon style",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 90,
+  "soundscape": "stadium",
+  "intro": "HA-HA! Welcome, students, to the Skyline Hero Academy practical exam! I am Captain Comet, retired hero and your examiner today. Your trials: rescue the stranded, work as a team, and stop the villain! Oh, and one small thing: the support class's robot, Doctor Dilemma, has gone a little rogue and locked every door. Heroes help first! BEGIN!",
+  "escapedText": "You climb out of the hatch into the sunshine, with Nugget the class hamster on your shoulder. The whole academy cheers, and Captain Comet pins a shiny badge on every one of you: 'Today, you became heroes!'",
+  "failedText": "The exam bell rings. Doctor Dilemma does a little victory dance, and Captain Comet sighs: 'Not this time, students. But a true hero always tries again!'",
+  "gameMaster": {
+    "name": "Captain Comet",
+    "persona": "A retired superhero turned teacher: booming, dramatic and big-hearted. Strikes a pose for everything, shouts encouragement, pretends to be a strict examiner but cheers wildly at every solve. Believes every student can be a hero. Never scary.",
+    "voice": {
+      "accent": "en-US",
+      "pitch": 0.8,
+      "rate": 1.0,
+      "style": "booming, heroic, enthusiastic"
+    }
+  },
+  "stages": [
+    {
+      "id": "locker-room",
+      "soundscape": "workshop",
+      "title": "The Locker Room",
+      "description": "The academy locker room smells of socks and excitement. Hero costumes hang in every colour, a vending machine hums in the corner, and Captain Comet's own steel locker stands at the end of the row. A roll-call board waits by the door to the rescue zone, which only opens for students with an exam licence.",
+      "puzzles": [
+        "roll-call",
+        "locker-search",
+        "hero-motto",
+        "charging-dock",
+        "hero-quiz",
+        "locker-door"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "comet-locker",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "Captain Comet's locker",
+            "look": "Through the X-ray goggles you can see right inside the steel locker: a signed photo of Captain Comet and, scratched on the back wall, 'Slide back {key:hero-motto}.'",
+            "requires": "x-ray-goggles",
+            "lockedText": "A big steel locker with a heavy lock. Something's written inside, but you can't see through steel... yet."
+          },
+          {
+            "id": "vending-machine",
+            "prop": "machine",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "vending machine",
+            "look": "With the power gloves on, you lift the whole vending machine like a feather! Underneath: your class's exam licence card.",
+            "gives": "student-licence",
+            "requires": "power-gloves",
+            "lockedText": "A huge vending machine full of power bars. Something is stuck underneath, but it's far too heavy to lift."
+          },
+          {
+            "id": "trophy-cabinet",
+            "prop": "cabinet",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "trophy cabinet",
+            "look": "Shiny trophies: BEST RESCUE, LOUDEST CHEER, and one that just says TRIED VERY HARD."
+          },
+          {
+            "id": "roll-call-board",
+            "prop": "sign",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "roll-call board",
+            "look": "A board with empty spaces for every student and a keypad. LINE UP, HEROES!"
+          },
+          {
+            "id": "rescue-door",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "rescue zone door",
+            "look": "A door with a card slot: STUDENTS WITH AN EXAM LICENCE ONLY."
+          },
+          {
+            "id": "changing-bench",
+            "prop": "table",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "changing bench",
+            "look": "Towels, a lost sock and a superhero lunchbox.",
+            "hidesPieces": true
+          },
+          {
+            "id": "laundry-basket",
+            "prop": "barrel",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "laundry basket",
+            "look": "Capes, capes and more capes. They all smell of socks.",
+            "hidesPieces": true
+          },
+          {
+            "id": "gym-bags",
+            "prop": "box",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "gym bags",
+            "look": "Water bottles, sweatbands and a squashed banana.",
+            "hidesPieces": true
+          },
+          {
+            "id": "costume-rail",
+            "prop": "statue",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "costume rail",
+            "look": "Hero costumes in every colour. One has a cape that's far too long.",
+            "hidesPieces": true
+          },
+          {
+            "id": "big-mirror",
+            "prop": "mirror",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "big mirror",
+            "look": "You strike a hero pose. Looking good!",
+            "hidesPieces": true
+          },
+          {
+            "id": "whiteboard",
+            "prop": "sign",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "whiteboard",
+            "look": "Captain Comet's training notes. In the corner, very small: back {key:hero-motto}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "water-bottle",
+            "prop": "barrel",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "giant water bottle",
+            "look": "On the label, in marker pen: back {key:hero-motto}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "showers",
+            "prop": "pipe",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "showers",
+            "look": "Drip. Drip. Someone left a tap running.",
+            "hidesPieces": true
+          },
+          {
+            "id": "first-aid",
+            "prop": "box",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "first aid kit",
+            "look": "Plasters with little stars on them.",
+            "hidesPieces": true
+          },
+          {
+            "id": "punching-bag",
+            "prop": "statue",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "punching bag",
+            "look": "It has a face drawn on it. The face looks worried.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "rescue-zone",
+      "title": "The Rescue Zone",
+      "description": "The rescue zone is a whole pretend city made of cardboard: shops, a fire station, a toppled bus and heaps of foam rubble, with crowds of students watching from the stands. Training dummies are stuck everywhere, a siren wails, and a calling card from Doctor Dilemma is glued to the billboard. At the far end, a spiky gate leads to his lair.",
+      "puzzles": [
+        "siren",
+        "rescue-search",
+        "hero-teams",
+        "calling-card",
+        "dummy-tag",
+        "lair-gate"
+      ],
+      "scene": {
+        "backdrop": "stadium",
+        "objects": [
+          {
+            "id": "rubble",
+            "prop": "crate",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "pile of rubble",
+            "look": "With the power gloves you lift the biggest slab off the heap. Underneath: a training dummy, giving you a thumbs up!",
+            "requires": "power-gloves",
+            "lockedText": "A huge heap of foam rubble. You can hear a muffled 'Help!' underneath, but it's far too heavy."
+          },
+          {
+            "id": "toppled-bus",
+            "prop": "machine",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "toppled bus",
+            "look": "You climb in through a window. On the back seat: a training dummy with a sign, I'M OK, JUST STUCK."
+          },
+          {
+            "id": "lamppost",
+            "prop": "lamp",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lamppost",
+            "look": "Halfway up the lamppost, a training dummy is clinging on for dear life. You help it down."
+          },
+          {
+            "id": "fire-station",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "fire station door",
+            "look": "A big red door with a number keypad, and a siren on the roof that won't stop wailing."
+          },
+          {
+            "id": "post-box",
+            "prop": "box",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "post box",
+            "look": "Through the X-ray goggles you can see inside the post box: a big iron key with a lightning bolt on it! You fish it out through the slot.",
+            "gives": "gate-key",
+            "requires": "x-ray-goggles",
+            "lockedText": "A red post box, locked tight. Something heavy rattles inside."
+          },
+          {
+            "id": "cardboard-shop",
+            "prop": "box",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cardboard bakery",
+            "look": "A pretend bakery made of cardboard. The buns are painted on.",
+            "hidesPieces": true
+          },
+          {
+            "id": "fire-hydrant",
+            "prop": "pipe",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "fire hydrant",
+            "look": "Pssssh! It sprays you with water. Brilliant.",
+            "hidesPieces": true
+          },
+          {
+            "id": "park-bench",
+            "prop": "table",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "park bench",
+            "look": "A bench with a little plaque: FOR TIRED HEROES.",
+            "hidesPieces": true
+          },
+          {
+            "id": "traffic-light",
+            "prop": "lamp",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "traffic light",
+            "look": "Stuck on yellow. Forever.",
+            "hidesPieces": true
+          },
+          {
+            "id": "phone-box",
+            "prop": "cabinet",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "phone box",
+            "look": "A phone box. Perfect for a quick costume change.",
+            "hidesPieces": true
+          },
+          {
+            "id": "billboard",
+            "prop": "poster",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "billboard",
+            "look": "A giant picture of Doctor Dilemma's grinning robot face, with a symbol card glued under his chin: {key:calling-card}"
+          },
+          {
+            "id": "manhole",
+            "prop": "rug",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "manhole cover",
+            "look": "Scratched on the underside: a symbol card: {key:calling-card}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "news-stand",
+            "prop": "sign",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "newspaper stand",
+            "look": "Today's headline: VILLAIN ON THE LOOSE! Tucked inside the paper: a symbol card: {key:calling-card}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "scoreboard",
+            "prop": "sign",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "scoreboard",
+            "look": "A big scoreboard with a keypad, and a row of team colours along the top."
+          }
+        ]
+      }
+    },
+    {
+      "id": "villain-lair",
+      "soundscape": "tension",
+      "title": "The Villain's Lair",
+      "description": "Doctor Dilemma's lair is a cave full of flashing screens, tanks of bubbling green goo and levers marked DO NOT PULL. In a cage in the corner, Nugget the class hamster squeaks for help, and Doctor Dilemma himself, a giant robot with glowing red eyes, clanks up and down in front of a hatch in the roof.",
+      "puzzles": [
+        "hero-oath",
+        "do-not-pull",
+        "villain-plans",
+        "robot-eyes",
+        "power-down",
+        "roof-hatch"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "hamster-cage",
+            "prop": "box",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "hamster cage",
+            "look": "Nugget the hamster runs round and round in his wheel. The cage has a word lock."
+          },
+          {
+            "id": "robot",
+            "prop": "statue",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "Doctor Dilemma",
+            "look": "A huge robot with glowing red eyes, clanking up and down. On his back is an empty socket. Clank. Clank. CLANK."
+          },
+          {
+            "id": "villain-screens",
+            "prop": "machine",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "villain screens",
+            "look": "Screens full of plans, all written in a strange back-to-front alphabet."
+          },
+          {
+            "id": "goo-tank",
+            "prop": "barrel",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "goo tank",
+            "look": "With the power gloves you twist the lid right off. At the bottom of the goo: an empty gadget casing with a battery-shaped hole!",
+            "gives": "gadget-casing",
+            "requires": "power-gloves",
+            "lockedText": "A tank of bubbling green goo. Something sits at the bottom, but the lid is screwed on far too tight."
+          },
+          {
+            "id": "roof-hatch-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "roof hatch",
+            "look": "A hatch in the ceiling with a card slot and a 3-digit keypad. Daylight peeks round the edges."
+          },
+          {
+            "id": "levers",
+            "prop": "machine",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "levers",
+            "look": "Levers marked DO NOT PULL, and one big one with a word lock on it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "spinny-chair",
+            "prop": "statue",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "spinny chair",
+            "look": "A big spinny villain chair. You spin. Wheee.",
+            "hidesPieces": true
+          },
+          {
+            "id": "blueprints",
+            "prop": "desk",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "blueprints",
+            "look": "Drawings of robots, rockets and a giant mechanical hamster wheel.",
+            "hidesPieces": true
+          },
+          {
+            "id": "villain-cape",
+            "prop": "lamp",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "villain cape",
+            "look": "A long purple cape on a hook. It's very dramatic.",
+            "hidesPieces": true
+          },
+          {
+            "id": "snack-stash",
+            "prop": "crate",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "snack stash",
+            "look": "Cookies, crisps and a sign: VILLAINS NEED SNACKS TOO.",
+            "hidesPieces": true
+          },
+          {
+            "id": "control-desk",
+            "prop": "desk",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "control desk",
+            "look": "A code card under a stack of evil plans: {key:robot-eyes}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "robot-manual",
+            "prop": "bookshelf",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "robot manual",
+            "look": "Page one: a table of dots and dashes: {key:robot-eyes}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "spare-parts",
+            "prop": "box",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "spare parts bin",
+            "look": "Bolts, nuts and a code card: {key:robot-eyes}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "costume-trunk",
+            "prop": "chest",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "costume trunk",
+            "look": "Villain disguises. At the bottom: a fake curly moustache.",
+            "gives": "moustache",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "roll-call",
+      "title": "The Roll Call",
+      "kind": "code",
+      "prompt": "Captain Comet's roll-call board flashes: LINE UP, HEROES! The class is in a muddle: {items}. The keypad wants each hero's spot, far left is 1, in the order on the list.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "fire hero",
+          "ice hero",
+          "speedster",
+          "shape-shifter",
+          "giant"
+        ],
+        "pieceTemplate": "Overheard in the corridor: {clue}"
+      },
+      "rewards": [
+        "gear-case"
+      ],
+      "hints": [
+        "Every phone overheard something about the line-up. Read them all out loud.",
+        "Start with the one you're surest about, and try each spot in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "DING DING DING! 'Perfect line-up!' booms Captain Comet over the speaker. A hatch opens under the board: inside is a silver support-gear case."
+    },
+    {
+      "id": "locker-search",
+      "title": "The Missing Gear",
+      "kind": "search",
+      "prompt": "Your support gear has been scattered all over the locker room. Search the changing bench, the laundry basket and the gym bags.",
+      "finds": [
+        "changing-bench",
+        "laundry-basket",
+        "gym-bags"
+      ],
+      "rewards": [
+        "power-gloves"
+      ],
+      "hints": [
+        "Three spots in the locker room are worth a proper rummage.",
+        "Look under the towels, through the capes and in the bags."
+      ],
+      "solvedText": "At the bottom of a gym bag: a pair of chunky silver power gloves! They hum when you put them on."
+    },
+    {
+      "id": "hero-motto",
+      "title": "The Hero Motto",
+      "kind": "text",
+      "prompt": "Captain Comet's hero motto is painted above the lockers in a code from his old hero days: {cipher}. It's the one thing every hero needs most. The trophy cabinet's word lock wants it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "courage",
+          "justice",
+          "kindness",
+          "bravery",
+          "honour",
+          "hope"
+        ]
+      },
+      "hints": [
+        "A number is written in more than one place, and one of them is hidden where only special gear can see.",
+        "Try each number you found: only one turns this into something every hero needs.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "The trophy cabinet clicks open and plays a tiny fanfare. Inside, a little gold trophy reads: FUTURE HEROES."
+    },
+    {
+      "id": "charging-dock",
+      "minMinutes": 45,
+      "title": "The Charging Dock",
+      "kind": "switches",
+      "prompt": "Every gadget in the charging dock has to be charged before the exam. The charging lights are wired together: tap one and the ones beside it flip too. Light every one!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the lights in the row below it.",
+        "Tap {answer}."
+      ],
+      "solvedText": "Every light glows green. Fully charged! Captain Comet's voice booms: 'NOW you're ready!'"
+    },
+    {
+      "id": "hero-quiz",
+      "minMinutes": 60,
+      "title": "The Pop Quiz",
+      "kind": "code",
+      "prompt": "Captain Comet's training timer has a {count}-digit lock. He's written each digit as a hero-school quiz question, one for each of you.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Your hero-school quiz card: the {ordinal} digit is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The timer beeps happily and plays the academy song. Captain Comet hums along, badly."
+    },
+    {
+      "id": "locker-door",
+      "title": "The Rescue Zone Door",
+      "kind": "use",
+      "prompt": "The door to the rescue zone has a card slot and a sign: STUDENTS WITH AN EXAM LICENCE ONLY.",
+      "requires": [
+        "student-licence"
+      ],
+      "hints": [
+        "Your exam licence is stuck under something very, very heavy.",
+        "Put on the power gloves, lift the vending machine, then slot the licence into the door."
+      ],
+      "solvedText": "The licence slides in, the door whooshes open and an announcer booms: 'TRIAL ONE: THE RESCUE ZONE!'"
+    },
+    {
+      "id": "siren",
+      "title": "The Siren",
+      "kind": "code",
+      "prompt": "The rescue zone's siren wails in bursts, and the fire station's keypad shows the count: {sequence}. Type the next number to switch it off!",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "The siren winds down with a sad little wheee. Peace and quiet! The crowd in the stands gives you a round of applause."
+    },
+    {
+      "id": "rescue-search",
+      "title": "The Rescue",
+      "kind": "search",
+      "prompt": "Three training dummies are stuck in the rescue zone! Rescue them all: check the pile of rubble, the toppled bus and the lamppost.",
+      "finds": [
+        "rubble",
+        "toppled-bus",
+        "lamppost"
+      ],
+      "rewards": [
+        "battery-pack"
+      ],
+      "hints": [
+        "Three dummies are stuck in three places, and one of them is under something very heavy.",
+        "Lift the rubble with the power gloves, then check inside the bus and up the lamppost."
+      ],
+      "solvedText": "All three dummies rescued! The stands cheer, and one of the dummies hands you a glowing battery pack with a wink. (Dummies can't wink. But it did.)"
+    },
+    {
+      "id": "hero-teams",
+      "title": "The Team Scoreboard",
+      "kind": "code",
+      "prompt": "The rescue scoreboard has a {count}-digit lock and a message: '{order}!' Each of you counted the dummies rescued by one colour of team.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "purple",
+          "orange",
+          "silver"
+        ],
+        "thing": "team",
+        "pieceTemplate": "You counted the dummies the {color} team rescued: {digit}."
+      },
+      "hints": [
+        "Each phone counted one team. Say your team's colour and its number.",
+        "Read them in the scoreboard's order: {order}."
+      ],
+      "solvedText": "The scoreboard flashes RESCUE TRIAL: PASSED! Fireworks pop over the cardboard city."
+    },
+    {
+      "id": "calling-card",
+      "minMinutes": 45,
+      "title": "The Calling Card",
+      "kind": "text",
+      "prompt": "Doctor Dilemma has left a calling card in his villain symbols: {cipher}. It says what he plans to cover the whole academy in, and it's something sticky! The card's frame has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "glue",
+          "slime",
+          "syrup",
+          "honey",
+          "gravy"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in the rescue zone. Only one is the villain's real key.",
+        "Try each card: only one turns the symbols into something sticky.",
+        "It says {answer}."
+      ],
+      "solvedText": "You've cracked his plan! Captain Comet gasps over the speaker: 'Not the {answer}! Quick, heroes, to his lair!'"
+    },
+    {
+      "id": "dummy-tag",
+      "minMinutes": 60,
+      "title": "The Dummy's Name Tag",
+      "kind": "text",
+      "prompt": "The last training dummy's name tag is written in numbers, where A is 1 and B is 2: {cipher}. Its rescue form wants the dummy's name.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "rusty",
+          "patches",
+          "noodle",
+          "pickles",
+          "dumpling",
+          "button"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "'Thank you, heroes!' says a little speaker in the dummy's chest. Then it falls over. Dummies."
+    },
+    {
+      "id": "lair-gate",
+      "title": "The Lair Gate",
+      "kind": "text",
+      "prompt": "The gate to Doctor Dilemma's lair has a keyhole and a word lock, with a riddle in spiky robot writing: 'What can you catch, but never throw?'",
+      "answers": [
+        "cold",
+        "a cold",
+        "colds"
+      ],
+      "requires": [
+        "gate-key"
+      ],
+      "hints": [
+        "It isn't a ball.",
+        "Achoo! You might catch one in winter."
+      ],
+      "solvedText": "The key turns, the gate grinds open, and a robot voice echoes: 'Welcome to my lair, little heroes. Mwa-ha-ha! Beep.'",
+      "variants": [
+        {},
+        {
+          "prompt": "The gate to Doctor Dilemma's lair has a keyhole and a word lock, with a riddle in spiky robot writing: 'What has to be broken before you can use it?'",
+          "answers": [
+            "egg",
+            "an egg",
+            "eggs"
+          ],
+          "hints": [
+            "Think about breakfast.",
+            "You crack it into a pan."
+          ]
+        },
+        {
+          "prompt": "The gate to Doctor Dilemma's lair has a keyhole and a word lock, with a riddle in spiky robot writing: 'What gets wetter and wetter the more it dries?'",
+          "answers": [
+            "towel",
+            "a towel",
+            "towels"
+          ],
+          "hints": [
+            "Think about bath time.",
+            "You dry yourself with it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-oath",
+      "minMinutes": 45,
+      "title": "The Hero Oath",
+      "kind": "text",
+      "prompt": "Nugget the class hamster is locked in Doctor Dilemma's cage, and it only opens for true heroes. Say the Hero Oath! Each of you remembers one word of it.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "brave",
+          "kind",
+          "honest",
+          "loyal",
+          "strong",
+          "fair",
+          "bold",
+          "true",
+          "calm",
+          "quick",
+          "helpful",
+          "humble"
+        ],
+        "pieceTemplate": "You remember the {ordinal} word of the Hero Oath: '{word}'."
+      },
+      "hints": [
+        "Each of you remembers one word. Say them in order: first, second, third...",
+        "Put them together in order, like: word word word."
+      ],
+      "solvedText": "'{answer}!' The cage springs open and Nugget scampers up your arm, squeaking happily."
+    },
+    {
+      "id": "do-not-pull",
+      "minMinutes": 45,
+      "title": "The DO NOT PULL Lever",
+      "kind": "text",
+      "prompt": "The big lever marked DO NOT PULL has a word lock, and one of Doctor Dilemma's riddles: 'I go up and I go down, but I never move an inch.'",
+      "answers": [
+        "stairs",
+        "staircase",
+        "steps",
+        "a staircase"
+      ],
+      "hints": [
+        "Think about how you get from one floor to the next.",
+        "You climb them to go upstairs."
+      ],
+      "solvedText": "You pull it anyway. A disco ball drops from the ceiling and the lair fills with sparkles. Doctor Dilemma groans: 'That was for my birthday!'",
+      "variants": [
+        {},
+        {
+          "prompt": "The big lever marked DO NOT PULL has a word lock, and one of Doctor Dilemma's riddles: 'I can fly without wings and cry without eyes, and wherever I go, the sunshine hides.'",
+          "answers": [
+            "cloud",
+            "clouds",
+            "a cloud",
+            "raincloud"
+          ],
+          "hints": [
+            "Look up at the sky.",
+            "It's fluffy and white, or grey and full of rain."
+          ]
+        },
+        {
+          "prompt": "The big lever marked DO NOT PULL has a word lock, and one of Doctor Dilemma's riddles: 'It belongs to you, but everybody else uses it more than you do.'",
+          "answers": [
+            "name",
+            "your name",
+            "names",
+            "hero name"
+          ],
+          "hints": [
+            "Think about what people call you.",
+            "Every hero has one, and so do you."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "villain-plans",
+      "minMinutes": 60,
+      "title": "The Villain's Plans",
+      "kind": "text",
+      "prompt": "Doctor Dilemma's screens show his plans in a back-to-front alphabet, where A swaps with Z: {cipher}. The screen's lock wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "mischief",
+          "mayhem",
+          "pranks",
+          "shenanigans",
+          "tomfoolery",
+          "trickery"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "The screen flips the right way round, and you can read every one of his plans. Captain Comet has already crossed them all out in red pen."
+    },
+    {
+      "id": "robot-eyes",
+      "minDifficulty": "hard",
+      "title": "The Robot's Eyes",
+      "kind": "text",
+      "prompt": "Doctor Dilemma's red eyes blink long and short as he clanks about. Captain Comet says he's spelling a word every hero lives by: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "duty",
+          "valour",
+          "mercy"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden round the lair. Only one reads a word a hero lives by.",
+        "Look at the control desk, the robot manual and the spare parts bin.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "Doctor Dilemma's eyes stop blinking. He gives you a very slow, very surprised salute."
+    },
+    {
+      "id": "power-down",
+      "title": "Power Down",
+      "kind": "use",
+      "prompt": "Doctor Dilemma is clanking up and down in front of the roof hatch. There's an empty socket on his back, just the right size for a support-class power-down gadget.",
+      "requires": [
+        "power-down-gadget"
+      ],
+      "rewards": [
+        "hatch-card"
+      ],
+      "hints": [
+        "You've got a battery pack and a gadget casing with a battery-shaped hole.",
+        "Click the battery pack into the casing, then plug the gadget into the robot's back."
+      ],
+      "solvedText": "You plug the gadget in. Doctor Dilemma's eyes fade from red to sleepy blue, and he sits down with a yawn: 'Power... down... mode...' A card pops out of a slot in his chest: HATCH ACCESS."
+    },
+    {
+      "id": "roof-hatch",
+      "title": "The Roof Hatch",
+      "kind": "code",
+      "prompt": "The roof hatch needs the access card AND a 3-digit code. Captain Comet's voice crackles: 'Dummies in the rescue zone, then gadgets on the dock, then trophies in the cabinet!'",
+      "answers": [
+        "648"
+      ],
+      "requires": [
+        "hatch-card"
+      ],
+      "pieces": [
+        "You counted the training dummies in the rescue zone: 6.",
+        "You counted the gadgets on the charging dock: 4.",
+        "You counted the trophies in the cabinet: 8."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order Captain Comet said.",
+        "Dummies, then gadgets, then trophies."
+      ],
+      "solvedText": "The hatch swings open onto blue sky and a cheering crowd. Captain Comet strikes his biggest pose yet: 'EXAM... PASSED!'",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "279"
+          ],
+          "pieces": [
+            "You counted the training dummies in the rescue zone: 2.",
+            "You counted the gadgets on the charging dock: 7.",
+            "You counted the trophies in the cabinet: 9."
+          ]
+        },
+        {
+          "answers": [
+            "531"
+          ],
+          "pieces": [
+            "You counted the training dummies in the rescue zone: 5.",
+            "You counted the gadgets on the charging dock: 3.",
+            "You counted the trophies in the cabinet: 1."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "gear-case",
+      "name": "Support-gear case",
+      "description": "A silver case from the support class, stamped PROPERTY OF SKYLINE ACADEMY. Something inside clinks.",
+      "inspect": "You open the case. Inside, in a nest of foam: a pair of X-ray goggles! Through them, you can see inside things.",
+      "inspectGives": "x-ray-goggles"
+    },
+    {
+      "id": "x-ray-goggles",
+      "name": "X-ray goggles",
+      "description": "Chunky goggles with green lenses. Through them, you can see inside lockers, boxes and walls."
+    },
+    {
+      "id": "power-gloves",
+      "name": "Power gloves",
+      "description": "Chunky silver gloves that hum. With them on, you can lift anything."
+    },
+    {
+      "id": "student-licence",
+      "name": "Exam licence",
+      "description": "Your class's exam licence card, a bit squashed from being under a vending machine."
+    },
+    {
+      "id": "battery-pack",
+      "name": "Glowing battery pack",
+      "description": "A battery pack from the support class. It glows a friendly blue."
+    },
+    {
+      "id": "gate-key",
+      "name": "Lightning key",
+      "description": "A big iron key with a lightning bolt on the handle."
+    },
+    {
+      "id": "gadget-casing",
+      "name": "Gadget casing",
+      "description": "An empty gadget with a battery-shaped hole and a label: POWER-DOWN GADGET."
+    },
+    {
+      "id": "power-down-gadget",
+      "name": "Power-down gadget",
+      "description": "The casing with its battery clicked in. One press, and any robot takes a nap."
+    },
+    {
+      "id": "hatch-card",
+      "name": "Hatch access card",
+      "description": "A card that popped out of Doctor Dilemma's chest: HATCH ACCESS."
+    },
+    {
+      "id": "moustache",
+      "name": "Fake moustache",
+      "description": "A curly villain moustache. It doesn't open anything, but it does look fabulous."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "battery-pack",
+        "gadget-casing"
+      ],
+      "makes": "power-down-gadget",
+      "text": "The battery pack clicks into the casing and the gadget beeps: READY."
+    }
+  ]
+}
