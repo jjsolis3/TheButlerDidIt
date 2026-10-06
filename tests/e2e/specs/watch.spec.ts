@@ -21,6 +21,8 @@ test('spectators watch the TV on their phones, cheer, and the host stays in char
   await tv.waitForURL('**/host/new')
   await tv.getByRole('tab', { name: /Escape room/ }).click()
   await tv.getByRole('button', { name: /The Workshop/ }).click()
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await tv.getByText('👐 Anyone, any time').click()
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = tv.url().split('/').pop()!

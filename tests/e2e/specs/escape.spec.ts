@@ -62,6 +62,8 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   // The (fake) AI is set up, so the room's villain is offered as the game master.
   await expect(tv.getByRole('checkbox', { name: /Use the AI game master \(The Tinkerer\)/ })).toBeChecked()
   await tv.screenshot({ path: `${SHOTS}/90-escape-shelf.png`, fullPage: true })
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await tv.getByText('👐 Anyone, any time').click()
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = tv.url().split('/').pop()!
@@ -212,6 +214,8 @@ test('an escape room written by AI from a theme lands on the host shelf, ready t
   await expect(tv.getByRole('button', { name: 'Delete this room' })).toBeVisible()
   await tv.screenshot({ path: `${SHOTS}/95-escape-written-by-ai.png`, fullPage: true })
 
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await tv.getByText('👐 Anyone, any time').click()
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   await expect(tv.getByRole('heading', { name: 'The Fake Lighthouse' })).toBeVisible()

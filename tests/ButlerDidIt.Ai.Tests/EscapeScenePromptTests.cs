@@ -96,15 +96,22 @@ public class EscapeScenePromptTests
     }
 
     [Fact]
-    public void On_normal_a_decoy_is_just_a_search()
+    public void On_easy_an_empty_search_is_just_a_search_and_on_normal_it_costs_time_but_hints_still_say_plenty()
     {
         var template = Lab.Value;
-        var s = EscapeEngine.NewGame(1, ai: new EscapeAiFeatures { GameMaster = true, Hints = true });
-        s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, Ada, "Ada", true, false));
-        s = EscapeEngine.Apply(s, template, new StartEscape(T0));
-        s = EscapeEngine.Apply(s, template, new ExamineSpot(T0, Ada, "plant"));
-        Assert.DoesNotContain(s.Cues, c => c.Kind == CueKind.Decoy);
-        Assert.DoesNotContain("only nudge", EscapePrompts.Hint(template, s, "formula", 0, T0));
+        EscapeState Searched(EscapeDifficulty level)
+        {
+            var s = EscapeEngine.NewGame(1, ai: new EscapeAiFeatures { GameMaster = true, Hints = true }, difficulty: level);
+            s = EscapeEngine.Apply(s, template, new AddEscapePlayer(T0, Ada, "Ada", true, false));
+            s = EscapeEngine.Apply(s, template, new StartEscape(T0));
+            return EscapeEngine.Apply(s, template, new ExamineSpot(T0, Ada, "plant"));
+        }
+        Assert.DoesNotContain(Searched(EscapeDifficulty.Easy).Cues, c => c.Kind == CueKind.Decoy);
+
+        // #132: on Normal too, a wasted search costs time, and the game master may tease the group for it.
+        var normal = Searched(EscapeDifficulty.Normal);
+        Assert.Contains(normal.Cues, c => c.Kind == CueKind.Decoy);
+        Assert.DoesNotContain("only nudge", EscapePrompts.Hint(template, normal, "formula", 0, T0));
     }
 
     private static EscapeCommand Move(EscapeState s, EscapeRoom room, EscapeStage stage, DateTimeOffset now)

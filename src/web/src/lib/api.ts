@@ -1,5 +1,6 @@
 import type {
   AdminGameRow,
+  AnswerRule,
   AdminOverview,
   SignUpsView,
   EscapeDifficulty,
@@ -180,7 +181,8 @@ export const api = {
     useAi: boolean,
     minutes: number | null,
     difficulty: EscapeDifficulty = 'normal',
-  ) => request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi, minutes, difficulty }),
+    answering: AnswerRule = 'anyone',
+  ) => request<PartyInfo>('POST', '/api/parties/escape', { roomId, mode, puzzles, puzzleSet, useAi, minutes, difficulty, answering }),
   leaderboard: (roomId: string, daily: boolean, minutes: number, party?: string, difficulty: EscapeDifficulty = 'normal') =>
     request<Leaderboard>(
       'GET',

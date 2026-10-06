@@ -65,7 +65,7 @@ public static class EscapePrompts
         CueKind.Escaped => $"They escaped! {cue.PlayerName} solved the last puzzle, {cue.PuzzleTitle}. Concede, in character.",
         CueKind.Failed => "Time ran out before they escaped. Gloat, in character, but invite them to try again.",
         CueKind.Found => $"{cue.PlayerName} searched and found something useful: {cue.Thing}. Don't say what it's for.",
-        CueKind.Decoy => $"{cue.PlayerName} searched the {cue.Thing} and found nothing at all, and on Hard that cost them time. Tease them for it, without hinting where to look instead.",
+        CueKind.Decoy => $"{cue.PlayerName} searched the {cue.Thing} and found nothing they could use, and the wasted search cost them time. Tease them for it, without hinting where to look instead.",
         _ => "",
     };
 

@@ -1,4 +1,4 @@
-import type { ContentRating, EscapeDifficulty, PartyMode, Tone } from './types'
+import type { AnswerRule, ContentRating, EscapeDifficulty, PartyMode, Tone } from './types'
 
 /**
  * The choices a new party offers, worded once: the host page (NewParty, NewEscapeParty) and the party settings page
@@ -35,4 +35,14 @@ export const DIFFICULTIES: { id: EscapeDifficulty; title: string }[] = [
   { id: 'easy', title: '🙂 Easy' },
   { id: 'normal', title: '😐 Normal' },
   { id: 'hard', title: '😈 Hard' },
+]
+
+/**
+ * Who answers an escape room's puzzles (#132). Taking turns shares the room out: one keen player can't do it all, and
+ * whoever holds a puzzle is the one who searches for what it needs.
+ */
+export const ANSWER_RULES: { id: AnswerRule; title: string; body: string }[] = [
+  { id: 'takeIt', title: '🙋 Take a puzzle', body: 'Each player takes one puzzle at a time and only they can answer it. Stuck? Hand it back, or someone takes over after a while.' },
+  { id: 'dealt', title: '🃏 Dealt at random', body: 'Each room’s puzzles are dealt round the table as it opens. Pass yours on if you’re stuck.' },
+  { id: 'anyone', title: '👐 Anyone, any time', body: 'Everyone can answer everything, as in a small group of two.' },
 ]

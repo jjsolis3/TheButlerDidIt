@@ -51,6 +51,8 @@ test('harder rooms: a solo player searches, decodes and reasons their way out of
   const tv = await hostTv(browser, /😈 Hard/)
   await expect(tv.getByRole('radio', { name: /Hard/ })).toBeChecked()
   await tv.screenshot({ path: `${SHOTS}/96-escape-difficulty.png`, fullPage: true })
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await tv.getByText('👐 Anyone, any time').click()
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = tv.url().split('/').pop()!
@@ -113,6 +115,8 @@ test('harder rooms: a solo player searches, decodes and reasons their way out of
 test('harder rooms: three phones share the search and the clues on Normal', async ({ browser }) => {
   test.setTimeout(180_000)
   const tv = await hostTv(browser, /😐 Normal/)
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await tv.getByText('👐 Anyone, any time').click()
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = tv.url().split('/').pop()!
@@ -136,6 +140,8 @@ test('harder rooms: a young family escapes the rebuilt Pirate Ship solo on Easy'
   test.setTimeout(180_000)
   const tv = await hostTv(browser, /🙂 Easy/, /The Pirate Ship/)
   await expect(tv.getByRole('radio', { name: /Easy/ })).toBeChecked()
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await tv.getByText('👐 Anyone, any time').click()
   await tv.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await tv.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   const code = tv.url().split('/').pop()!

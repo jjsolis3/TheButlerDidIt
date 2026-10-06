@@ -45,6 +45,7 @@ public sealed record HostPreferences
         if (Mystery.Tone == Tone.Playful && Mystery.Shelf != ContentRating.Family) return "Funny is a tone for Family mysteries.";
         if (Mystery.Tone == Tone.Clean && Mystery.Shelf != ContentRating.Mature) return "Mixed company is a tone for Adult mysteries.";
         if (!Enum.IsDefined(Escape.Difficulty)) return "Choose easy, normal or hard.";
+        if (!Enum.IsDefined(Escape.Answering)) return "Choose who answers the puzzles.";
         if (Escape.Puzzles is not (PuzzleChoice.Fresh or PuzzleChoice.Daily)) return "Choose fresh puzzles or today's challenge.";
         if (Escape.Minutes is { } m && m is not (30 or 45 or 60)) return "Choose 30, 45 or 60 minutes, or each room's own length.";
         return null;
@@ -79,4 +80,7 @@ public sealed record EscapeDefaults
     /// <summary>Fresh puzzles or today's challenge. (A replay is of one shared set, so it's never a default.)</summary>
     public PuzzleChoice Puzzles { get; init; } = PuzzleChoice.Fresh;
     public bool UseAi { get; init; } = true;
+
+    /// <summary>Who answers the puzzles (#132). Taking turns is the default: it shares the room out at a family table.</summary>
+    public ButlerDidIt.Escape.Engine.AnswerRule Answering { get; init; } = ButlerDidIt.Escape.Engine.AnswerRule.TakeIt;
 }

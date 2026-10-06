@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { CheerBar, CheerOverlay } from '../components/Cheers'
+import { FitToScreen } from '../components/FitToScreen'
 import { RecapShare } from '../components/RecapShare'
 import { QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
@@ -219,19 +220,30 @@ function Room({ stage, info, invoke, tv, controls }: { stage: EscapeStageView; i
     setError(null)
     invoke('EscapeHostHint', info.code, p.id).catch((e: Error) => setError(e.message))
   }
-  const onHint = info.isHost ? hint : undefined
-  return tv ? <TvRoom stage={stage} onHint={onHint} error={error} controls={controls} /> : <StackedRoom stage={stage} onHint={onHint} error={error} />
+  // A puzzle someone has taken and left (#132): the host can put it back on the table from the TV.
+  const free = (p: EscapePuzzleView) => {
+    if (!confirm(`Free "${p.title}" from ${p.heldBy?.name ?? 'its holder'}? Anyone can then take it.`)) return
+    setError(null)
+    invoke('EscapeHostFree', info.code, p.id).catch((e: Error) => setError(e.message))
+  }
+  const host = info.isHost ? { hint, free } : undefined
+  return tv ? <TvRoom stage={stage} host={host} error={error} controls={controls} /> : <StackedRoom stage={stage} host={host} error={error} />
 }
+
+/** What the host can do from the TV, on any puzzle. */
+type HostActions = { hint: (p: EscapePuzzleView) => void; free: (p: EscapePuzzleView) => void }
 
 const solvedSummary = (stage: EscapeStageView) => `${stage.solvedCount}/${stage.puzzleCount} solved · ${stage.hintsUsed} hint${stage.hintsUsed === 1 ? '' : 's'}`
 
 /**
- * The TV layout: a header, then two columns filling the rest of the screen. Every panel has a fixed share of it
- * (min-h-0, so content can't stretch the page), and the lists show the newest first and fade out at the bottom,
- * so what matters most is always on screen. Only the puzzles may scroll inside themselves, as a last resort on a
- * small laptop: the busiest stage in any room has six.
+ * The TV layout: a header, then two columns filling the rest of the screen, nothing scrolling (#116).
+ *
+ * The right column starts with what the group carries and what it has read (#132: on a big TV these were squeezed
+ * into the bottom of the left column and cut off), always in full, then the puzzles, scaled down to fit when a busy
+ * stage needs it. The left column is the room itself: the scene, the game master, and two short lists, what's
+ * happened (newest first) and what's been searched, which fade out at the bottom since they only grow.
  */
-function TvRoom({ stage, onHint, error, controls }: { stage: EscapeStageView; onHint?: (p: EscapePuzzleView) => void; error: string | null; controls: ReactNode }) {
+function TvRoom({ stage, host, error, controls }: { stage: EscapeStageView; host?: HostActions; error: string | null; controls: ReactNode }) {
   // Open puzzles first, then the ones waiting for an item, then the solved ones (shrunk): the TV's own order within each.
   const rank = (p: EscapePuzzleView) => (p.solved ? 2 : p.needs.length ? 1 : 0)
   const puzzles = [...stage.puzzles].sort((a, b) => rank(a) - rank(b))
@@ -270,24 +282,25 @@ function TvRoom({ stage, onHint, error, controls }: { stage: EscapeStageView; on
           <div className="shrink-0">
             <GameMasterPanel gameMaster={stage.gameMaster} narration={stage.narration} />
           </div>
-          <div className={`grid max-h-[30%] min-h-0 shrink-0 grid-cols-2 gap-6 overflow-hidden ${fade}`}>
-            <div className="min-h-0 space-y-3">
-              {stage.scene && <SearchedList scene={stage.scene} className="space-y-1 text-sm 2xl:text-base" />}
-              <Notebook notes={stage.notebook} limit={4} />
-            </div>
-            <RoomLog stage={stage} tv />
+          <div className={`grid max-h-[26%] min-h-0 shrink-0 grid-cols-2 gap-6 overflow-hidden ${fade}`}>
+            <Happened stage={stage} />
+            {stage.scene && <SearchedList scene={stage.scene} className="min-h-0 space-y-1 text-sm 2xl:text-base" />}
           </div>
         </div>
 
         <div className="flex min-h-0 flex-col gap-3">
+          <Found stage={stage} tv />
           <ErrorText>{error}</ErrorText>
-          {/* Two newspaper-style columns: each card takes the height it needs, so short ones don't leave gaps. */}
-          <div className="min-h-0 flex-1 overflow-y-auto" data-testid="tv-puzzles">
-            <div className="columns-2 gap-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
-              {puzzles.map((p) => (
-                <PuzzleCard key={p.id} puzzle={p} stage={stage} onHint={onHint} compact />
-              ))}
-            </div>
+          <div className="min-h-0 flex-1" data-testid="tv-puzzles">
+            {/* Scaled to fit on a TV (1080p and up). A busy stage on a small laptop scrolls this box, as a last resort. */}
+            <FitToScreen>
+              {/* Two newspaper-style columns: each card takes the height it needs, so short ones don't leave gaps. */}
+              <div className="columns-2 gap-3 [&>*]:mb-3 [&>*]:break-inside-avoid">
+                {puzzles.map((p) => (
+                  <PuzzleCard key={p.id} puzzle={p} stage={stage} host={host} compact />
+                ))}
+              </div>
+            </FitToScreen>
           </div>
         </div>
       </div>
@@ -296,7 +309,7 @@ function TvRoom({ stage, onHint, error, controls }: { stage: EscapeStageView; on
 }
 
 /** The phone layout: everything stacked, for someone holding the screen (and scrolling it). */
-function StackedRoom({ stage, onHint, error }: { stage: EscapeStageView; onHint?: (p: EscapePuzzleView) => void; error: string | null }) {
+function StackedRoom({ stage, host, error }: { stage: EscapeStageView; host?: HostActions; error: string | null }) {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -323,26 +336,24 @@ function StackedRoom({ stage, onHint, error }: { stage: EscapeStageView; onHint?
       )}
       <p className="max-w-3xl text-lg text-ink/90">{stage.stage?.description}</p>
       <GameMasterPanel gameMaster={stage.gameMaster} narration={stage.narration} />
+      <Found stage={stage} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {stage.puzzles.map((p) => (
-          <PuzzleCard key={p.id} puzzle={p} stage={stage} onHint={onHint} />
+          <PuzzleCard key={p.id} puzzle={p} stage={stage} host={host} />
         ))}
       </div>
       <ErrorText>{error}</ErrorText>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <RoomLog stage={stage} notebook />
-      </div>
+      <Happened stage={stage} />
     </div>
   )
 }
 
 /**
- * One puzzle in front of the group: its prompt, what it needs, its clues on the phones, the hints taken, and
- * (for the host) the Hint button. `compact` (the TV layout) shrinks a solved one to its title and outcome.
+ * One puzzle in front of the group: its prompt, what it needs, its clues on the phones, who's working on it (#132),
+ * the hints taken, and the host's buttons. `compact` (the TV layout) shrinks a solved one to its title and outcome.
  */
-function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: EscapePuzzleView; stage: EscapeStageView; onHint?: (p: EscapePuzzleView) => void; compact?: boolean }) {
+function PuzzleCard({ puzzle: p, stage, host, compact = false }: { puzzle: EscapePuzzleView; stage: EscapeStageView; host?: HostActions; compact?: boolean }) {
   if (compact && p.solved)
     return (
       <article data-testid={`puzzle-${p.id}`} className="rounded-xl border border-green-600/40 bg-green-900/10 px-3 py-2">
@@ -354,6 +365,7 @@ function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: Esc
         <p className="mt-1 line-clamp-2 text-xs text-green-300/80">{p.solvedText}</p>
       </article>
     )
+  const turns = stage.answering !== 'anyone' && p.kind !== 'search'
   return (
     <article
       data-testid={`puzzle-${p.id}`}
@@ -365,6 +377,18 @@ function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: Esc
           {p.solved ? '✅' : p.needs.length ? '🔒' : KIND_ICON[p.kind]}
         </span>
       </div>
+      {!p.solved && turns && (
+        <p className="mt-1 text-sm" data-testid={`holder-${p.id}`}>
+          {p.heldBy ? (
+            <span className="rounded-full border border-accent/50 bg-accent/10 px-2 py-0.5">
+              🙋 {p.heldBy.name}
+              {p.heldBy.free && <span className="text-muted"> · free to take over</span>}
+            </span>
+          ) : (
+            <span className="text-muted">🙋 Nobody's on it yet</span>
+          )}
+        </p>
+      )}
       <p className={`mt-2 text-sm text-ink/90 ${compact ? 'leading-snug 2xl:text-base' : 'leading-relaxed'}`}>{p.prompt}</p>
       {p.solved ? (
         <p className="mt-3 text-sm text-green-300">
@@ -379,6 +403,7 @@ function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: Esc
               🔎 {p.piecesHidden} more clue piece{p.piecesHidden === 1 ? '' : 's'} hidden somewhere in the room
             </p>
           )}
+          {p.keysHidden > 0 && <p className="mt-1 text-xs text-accent">🔑 Its key is written on something in this room</p>}
           {p.finds && (
             <p className="mt-3 text-sm text-muted">
               Searched {p.finds.found} of {p.finds.total}
@@ -391,10 +416,19 @@ function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: Esc
             </p>
           ))}
           {p.hintPending && <p className="mt-2 animate-pulse text-sm text-muted">💭 {stage.gameMaster?.name ?? 'The game master'} is thinking of a hint…</p>}
-          {onHint && p.hintsLeft > 0 && !p.hintPending && (
-            <button className="mt-3 text-xs text-muted underline hover:text-ink" onClick={() => onHint(p)}>
-              Hint (−{penaltyLabel(stage.hintPenaltySeconds)})
-            </button>
+          {host && (
+            <p className="mt-3 flex gap-3 text-xs text-muted">
+              {p.hintsLeft > 0 && !p.hintPending && (
+                <button className="underline hover:text-ink" onClick={() => host.hint(p)}>
+                  Hint (−{penaltyLabel(stage.hintPenaltySeconds)})
+                </button>
+              )}
+              {p.heldBy && (
+                <button className="underline hover:text-ink" onClick={() => host.free(p)}>
+                  Free it
+                </button>
+              )}
+            </p>
           )}
         </>
       )}
@@ -403,47 +437,45 @@ function PuzzleCard({ puzzle: p, stage, onHint, compact = false }: { puzzle: Esc
 }
 
 /**
- * What the group carries and what's happened, newest first (and, on the stacked page, the notebook too). On the TV
- * what's happened comes first: it's the live part, and the list fades out at the bottom.
+ * What the group carries, and what it has read (the notebook: clues written down when searching, looking closely or
+ * putting things together). On the TV it heads the puzzles' column (#132), so it's never cut off: every item, on one
+ * line each, and the newest notes.
  */
-function RoomLog({ stage, notebook = false, tv = false }: { stage: EscapeStageView; notebook?: boolean; tv?: boolean }) {
-  const found = (
-    <section key="found">
-      <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">What you've found</h2>
+function Found({ stage, tv = false }: { stage: EscapeStageView; tv?: boolean }) {
+  return (
+    <section className={tv ? 'shrink-0 rounded-xl border border-line bg-surface/70 p-3' : 'space-y-3'} data-testid="found">
+      <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">🎒 What you've found</h2>
       {stage.inventory.length === 0 ? (
-        <p className="mt-2 text-sm text-muted">Nothing yet.</p>
+        <p className="mt-1 text-sm text-muted">Nothing yet: search the room.</p>
       ) : (
-        <ul className="mt-2 space-y-1 text-sm 2xl:text-base">
+        <ul className={`mt-2 text-sm 2xl:text-base ${tv ? 'grid grid-cols-2 gap-x-4 gap-y-1' : 'space-y-1'}`} data-testid="found-items">
           {stage.inventory.map((i) => (
-            <li key={i.id}>
-              🎒 <span className="text-ink">{i.name}</span> <span className="text-muted">— {i.description}</span>
+            <li key={i.id} className={tv ? 'min-w-0 truncate' : ''} title={i.description}>
+              <span className="text-ink">{i.name}</span> <span className="text-muted">— {i.description}</span>
             </li>
           ))}
         </ul>
       )}
+      {stage.notebook.length > 0 && (
+        <div className={tv ? 'mt-3' : ''}>
+          <Notebook notes={stage.notebook} limit={tv ? 3 : undefined} clamp={tv} />
+        </div>
+      )}
     </section>
   )
-  const happened = (
-    <section key="happened" aria-live="polite">
-      {notebook && <Notebook notes={stage.notebook} limit={5} />}
-      <h2 className="mt-4 text-xs font-semibold tracking-widest text-accent uppercase first:mt-0">What's happened</h2>
+}
+
+/** What's happened, newest first: the live part of the room. */
+function Happened({ stage }: { stage: EscapeStageView }) {
+  return (
+    <section aria-live="polite" className="min-h-0">
+      <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">What's happened</h2>
       <ul className="mt-2 space-y-1 text-sm text-muted 2xl:text-base">
         {[...stage.feed].reverse().slice(0, 6).map((f) => (
           <li key={f.at + f.text}>{f.text}</li>
         ))}
       </ul>
     </section>
-  )
-  return tv ? (
-    <div className="min-h-0 space-y-4">
-      {happened}
-      {found}
-    </div>
-  ) : (
-    <>
-      {found}
-      {happened}
-    </>
   )
 }
 

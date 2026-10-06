@@ -28,6 +28,15 @@ public sealed record InspectItem(DateTimeOffset Now, Guid SeatId, string ItemId)
 /// <summary>A player tries two items together.</summary>
 public sealed record CombineItems(DateTimeOffset Now, Guid SeatId, string First, string Second) : EscapeCommand(Now);
 
+/// <summary>A player takes a puzzle to work on (#132): while puzzles go to people, only they can answer it.</summary>
+public sealed record TakePuzzle(DateTimeOffset Now, Guid SeatId, string PuzzleId) : EscapeCommand(Now);
+
+/// <summary>A puzzle goes back to the table for anyone to take. <paramref name="SeatId"/> is null when the host frees it from the TV.</summary>
+public sealed record ReleasePuzzle(DateTimeOffset Now, Guid? SeatId, string PuzzleId) : EscapeCommand(Now);
+
+/// <summary>Its holder hands a puzzle to someone else at the table.</summary>
+public sealed record PassPuzzle(DateTimeOffset Now, Guid SeatId, string PuzzleId, Guid ToSeatId) : EscapeCommand(Now);
+
 /// <summary>A player presses one light in a Switches puzzle (cells numbered row by row from 0).</summary>
 public sealed record PressSwitch(DateTimeOffset Now, Guid SeatId, string PuzzleId, int Cell) : EscapeCommand(Now);
 

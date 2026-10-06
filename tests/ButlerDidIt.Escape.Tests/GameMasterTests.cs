@@ -62,12 +62,17 @@ public class GameMasterTests
         var s = Started(AllOn);
         Assert.Equal([CueKind.Start], s.Cues.Select(c => c.Kind));
 
-        // The state keeps only the latest few moments, so collect them as they happen.
+        // The state keeps only the latest few moments, so collect them after every move: one search can be a
+        // moment of its own (an empty one costs time on Normal, #132), and a solve can take several moves.
         var seen = new Dictionary<int, EscapeCue>();
         for (var i = 0; s.Phase == EscapePhase.Playing; i++)
         {
-            s = SolveNext(s, T0.AddMinutes(i + 1));
-            foreach (var cue in s.Cues) seen.TryAdd(cue.Id, cue);
+            var solved = s.Solved.Count;
+            while (s.Phase == EscapePhase.Playing && s.Solved.Count == solved)
+            {
+                s = EscapeEngine.Apply(s, Workshop, EscapeBot.NextMove(s, EscapeEngine.RoomFor(s, Workshop), Ben, T0.AddMinutes(i + 1)));
+                foreach (var cue in s.Cues) seen.TryAdd(cue.Id, cue);
+            }
         }
         var cues = seen.Values.OrderBy(c => c.Id).ToList();
         var kinds = cues.Select(c => c.Kind).ToList();

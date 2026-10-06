@@ -864,6 +864,21 @@ export interface EscapeDefaults {
   /** A replay is of one shared set, so it's never a default */
   puzzles: Exclude<PuzzleChoice, 'replay'>
   useAi: boolean
+  /** Who answers the puzzles (#132) */
+  answering: AnswerRule
+}
+
+/**
+ * Who may answer an escape room puzzle (#132): anyone; whoever takes it (one at a time); or whoever it was dealt to.
+ * While puzzles go to people, only a puzzle's holder can find its hidden clue pieces and read where its key is written.
+ */
+export type AnswerRule = 'anyone' | 'takeIt' | 'dealt'
+
+/** Who is working on a puzzle. `free`: they haven't tried it for a while, so someone else may take it over. */
+export interface EscapeHoldView {
+  seatId: string
+  name: string
+  free: boolean
 }
 
 export interface LeaderboardEntry {
@@ -929,6 +944,10 @@ export interface EscapePuzzleView {
   cipher: EscapeCipherView | null
   /** Deductions: the things to line up, for the logic grid */
   deduction: { items: string[]; spots: number } | null
+  /** Who is working on it, while puzzles go to people; null when nobody is (or anyone may answer) */
+  heldBy: EscapeHoldView | null
+  /** Ciphers: spots in this part of the room with its key (or a decoy) written on them, not yet found */
+  keysHidden: number
 }
 
 export type CipherType = 'shift' | 'symbols' | 'morse' | 'numbers' | 'mirror'
@@ -1049,6 +1068,10 @@ export interface EscapeStageView {
   introVoiceUrl: string | null
   /** The game master reading the current stage's description, or null. Never a later stage's */
   stageVoiceUrl: string | null
+  /** Who may answer a puzzle as the game plays now: 'anyone' with a single player, whatever was chosen */
+  answering: AnswerRule
+  /** What a search that turns up nothing new costs, in seconds (0 on Easy) */
+  searchPenaltySeconds: number
 }
 
 /** What a room's media place holds (C# MediaKind; a room never holds a "photo", which is a guest's selfie). */
