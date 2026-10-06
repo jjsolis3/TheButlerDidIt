@@ -601,7 +601,7 @@
     },
     {
       "id": "dining-search",
-      "title": "The Dining Hall",
+      "title": "Something to Prise With",
       "kind": "search",
       "prompt": "Those boards and vents won't open with bare hands. Search the host stand, the coat check and the prize booth for something to prise them with.",
       "finds": [
