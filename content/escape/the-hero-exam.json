@@ -53,7 +53,7 @@
             "y": 20,
             "w": 170,
             "h": 160,
-            "label": "Captain Comet's locker",
+            "label": "captain's steel locker",
             "look": "Through the X-ray goggles you can see right inside the steel locker: a signed photo of Captain Comet and, scratched on the back wall, 'Slide back {key:hero-motto}.'",
             "requires": "x-ray-goggles",
             "lockedText": "A big steel locker with a heavy lock. Something's written inside, but you can't see through steel... yet."
@@ -73,7 +73,7 @@
           },
           {
             "id": "trophy-cabinet",
-            "prop": "cabinet",
+            "prop": "trophy",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -114,7 +114,7 @@
           },
           {
             "id": "laundry-basket",
-            "prop": "barrel",
+            "prop": "clothes",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -136,7 +136,7 @@
           },
           {
             "id": "costume-rail",
-            "prop": "statue",
+            "prop": "clothes",
             "x": 615,
             "y": 220,
             "w": 170,
@@ -231,7 +231,7 @@
         "objects": [
           {
             "id": "rubble",
-            "prop": "crate",
+            "prop": "rock",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -243,7 +243,7 @@
           },
           {
             "id": "toppled-bus",
-            "prop": "machine",
+            "prop": "vehicle",
             "x": 215,
             "y": 20,
             "w": 170,
@@ -286,7 +286,7 @@
           },
           {
             "id": "cardboard-shop",
-            "prop": "box",
+            "prop": "food",
             "x": 15,
             "y": 220,
             "w": 170,
@@ -412,17 +412,17 @@
           },
           {
             "id": "robot",
-            "prop": "statue",
+            "prop": "robot",
             "x": 215,
             "y": 20,
             "w": 170,
             "h": 160,
-            "label": "Doctor Dilemma",
+            "label": "giant robot",
             "look": "A huge robot with glowing red eyes, clanking up and down. On his back is an empty socket. Clank. Clank. CLANK."
           },
           {
             "id": "villain-screens",
-            "prop": "machine",
+            "prop": "screen",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -455,7 +455,7 @@
           },
           {
             "id": "levers",
-            "prop": "machine",
+            "prop": "lever",
             "x": 15,
             "y": 220,
             "w": 170,
@@ -466,7 +466,7 @@
           },
           {
             "id": "spinny-chair",
-            "prop": "statue",
+            "prop": "table",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -488,7 +488,7 @@
           },
           {
             "id": "villain-cape",
-            "prop": "lamp",
+            "prop": "clothes",
             "x": 615,
             "y": 220,
             "w": 170,
@@ -499,7 +499,7 @@
           },
           {
             "id": "snack-stash",
-            "prop": "crate",
+            "prop": "food",
             "x": 815,
             "y": 220,
             "w": 170,

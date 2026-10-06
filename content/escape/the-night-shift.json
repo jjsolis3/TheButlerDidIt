@@ -51,7 +51,7 @@
         "objects": [
           {
             "id": "monitors",
-            "prop": "machine",
+            "prop": "screen",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -114,7 +114,7 @@
           },
           {
             "id": "coat-rack",
-            "prop": "statue",
+            "prop": "clothes",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -217,7 +217,7 @@
         "objects": [
           {
             "id": "show-stage",
-            "prop": "statue",
+            "prop": "robot",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -237,7 +237,7 @@
           },
           {
             "id": "claw-machine",
-            "prop": "machine",
+            "prop": "arcade",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -250,7 +250,7 @@
           },
           {
             "id": "arcade-games",
-            "prop": "machine",
+            "prop": "arcade",
             "x": 615,
             "y": 20,
             "w": 170,
@@ -271,7 +271,7 @@
           },
           {
             "id": "party-table",
-            "prop": "table",
+            "prop": "food",
             "x": 15,
             "y": 220,
             "w": 170,
@@ -315,7 +315,7 @@
           },
           {
             "id": "birthday-throne",
-            "prop": "statue",
+            "prop": "table",
             "x": 815,
             "y": 220,
             "w": 170,
@@ -347,7 +347,7 @@
           },
           {
             "id": "dessert-cart",
-            "prop": "table",
+            "prop": "food",
             "x": 415,
             "y": 420,
             "w": 170,
@@ -399,7 +399,7 @@
         "objects": [
           {
             "id": "head-shelf",
-            "prop": "shelf",
+            "prop": "robot",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -463,7 +463,7 @@
           },
           {
             "id": "costume-rack",
-            "prop": "statue",
+            "prop": "clothes",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -507,7 +507,7 @@
           },
           {
             "id": "sound-desk",
-            "prop": "machine",
+            "prop": "lever",
             "x": 15,
             "y": 420,
             "w": 170,

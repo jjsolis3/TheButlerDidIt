@@ -72,7 +72,7 @@
           },
           {
             "id": "drum-pads",
-            "prop": "machine",
+            "prop": "speaker",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -82,7 +82,7 @@
           },
           {
             "id": "hoshi-figures",
-            "prop": "shelf",
+            "prop": "trophy",
             "x": 615,
             "y": 20,
             "w": 170,
@@ -113,7 +113,7 @@
           },
           {
             "id": "costume-rack",
-            "prop": "statue",
+            "prop": "clothes",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -189,7 +189,7 @@
           },
           {
             "id": "water-cooler",
-            "prop": "machine",
+            "prop": "water",
             "x": 615,
             "y": 420,
             "w": 170,
@@ -216,7 +216,7 @@
         "objects": [
           {
             "id": "mixing-desk",
-            "prop": "machine",
+            "prop": "lever",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -226,7 +226,7 @@
           },
           {
             "id": "speaker-stack",
-            "prop": "box",
+            "prop": "speaker",
             "x": 215,
             "y": 20,
             "w": 170,
@@ -237,7 +237,7 @@
           },
           {
             "id": "riser-spot",
-            "prop": "statue",
+            "prop": "rug",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -252,7 +252,7 @@
             "y": 20,
             "w": 170,
             "h": 160,
-            "label": "under the desk",
+            "label": "space under the desk",
             "look": "By the glow stick's green light, you spot a small key on a guitar-pick keyring, taped under the desk!",
             "gives": "booth-key",
             "requires": "glow-stick",
@@ -292,7 +292,7 @@
           },
           {
             "id": "producer-laptop",
-            "prop": "desk",
+            "prop": "screen",
             "x": 415,
             "y": 220,
             "w": 170,
@@ -303,7 +303,7 @@
           },
           {
             "id": "snack-table",
-            "prop": "table",
+            "prop": "food",
             "x": 615,
             "y": 220,
             "w": 170,
@@ -314,7 +314,7 @@
           },
           {
             "id": "headsets",
-            "prop": "shelf",
+            "prop": "microphone",
             "x": 815,
             "y": 220,
             "w": 170,
@@ -418,7 +418,7 @@
           },
           {
             "id": "giant-screen",
-            "prop": "painting",
+            "prop": "screen",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -438,7 +438,7 @@
           },
           {
             "id": "mic-stand",
-            "prop": "lamp",
+            "prop": "microphone",
             "x": 815,
             "y": 20,
             "w": 170,

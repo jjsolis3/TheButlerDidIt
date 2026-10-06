@@ -66,7 +66,7 @@
           },
           {
             "id": "mossy-boulder",
-            "prop": "statue",
+            "prop": "rock",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -78,7 +78,7 @@
           },
           {
             "id": "dark-stone",
-            "prop": "crate",
+            "prop": "rock",
             "x": 615,
             "y": 20,
             "w": 170,
@@ -101,7 +101,7 @@
           },
           {
             "id": "oak-tree",
-            "prop": "plant",
+            "prop": "tree",
             "x": 15,
             "y": 220,
             "w": 170,
@@ -123,7 +123,7 @@
           },
           {
             "id": "sheep-field",
-            "prop": "statue",
+            "prop": "animal",
             "x": 415,
             "y": 220,
             "w": 170,
@@ -145,7 +145,7 @@
           },
           {
             "id": "pond",
-            "prop": "rug",
+            "prop": "water",
             "x": 815,
             "y": 220,
             "w": 170,
@@ -200,7 +200,7 @@
           },
           {
             "id": "chicken-coop",
-            "prop": "box",
+            "prop": "animal",
             "x": 815,
             "y": 420,
             "w": 170,
@@ -229,7 +229,7 @@
         "objects": [
           {
             "id": "underground-lake",
-            "prop": "rug",
+            "prop": "water",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -242,7 +242,7 @@
           },
           {
             "id": "lava-pool",
-            "prop": "barrel",
+            "prop": "lava",
             "x": 215,
             "y": 20,
             "w": 170,
@@ -255,7 +255,7 @@
           },
           {
             "id": "gravel-pile",
-            "prop": "crate",
+            "prop": "rock",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -299,7 +299,7 @@
           },
           {
             "id": "old-minecart",
-            "prop": "box",
+            "prop": "vehicle",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -332,7 +332,7 @@
           },
           {
             "id": "stalagmites",
-            "prop": "statue",
+            "prop": "rock",
             "x": 815,
             "y": 220,
             "w": 170,
@@ -402,7 +402,7 @@
         "objects": [
           {
             "id": "portal-frame",
-            "prop": "door",
+            "prop": "portal",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -432,7 +432,7 @@
           },
           {
             "id": "rune-stone",
-            "prop": "statue",
+            "prop": "rock",
             "x": 615,
             "y": 20,
             "w": 170,
@@ -531,7 +531,7 @@
           },
           {
             "id": "beacon-base",
-            "prop": "machine",
+            "prop": "lamp",
             "x": 415,
             "y": 420,
             "w": 170,

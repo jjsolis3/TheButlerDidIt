@@ -75,7 +75,7 @@
           },
           {
             "id": "portal",
-            "prop": "door",
+            "prop": "portal",
             "x": 415,
             "y": 20,
             "w": 170,
@@ -85,7 +85,7 @@
           },
           {
             "id": "leaderboard",
-            "prop": "sign",
+            "prop": "screen",
             "x": 615,
             "y": 20,
             "w": 170,
@@ -116,7 +116,7 @@
           },
           {
             "id": "trophy-wall",
-            "prop": "shelf",
+            "prop": "trophy",
             "x": 215,
             "y": 220,
             "w": 170,
@@ -138,7 +138,7 @@
           },
           {
             "id": "emote-screen",
-            "prop": "machine",
+            "prop": "screen",
             "x": 615,
             "y": 220,
             "w": 170,
@@ -160,7 +160,7 @@
           },
           {
             "id": "chat-screen",
-            "prop": "sign",
+            "prop": "screen",
             "x": 15,
             "y": 420,
             "w": 170,
@@ -171,7 +171,7 @@
           },
           {
             "id": "skin-rack",
-            "prop": "statue",
+            "prop": "clothes",
             "x": 215,
             "y": 420,
             "w": 170,
@@ -264,7 +264,7 @@
           },
           {
             "id": "playground",
-            "prop": "statue",
+            "prop": "tree",
             "x": 615,
             "y": 20,
             "w": 170,
@@ -308,7 +308,7 @@
           },
           {
             "id": "foggy-park",
-            "prop": "plant",
+            "prop": "tree",
             "x": 415,
             "y": 220,
             "w": 170,
@@ -401,7 +401,7 @@
         "objects": [
           {
             "id": "gate-control",
-            "prop": "machine",
+            "prop": "lever",
             "x": 15,
             "y": 20,
             "w": 170,
@@ -421,12 +421,12 @@
           },
           {
             "id": "tagalong",
-            "prop": "statue",
+            "prop": "robot",
             "x": 415,
             "y": 20,
             "w": 170,
             "h": 160,
-            "label": "Tagalong",
+            "label": "grinning hunter",
             "look": "A tall, blocky figure with a huge glowing grin, sitting on the gate. 'Wanna play?'"
           },
           {
@@ -495,7 +495,7 @@
           },
           {
             "id": "puddle",
-            "prop": "rug",
+            "prop": "water",
             "x": 815,
             "y": 220,
             "w": 170,
