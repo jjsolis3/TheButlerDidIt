@@ -3,8 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Button, ErrorText, inputClass } from '../components/ui'
 import { SaveDefaults } from '../components/SaveDefaults'
 import { api } from '../lib/api'
-import { ESCAPE_MODES } from '../lib/partyOptions'
-import type { AiStatus, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
+import { ANSWER_RULES, ESCAPE_MODES } from '../lib/partyOptions'
+import type { AiStatus, AnswerRule, EscapeDifficulty, EscapeRoomSummary, GenerationJob, PartyMode, PuzzleChoice } from '../lib/types'
 import { GenerateEscapeRoom } from './GenerateEscapeRoom'
 import { RoomCardBody, ShelfControls } from './RoomShelf'
 import { roomTitleId, useRoomShelf } from './useRoomShelf'
@@ -30,6 +30,8 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
     return d === 'easy' || d === 'hard' ? d : 'normal'
   })
   const [mode, setMode] = useState<PartyMode>('sharedScreen')
+  // Who answers (#132): taking a puzzle each shares the room out at a family table.
+  const [answering, setAnswering] = useState<AnswerRule>('takeIt')
   // Fresh puzzles every time by default; today's challenge races every other group; a puzzle set
   // number (shown at the end of every game) replays exactly the same puzzles.
   const [puzzles, setPuzzles] = useState<PuzzleChoice>('fresh')
@@ -52,6 +54,7 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
       if (!askedDifficulty) setDifficulty(p.escape.difficulty)
       setPuzzles(p.escape.puzzles)
       setUseAi(p.escape.useAi)
+      setAnswering(p.escape.answering)
     }, () => {}) // none saved, or offline: the page's own defaults
   }, [askedRoom, askedMinutes, askedDifficulty, setShelf])
 
@@ -111,7 +114,7 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
     setBusy(true)
     setError(null)
     try {
-      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi, minutes ?? null, difficulty)
+      const party = await api.createEscapeParty(roomId, mode, puzzles, puzzles === 'replay' ? Number(puzzleSet) : null, aiAvailable && useAi, minutes ?? null, difficulty, answering)
       navigate(`/stage/${party.code}`)
     } catch (e) {
       setError((e as Error).message)
@@ -186,9 +189,9 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
             <div className="grid gap-2 sm:grid-cols-3">
               {(
                 [
-                  ['easy', '🙂 Easy', 'Fewer clues to gather, and hints cost half the time.'],
-                  ['normal', '😐 Normal', 'The room as it was written.'],
-                  ['hard', '😈 Hard', 'More clues, tougher codes, hints that only nudge, and empty hiding places cost time.'],
+                  ['easy', '🙂 Easy', 'Fewer clues to gather, hints cost half the time, and searching is free.'],
+                  ['normal', '😐 Normal', 'The room as it was written. A search that turns up nothing costs 10 seconds.'],
+                  ['hard', '😈 Hard', 'More clues, tougher codes, hints that only nudge, and an empty search costs 20 seconds.'],
                 ] as const
               ).map(([value, label, text]) => (
                 <label key={value} className={`cursor-pointer rounded-xl border p-3 ${difficulty === value ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}>
@@ -246,6 +249,17 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
             </label>
           ))}
         </div>
+        <h3 className="pt-2 text-sm font-semibold">Who answers the puzzles?</h3>
+        <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Who answers the puzzles?">
+          {ANSWER_RULES.map(({ id: value, title: label, body: text }) => (
+            <label key={value} className={`cursor-pointer rounded-xl border p-3 ${answering === value ? 'border-accent bg-accent/10' : 'border-line bg-surface'}`}>
+              <input type="radio" name="escape-answering" className="sr-only" checked={answering === value} onChange={() => setAnswering(value)} />
+              <span className="font-semibold">{label}</span>
+              <span className="mt-1 block text-xs text-muted">{text}</span>
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-muted">With a puzzle each, only its holder can find what it needs by searching: its hidden clue pieces and its key.</p>
       </section>
 
       {aiAvailable && ai && (
@@ -285,6 +299,7 @@ export function NewEscapeParty({ locked = false }: { locked?: boolean }) {
                 difficulty,
                 puzzles: puzzles === 'replay' ? 'fresh' : puzzles,
                 useAi,
+                answering,
               },
             })}
           />

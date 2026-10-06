@@ -82,13 +82,24 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
             )}
           </section>
 
-          {stage.scene && <SceneView scene={stage.scene} artUrl={stage.artUrl} feed={stage.feed} onExamine={(id) => invoke('EscapeExamine', id)} />}
+          {stage.scene && (
+            <SceneView
+              scene={stage.scene}
+              artUrl={stage.artUrl}
+              feed={stage.feed}
+              onExamine={(id) => invoke('EscapeExamine', id)}
+              penaltySeconds={stage.searchPenaltySeconds}
+            />
+          )}
 
           <section className="space-y-3">
             <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">In front of you</h2>
-            {stage.puzzles.map((p) => (
-              <PuzzleCard key={p.id} code={code} puzzle={p} penalty={stage.hintPenaltySeconds} gameMaster={stage.gameMaster?.name ?? null} invoke={invoke} />
-            ))}
+            {/* Yours first, then the ones nobody has taken, then the others', then the solved ones. */}
+            {[...stage.puzzles]
+              .sort((a, b) => order(a, player.seatId) - order(b, player.seatId))
+              .map((p) => (
+                <PuzzleCard key={p.id} code={code} puzzle={p} stage={stage} me={player.seatId} invoke={invoke} />
+              ))}
           </section>
 
           <ItemInspector items={stage.inventory} invoke={invoke} />
@@ -118,7 +129,19 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
   )
 }
 
-function PuzzleCard({ code, puzzle: p, penalty, gameMaster, invoke }: { code: string; puzzle: EscapePuzzleView; penalty: number; gameMaster: string | null; invoke: Invoke }) {
+const order = (p: EscapePuzzleView, me: string) => (p.solved ? 3 : p.heldBy?.seatId === me ? 0 : p.heldBy ? 2 : 1)
+
+/**
+ * One puzzle on a phone. While puzzles go to people (#132), only its holder gets the controls to answer it: anyone
+ * else sees who's on it (and can take over once they've stopped trying). Its holder can hand it back or pass it on.
+ */
+function PuzzleCard({ code, puzzle: p, stage, me, invoke }: { code: string; puzzle: EscapePuzzleView; stage: EscapeStageView; me: string; invoke: Invoke }) {
+  const penalty = stage.hintPenaltySeconds
+  const gameMaster = stage.gameMaster?.name ?? null
+  const turns = stage.answering !== 'anyone' && p.kind !== 'search'
+  const mine = turns && p.heldBy?.seatId === me
+  // Whose things a search can find: the holder's, or anyone's when anyone may answer.
+  const finder = !turns ? null : mine ? 'only you can find them' : p.heldBy ? `only ${p.heldBy.name} can find them` : 'whoever takes this one can find them'
   const [answer, setAnswer] = useState('')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<string | null>(null)
@@ -155,6 +178,12 @@ function PuzzleCard({ code, puzzle: p, penalty, gameMaster, invoke }: { code: st
       return null
     })
   }
+  const act = (method: string, ...args: unknown[]) =>
+    void run(async () => {
+      await invoke(method, p.id, ...args)
+      return null
+    })
+  const others = stage.players.filter((x) => x.seatId !== me)
 
   return (
     <article className={`rounded-xl border p-3 ${p.solved ? 'border-green-600/60' : 'border-line'} bg-surface`} data-testid={`phone-puzzle-${p.id}`}>
@@ -165,14 +194,63 @@ function PuzzleCard({ code, puzzle: p, penalty, gameMaster, invoke }: { code: st
       <p className="mt-1 text-sm text-ink/90">{p.prompt}</p>
       {!p.solved && p.piecesHidden > 0 && (
         <p className="mt-1 text-xs text-accent">
-          🧩 {p.piecesHidden} clue piece{p.piecesHidden === 1 ? '' : 's'} still hidden in the room
+          🧩 {p.piecesHidden} clue piece{p.piecesHidden === 1 ? '' : 's'} still hidden in the room{finder ? `: ${finder}` : ''}
         </p>
+      )}
+      {!p.solved && p.keysHidden > 0 && (
+        <p className="mt-1 text-xs text-accent">
+          🔑 Its key is written on something in this room{finder ? `: ${finder}` : ''}
+        </p>
+      )}
+      {!p.solved && turns && (
+        <div className="mt-2 rounded-lg bg-bg/60 p-2 text-sm" data-testid="puzzle-turn">
+          {!p.heldBy ? (
+            <Button className="w-full" disabled={busy} onClick={() => act('EscapeTake')}>
+              🙋 Take this puzzle
+            </Button>
+          ) : mine ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold text-accent">🙋 You're on this one.</span>
+              <button className="text-xs text-muted underline hover:text-ink" disabled={busy} onClick={() => act('EscapeRelease')}>
+                Hand it back
+              </button>
+              {others.length > 0 && (
+                <select
+                  aria-label={`Pass ${p.title} to`}
+                  className="rounded border border-line bg-bg px-2 py-1 text-xs"
+                  value=""
+                  disabled={busy}
+                  onChange={(e) => e.target.value && act('EscapePass', e.target.value)}
+                >
+                  <option value="">Pass it to…</option>
+                  {others.map((o) => (
+                    <option key={o.seatId} value={o.seatId}>
+                      {o.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span>
+                🙋 <span className="font-semibold">{p.heldBy.name}</span> is on this one.
+                {p.heldBy.free && <span className="text-muted"> They haven't tried it for a while.</span>}
+              </span>
+              {p.heldBy.free && (
+                <Button variant="ghost" className="min-h-9 py-1" disabled={busy} onClick={() => act('EscapeTake')}>
+                  Take over
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       )}
       {p.solved ? (
         <p className="mt-2 text-sm text-green-300">{p.solvedText}</p>
       ) : p.needs.length > 0 ? (
         <p className="mt-2 text-xs text-muted">You need {p.needs.join(' and ')} first.</p>
-      ) : p.kind === 'use' ? (
+      ) : turns && !mine ? null : p.kind === 'use' ? (
         <Button className="mt-3 w-full" disabled={busy} onClick={use}>
           Use it
         </Button>

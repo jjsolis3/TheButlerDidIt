@@ -45,6 +45,8 @@ export default function NewParty() {
   // ?game=escape opens the escape rooms, e.g. from "Host another game" on an escape room's ending.
   const [params] = useSearchParams()
   const [game, setGame] = useState<GameKind>(params.get('game') === 'escape' ? 'escapeRoom' : 'mystery')
+  // Set once the host picks a tab, so their usual settings, arriving a moment later, don't switch it back.
+  const pickedGame = useRef(false)
 
   // Signing in comes back here, to the same game and room (e.g. "Host this room" on /escape).
   const location = useLocation()
@@ -62,7 +64,7 @@ export default function NewParty() {
   useEffect(() => {
     if (!signedIn) return
     api.account.preferences().then((p) => {
-      if (!askedGame) setGame(p.game)
+      if (!askedGame && !pickedGame.current) setGame(p.game)
       setMode(p.mystery.mode)
       setShelf(p.mystery.shelf)
       setTone(p.mystery.tone)
@@ -126,7 +128,10 @@ export default function NewParty() {
             key={kind}
             role="tab"
             aria-selected={game === kind}
-            onClick={() => setGame(kind)}
+            onClick={() => {
+              pickedGame.current = true
+              setGame(kind)
+            }}
             className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${game === kind ? 'bg-accent text-bg' : 'text-muted hover:text-ink'}`}
           >
             {label}

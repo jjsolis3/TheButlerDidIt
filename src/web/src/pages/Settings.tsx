@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Button, Card, ErrorText, Eyebrow, Heading, Shell } from '../components/ui'
 import { api } from '../lib/api'
-import { DIFFICULTIES, ESCAPE_MODES, MODES, TONES } from '../lib/partyOptions'
+import { ANSWER_RULES, DIFFICULTIES, ESCAPE_MODES, MODES, TONES } from '../lib/partyOptions'
 import type { ContentRating, HostPreferences } from '../lib/types'
 import { useMe } from '../lib/useMe'
 
@@ -186,6 +186,12 @@ export default function Settings() {
             value={escape.mode}
             options={ESCAPE_MODES.map((m) => ({ id: m.id, title: m.title }))}
             onChange={(mode) => change((p) => ({ ...p, escape: { ...p.escape, mode } }))}
+          />
+          <Choice
+            label="Who answers the puzzles"
+            value={escape.answering}
+            options={ANSWER_RULES.map((a) => ({ id: a.id, title: a.title }))}
+            onChange={(answering) => change((p) => ({ ...p, escape: { ...p.escape, answering } }))}
           />
           <Choice label="Shelf" value={escape.shelf} options={SHELVES} onChange={(shelf) => change((p) => ({ ...p, escape: { ...p.escape, shelf } }))} />
           <Choice

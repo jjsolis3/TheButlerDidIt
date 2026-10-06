@@ -88,6 +88,8 @@ test('a host copies a built-in room, edits it, and plays their own version', asy
   await expect(card).toContainText('Your own copy')
   await expect(card).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('link', { name: '✏️ Edit' })).toBeVisible()
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await page.getByText('👐 Anyone, any time').click()
   await page.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await page.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   await expect(page.getByRole('heading', { name: "Grandpa's Workshop" })).toBeVisible()

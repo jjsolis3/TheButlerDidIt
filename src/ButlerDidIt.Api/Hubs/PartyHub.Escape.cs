@@ -62,6 +62,34 @@ public sealed partial class PartyHub
         await escape.ExecuteAsync(partyId, (_, now) => new PressSwitch(now, seatId, puzzleId, cell));
     }
 
+    /// <summary>Take a puzzle to work on (#132): while puzzles go to people, only its holder answers it.</summary>
+    public async Task EscapeTake(string puzzleId)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new TakePuzzle(now, seatId, puzzleId));
+    }
+
+    /// <summary>Hand a puzzle back to the table, for anyone to take.</summary>
+    public async Task EscapeRelease(string puzzleId)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new ReleasePuzzle(now, seatId, puzzleId));
+    }
+
+    /// <summary>Pass a puzzle straight to someone else at the table.</summary>
+    public async Task EscapePass(string puzzleId, Guid toSeatId)
+    {
+        var (seatId, partyId) = RequireSeat();
+        await escape.ExecuteAsync(partyId, (_, now) => new PassPuzzle(now, seatId, puzzleId, toSeatId));
+    }
+
+    /// <summary>The host frees a puzzle from the TV, whoever holds it.</summary>
+    public async Task EscapeHostFree(string code, string puzzleId)
+    {
+        var party = await RequireHostParty(code);
+        await escape.ExecuteAsync(party.Id, (_, now) => new ReleasePuzzle(now, null, puzzleId));
+    }
+
     /// <summary>A hint from a player's phone: written by the AI game master when the party has one.</summary>
     public async Task EscapeHint(string puzzleId)
     {

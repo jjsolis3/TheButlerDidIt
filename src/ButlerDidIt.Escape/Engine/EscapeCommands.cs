@@ -28,6 +28,15 @@ public sealed record InspectItem(DateTimeOffset Now, Guid SeatId, string ItemId)
 /// <summary>A player tries two items together.</summary>
 public sealed record CombineItems(DateTimeOffset Now, Guid SeatId, string First, string Second) : EscapeCommand(Now);
 
+/// <summary>A player takes a puzzle to work on (#132): while puzzles go to people, only they can answer it.</summary>
+public sealed record TakePuzzle(DateTimeOffset Now, Guid SeatId, string PuzzleId) : EscapeCommand(Now);
+
+/// <summary>A puzzle goes back to the table for anyone to take. <paramref name="SeatId"/> is null when the host frees it from the TV.</summary>
+public sealed record ReleasePuzzle(DateTimeOffset Now, Guid? SeatId, string PuzzleId) : EscapeCommand(Now);
+
+/// <summary>Its holder hands a puzzle to someone else at the table.</summary>
+public sealed record PassPuzzle(DateTimeOffset Now, Guid SeatId, string PuzzleId, Guid ToSeatId) : EscapeCommand(Now);
+
 /// <summary>A player presses one light in a Switches puzzle (cells numbered row by row from 0).</summary>
 public sealed record PressSwitch(DateTimeOffset Now, Guid SeatId, string PuzzleId, int Cell) : EscapeCommand(Now);
 
@@ -43,10 +52,13 @@ public sealed record CompleteEscapeHint(DateTimeOffset Now, Guid HintId, string 
 /// <summary>The AI failed: the room's written hint is shown instead (the time was still spent).</summary>
 public sealed record CancelEscapeHint(DateTimeOffset Now, Guid HintId) : EscapeCommand(Now);
 
-/// <summary>The game master's line for a moment, written by the AI.</summary>
-public sealed record SetCueNarration(DateTimeOffset Now, int CueId, string Text) : EscapeCommand(Now);
+/// <summary>
+/// The game master's line for a moment, written by the AI, with its recording when the party has a voice: the two
+/// arrive together, so the TV shows the words as it starts saying them (#132).
+/// </summary>
+public sealed record SetCueNarration(DateTimeOffset Now, int CueId, string Text, string? AudioUrl = null) : EscapeCommand(Now);
 
-/// <summary>A recording of that line.</summary>
+/// <summary>A recording of a line already shown (lines are now normally recorded first, see <see cref="SetCueNarration"/>).</summary>
 public sealed record SetCueAudio(DateTimeOffset Now, int CueId, string Url) : EscapeCommand(Now);
 
 /// <summary>Several moments piled up: only the newest gets a line, the ones before it are passed over.</summary>

@@ -19,11 +19,14 @@ export function SceneView({
   feed,
   onExamine,
   fit = false,
+  penaltySeconds = 0,
 }: {
   scene: EscapeSceneView
   artUrl: string | null
   feed: EscapeFeedEntry[]
   onExamine?: Examine
+  /** What a search that turns up nothing new costs (#132), for the "Search it again" button. */
+  penaltySeconds?: number
   /**
    * The TV layout (#116): fill the box it's given, as big as fits while keeping the scene's proportions, and
    * leave the list of what's been searched to the layout (`SearchedList`).
@@ -36,11 +39,13 @@ export function SceneView({
   const [error, setError] = useState<string | null>(null)
   const interactive = !!onExamine
 
-  const search = async (spot: EscapeSpotView) => {
+  const search = async (spot: EscapeSpotView, again = false) => {
     if (!onExamine || busy) return
     setError(null)
     setLast(spot.id)
-    if (spot.examined) return // already searched: just show what was there again
+    // Already searched: show what was there. Searching again is a choice (it may hold something only for whoever
+    // works on a puzzle, #132), so it's a button of its own, which says what an empty search costs.
+    if (spot.examined && !again) return
     setBusy(true)
     try {
       await onExamine(spot.id)
@@ -52,9 +57,10 @@ export function SceneView({
     }
   }
 
-  // Feedback for the last tap: what was there, or the penalty for a decoy on Hard (from the ticker).
+  // Feedback for the last tap: what was there, and the newest line about it in the ticker ("Nothing there (−10 s)",
+  // "found a clue piece"). A spot whose writing isn't yours to read stays unsearched, so the ticker is all there is.
   const lastSpot = scene.objects.find((o) => o.id === last)
-  const penalty = lastSpot && feed.findLast((f) => f.text.includes(`the ${lastSpot.label}. Nothing there`))
+  const lastLine = lastSpot && feed.findLast((f) => f.text.includes(` the ${lastSpot.label}`))?.text
 
   if (fit) {
     // The box is a size container, so the scene can be sized from both its width (cqw) and its height (cqh):
@@ -107,10 +113,17 @@ export function SceneView({
           {error ? (
             <p className="text-muted">🔒 {error}</p>
           ) : lastSpot?.examined ? (
-            <p>
-              🔎 <span className="font-semibold">{capitalise(lastSpot.label)}:</span> {lastSpot.look}
-              {penalty && <span className="text-red-300"> (−10 s)</span>}
-            </p>
+            <div className="space-y-1">
+              <p>
+                🔎 <span className="font-semibold">{capitalise(lastSpot.label)}:</span> {lastSpot.look}
+              </p>
+              {lastLine && <p className="text-xs text-muted">{lastLine}</p>}
+              <button className="text-xs text-muted underline hover:text-ink" disabled={busy} onClick={() => void search(lastSpot, true)}>
+                Search it again{penaltySeconds > 0 ? ` (−${penaltySeconds} s if there's nothing new)` : ''}
+              </button>
+            </div>
+          ) : lastSpot && lastLine ? (
+            <p className="text-sm">{lastLine}</p>
           ) : null}
         </div>
       )}

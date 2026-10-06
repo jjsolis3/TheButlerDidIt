@@ -94,25 +94,36 @@ public sealed class EscapeGameMaster(EscapeService escape, AiGateway ai, MediaSe
                 await escape.ExecuteAsync(partyId, (_, t) => new SkipCues(t, cue.Id + 1), ct);
                 continue;
             }
-            var spoken = await escape.ExecuteAsync(partyId, (_, t) => new SetCueNarration(t, cue.Id, text), ct);
-            if (spoken.State.Ai.Voice) await VoiceAsync(party, spoken, cue.Id, ct);
+            // With a voice, the line waits for its recording, so the TV shows the words as it starts saying them
+            // (#132): shown first, the group read it aloud before the voice caught up, seconds later.
+            var audio = session.State.Ai.Voice ? await VoiceAsync(party, session.Room, EscapeEngine.CutLine(text), ct) : null;
+            await escape.ExecuteAsync(partyId, (_, t) => new SetCueNarration(t, cue.Id, text, audio), ct);
         }
     }
 
-    /// <summary>Records the line in the game master's voice. The text is already on the TV, so on failure the browser reads it.</summary>
-    private async Task VoiceAsync(Party party, EscapeSession session, int cueId, CancellationToken ct)
+    /// <summary>How long a line waits for its recording before it's shown without one (and the TV's browser reads it).</summary>
+    public static readonly TimeSpan VoiceWait = TimeSpan.FromSeconds(12);
+
+    /// <summary>The line recorded in the game master's voice, or null if that fails or takes longer than <see cref="VoiceWait"/>.</summary>
+    private async Task<string?> VoiceAsync(Party party, EscapeRoom room, string line, CancellationToken ct)
     {
+        using var wait = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        wait.CancelAfter(VoiceWait);
         try
         {
-            var line = session.State.Cues.First(c => c.Id == cueId).Text!;
-            var host = session.Room.Host;
-            var assetId = await media.SpeechAsync(line, VoiceCasting.For($"game-master:{session.Room.Id}", host.Voice),
-                new AiCallContext(party.HostUserId, party.Id, Purpose: "escape-voice"), ct);
-            await escape.ExecuteAsync(party.Id, (_, now) => new SetCueAudio(now, cueId, MediaStore.Url(assetId)), ct);
+            var assetId = await media.SpeechAsync(line, VoiceCasting.For($"game-master:{room.Id}", room.Host.Voice),
+                new AiCallContext(party.HostUserId, party.Id, Purpose: "escape-voice"), wait.Token);
+            return MediaStore.Url(assetId);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            log.LogWarning("The game master's voice for party {PartyId} took over {Seconds} s; showing the line without it", party.Id, VoiceWait.TotalSeconds);
+            return null;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             log.LogWarning(ex, "Could not voice the game master's line for party {PartyId}", party.Id);
+            return null;
         }
     }
 }

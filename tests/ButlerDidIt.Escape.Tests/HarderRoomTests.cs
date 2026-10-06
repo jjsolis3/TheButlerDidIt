@@ -96,7 +96,10 @@ public class LaboratoryTests
 
         var ex = Assert.Throws<GameRuleException>(() => s.Do(new ExamineSpot(T0, Ada, "poster")));
         Assert.Contains("different light", ex.Message); // the room's own words, not "you need the UV lamp"
-        Assert.Throws<GameRuleException>(() => s.Do(new ExamineSpot(T0, Ada, "crate"))); // once is enough
+        // Searching it again is allowed, but it's had its find: nothing new, and on Normal that costs time (#132).
+        var again = s.Do(new ExamineSpot(T0, Ada, "crate"));
+        Assert.Equal(s.Deadline!.Value.AddSeconds(-EscapeEngine.SearchPenaltySeconds(EscapeDifficulty.Normal)), again.Deadline);
+        Assert.Equal(s.Inventory, again.Inventory);
         Assert.Throws<GameRuleException>(() => s.Do(new ExamineSpot(T0, Ada, "window"))); // the next stage's
 
         s = s.Do(new ExamineSpot(T0, Ada, "drawer"));
@@ -152,16 +155,26 @@ public class LaboratoryTests
     }
 
     [Fact]
-    public void Decoys_cost_time_only_on_hard_and_a_spot_holding_a_key_is_no_decoy()
+    public void An_empty_search_costs_time_except_on_easy_and_a_spot_holding_a_key_is_never_empty()
     {
-        var normal = Lab.Started(EscapeDifficulty.Normal);
-        Assert.Equal(normal.Deadline, normal.Do(new ExamineSpot(T0, Ada, "plant")).Deadline);
+        // #132: searching is a choice, not a free sweep of the room. Easy stays free for younger players.
+        var easy = Lab.Started(EscapeDifficulty.Easy);
+        Assert.Equal(easy.Deadline, easy.Do(new ExamineSpot(T0, Ada, "plant")).Deadline);
 
-        var hard = Lab.Started(EscapeDifficulty.Hard);
-        var searched = hard.Do(new ExamineSpot(T0, Ada, "plant"));
-        Assert.Equal(hard.Deadline!.Value.AddSeconds(-EscapeEngine.DecoyPenaltySeconds), searched.Deadline);
-        Assert.Contains("Nothing there", searched.Feed[^1].Text);
-        Assert.Equal(hard.Deadline, hard.Do(new ExamineSpot(T0, Ada, "painting")).Deadline); // the cipher's key is written on it
+        foreach (var (level, seconds) in new[] { (EscapeDifficulty.Normal, 10), (EscapeDifficulty.Hard, 20) })
+        {
+            var s = Lab.Started(level);
+            Assert.Equal(seconds, EscapeEngine.SearchPenaltySeconds(level));
+            var searched = s.Do(new ExamineSpot(T0, Ada, "plant"));
+            Assert.Equal(s.Deadline!.Value.AddSeconds(-seconds), searched.Deadline);
+            Assert.Contains("Nothing there", searched.Feed[^1].Text);
+            Assert.Equal(s.Deadline, s.Do(new ExamineSpot(T0, Ada, "painting")).Deadline); // the cipher's key is written on it
+
+            // Searching it again finds nothing new, and costs again.
+            var again = searched.Do(new ExamineSpot(T0, Ada, "plant"));
+            Assert.Equal(searched.Deadline!.Value.AddSeconds(-seconds), again.Deadline);
+            Assert.Contains("again. Nothing new", again.Feed[^1].Text);
+        }
     }
 
     [Fact]
@@ -327,16 +340,21 @@ public class LaboratoryTests
     }
 
     [Fact]
-    public void The_game_master_hears_about_finds()
+    public void The_game_master_hears_about_finds_and_about_time_wasted_on_empty_spots()
     {
         var s = EscapeEngine.NewGame(7, ai: new EscapeAiFeatures { GameMaster = true });
         s = s.Do(new AddEscapePlayer(T0, Ada, "Ada", true, false)).Do(new StartEscape(T0));
         s = s.Do(new ExamineSpot(T0, Ada, "crate"));
         Assert.Equal(CueKind.Found, s.Cues[^1].Kind);
         Assert.Equal("crate", s.Cues[^1].Thing);
-        var cues = s.Cues.Count;
-        s = s.Do(new ExamineSpot(T0, Ada, "plant")); // nothing there: nothing to say
-        Assert.Equal(cues, s.Cues.Count);
+        s = s.Do(new ExamineSpot(T0, Ada, "plant")); // nothing there, and it cost time: worth a remark
+        Assert.Equal((CueKind.Decoy, "plant"), (s.Cues[^1].Kind, s.Cues[^1].Thing));
+
+        // On Easy an empty search is free, so there's nothing to say.
+        var easy = EscapeEngine.NewGame(7, ai: new EscapeAiFeatures { GameMaster = true }, difficulty: EscapeDifficulty.Easy);
+        easy = easy.Do(new AddEscapePlayer(T0, Ada, "Ada", true, false)).Do(new StartEscape(T0));
+        var cues = easy.Cues.Count;
+        Assert.Equal(cues, easy.Do(new ExamineSpot(T0, Ada, "plant")).Cues.Count);
     }
 }
 

@@ -57,7 +57,9 @@ public static class EscapeProjector
             AmbienceUrl: (stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageAmbience(stage.Id))) ?? art?.GetValueOrDefault(EscapeArt.Ambience),
             IntroVoiceUrl: art?.GetValueOrDefault(EscapeArt.IntroVoice),
             // Like the stage's picture and video: a later stage's description stays unheard until it opens.
-            StageVoiceUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageVoice(stage.Id)));
+            StageVoiceUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageVoice(stage.Id)),
+            Answering: s.TakesTurns() ? s.Answering : AnswerRule.Anyone,
+            SearchPenaltySeconds: EscapeEngine.SearchPenaltySeconds(s.Level));
     }
 
     private static EscapeSceneView Scene(EscapeState s, EscapeScene scene) => new(
@@ -115,7 +117,19 @@ public static class EscapeProjector
             Finds: p.Kind == PuzzleKind.Search ? new EscapeFindsView(p.Finds.Count(s.Examined.Contains), p.Finds.Count) : null,
             Switches: p.Grid is { } grid ? new EscapeSwitchesView(grid.Size, EscapeEngine.LitNow(s, p)) : null,
             Cipher: p.Decoder is { } d ? Cipher(s, room, p, d) : null,
-            Deduction: p.Lineup.Count > 0 ? new EscapeDeductionView(p.Lineup, p.Lineup.Count) : null);
+            Deduction: p.Lineup.Count > 0 ? new EscapeDeductionView(p.Lineup, p.Lineup.Count) : null,
+            // Who's on it is public: the TV shows it, so the table knows who to talk to.
+            HeldBy: solved is null && s.TakesTurns() && s.Holds.TryGetValue(p.Id, out var hold) && s.FindPlayer(hold.SeatId) is { } holder
+                ? new EscapeHoldView(holder.SeatId, holder.Name, now - hold.Active >= EscapeEngine.TakeOverAfter)
+                : null,
+            // A count, never where: finding them is the search.
+            KeysHidden: solved is null ? KeySpotsLeft(s, room, p) : 0);
+    }
+
+    private static int KeySpotsLeft(EscapeState s, EscapeRoom room, EscapePuzzle p)
+    {
+        if (p.Decoder is null || room.StageOf(p.Id)?.Scene is not { } scene) return 0;
+        return scene.Objects.Count(o => p.KeyAt.Contains($"object:{o.Id}") && !s.Examined.Contains(o.Id));
     }
 
     private static EscapeCipherView Cipher(EscapeState s, EscapeRoom room, EscapePuzzle p, CipherDecoder d)

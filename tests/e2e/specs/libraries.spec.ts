@@ -89,6 +89,8 @@ test('the admin improves a built-in escape room for every host', async ({ browse
   await shared.getByRole('link', { name: 'Host it' }).click()
   await host.waitForURL(/\/host\/new\?game=escape&room=the-bunker-[0-9a-f]{6}$/)
   await expect(host.getByRole('button', { name: /The Bunker \(revised\)/ })).toHaveAttribute('aria-pressed', 'true')
+  // Anyone answers: these specs play the room itself; taking puzzles (#132) has its own spec.
+  await host.getByText('👐 Anyone, any time').click()
   await host.getByRole('button', { name: 'Create the escape room and get the invite code' }).click()
   await host.waitForURL(/\/stage\/[A-Z0-9]{6}$/)
   await expect(host.getByRole('heading', { name: 'The Bunker (revised)' })).toBeVisible()

@@ -39,6 +39,15 @@ public sealed class EscapeState
 
     public List<EscapePlayer> Players { get; set; } = [];
 
+    /// <summary>Who may answer a puzzle (#132), chosen when the party was made. Parties from before have Anyone.</summary>
+    public AnswerRule Answering { get; set; }
+
+    /// <summary>Who is working on each open puzzle, while <see cref="TakesTurns"/>. A puzzle not in here is free to take.</summary>
+    public Dictionary<string, PuzzleHold> Holds { get; set; } = [];
+
+    /// <summary>Where the next deal starts round the table (Dealt), so the stages share out evenly.</summary>
+    public int DealOffset { get; set; }
+
     public DateTimeOffset? StartedAt { get; set; }
 
     /// <summary>When the clock runs out. Every hint moves it earlier.</summary>
@@ -98,9 +107,44 @@ public sealed class EscapeState
     /// <summary>Hints the AI is writing or has written. A paid hint step without one shows the room's written hint.</summary>
     public List<AiHint> AiHints { get; set; } = [];
 
+    /// <summary>Puzzles go to people (taken or dealt). Not with one player: there's nobody to share with.</summary>
+    public bool TakesTurns() => Answering != AnswerRule.Anyone && Players.Count > 1;
+
     public EscapePlayer? FindPlayer(Guid seatId) => Players.FirstOrDefault(p => p.SeatId == seatId);
     public bool IsSolved(string puzzleId) => Solved.Any(s => s.PuzzleId == puzzleId);
     public int HintsUsed => HintsShown.Values.Sum();
+}
+
+/// <summary>
+/// Who may answer a puzzle (#132). With anyone answering anything, one keen player can do the whole room; giving
+/// puzzles to people shares the room out. Whoever holds a puzzle is also the only one who can find its own things
+/// by searching: its hidden clue pieces, and the spots where its cipher key is written.
+/// </summary>
+public enum AnswerRule
+{
+    /// <summary>Anyone answers anything, as escape rooms first played.</summary>
+    Anyone,
+
+    /// <summary>A player takes a puzzle and only they answer it, one puzzle at a time.</summary>
+    TakeIt,
+
+    /// <summary>Each stage's puzzles are dealt round the table as it opens. A player can pass theirs on.</summary>
+    Dealt,
+}
+
+/// <summary>
+/// A puzzle someone is working on. It goes back to the table after <see cref="EscapeEngine.MissesBeforeFree"/> wrong
+/// answers in a row, and someone else may take it over once its holder hasn't tried for <see cref="EscapeEngine.TakeOverAfter"/>.
+/// </summary>
+public sealed class PuzzleHold
+{
+    public Guid SeatId { get; set; }
+
+    /// <summary>When it came to them, or they last tried it: what "hasn't tried for a while" is measured from.</summary>
+    public DateTimeOffset Active { get; set; }
+
+    /// <summary>Wrong answers in a row on it.</summary>
+    public int Misses { get; set; }
 }
 
 public sealed class EscapePlayer
@@ -141,7 +185,7 @@ public enum CueKind
     /// <summary>Someone found something by searching or looking closely.</summary>
     Found,
 
-    /// <summary>On Hard, someone searched a decoy: nothing there, and it cost time.</summary>
+    /// <summary>Someone searched and found nothing they could use, and it cost time (Normal and Hard, #132).</summary>
     Decoy,
 }
 

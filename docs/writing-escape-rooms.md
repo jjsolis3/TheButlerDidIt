@@ -76,7 +76,9 @@ A real escape room is searched, not just solved. A stage can have a **scene**: a
 | `hidesPieces` | A hiding place for clue pieces (see *Playing solo* below). |
 | `minDifficulty` | Only in the scene at this difficulty or harder: `"hard"` adds decoys and red herrings for experts. |
 
-A spot with only a `look` is a **decoy**. It's harmless on Easy and Normal, but on Hard searching it costs 10 seconds. So put anything useful in `gives` or `clue`, not only in the look.
+A spot with only a `look` is a **decoy**: searching it turns up nothing, which costs 10 seconds on Normal and 20 on Hard (Easy is free). So put anything useful in `gives` or `clue`, not only in the look.
+
+**Who finds what (#132).** When the host has the group take puzzles (or deals them), a puzzle's own things turn up only for the player holding it: its hidden clue pieces, and the writing on any spot with `{key:<that puzzle>}` (real or decoy). Anyone else who searches such a spot finds nothing, and the spot stays unsearched for its holder. Items (`gives`) and plain clues are first come, first served. Keys written in an earlier stage, for a later puzzle, are never held back. So a key spot is best kept to that key: an item on it would wait for the cipher's holder too.
 
 **Items** can hide more:
 - `inspect` is what a closer look shows ("Numbers are scratched inside the lid"). It goes into the notebook.
@@ -131,7 +133,7 @@ The validator builds a templated room from 200 puzzle sets and checks each one, 
 ## How it plays
 
 What players see and tap for each of the newer pieces:
-- **A scene** is the stage's picture on the TV and on every phone, with each spot drawn from its `prop` over the stage's painted art (or a backdrop for `backdrop`). On a phone, tapping a spot searches it, and the phone says what was there. A spot that needs a tool shows the room's `lockedText`, and a decoy on Hard shows the 10-second penalty. Phones can zoom the picture 2× or 3×. The TV lists what has been found under the picture.
+- **A scene** is the stage's picture on the TV and on every phone, with each spot drawn from its `prop` over the stage's painted art (or a backdrop for `backdrop`). On a phone, tapping a spot searches it, and the phone says what was there. A spot that needs a tool shows the room's `lockedText`, and a search that turns up nothing shows what it cost. Any spot can be searched again, and costs again if there's nothing new. Phones can zoom the picture 2× or 3×. The TV lists what has been found under the picture.
 - **Items** are buttons in "The group is carrying". Tap one to read it, **Look closer** (when there's more to see), or try it with each of the other items. Dragging one item onto another does the same.
 - **The notebook** shows on the TV and the phones, newest first.
 - **Search** puzzles show how many of their spots have been searched. **Light panels** are a grid of buttons on the phones, and the TV shows the lights as they are.
@@ -152,7 +154,7 @@ A host picks **Easy, Normal or Hard**, and each has its own leaderboard. **Norma
 | `deduction` | 3 things | 5 things (Normal: 4) |
 | `switches` | 3 × 3, two presses away | 4 × 4, six presses away (Normal: 3 × 3, four) |
 | Hints | Cost half the time | The last step of every ladder with two or more is dropped, so hints only nudge |
-| Decoy spots | Free | Cost 10 seconds |
+| Empty searches | Free | Cost 20 seconds (Normal: 10) |
 
 **`minDifficulty`** on a puzzle keeps it only at that difficulty or harder: `"hard"` makes it an extra for experts. The validator plays every length at every difficulty.
 

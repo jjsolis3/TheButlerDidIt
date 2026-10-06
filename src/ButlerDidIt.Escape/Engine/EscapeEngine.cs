@@ -28,13 +28,29 @@ public static class EscapeEngine
     /// <summary>How long an AI hint may take before the written one is shown instead.</summary>
     public static readonly TimeSpan AiHintTimeout = TimeSpan.FromSeconds(60);
 
-    /// <summary>On Hard, searching a spot with nothing in it costs this much time.</summary>
-    public const int DecoyPenaltySeconds = 10;
+    /// <summary>
+    /// What a search that turns up nothing new for the searcher costs (#132): searching is a choice, not a sweep of the
+    /// room. Easy is free, for younger players.
+    /// </summary>
+    public static int SearchPenaltySeconds(EscapeDifficulty level) => level switch
+    {
+        EscapeDifficulty.Easy => 0,
+        EscapeDifficulty.Hard => 20,
+        _ => 10,
+    };
+
+    /// <summary>Wrong answers in a row on a puzzle before it goes back to the table, so someone else gets a go.</summary>
+    public const int MissesBeforeFree = 3;
+
+    /// <summary>Someone else may take over a puzzle whose holder hasn't tried it for this long.</summary>
+    public static readonly TimeSpan TakeOverAfter = TimeSpan.FromMinutes(3);
 
     /// <param name="minutes">The game's length, one of the room's lengths; null plays the room's own time limit.</param>
     /// <param name="difficulty">Null plays Normal.</param>
-    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null, int? minutes = null, EscapeDifficulty? difficulty = null) =>
-        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures(), Minutes = minutes, Difficulty = difficulty };
+    /// <param name="answering">Who may answer a puzzle (#132).</param>
+    public static EscapeState NewGame(long seed = 0, bool daily = false, EscapeAiFeatures? ai = null, int? minutes = null, EscapeDifficulty? difficulty = null,
+        AnswerRule answering = AnswerRule.Anyone) =>
+        new() { Seed = seed, Daily = daily, Ai = ai ?? new EscapeAiFeatures(), Minutes = minutes, Difficulty = difficulty, Answering = answering };
 
     /// <summary>
     /// The room as this attempt plays it: its variants and generated codes picked from the state's seed
@@ -70,11 +86,18 @@ public static class EscapeEngine
             case InspectItem c: Inspect(s, room, c); break;
             case CombineItems c: Combine(s, room, c); break;
             case PressSwitch c: Press(s, room, c); break;
+            case TakePuzzle c: Take(s, room, c); break;
+            case ReleasePuzzle c: Release(s, room, c); break;
+            case PassPuzzle c: Pass(s, room, c); break;
             case RequestEscapeHint c: Hint(s, room, c.Now, c.SeatId, c.PuzzleId); break;
             case BeginEscapeHint c: BeginAiHint(s, room, c); break;
             case CompleteEscapeHint c: CompleteAiHint(s, room, c); break;
             case CancelEscapeHint c: s.AiHints.RemoveAll(h => h.Id == c.HintId); break;
-            case SetCueNarration c: FindCue(s, c.CueId)!.Text = Cut(c.Text); break;
+            case SetCueNarration c:
+                var spoken = FindCue(s, c.CueId)!;
+                spoken.Text = CutLine(c.Text);
+                spoken.AudioUrl = c.AudioUrl;
+                break;
             case SetCueAudio c: FindCue(s, c.CueId)!.AudioUrl = c.Url; break;
             case SkipCues c: foreach (var cue in s.Cues.Where(x => x.Id < c.BeforeCueId && x.Text is null)) cue.Skipped = true; break;
             default: throw new GameRuleException($"Unknown command {command.GetType().Name}.");
@@ -124,6 +147,8 @@ public static class EscapeEngine
     private static void RemovePlayer(EscapeState s, RemoveEscapePlayer c)
     {
         s.Players.RemoveAll(p => p.SeatId == c.SeatId);
+        // What they were working on goes back to the table.
+        foreach (var held in s.Holds.Where(h => h.Value.SeatId == c.SeatId).Select(h => h.Key).ToList()) s.Holds.Remove(held);
         // Their clue pieces go to someone still playing, so no puzzle becomes unsolvable.
         // Pieces still hidden in the room stay where they are.
         if (s.Players.Count == 0) { s.Pieces.RemoveAll(p => !p.IsHidden); return; }
@@ -144,8 +169,28 @@ public static class EscapeEngine
         // A warning only makes sense when there's real time before it.
         s.LowTimeCued = !s.Ai.GameMaster || room.TimeLimitMinutes < 2 * LowTimeWarning.TotalMinutes;
         Log(s, now, $"🔒 The clock is running: {room.TimeLimitMinutes} minutes.");
+        DealStage(s, room, now);
         Cue(s, CueKind.Start, now, stage: room.Stages[0].Title);
     }
+
+    /// <summary>
+    /// Dealt (#132): the stage's puzzles go round the table as it opens, so everyone has something of their own. The
+    /// seat order is shuffled once from the seed (no fixed "first player"), and each deal starts where the last one
+    /// stopped, so over a game nobody gets more than one puzzle more than anyone else.
+    /// </summary>
+    private static void DealStage(EscapeState s, EscapeRoom room, DateTimeOffset now)
+    {
+        if (s.Answering != AnswerRule.Dealt || !s.TakesTurns()) return;
+        var seats = new SeededRandom(s.Seed ^ SeededRandom.StableHash("deal")).Pick(s.Players.Select(p => p.SeatId).ToList(), int.MaxValue);
+        var stage = room.Stages[s.StageIndex];
+        var puzzles = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => Holdable(p) && !s.IsSolved(p.Id)).ToList();
+        foreach (var p in puzzles)
+            s.Holds[p.Id] = new PuzzleHold { SeatId = seats[s.DealOffset++ % seats.Count], Active = now };
+        if (puzzles.Count > 0) Log(s, now, "🃏 The puzzles are dealt: check your phone for yours.");
+    }
+
+    /// <summary>A puzzle someone can work on. A Search puzzle opens itself as the spots it needs are searched, by anyone.</summary>
+    public static bool Holdable(EscapePuzzle p) => p.Kind != PuzzleKind.Search;
 
     /// <summary>
     /// Deals each puzzle's pieces round the table, starting one seat further along each time, so
@@ -176,7 +221,7 @@ public static class EscapeEngine
 
     private static void Answer(EscapeState s, EscapeRoom room, SubmitAnswer c)
     {
-        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId);
+        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId, c.Now);
         if (puzzle.Kind != PuzzleKind.Code && puzzle.Kind != PuzzleKind.Text) throw new GameRuleException(puzzle.Kind switch
         {
             PuzzleKind.Use => "This one isn't opened with an answer: use the items it needs.",
@@ -194,6 +239,12 @@ public static class EscapeEngine
         s.WrongAttempts++;
         s.LockedUntil[puzzle.Id] = c.Now + WrongAnswerCooldown;
         Log(s, c.Now, $"✗ {player.Name} tried “{Trim(c.Answer)}” on {puzzle.Title}. Nothing.");
+        if (s.Holds.TryGetValue(puzzle.Id, out var hold) && ++hold.Misses >= MissesBeforeFree)
+        {
+            // Stuck: it goes back to the table, so someone else gets a go (#132).
+            s.Holds.Remove(puzzle.Id);
+            Log(s, c.Now, $"🙌 {puzzle.Title} is free to take after {MissesBeforeFree} tries.");
+        }
 
         var tries = s.RecentWrong.TryGetValue(puzzle.Id, out var list) ? list : s.RecentWrong[puzzle.Id] = [];
         tries.Add(Trim(c.Answer));
@@ -207,7 +258,7 @@ public static class EscapeEngine
 
     private static void Use(EscapeState s, EscapeRoom room, UseItems c)
     {
-        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId);
+        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId, c.Now);
         if (puzzle.Kind != PuzzleKind.Use) throw new GameRuleException(puzzle.Kind switch
         {
             PuzzleKind.Search => "This one opens once you've searched the right places.",
@@ -218,33 +269,51 @@ public static class EscapeEngine
     }
 
     /// <summary>
-    /// Searching a spot: the searcher sees what's there, the group gets whatever it holds (an item, a clue
-    /// for the notebook, hidden clue pieces for the searcher's phone), and Search puzzles finish themselves.
-    /// A spot that needs a tool (the UV lamp) shows nothing without it and can be searched again later.
+    /// Searching a spot. The first search takes what the spot itself holds (an item, a clue for the notebook, a step
+    /// of a Search puzzle). A puzzle's own things (its hidden clue pieces, and the writing of its cipher key, real or
+    /// decoy) turn up only for whoever is working on that puzzle, while puzzles go to people (#132): the player who
+    /// needs the decoder goes and finds it, rather than someone stumbling on it. A spot with key writing is left
+    /// untouched by anyone else, so its text stays unseen. Any spot can be searched again, and a search that turns up
+    /// nothing new for the searcher costs time (Normal and Hard), so searching is a choice rather than a sweep.
+    /// A spot that needs a tool (the UV lamp) shows nothing without it, and costs nothing.
     /// </summary>
     private static void Examine(EscapeState s, EscapeRoom room, ExamineSpot c)
     {
         var player = Playing(s, c.SeatId);
         var spot = room.Stages[s.StageIndex].Scene?.Objects.FirstOrDefault(o => o.Id == c.ObjectId)
             ?? throw new GameRuleException("That isn't in this part of the room.");
-        if (s.Examined.Contains(spot.Id)) throw new GameRuleException($"Someone has already searched the {spot.Label}.");
         if (spot.Requires is { } tool && !s.Inventory.Contains(tool))
             throw new GameRuleException(spot.LockedText ?? $"You can't make anything out at the {spot.Label}. Not yet, anyway.");
 
-        s.Examined.Add(spot.Id);
+        var again = s.Examined.Contains(spot.Id);
+        var keys = KeyPuzzlesAt(s, room, spot);
+        // Key writing for a puzzle someone else holds (or nobody does yet): the spot isn't theirs to read.
+        var readable = keys.Count == 0 || keys.Any(p => MayFind(s, p, player.SeatId));
         var found = false;
-        if (spot.Gives is { } item && !s.Inventory.Contains(item))
+        if (!again && readable)
         {
-            s.Inventory.Add(item);
-            Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label} and found {room.FindItem(item)!.Name}.");
-            found = true;
+            s.Examined.Add(spot.Id);
+            if (spot.Gives is { } item && !s.Inventory.Contains(item))
+            {
+                s.Inventory.Add(item);
+                Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label} and found {room.FindItem(item)!.Name}.");
+                found = true;
+            }
+            if (spot.Clue is { } clue)
+            {
+                s.Notebook.Add(new NotebookEntry(c.Now, Capitalise(spot.Label), clue));
+                found = true;
+            }
+            if (keys.Count > 0)
+            {
+                Log(s, c.Now, $"🔑 {player.Name} found writing on the {spot.Label}.");
+                found = true;
+            }
+            // A step towards a Search puzzle (or a key written here for a later puzzle) is something found too.
+            found |= room.Puzzles.Any(p => (p.Kind == PuzzleKind.Search && p.Finds.Contains(spot.Id) && !s.IsSolved(p.Id)) || p.KeyAt.Contains($"object:{spot.Id}"));
         }
-        if (spot.Clue is { } clue)
-        {
-            s.Notebook.Add(new NotebookEntry(c.Now, Capitalise(spot.Label), clue));
-            found = true;
-        }
-        var hidden = s.Pieces.Where(p => p.SpotId == spot.Id && p.IsHidden).ToList();
+
+        var hidden = s.Pieces.Where(p => p.SpotId == spot.Id && p.IsHidden && MayFind(s, p.PuzzleId, player.SeatId)).ToList();
         foreach (var piece in hidden)
             s.Pieces[s.Pieces.IndexOf(piece)] = piece with { SeatId = player.SeatId };
         if (hidden.Count > 0)
@@ -252,29 +321,39 @@ public static class EscapeEngine
             Log(s, c.Now, $"🧩 {player.Name} found a clue piece in the {spot.Label}.");
             found = true;
         }
+
         if (!found)
         {
-            if (s.Level == EscapeDifficulty.Hard && IsDecoy(room, spot))
+            var penalty = SearchPenaltySeconds(s.Level);
+            var what = again ? $"🔎 {player.Name} searched the {spot.Label} again. Nothing new" : $"🔎 {player.Name} searched the {spot.Label}. Nothing there";
+            if (penalty == 0)
             {
-                s.Deadline = s.Deadline!.Value.AddSeconds(-DecoyPenaltySeconds);
-                Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label}. Nothing there (−{FormatPenalty(DecoyPenaltySeconds)}).");
-                if (s.Deadline <= c.Now) { End(s, EscapePhase.Failed, c.Now, "⏰ That search cost the last of your time."); return; }
-                Cue(s, CueKind.Decoy, c.Now, by: player.Name, thing: spot.Label);
+                Log(s, c.Now, $"{what}.");
+                return;
             }
-            else
-            {
-                Log(s, c.Now, $"🔎 {player.Name} searched the {spot.Label}.");
-            }
+            s.Deadline = s.Deadline!.Value.AddSeconds(-penalty);
+            Log(s, c.Now, $"{what} (−{FormatPenalty(penalty)}).");
+            if (s.Deadline <= c.Now) { End(s, EscapePhase.Failed, c.Now, "⏰ That search cost the last of your time."); return; }
+            Cue(s, CueKind.Decoy, c.Now, by: player.Name, thing: spot.Label);
+            return;
         }
 
-        if (!SolveSearches(s, room, player.Name, c.Now) && found)
+        if (!SolveSearches(s, room, player.Name, c.Now))
             Cue(s, CueKind.Found, c.Now, by: player.Name, thing: spot.Label);
     }
 
-    /// <summary>A spot with nothing to find, and no part in any puzzle.</summary>
-    private static bool IsDecoy(EscapeRoom room, SceneObject spot) =>
-        spot is { Gives: null, Clue: null, HidesPieces: false }
-        && !room.Puzzles.Any(p => p.Finds.Contains(spot.Id) || p.KeyAt.Contains($"object:{spot.Id}"));
+    /// <summary>
+    /// The open puzzles whose cipher key (real or decoy) is written on this spot. Only puzzles in the stage in front of
+    /// the group: a key for a later puzzle can't wait for its holder, since this spot will be behind them by then.
+    /// </summary>
+    private static List<string> KeyPuzzlesAt(EscapeState s, EscapeRoom room, SceneObject spot) =>
+        room.Stages[s.StageIndex].Puzzles
+            .Where(id => !s.IsSolved(id) && room.FindPuzzle(id)!.KeyAt.Contains($"object:{spot.Id}"))
+            .ToList();
+
+    /// <summary>May this player find a puzzle's own things? Anyone may, unless puzzles go to people; then only its holder.</summary>
+    private static bool MayFind(EscapeState s, string puzzleId, Guid seatId) =>
+        !s.TakesTurns() || (s.Holds.TryGetValue(puzzleId, out var hold) && hold.SeatId == seatId);
 
     /// <summary>Finishes every Search puzzle in the current stage whose spots have all been searched. True if any was.</summary>
     private static bool SolveSearches(EscapeState s, EscapeRoom room, string by, DateTimeOffset now)
@@ -339,7 +418,7 @@ public static class EscapeEngine
     /// <summary>A press flips that light and the ones next to it. All on solves the puzzle.</summary>
     private static void Press(EscapeState s, EscapeRoom room, PressSwitch c)
     {
-        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId);
+        var (player, puzzle) = Attempt(s, room, c.SeatId, c.PuzzleId, c.Now);
         if (puzzle is not { Kind: PuzzleKind.Switches, Grid: { } grid }) throw new GameRuleException("There are no switches on this one.");
         if (c.Cell < 0 || c.Cell >= grid.Size * grid.Size) throw new GameRuleException("There's no switch there.");
 
@@ -426,14 +505,83 @@ public static class EscapeEngine
         else hint.Text = c.Text.Trim();
     }
 
-    /// <summary>The checks every attempt shares: the game is on, the person is playing, the puzzle is open and its items are in hand.</summary>
-    private static (EscapePlayer Player, EscapePuzzle Puzzle) Attempt(EscapeState s, EscapeRoom room, Guid seatId, string puzzleId)
+    /// <summary>
+    /// The checks every attempt shares: the game is on, the person is playing, the puzzle is open, it's theirs to answer
+    /// (while puzzles go to people) and its items are in hand. A try counts as working on it, for <see cref="TakeOverAfter"/>.
+    /// </summary>
+    private static (EscapePlayer Player, EscapePuzzle Puzzle) Attempt(EscapeState s, EscapeRoom room, Guid seatId, string puzzleId, DateTimeOffset now)
     {
         var player = Playing(s, seatId);
         var puzzle = OpenPuzzle(s, room, puzzleId);
+        if (s.TakesTurns() && Holdable(puzzle))
+        {
+            if (!s.Holds.TryGetValue(puzzle.Id, out var hold)) throw new GameRuleException("Take this puzzle first: then it's yours to answer.");
+            if (hold.SeatId != seatId) throw new GameRuleException($"{NameOf(s, hold.SeatId)} is working on this one.");
+            hold.Active = now;
+        }
         var missing = puzzle.Requires.Where(i => !s.Inventory.Contains(i)).Select(i => room.FindItem(i)?.Name ?? i).ToList();
         if (missing.Count > 0) throw new GameRuleException($"You need {string.Join(" and ", missing)} first.");
         return (player, puzzle);
+    }
+
+    private static string NameOf(EscapeState s, Guid seatId) => s.FindPlayer(seatId)?.Name ?? "Someone";
+
+    /// <summary>
+    /// Taking a puzzle (#132). While puzzles go to people, only its holder can answer it, and only they can find its
+    /// own things by searching. With Take it, a player works on one puzzle at a time, so the room gets shared out.
+    /// A puzzle someone else holds can be taken over once they haven't tried it for <see cref="TakeOverAfter"/>.
+    /// </summary>
+    private static void Take(EscapeState s, EscapeRoom room, TakePuzzle c)
+    {
+        var player = Playing(s, c.SeatId);
+        var puzzle = OpenPuzzle(s, room, c.PuzzleId);
+        if (!s.TakesTurns()) throw new GameRuleException("Anyone can answer any puzzle in this game.");
+        if (!Holdable(puzzle)) throw new GameRuleException("This one opens itself as the room is searched: anyone can help.");
+        var takingOver = false;
+        if (s.Holds.TryGetValue(puzzle.Id, out var held))
+        {
+            if (held.SeatId == c.SeatId) throw new GameRuleException("It's already yours.");
+            if (c.Now - held.Active < TakeOverAfter) throw new GameRuleException($"{NameOf(s, held.SeatId)} is working on this one.");
+            takingOver = true;
+        }
+        if (s.Answering == AnswerRule.TakeIt
+            && s.Holds.FirstOrDefault(h => h.Value.SeatId == c.SeatId && !s.IsSolved(h.Key)) is { Key: { } other })
+            throw new GameRuleException($"You're working on {room.FindPuzzle(other)!.Title}. Hand it back first.");
+
+        var from = held is null ? null : NameOf(s, held.SeatId);
+        s.Holds[puzzle.Id] = new PuzzleHold { SeatId = c.SeatId, Active = c.Now };
+        Log(s, c.Now, takingOver ? $"🙋 {player.Name} took over {puzzle.Title} from {from}." : $"🙋 {player.Name} is working on {puzzle.Title}.");
+    }
+
+    /// <summary>Handing a puzzle back to the table: by its holder, or by the host from the TV (no seat) for anyone's.</summary>
+    private static void Release(EscapeState s, EscapeRoom room, ReleasePuzzle c)
+    {
+        if (s.Phase != EscapePhase.Playing) throw new GameRuleException("The game isn't running.");
+        var puzzle = OpenPuzzle(s, room, c.PuzzleId);
+        if (!s.Holds.TryGetValue(puzzle.Id, out var held)) throw new GameRuleException("Nobody is working on that one.");
+        if (c.SeatId is { } seat)
+        {
+            RequirePlayer(s, seat);
+            if (held.SeatId != seat) throw new GameRuleException($"{NameOf(s, held.SeatId)} is working on this one.");
+        }
+        s.Holds.Remove(puzzle.Id);
+        Log(s, c.Now, c.SeatId is null
+            ? $"🙌 The host freed {puzzle.Title}: anyone can take it."
+            : $"🙌 {NameOf(s, held.SeatId)} handed back {puzzle.Title}: anyone can take it.");
+    }
+
+    /// <summary>Its holder hands a puzzle straight to someone else. With Take it, only to someone not already working on one.</summary>
+    private static void Pass(EscapeState s, EscapeRoom room, PassPuzzle c)
+    {
+        var player = Playing(s, c.SeatId);
+        var puzzle = OpenPuzzle(s, room, c.PuzzleId);
+        if (!s.Holds.TryGetValue(puzzle.Id, out var held) || held.SeatId != c.SeatId) throw new GameRuleException("Only the one working on a puzzle can pass it on.");
+        var to = RequirePlayer(s, c.ToSeatId);
+        if (to.SeatId == c.SeatId) throw new GameRuleException("It's already yours.");
+        if (s.Answering == AnswerRule.TakeIt && s.Holds.Any(h => h.Value.SeatId == to.SeatId && !s.IsSolved(h.Key)))
+            throw new GameRuleException($"{to.Name} is already working on a puzzle.");
+        s.Holds[puzzle.Id] = new PuzzleHold { SeatId = to.SeatId, Active = c.Now };
+        Log(s, c.Now, $"🤝 {player.Name} passed {puzzle.Title} to {to.Name}.");
     }
 
     /// <summary>A puzzle in the current stage that hasn't been solved yet.</summary>
@@ -452,6 +600,7 @@ public static class EscapeEngine
         s.Inventory.RemoveAll(puzzle.Requires.Contains); // used up: the key stays in its lock
         s.Inventory.AddRange(puzzle.Rewards.Where(r => !s.Inventory.Contains(r)));
         s.LockedUntil.Remove(puzzle.Id);
+        s.Holds.Remove(puzzle.Id);
         s.WrongStreak = 0;
         Log(s, now, $"✓ {by} solved {puzzle.Title}.");
 
@@ -466,6 +615,7 @@ public static class EscapeEngine
         {
             s.StageIndex++;
             Log(s, now, $"🚪 {room.Stages[s.StageIndex].Title}");
+            DealStage(s, room, now);
             Cue(s, CueKind.StageOpened, now, puzzle.Title, by, room.Stages[s.StageIndex].Title);
         }
         else
@@ -479,6 +629,7 @@ public static class EscapeEngine
         s.Phase = phase;
         s.EndedAt = at;
         s.LockedUntil.Clear();
+        s.Holds.Clear();
         // Hints still being written can't be shown any more: drop them rather than leave them "on their way".
         s.AiHints.RemoveAll(h => h.Text is null);
         Log(s, at, message);
@@ -495,7 +646,8 @@ public static class EscapeEngine
 
     private static EscapeCue? FindCue(EscapeState s, int id) => s.Cues.FirstOrDefault(c => c.Id == id);
 
-    private static string Cut(string text)
+    /// <summary>A line as the game master's panel keeps it: trimmed, and cut at <see cref="MaxAiText"/>. Its recording reads the same.</summary>
+    public static string CutLine(string text)
     {
         var t = text.Trim();
         return t.Length <= MaxAiText ? t : t[..MaxAiText].TrimEnd() + "…";

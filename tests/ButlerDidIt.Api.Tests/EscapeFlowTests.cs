@@ -295,6 +295,44 @@ public class EscapeFlowTests(ApiFactory app) : IClassFixture<ApiFactory>
         Assert.Null(standard.ThisParty);
     }
 
+    [Fact]
+    public async Task With_take_it_a_puzzle_is_answered_only_by_whoever_took_it_and_the_host_can_free_it()
+    {
+        var (host, cookie) = await app.RegisterHostAsync($"turns{Guid.NewGuid():N}@example.com");
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, (await host.PostAsJsonAsync("/api/parties/escape",
+            new { roomId = "the-workshop", mode = "sharedScreen", answering = "everyoneAtOnce" }, GameJson.Options)).StatusCode);
+        var party = await Read<PartyInfo>(await host.PostAsJsonAsync("/api/parties/escape",
+            new CreateEscapePartyRequest("the-workshop", PartyMode.SharedScreen, Answering: AnswerRule.TakeIt), GameJson.Options));
+        var ada = await Read<SeatResponse>(await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/join", new JoinRequest("Ada")));
+        var ben = await Read<SeatResponse>(await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/join", new JoinRequest("Ben")));
+        await using var tv = await app.ConnectAsync(cookie: cookie);
+        await using var adaPhone = await app.ConnectAsync(ada.Token);
+        await using var benPhone = await app.ConnectAsync(ben.Token);
+        await tv.InvokeAsync("EscapeStart", party.Code);
+
+        var stage = await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code);
+        Assert.Equal(AnswerRule.TakeIt, stage.Answering);
+        var puzzle = stage.Puzzles.First(p => p.Kind is PuzzleKind.Code or PuzzleKind.Text && p.Needs.Count == 0);
+        var answer = PlayedRoom(party.Code, "the-workshop").FindPuzzle(puzzle.Id)!.Answers[0];
+
+        var refused = await Assert.ThrowsAsync<HubException>(() => adaPhone.InvokeAsync<bool>("EscapeAnswer", puzzle.Id, answer));
+        Assert.Contains("Take this puzzle first", refused.Message);
+        await adaPhone.InvokeAsync("EscapeTake", puzzle.Id);
+        Assert.Equal("Ada", (await tv.InvokeAsync<EscapeStageView>("WatchParty", party.Code)).Puzzles.Single(p => p.Id == puzzle.Id).HeldBy?.Name);
+        await Assert.ThrowsAsync<HubException>(() => benPhone.InvokeAsync<bool>("EscapeAnswer", puzzle.Id, answer));
+
+        // Ada passes it to Ben; the host frees it from the TV; Ben takes it back and opens it.
+        await adaPhone.InvokeAsync("EscapePass", puzzle.Id, ben.SeatId);
+        Assert.Equal(ben.SeatId, StateOf(party.Code).Holds[puzzle.Id].SeatId);
+        await Assert.ThrowsAsync<HubException>(() => benPhone.InvokeAsync("EscapeHostFree", party.Code, puzzle.Id)); // a phone isn't the host
+        await tv.InvokeAsync("EscapeHostFree", party.Code, puzzle.Id);
+        Assert.False(StateOf(party.Code).Holds.ContainsKey(puzzle.Id));
+        await benPhone.InvokeAsync("EscapeTake", puzzle.Id);
+        await benPhone.InvokeAsync("EscapeRelease", puzzle.Id);
+        await benPhone.InvokeAsync("EscapeTake", puzzle.Id);
+        Assert.True(await benPhone.InvokeAsync<bool>("EscapeAnswer", puzzle.Id, answer));
+    }
+
     private Guid StateParty(string code)
     {
         using var scope = app.Services.CreateScope();

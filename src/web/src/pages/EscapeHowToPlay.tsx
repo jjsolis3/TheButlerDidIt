@@ -98,7 +98,13 @@ export default function EscapeHowToPlay() {
             <b>A wrong answer locks that puzzle for 3 seconds</b>, so guessing every code doesn't work.
           </li>
           <li>
-            <b>On Hard, searching an empty hiding place costs time.</b> Think before you tap.
+            <b>A search that turns up nothing costs time:</b> 10 seconds on Normal, 20 on Hard (Easy is free). Think before you tap.
+          </li>
+          <li>
+            <b>Take a puzzle to answer it</b> (unless the host chose "Anyone"). Each player works on one at a time, and only its holder can
+            answer it, or find what it needs by searching: its hidden clue pieces and the spot where its key is written. Stuck? Hand it back
+            or pass it on. After 3 wrong tries in a row it goes back to the table, and anyone can take over a puzzle nobody has tried for 3
+            minutes.
           </li>
           <li>
             <b>If someone leaves,</b> their clue pieces pass to someone still playing. Nothing is lost.

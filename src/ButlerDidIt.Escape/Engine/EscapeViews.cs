@@ -60,7 +60,11 @@ public sealed record EscapeStageView(
     /// <summary>The game master reading the intro, recorded by the AI's Voice role, or null (the browser reads it). Public, like the intro.</summary>
     string? IntroVoiceUrl = null,
     /// <summary>The game master reading the description of the stage in front of the group (never a later one), or null.</summary>
-    string? StageVoiceUrl = null);
+    string? StageVoiceUrl = null,
+    /// <summary>Who may answer a puzzle as the game plays now (#132): Anyone with a single player, whatever was chosen.</summary>
+    AnswerRule Answering = AnswerRule.Anyone,
+    /// <summary>What a search that turns up nothing new costs, in seconds (0 on Easy).</summary>
+    int SearchPenaltySeconds = 0);
 
 public sealed record EscapeSceneView(int Width, int Height, string Backdrop, IReadOnlyList<EscapeSpotView> Objects);
 
@@ -110,7 +114,14 @@ public sealed record EscapePuzzleView(
     /// <summary>For ciphers: which decoding tool the phones offer, once the key has been found.</summary>
     EscapeCipherView? Cipher,
     /// <summary>For deductions: the things to line up, for the phones' logic grid.</summary>
-    EscapeDeductionView? Deduction);
+    EscapeDeductionView? Deduction,
+    /// <summary>Who is working on it, while puzzles go to people (#132); null when nobody is (or anyone may answer).</summary>
+    EscapeHoldView? HeldBy = null,
+    /// <summary>For ciphers: spots in this part of the room with its key (or a decoy) written on them, not yet found.</summary>
+    int KeysHidden = 0);
+
+/// <param name="Free">Its holder hasn't tried it for a while: someone else may take it over.</param>
+public sealed record EscapeHoldView(Guid SeatId, string Name, bool Free);
 
 /// <param name="Unlocked">The group has found a key for it (numbers and mirror need none).</param>
 /// <param name="Keys">

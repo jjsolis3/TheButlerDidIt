@@ -62,12 +62,17 @@ public class GameMasterTests
         var s = Started(AllOn);
         Assert.Equal([CueKind.Start], s.Cues.Select(c => c.Kind));
 
-        // The state keeps only the latest few moments, so collect them as they happen.
+        // The state keeps only the latest few moments, so collect them after every move: one search can be a
+        // moment of its own (an empty one costs time on Normal, #132), and a solve can take several moves.
         var seen = new Dictionary<int, EscapeCue>();
         for (var i = 0; s.Phase == EscapePhase.Playing; i++)
         {
-            s = SolveNext(s, T0.AddMinutes(i + 1));
-            foreach (var cue in s.Cues) seen.TryAdd(cue.Id, cue);
+            var solved = s.Solved.Count;
+            while (s.Phase == EscapePhase.Playing && s.Solved.Count == solved)
+            {
+                s = EscapeEngine.Apply(s, Workshop, EscapeBot.NextMove(s, EscapeEngine.RoomFor(s, Workshop), Ben, T0.AddMinutes(i + 1)));
+                foreach (var cue in s.Cues) seen.TryAdd(cue.Id, cue);
+            }
         }
         var cues = seen.Values.OrderBy(c => c.Id).ToList();
         var kinds = cues.Select(c => c.Kind).ToList();
@@ -132,6 +137,22 @@ public class GameMasterTests
         // A second line for the same moment, or a late recording for a skipped one, changes nothing.
         Assert.Same(s, EscapeEngine.Apply(s, Workshop, new SetCueNarration(T0, newest, "again")));
         Assert.Same(s, EscapeEngine.Apply(s, Workshop, new SetCueAudio(T0, s.Cues[0].Id, "/media/late.mp3")));
+    }
+
+    [Fact]
+    public void A_line_and_its_recording_can_arrive_together_so_the_words_never_run_ahead_of_the_voice()
+    {
+        var s = Started(AllOn);
+        var start = s.Cues.Single(c => c.Kind == CueKind.Start).Id;
+        var line = new string('a', EscapeEngine.MaxAiText + 50);
+
+        s = EscapeEngine.Apply(s, Workshop, new SetCueNarration(T0, start, line, "/media/welcome.mp3"));
+
+        var shown = Assert.Single(EscapeProjector.Stage(s, Workshop, T0).Narration);
+        Assert.Equal("/media/welcome.mp3", shown.AudioUrl);
+        // Cut exactly as the server cuts what it records, so the voice says what the panel shows.
+        Assert.Equal(EscapeEngine.CutLine(line), shown.Text);
+        Assert.Equal(EscapeEngine.MaxAiText + 1, shown.Text.Length);
     }
 
     // ------------------------------------------------------------------ AI hints

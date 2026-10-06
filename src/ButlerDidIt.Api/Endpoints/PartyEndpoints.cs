@@ -27,7 +27,9 @@ public sealed record CreateEscapePartyRequest(string RoomId, PartyMode Mode, Dat
     /// <summary>The game's length, one of the room's lengths; null plays the room's own time limit.</summary>
     int? Minutes = null,
     /// <summary>Easy, Normal or Hard; each has its own leaderboard.</summary>
-    ButlerDidIt.Escape.Rooms.EscapeDifficulty Difficulty = ButlerDidIt.Escape.Rooms.EscapeDifficulty.Normal);
+    ButlerDidIt.Escape.Rooms.EscapeDifficulty Difficulty = ButlerDidIt.Escape.Rooms.EscapeDifficulty.Normal,
+    /// <summary>Who may answer a puzzle (#132): anyone, whoever takes it, or whoever it was dealt to.</summary>
+    ButlerDidIt.Escape.Engine.AnswerRule Answering = ButlerDidIt.Escape.Engine.AnswerRule.Anyone);
 public sealed record JoinRequest(string Name);
 public sealed record AddSeatRequest(string Name, bool IsLocal);
 public sealed record SeatResponse(Guid SeatId, string Token, string Code);
@@ -153,6 +155,7 @@ public static class PartyEndpoints
             if (req.Minutes is { } minutes && !room.PlayableLengths.Contains(minutes))
                 return Results.Problem($"This room can be played in {string.Join(", ", room.PlayableLengths)} minutes.", statusCode: 400);
             if (!Enum.IsDefined(req.Difficulty)) return Results.Problem("Choose easy, normal or hard.", statusCode: 400);
+            if (!Enum.IsDefined(req.Answering)) return Results.Problem("Choose who answers the puzzles.", statusCode: 400);
             var (seed, daily) = ButlerDidIt.Api.Escape.PuzzleSets.For(req.Puzzles, req.PuzzleSet, parties.Now);
             var party = new Party
             {
@@ -167,7 +170,7 @@ public static class PartyEndpoints
                 CreatedAt = parties.Now,
                 UpdatedAt = parties.Now,
                 ScheduledFor = req.ScheduledFor,
-                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame(seed, daily, await EscapeAiFor(req.UseAi, ai, media, ct), req.Minutes, req.Difficulty)),
+                State = GameJson.Serialize(ButlerDidIt.Escape.Engine.EscapeEngine.NewGame(seed, daily, await EscapeAiFor(req.UseAi, ai, media, ct), req.Minutes, req.Difficulty, req.Answering)),
             };
             db.Parties.Add(party);
             await db.SaveChangesAsync(ct);
