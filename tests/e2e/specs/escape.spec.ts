@@ -123,7 +123,9 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect.poll(() => tv.evaluate(() => document.documentElement.scrollHeight - window.innerHeight)).toBeLessThanOrEqual(1)
   for (const part of [tv.getByLabel('Time left'), tv.getByTestId('scene'), tv.getByTestId('game-master'), tv.getByText("What's happened")])
     await expect(part).toBeInViewport()
-  for (const card of await tv.locator('[data-testid^="puzzle-"]').all()) await expect(card).toBeInViewport({ ratio: 1 }) // every card whole
+  // Every card whole. The puzzles' column is scaled to fit, so a whole card can measure 0.9999999 (floating point);
+  // a card clipped by even half a pixel measures about 0.998 and fails.
+  for (const card of await tv.locator('[data-testid^="puzzle-"]').all()) await expect(card).toBeInViewport({ ratio: 0.9999 })
   await expect(tv.getByTestId('watchers')).toContainText('0 watching') // the host's watchers, in the header
   // A full-HD TV, for the screenshot.
   const fullHd = await (await browser.newContext({ viewport: { width: 1920, height: 1080 }, storageState: await tv.context().storageState() })).newPage()
