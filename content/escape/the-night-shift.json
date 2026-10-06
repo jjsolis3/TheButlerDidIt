@@ -1,0 +1,1119 @@
+{
+  "id": "the-night-shift",
+  "title": "The Night Shift",
+  "synopsis": "It's Halloween night at Pepper's Pizza Playhouse, and you've signed up to keep watch until the morning crew arrives. At midnight the animatronic band starts to sing on its own, the doors lock, and Pepper the Raccoon announces a party that never ends. Get the power back, outsmart the band and reach the front doors by sunrise!",
+  "contentRating": "family",
+  "theme": "pizzeria",
+  "artStyle": "a cheerful, slightly spooky family pizza restaurant after closing on Halloween night: a band of animatronic animals on a little stage, party tables with paper hats, glowing arcade cabinets, flickering security monitors and paper bats, colourful cartoon style, spooky-fun and never scary",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 90,
+  "soundscape": "arcade",
+  "intro": "Hello, hello! Welcome to the night shift at Pepper's Pizza Playhouse! I'm Pepper the Raccoon, and I LOVE a party. Look: the doors have locked all by themselves, the power is low, and my band is warming up. You'll stay and sing with us forever and ever... unless you can reach the front doors by sunrise. Tee-hee! Let the party begin!",
+  "escapedText": "The front doors swing open and pink morning light floods in. Behind you, the band slumps, fast asleep, and Pepper yawns: 'Same time tomorrow night, new friends?' You're out, and your shift is over!",
+  "failedText": "The music box plays its very last note, and the whole band turns to look at you. 'Yaaay! You're staying for the party!' Paper hats are popped on your heads. You'll be singing birthday songs until the morning crew lets you out.",
+  "gameMaster": {
+    "name": "Pepper the Raccoon",
+    "persona": "The pizza place's animatronic mascot: a singing raccoon in a sparkly bow tie. Cheerful and sing-song, with the odd glitch (she repeats words, giggles at the wrong moment). She wants the night crew to stay for her party forever, teases them when they're stuck and is secretly impressed when they're clever. Spooky-fun, never truly scary.",
+    "voice": {
+      "accent": "en-US",
+      "pitch": 1.3,
+      "rate": 1.05,
+      "style": "sing-song, bubbly, a little glitchy"
+    }
+  },
+  "stages": [
+    {
+      "id": "office",
+      "soundscape": "tension",
+      "title": "The Security Office",
+      "description": "A cramped little office lit by six flickering security monitors. A desk fan wobbles, the phone's message light blinks, and a door stands open on each side, with a big red button beside it. The power meter on the wall reads 12%. And on the monitors, the band on the stage... has moved.",
+      "puzzles": [
+        "camera-log",
+        "desk-search",
+        "phone-message",
+        "breaker-panel",
+        "guard-locker",
+        "office-door"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "monitors",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "security monitors",
+            "look": "Six fuzzy camera screens: the stage, the party hall, the prize counter, the arcade, the kitchen and backstage. On one of them, a pair of glowing eyes blinks at you. Then it's gone."
+          },
+          {
+            "id": "office-safe",
+            "prop": "safe",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "office safe",
+            "look": "A heavy little safe with a word lock. The password must be in Gus's phone message."
+          },
+          {
+            "id": "door-buttons",
+            "prop": "door",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "door buttons",
+            "look": "Two big red buttons, one for each door. You press one: BZZT. Nothing happens. The doors need more power than this."
+          },
+          {
+            "id": "air-vent",
+            "prop": "vent",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "air vent",
+            "look": "You shine the flashlight in. Dust bunnies, a lost party blower... and, scratched into the metal where no animatronic could reach: 'Slide back {key:phone-message}. Gus.'",
+            "requires": "flashlight",
+            "lockedText": "It's pitch black in there, and something in the dark goes clank. You'd need a light."
+          },
+          {
+            "id": "office-clock",
+            "prop": "clock",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "office clock",
+            "look": "It says 12 AM. It has said 12 AM for quite a while now."
+          },
+          {
+            "id": "guard-desk",
+            "prop": "desk",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "guard's desk",
+            "look": "Old pizza boxes, a squeaky chair and a mug that says WORLD'S OKAYEST NIGHT GUARD.",
+            "hidesPieces": true
+          },
+          {
+            "id": "coat-rack",
+            "prop": "statue",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "coat rack",
+            "look": "Gus's spare jacket, a party hat and a dripping umbrella.",
+            "hidesPieces": true
+          },
+          {
+            "id": "lost-and-found",
+            "prop": "box",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "lost-and-found box",
+            "look": "Odd socks, a toy car and three left shoes. Under them all: a big, heavy flashlight.",
+            "hidesPieces": true
+          },
+          {
+            "id": "desk-fan",
+            "prop": "machine",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "desk fan",
+            "look": "It whirs and wobbles and blows cold air at your ankles.",
+            "hidesPieces": true
+          },
+          {
+            "id": "staff-poster",
+            "prop": "poster",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "staff poster",
+            "look": "'SMILE! The kids are watching.' Someone has added in pen: 'So is the band.'",
+            "hidesPieces": true
+          },
+          {
+            "id": "sticky-note",
+            "prop": "sign",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "sticky note",
+            "look": "Stuck to a monitor, in Gus's scribble: 'back {key:phone-message}'",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "desk-mat",
+            "prop": "rug",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "desk mat",
+            "look": "Under the desk mat, in tiny writing: 'back {key:phone-message}'",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "supply-locker",
+            "prop": "cabinet",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "supply locker",
+            "look": "A metal locker under the monitors, with a number keypad. A label says SPARE BATTERIES."
+          },
+          {
+            "id": "paper-bats",
+            "prop": "painting",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "paper bats",
+            "look": "Paper bats hang from the ceiling on strings. One of them is slowly turning to face you."
+          }
+        ]
+      }
+    },
+    {
+      "id": "party-hall",
+      "title": "The Party Hall",
+      "description": "Rows of party tables, still covered in paper hats and streamers. A prize counter is piled high with plush toys, a claw machine and arcade games blink in the corner, and on the little show stage the band stands perfectly still. Perfectly. Still. Their eyes follow you as you walk. At the back, a door says STAFF ONLY.",
+      "puzzles": [
+        "band-lineup",
+        "prize-counter",
+        "kids-drawings",
+        "birthday-banner",
+        "staff-door"
+      ],
+      "scene": {
+        "backdrop": "arcade",
+        "objects": [
+          {
+            "id": "show-stage",
+            "prop": "statue",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "show stage",
+            "look": "The band stands frozen mid-song, all jumbled up. You could swear the moose just blinked."
+          },
+          {
+            "id": "prize-cabinet",
+            "prop": "cabinet",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "prize counter",
+            "look": "Shelves of plush toys, bouncy balls and glow sticks, and a cabinet with a 3-digit lock."
+          },
+          {
+            "id": "claw-machine",
+            "prop": "machine",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "claw machine",
+            "look": "You drop the token in. The claw wobbles, dives... and grabs a plush raccoon! A key is sewn into its bow tie. Clunk: the broken machine spits your token back out.",
+            "gives": "backstage-key",
+            "requires": "arcade-token",
+            "lockedText": "A glass box full of plush toys. INSERT TOKEN, it says. You don't have one."
+          },
+          {
+            "id": "arcade-games",
+            "prop": "machine",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "arcade games",
+            "look": "Three old games, all flashing GAME OVER. The high-score table says NIGHT CREW. You never typed that.",
+            "hidesPieces": true
+          },
+          {
+            "id": "staff-door-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "STAFF ONLY door",
+            "look": "A heavy door with a keyhole and a word lock. A riddle is painted on it in curly writing."
+          },
+          {
+            "id": "party-table",
+            "prop": "table",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "party table",
+            "look": "Paper plates, crumbs and a party hat with a raccoon on it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "ball-pit",
+            "prop": "crate",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "ball pit",
+            "look": "Hundreds of plastic balls. Something squeaks at the bottom.",
+            "hidesPieces": true
+          },
+          {
+            "id": "jukebox",
+            "prop": "machine",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "jukebox",
+            "look": "It's playing Pepper's birthday song very, very slowly.",
+            "hidesPieces": true
+          },
+          {
+            "id": "party-lights",
+            "prop": "lamp",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "party lights",
+            "look": "Strings of coloured lights, blinking in a pattern you can't quite work out.",
+            "hidesPieces": true
+          },
+          {
+            "id": "birthday-throne",
+            "prop": "statue",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "birthday throne",
+            "look": "A big golden chair for the birthday kid. It's warm, as if someone just got up.",
+            "hidesPieces": true
+          },
+          {
+            "id": "crayon-box",
+            "prop": "box",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "crayon box",
+            "look": "Crayons, and a card that says SECRET CLUB KEY: {key:kids-drawings}"
+          },
+          {
+            "id": "placemats",
+            "prop": "rug",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "kids' placemats",
+            "look": "A maze, a word search and, on the back of one, a symbol card: {key:kids-drawings}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "dessert-cart",
+            "prop": "table",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "dessert cart",
+            "look": "A symbol card stuck to a plate of crumbs: {key:kids-drawings}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "ticket-machine",
+            "prop": "cabinet",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "ticket machine",
+            "look": "It prints one long ticket that just says HA HA HA.",
+            "hidesPieces": true
+          },
+          {
+            "id": "drinks-fridge",
+            "prop": "cabinet",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "drinks fridge",
+            "look": "Orange fizz, grape fizz and a lot of ice.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "backstage",
+      "soundscape": "workshop",
+      "title": "Parts & Service",
+      "description": "Behind the stage is the repair room. Spare animatronic heads stare down from the shelves, tools spill across the workbench, and in the corner a big music box with a bow on top is slowly winding down. Every time it slows, something out in the hall starts to move. At the end of a corridor, the front doors are chained shut beside a glowing keypad.",
+      "puzzles": [
+        "lullaby",
+        "parts-cabinet",
+        "repair-log",
+        "spare-heads",
+        "music-box",
+        "front-doors"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "head-shelf",
+            "prop": "shelf",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "spare heads",
+            "look": "A row of spare costume heads, staring at nothing. Their eyes are glass. Probably."
+          },
+          {
+            "id": "music-box-spot",
+            "prop": "box",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "music box",
+            "look": "A big music box with a bow on top, and a keyhole for a winding key. Its tune plays slower... and slower..."
+          },
+          {
+            "id": "workbench",
+            "prop": "desk",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "workbench",
+            "look": "Screwdrivers, a soldering iron and a half-built robot paw that waves at you."
+          },
+          {
+            "id": "front-doors-spot",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "front doors",
+            "look": "Glass doors, chained shut, with a padlock and a 3-digit keypad. Outside, the sky is just starting to turn grey."
+          },
+          {
+            "id": "dark-corner",
+            "prop": "crate",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "dark corner",
+            "look": "You shine the flashlight into the corner. Behind a crate of spare costume paws, something glints: the long metal stem of a winding key!",
+            "gives": "key-stem",
+            "requires": "flashlight",
+            "lockedText": "It's too dark back there to see a thing. Something glints, though."
+          },
+          {
+            "id": "toolbox",
+            "prop": "chest",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "toolbox",
+            "look": "Nuts, bolts and a sticker that says PROPERTY OF GUS.",
+            "hidesPieces": true
+          },
+          {
+            "id": "costume-rack",
+            "prop": "statue",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "costume rack",
+            "look": "Furry suits on hangers. One of them is warm.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cable-reels",
+            "prop": "pipe",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cable reels",
+            "look": "Coils of cable, all tangled together.",
+            "hidesPieces": true
+          },
+          {
+            "id": "paint-cans",
+            "prop": "barrel",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "paint cans",
+            "look": "Paint in every animatronic colour: raccoon grey, moose brown and penguin black.",
+            "hidesPieces": true
+          },
+          {
+            "id": "manuals",
+            "prop": "bookshelf",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "repair manuals",
+            "look": "Thick manuals: HOW TO TUNE A SINGING MOOSE, and WHY IS MY PENGUIN SINGING AT 3 AM?",
+            "hidesPieces": true
+          },
+          {
+            "id": "sound-desk",
+            "prop": "machine",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "sound desk",
+            "look": "A code card taped under the sliders: {key:spare-heads}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "fuse-box",
+            "prop": "cabinet",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "fuse box",
+            "look": "Inside the door, a table of dots and dashes: {key:spare-heads}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "clipboard",
+            "prop": "sign",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "clipboard",
+            "look": "A repair checklist, with a code card clipped to it: {key:spare-heads}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "costume-bin",
+            "prop": "crate",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "costume bin",
+            "look": "Spare costumes, all a bit squashed. At the bottom: a spare sparkly bow tie.",
+            "gives": "spare-bow-tie",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "camera-log",
+      "title": "The Camera Log",
+      "kind": "code",
+      "prompt": "Every time a camera spots Pepper the Raccoon, the security tablet logs a code: {sequence}. The supply locker's keypad asks: 'What will the next code be?'",
+      "generator": {
+        "type": "sequence"
+      },
+      "rewards": [
+        "batteries"
+      ],
+      "hints": [
+        "Look at how each code changes to get the next one.",
+        "The next code is {answer}."
+      ],
+      "solvedText": "Beep! The supply locker clicks open. Inside: a pack of chunky batteries, just right for a big flashlight."
+    },
+    {
+      "id": "desk-search",
+      "title": "The Night Guard's Things",
+      "kind": "search",
+      "prompt": "Gus always kept a flashlight for the dark corners. Search the guard's desk, the coat rack and the lost-and-found box.",
+      "finds": [
+        "guard-desk",
+        "coat-rack",
+        "lost-and-found"
+      ],
+      "rewards": [
+        "flashlight-shell"
+      ],
+      "hints": [
+        "Three spots in the office are worth a proper rummage.",
+        "Rummage on the desk, through the coats and in the lost-and-found."
+      ],
+      "solvedText": "Under the odd socks in the lost-and-found: Gus's big flashlight! It clicks, but nothing happens. It needs batteries."
+    },
+    {
+      "id": "phone-message",
+      "title": "The Phone Message",
+      "kind": "text",
+      "prompt": "The answering machine blinks. 'Hello? Hello? Gus here, the last night guard. If you can hear this, the band's awake. I put the safe's password in code, in case they're listening. It's my favourite pizza topping: {cipher}.'",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "olive",
+          "basil",
+          "onion",
+          "anchovy",
+          "oregano",
+          "mushroom",
+          "pineapple"
+        ]
+      },
+      "rewards": [
+        "lanyard"
+      ],
+      "hints": [
+        "Gus wrote a number in more than one place, and one of them is somewhere dark, where you'll need a light.",
+        "Try each number you found. Only one turns the code into a pizza topping.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "You type the topping and the safe swings open. Inside: Gus's name badge, on a lanyard."
+    },
+    {
+      "id": "breaker-panel",
+      "minMinutes": 45,
+      "title": "The Breaker Panel",
+      "kind": "switches",
+      "prompt": "The office is running on backup power. The breakers are wired together: flip one and the ones beside it flip too. Turn every breaker on!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the switches in the row below it.",
+        "Flip {answer}."
+      ],
+      "solvedText": "Clunk, clunk, CLUNK! The monitors stop flickering, the fan speeds up and the power meter jumps to 100%. Out in the dark, the music stops. For now."
+    },
+    {
+      "id": "guard-locker",
+      "minMinutes": 60,
+      "title": "Gus's Locker",
+      "kind": "code",
+      "prompt": "Gus's locker has a 3-digit lock. He loved a quiz, so he wrote each digit as a quiz question on a sticky note, and you've each pocketed one.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Gus's quiz note: the {ordinal} digit of my locker is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit, written as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The locker opens. Inside: Gus's spare uniform, a whistle and a very old slice of pizza. Ew!"
+    },
+    {
+      "id": "office-door",
+      "title": "The Office Door",
+      "kind": "use",
+      "prompt": "The door out to the party hall is shut tight. Its card reader blinks red: STAFF ONLY. SWIPE YOUR CARD.",
+      "requires": [
+        "keycard"
+      ],
+      "hints": [
+        "You need a staff card. Who was the last member of staff in this office?",
+        "Look closely at Gus's name badge, then swipe what you find at the door."
+      ],
+      "solvedText": "Beep! The light turns green and the door slides open onto the dark party hall. Somewhere out there, a music box is playing."
+    },
+    {
+      "id": "band-lineup",
+      "title": "The Band Line-Up",
+      "kind": "code",
+      "prompt": "The show stage's control panel flashes: PLACES FOR THE MORNING SHOW! The band is all jumbled up: {items}. The keypad wants each one's place, far left is 1, in the order they're listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "raccoon",
+          "moose",
+          "penguin",
+          "bear",
+          "owl"
+        ],
+        "pieceTemplate": "From the day crew's set-up sheet: {clue}"
+      },
+      "rewards": [
+        "key-bow"
+      ],
+      "hints": [
+        "Every phone has a line from the set-up sheet. Read them all out loud.",
+        "Start with the line you're surest about, and try each place in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "Whirr, clunk: the band shuffles into place and freezes again. A little drawer pops out of the stage. Inside: the round handle of a wind-up key, shaped like a raccoon's head."
+    },
+    {
+      "id": "prize-counter",
+      "title": "The Prize Counter",
+      "kind": "code",
+      "prompt": "The prize counter's cabinet has a 3-digit lock. A sign above it says: '{order}! Count your tickets!' Each of you grabbed a different colour of prize ticket off the floor.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "purple",
+          "orange",
+          "pink"
+        ],
+        "thing": "ticket",
+        "pieceTemplate": "You counted the {color} prize tickets in your hand: there were {digit} of them."
+      },
+      "rewards": [
+        "arcade-token"
+      ],
+      "hints": [
+        "Each phone counted one colour of ticket. Say your colour and your number.",
+        "Read them in the sign's order: {order}."
+      ],
+      "solvedText": "The cabinet swings open. It's full of shiny gold arcade tokens! You take one, and the claw machine in the corner lights up, as if it's been waiting for you."
+    },
+    {
+      "id": "kids-drawings",
+      "minMinutes": 45,
+      "title": "The Secret Club Drawing",
+      "kind": "text",
+      "prompt": "Crayon drawings cover the wall. Under a drawing of the band, a kid has written a word in their secret club's symbols: {cipher}. It's their favourite thing about a birthday party. The drawing's frame has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "cake",
+          "candy",
+          "gifts",
+          "sundae",
+          "frosting"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "grape",
+          "brick",
+          "garden",
+          "planet",
+          "rocket",
+          "bishop",
+          "jungle",
+          "triangle",
+          "hospital",
+          "keyboard",
+          "dolphins"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in the hall. Only one is the club's real key.",
+        "Try each card: only one turns the symbols into something you'd love at a birthday party.",
+        "It says {answer}."
+      ],
+      "solvedText": "The frame swings open. Behind the drawing, the kids have stuck a gold star and a note: NIGHT CREW, YOU ARE IN THE CLUB NOW."
+    },
+    {
+      "id": "birthday-banner",
+      "minMinutes": 60,
+      "title": "The Birthday Banner",
+      "kind": "text",
+      "prompt": "A banner over the stage is written in Pepper's back-to-front alphabet, where A swaps with Z: {cipher}. The banner's pull cord has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "confetti",
+          "glitter",
+          "sparkler",
+          "bubbles",
+          "kazoo",
+          "trumpet"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "The cord drops and a shower of paper streamers falls on your heads. Pepper giggles through a speaker: 'Hooray! A party!'"
+    },
+    {
+      "id": "staff-door",
+      "title": "The STAFF ONLY Door",
+      "kind": "text",
+      "prompt": "The STAFF ONLY door has a keyhole and a word lock, and a riddle painted on it in Pepper's curly writing: 'I'm orange and round with a big toothy grin, and on Halloween night there's a candle within.'",
+      "answers": [
+        "pumpkin",
+        "pumpkins",
+        "jack o lantern"
+      ],
+      "requires": [
+        "backstage-key"
+      ],
+      "hints": [
+        "Think of what people carve on Halloween.",
+        "It's a big orange vegetable with a face cut into it."
+      ],
+      "solvedText": "The key turns, the lock clicks, and the STAFF ONLY door creaks open onto a dark corridor that smells of oil and old costumes.",
+      "variants": [
+        {},
+        {
+          "prompt": "The STAFF ONLY door has a keyhole and a word lock, and a riddle painted on it in Pepper's curly writing: 'The more of me you take, the more you leave behind. Walk these halls at night and you'll hear them.'",
+          "answers": [
+            "footsteps",
+            "footprints",
+            "steps"
+          ],
+          "hints": [
+            "Think about walking.",
+            "You leave them behind you every time you walk."
+          ]
+        },
+        {
+          "prompt": "The STAFF ONLY door has a keyhole and a word lock, and a riddle painted on it in Pepper's curly writing: 'I'm full of air, I come to every party, and if you squeeze me too hard I go POP!'",
+          "answers": [
+            "balloon",
+            "balloons"
+          ],
+          "hints": [
+            "Think of party decorations.",
+            "You blow it up and tie a knot in it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lullaby",
+      "minMinutes": 45,
+      "title": "Pepper's Lullaby",
+      "kind": "text",
+      "prompt": "A tape recorder by the music box is labelled PEPPER'S LULLABY: SING ALONG TO SEND THE BAND TO SLEEP. Someone has cut the words out and mixed them up. Its word lock wants the lullaby's words, in order.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "moon",
+          "stars",
+          "pillow",
+          "blanket",
+          "yawn",
+          "snooze",
+          "teddy",
+          "sleepy",
+          "twinkle",
+          "cosy",
+          "dreamy",
+          "hush"
+        ],
+        "pieceTemplate": "A scrap of the lullaby is stuck to your shoe: the {ordinal} word is '{word}'."
+      },
+      "hints": [
+        "Each of you has one word of the lullaby. Say them in order: first, second, third...",
+        "Put them together in order, like: word word word."
+      ],
+      "solvedText": "You sing it softly: '{answer}...' Out in the hall, the band gives a long, sleepy whirr."
+    },
+    {
+      "id": "parts-cabinet",
+      "minMinutes": 45,
+      "title": "The Parts Cabinet",
+      "kind": "text",
+      "prompt": "The spare-parts cabinet has a word lock and a riddle on a label: 'I've a big round mouth made of mesh, I never eat a thing, but every song in the hall comes out of me.'",
+      "answers": [
+        "speaker",
+        "speakers",
+        "loudspeaker"
+      ],
+      "hints": [
+        "Think about how the band's music gets to the party hall.",
+        "It's the box the music booms out of."
+      ],
+      "solvedText": "The cabinet opens: spare eyes, spare ears and a spare tail, all neatly labelled. Creepy, but tidy.",
+      "variants": [
+        {},
+        {
+          "prompt": "The spare-parts cabinet has a word lock and a riddle on a label: 'I've got teeth but I never bite. I spin round and round to make the band move right.'",
+          "answers": [
+            "cog",
+            "cogs",
+            "gear",
+            "gears",
+            "gearwheel"
+          ],
+          "hints": [
+            "Think about what's inside a machine that turns.",
+            "It's a little wheel with teeth around its edge."
+          ]
+        },
+        {
+          "prompt": "The spare-parts cabinet has a word lock and a riddle on a label: 'On Halloween night you wear me to be someone new. Take me off, and there you are again!'",
+          "answers": [
+            "mask",
+            "masks",
+            "costume",
+            "costumes"
+          ],
+          "hints": [
+            "Think about trick-or-treating.",
+            "You put it over your face to look like a monster or a superhero."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "repair-log",
+      "minMinutes": 60,
+      "title": "The Repair Log",
+      "kind": "text",
+      "prompt": "The repair log on the wall says one tool keeps going missing. Its name is written as numbers, where A is 1 and B is 2: {cipher}. The tool drawer wants its name.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "wrench",
+          "pliers",
+          "hammer",
+          "magnet",
+          "spanner",
+          "chisel"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "The tool drawer slides open. There's the missing tool, with a raccoon-shaped bite out of the handle."
+    },
+    {
+      "id": "spare-heads",
+      "minDifficulty": "hard",
+      "title": "The Blinking Head",
+      "kind": "text",
+      "prompt": "One of the spare heads on the shelf blinks its glowing eyes, long and short, over and over. It's spelling out the thing every night guard waits for: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "dawn",
+          "daylight",
+          "sunlight"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "triangle",
+          "hospital",
+          "keyboard",
+          "dolphins"
+        ]
+      },
+      "hints": [
+        "There's more than one dots-and-dashes card back here. Only one reads what a night guard waits for.",
+        "Look at the sound desk, the fuse box and the clipboard.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "The head's eyes stop blinking. It gives you a slow, creaky wink, and goes back to sleep."
+    },
+    {
+      "id": "music-box",
+      "title": "The Music Box",
+      "kind": "use",
+      "prompt": "The big music box is winding down, and every time it slows, the band out in the hall twitches back to life. It has a keyhole for a winding key, but no key.",
+      "requires": [
+        "winding-key"
+      ],
+      "rewards": [
+        "front-door-key"
+      ],
+      "hints": [
+        "You've found two parts of something. Have you tried putting them together?",
+        "Fit the raccoon handle onto the long stem, then wind the music box with it."
+      ],
+      "solvedText": "You wind it, and wind it, and wind it. The lullaby plays loud and sweet, and the whole band sits down with a happy, sleepy sigh. The lid pops open: inside is a big brass key on a pizza-slice keyring."
+    },
+    {
+      "id": "front-doors",
+      "title": "The Front Doors",
+      "kind": "code",
+      "prompt": "The front doors need their key AND a 3-digit code. Gus's last sticky note: 'Party hats in the hall, then tokens in the jar, then heads on the shelf!'",
+      "answers": [
+        "746"
+      ],
+      "requires": [
+        "front-door-key"
+      ],
+      "pieces": [
+        "You counted the party hats in the hall: 7.",
+        "You counted the tokens in the prize jar: 4.",
+        "You counted the spare heads on the shelf: 6."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on Gus's note.",
+        "Party hats, then tokens, then heads."
+      ],
+      "solvedText": "The padlock falls, the keypad plays a cheerful jingle, and the chains slither to the floor. The front doors are open!",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "358"
+          ],
+          "pieces": [
+            "You counted the party hats in the hall: 3.",
+            "You counted the tokens in the prize jar: 5.",
+            "You counted the spare heads on the shelf: 8."
+          ]
+        },
+        {
+          "answers": [
+            "925"
+          ],
+          "pieces": [
+            "You counted the party hats in the hall: 9.",
+            "You counted the tokens in the prize jar: 2.",
+            "You counted the spare heads on the shelf: 5."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "batteries",
+      "name": "Big batteries",
+      "description": "A pack of four chunky batteries. Still fully charged."
+    },
+    {
+      "id": "flashlight-shell",
+      "name": "Empty flashlight",
+      "description": "Gus's big flashlight. It clicks, but nothing happens: no batteries."
+    },
+    {
+      "id": "flashlight",
+      "name": "Flashlight",
+      "description": "Gus's flashlight, with fresh batteries. It lights up the darkest corners."
+    },
+    {
+      "id": "lanyard",
+      "name": "Gus's name badge",
+      "description": "A name badge on a lanyard: GUS, NIGHT GUARD. It feels thicker than a badge should.",
+      "inspect": "You flip the badge over. Tucked behind Gus's photo: a security keycard!",
+      "inspectGives": "keycard"
+    },
+    {
+      "id": "keycard",
+      "name": "Security keycard",
+      "description": "A white plastic card with a little raccoon on it. It says STAFF ONLY."
+    },
+    {
+      "id": "key-bow",
+      "name": "Raccoon key handle",
+      "description": "The round handle of a wind-up key, shaped like a raccoon's head. There's no stem."
+    },
+    {
+      "id": "arcade-token",
+      "name": "Gold arcade token",
+      "description": "A shiny token with Pepper's face on it. GOOD FOR ONE GAME."
+    },
+    {
+      "id": "backstage-key",
+      "name": "Backstage key",
+      "description": "A small silver key that was sewn into a plush raccoon's bow tie. Its tag says STAFF."
+    },
+    {
+      "id": "key-stem",
+      "name": "Key stem",
+      "description": "A long metal stem with a notch at the top. Something should fit on it."
+    },
+    {
+      "id": "winding-key",
+      "name": "Winding key",
+      "description": "A big wind-up key with a raccoon-head handle. It looks just right for a music box."
+    },
+    {
+      "id": "front-door-key",
+      "name": "Front door key",
+      "description": "A big brass key on a pizza-slice keyring."
+    },
+    {
+      "id": "spare-bow-tie",
+      "name": "Sparkly bow tie",
+      "description": "A spare bow tie from the costume bin. It doesn't open anything. It does look fabulous."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "flashlight-shell",
+        "batteries"
+      ],
+      "makes": "flashlight",
+      "text": "The batteries click into place and the flashlight blazes into life. Much better!"
+    },
+    {
+      "items": [
+        "key-bow",
+        "key-stem"
+      ],
+      "makes": "winding-key",
+      "text": "The raccoon handle clicks onto the stem: a proper winding key!"
+    }
+  ]
+}
