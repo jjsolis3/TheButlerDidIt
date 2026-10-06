@@ -73,6 +73,12 @@ public sealed class EscapeState
     /// <summary>Scene objects someone has searched.</summary>
     public List<string> Examined { get; set; } = [];
 
+    /// <summary>
+    /// Puzzles the group has found (#134): ones that start out of sight (EscapePuzzle.RevealedBy) and final locks, once
+    /// they come into sight. Puzzles in sight from the start aren't listed.
+    /// </summary>
+    public List<string> Revealed { get; set; } = [];
+
     /// <summary>Items someone has looked at closely.</summary>
     public List<string> Inspected { get; set; } = [];
 
@@ -187,6 +193,9 @@ public enum CueKind
 
     /// <summary>Someone searched and found nothing they could use, and it cost time (Normal and Hard, #132).</summary>
     Decoy,
+
+    /// <summary>The last other puzzle in a stage was solved, and its final lock came into sight (#134).</summary>
+    FinalLock,
 }
 
 /// <summary>Something the game master may react to. Its line (and recording) arrive later, from the AI.</summary>

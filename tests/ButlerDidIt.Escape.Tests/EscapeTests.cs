@@ -318,6 +318,18 @@ public class PrivacyTests
                 foreach (var piece in p.Pieces) Assert.DoesNotContain(piece, stageJson);
                 if (!current.Puzzles.Contains(p.Id)) Assert.DoesNotContain(p.Prompt, stageJson);
             }
+            // A puzzle the group hasn't found yet (#134) isn't on any screen: not its title, its prompt or its pieces. And a
+            // final lock's code, built for this game, never shows either.
+            var phones = seats.Select(seat => ViewText.Decoded(GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0)))).ToList();
+            foreach (var p in current.Puzzles.Select(played.FindPuzzle).OfType<EscapePuzzle>().Where(p => !EscapeEngine.Visible(s, p)))
+                foreach (var screen in phones.Prepend(stageJson))
+                {
+                    Assert.False(screen.Contains($"\n{p.Title}\n"), $"{p.Id} is out of sight, but its title was sent");
+                    Assert.DoesNotContain(p.Prompt, screen);
+                    foreach (var piece in p.Pieces) Assert.DoesNotContain(piece, screen);
+                }
+            foreach (var code in played.Puzzles.Where(p => p.Final is not null).SelectMany(p => p.Answers))
+                Assert.False(stageJson.Contains($"\n{code}\n"), "a final lock's code leaked");
 
             foreach (var seat in seats)
             {

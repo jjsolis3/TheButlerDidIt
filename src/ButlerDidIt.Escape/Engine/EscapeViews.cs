@@ -29,6 +29,7 @@ public sealed record EscapeStageView(
     DateTimeOffset ServerNow,
     IReadOnlyList<EscapeFeedEntry> Feed,
     int SolvedCount,
+    /// <summary>While the game plays, the puzzles found so far (#134); once it's over, every puzzle the game had.</summary>
     int PuzzleCount,
     int HintsUsed,
     int WrongAttempts,
@@ -118,7 +119,14 @@ public sealed record EscapePuzzleView(
     /// <summary>Who is working on it, while puzzles go to people (#132); null when nobody is (or anyone may answer).</summary>
     EscapeHoldView? HeldBy = null,
     /// <summary>For ciphers: spots in this part of the room with its key (or a decoy) written on them, not yet found.</summary>
-    int KeysHidden = 0);
+    int KeysHidden = 0,
+    /// <summary>The stage's final lock (#134): its code is built from the marks the other puzzles here left.</summary>
+    bool Final = false,
+    /// <summary>Once it's solved, in a stage with a final lock: the mark and digit it left for that lock.</summary>
+    EscapeMarkView? Mark = null);
+
+/// <summary>A mark a solved puzzle left for its stage's final lock ("⚓" and 7).</summary>
+public sealed record EscapeMarkView(string Mark, int Digit);
 
 /// <param name="Free">Its holder hasn't tried it for a while: someone else may take it over.</param>
 public sealed record EscapeHoldView(Guid SeatId, string Name, bool Free);

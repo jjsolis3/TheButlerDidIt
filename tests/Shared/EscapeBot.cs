@@ -15,7 +15,8 @@ public static class EscapeBot
     public static EscapeCommand NextMove(EscapeState s, EscapeRoom room, Guid seat, DateTimeOffset now)
     {
         var stage = room.Stages[s.StageIndex];
-        var open = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => !s.IsSolved(p.Id)).ToList();
+        // Only what the group can see (#134): searching and solving brings the rest into sight.
+        var open = EscapeEngine.InSight(s, room).Where(p => !s.IsSolved(p.Id)).ToList();
         // While puzzles go to people (#132), a spot with a key written on it is only readable by that puzzle's holder:
         // the bot searches it as them once someone has taken the puzzle, and leaves it until then.
         Guid? Reader(SceneObject o) => open.FirstOrDefault(p => p.KeyAt.Contains($"object:{o.Id}")) is not { } keyed || !s.TakesTurns()

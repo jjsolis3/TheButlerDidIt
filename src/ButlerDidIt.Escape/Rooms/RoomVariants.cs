@@ -40,6 +40,7 @@ public static partial class RoomVariants
                 Math.Max(0, places.GetValueOrDefault(p.Id)?.Count - 1 ?? 0), made)).ToList(),
         };
         if (made.Count > 0) built = WithKeys(built, places, made, seed, difficulty);
+        built = FinalLocks.Make(built, seed, OrderPlaces(room));
         return difficulty switch
         {
             EscapeDifficulty.Easy => built with { HintPenaltySeconds = built.HintPenaltySeconds / 2 },
@@ -56,6 +57,9 @@ public static partial class RoomVariants
         var v = p.Variants.Count == 0 ? null : p.Variants[rng.Next(p.Variants.Count)];
         string prompt = v?.Prompt ?? p.Prompt, solved = v?.SolvedText ?? p.SolvedText;
         List<string> answers = v?.Answers ?? p.Answers, pieces = v?.Pieces ?? p.Pieces, hints = v?.Hints ?? p.Hints;
+        // A final lock is built from the rest of its stage (FinalLocks): its text keeps its placeholders until the game's puzzles are known.
+        if (p.Generator is { Type: GeneratorType.Final })
+            return p with { Prompt = prompt, Answers = [], Pieces = pieces, Hints = hints, SolvedText = solved, Variants = [] };
         SwitchGrid? grid = null;
         CipherDecoder? decoder = null;
         List<string> lineup = [];
@@ -171,9 +175,12 @@ public static partial class RoomVariants
     /// text never says the number itself.
     /// </summary>
     private static Dictionary<string, string> Dealt(int count, string order = "", string facts = "") =>
-        new() { ["{order}"] = order, ["{facts}"] = facts, ["{count}"] = CountWords[count] };
+        new() { ["{order}"] = order, ["{facts}"] = facts, ["{count}"] = CountWord(count) };
 
     private static readonly string[] CountWords = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+
+    /// <summary>A count as a word ("four"), for {count}: a room's text never says the number itself.</summary>
+    public static string CountWord(int count) => count >= 0 && count < CountWords.Length ? CountWords[count] : count.ToString();
     private static Dictionary<string, string> New(params (string Placeholder, string Text)[] fills) => fills.ToDictionary(f => f.Placeholder, f => f.Text);
 
     private static string Fill(string text, Made m)
@@ -187,7 +194,12 @@ public static partial class RoomVariants
     /// pieces), "object:&lt;id&gt;" (a spot's look or clue), "item:&lt;id&gt;" (an item's description), "inspect:&lt;id&gt;"
     /// (what a close look at it shows).
     /// </summary>
-    public static Dictionary<string, List<string>> KeyPlaces(EscapeRoom room)
+    public static Dictionary<string, List<string>> KeyPlaces(EscapeRoom room) => Places(room, KeyPlaceholder());
+
+    /// <summary>Every place a room writes a final lock's order ({order:&lt;puzzle id&gt;}), per lock, as <see cref="KeyPlaces"/> does for keys.</summary>
+    public static Dictionary<string, List<string>> OrderPlaces(EscapeRoom room) => Places(room, FinalLocks.OrderPlaceholder());
+
+    private static Dictionary<string, List<string>> Places(EscapeRoom room, Regex placeholder)
     {
         var at = new Dictionary<string, List<string>>();
         void Note(string place, params string?[] texts)
@@ -195,7 +207,7 @@ public static partial class RoomVariants
             foreach (var text in texts)
             {
                 if (text is null) continue;
-                foreach (Match m in KeyPlaceholder().Matches(text))
+                foreach (Match m in placeholder.Matches(text))
                 {
                     var list = at.TryGetValue(m.Groups[1].Value, out var l) ? l : at[m.Groups[1].Value] = [];
                     if (!list.Contains(place)) list.Add(place);

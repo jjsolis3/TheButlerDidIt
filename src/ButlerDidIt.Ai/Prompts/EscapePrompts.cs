@@ -32,7 +32,7 @@ public static class EscapePrompts
         sb.AppendLine();
         sb.AppendLine("## Where they are");
         sb.AppendLine($"Players: {string.Join(", ", view.Players.Select(p => p.Name))}.");
-        sb.AppendLine($"Stage {view.StageNumber} of {view.StageCount}{(view.Stage is { } stage ? $": {stage.Title}" : "")}. Puzzles solved: {view.SolvedCount} of {view.PuzzleCount}.");
+        sb.AppendLine($"Stage {view.StageNumber} of {view.StageCount}{(view.Stage is { } stage ? $": {stage.Title}" : "")}. Puzzles solved: {view.SolvedCount} of the {view.PuzzleCount} they've found so far.");
         if (view.Deadline is { } deadline && view.Phase == EscapePhase.Playing)
             sb.AppendLine($"Time left: about {Math.Max(0, (int)Math.Round((deadline - now).TotalMinutes))} minutes of {view.TimeLimitMinutes}.");
         sb.AppendLine($"Hints used: {view.HintsUsed}. Wrong answers so far: {view.WrongAttempts}.");
@@ -66,6 +66,7 @@ public static class EscapePrompts
         CueKind.Failed => "Time ran out before they escaped. Gloat, in character, but invite them to try again.",
         CueKind.Found => $"{cue.PlayerName} searched and found something useful: {cue.Thing}. Don't say what it's for.",
         CueKind.Decoy => $"{cue.PlayerName} searched the {cue.Thing} and found nothing they could use, and the wasted search cost them time. Tease them for it, without hinting where to look instead.",
+        CueKind.FinalLock => $"{cue.PlayerName} opened the last lock in this part of the room, and the final lock has appeared: {cue.PuzzleTitle}. Build up the suspense, without saying how it opens.",
         _ => "",
     };
 
@@ -99,6 +100,7 @@ public static class EscapePrompts
                 (GeneratorType.Cipher, _) => "a coded word: decode it with its key, then type the word",
                 (GeneratorType.Sequence, _) => "a number pattern: type the number that comes next",
                 (GeneratorType.Deduction, _) => "a logic puzzle: line the things up so every clue is true; the code is each one's place, in the order listed",
+                (GeneratorType.Final, _) => "the final lock of this part of the room: every other lock here left a mark and a digit when it opened, and the code is those digits in the order written somewhere in the room",
                 (_, PuzzleKind.Code) => "a number keypad",
                 (_, PuzzleKind.Text) => "a word or phrase to type",
                 (_, PuzzleKind.Search) => "opens once the right spots in the room have been searched",
