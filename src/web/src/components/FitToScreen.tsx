@@ -22,7 +22,10 @@ export function FitToScreen({ children, min = 0.6, className = '' }: { children:
     if (!box || !content) return
     const measure = () => {
       const needed = content.offsetHeight
-      const scale = needed > box.clientHeight ? Math.max(min, box.clientHeight / needed) : 1
+      // Both heights are rounded to whole pixels but the layout isn't, so keep a pixel spare: otherwise the scaled
+      // content can come out a fraction taller than its box, which clips the bottom of the last card.
+      const room = box.clientHeight - 1
+      const scale = needed > room ? Math.max(min, room / needed) : 1
       setFit((f) => (f.scale === scale && f.height === needed ? f : { scale, height: needed }))
     }
     measure()
