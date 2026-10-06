@@ -923,7 +923,7 @@
         "cipher": "morse",
         "words": [
           "pets",
-          "family",
+          "parents",
           "friends"
         ],
         "decoyWords": [
@@ -932,11 +932,6 @@
           "rock",
           "worm",
           "shoe",
-          "garden",
-          "jungle",
-          "bishop",
-          "pickle",
-          "donkey",
           "blanket",
           "kitchen",
           "dolphin",
