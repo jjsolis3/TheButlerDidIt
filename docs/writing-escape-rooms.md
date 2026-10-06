@@ -66,7 +66,7 @@ A real escape room is searched, not just solved. A stage can have a **scene**: a
 | Spot field | Meaning |
 |---|---|
 | `id` | Unique in the whole room. |
-| `prop` | What the screens draw: rug, painting, crate, pipe, bookshelf, clock, chest, barrel, lamp, window, desk, vent, poster, door, safe, plant, mirror, shelf, box, table, cabinet, statue, drawer, bed, sign or machine. |
+| `prop` | What the screens draw: rug, painting, crate, pipe, bookshelf, clock, chest, barrel, lamp, window, desk, vent, poster, door, safe, plant, mirror, shelf, box, table, cabinet, statue, drawer, bed, sign or machine; and for themed rooms, tree, rock, screen, arcade, robot, speaker, microphone, trophy, portal, water, lava, animal, clothes, food, vehicle or lever. A new prop needs a drawing in `src/web/src/escape/props.tsx` too (a test checks the two lists match). |
 | `x`, `y`, `w`, `h` | Where it is on the canvas. It must fit inside. |
 | `label` | What everyone sees ("the rug"). |
 | `look` | What the searcher finds. Only shown once searched. |
@@ -111,12 +111,14 @@ There are two ways to make a puzzle vary:
 ]
 ```
 
-**Generators** build the clue pieces and the answer from the seed. The prompt, the hints and the solved text can use `{order}`, `{facts}` and `{answer}`, and the newer generators add their own placeholders.
+**Generators** build the clue pieces and the answer from the seed. The prompt, the hints and the solved text can use `{order}`, `{facts}`, `{count}` and `{answer}`, and the newer generators add their own placeholders.
+
+`{count}` is how many digits or words a `digitFacts`, `colorDigits` or `wordSequence` puzzle deals in this game, as a word. Easy deals one fewer and Hard one more, so never write the number yourself: "a {count}-digit lock" reads "a four-digit lock" on Hard (#139). A test checks no shipped room does.
 
 | `type` | Kind | Makes | Needs |
 |---|---|---|---|
 | `digitFacts` | code | A code whose digits are everyday facts ("the number of days in a week"), one fact per phone. The facts come from `FactBank`. | A piece template with `{ordinal}` and `{fact}` |
-| `colorDigits` | code | A code read from coloured objects in the order a sign gives (`{order}`). | A piece template with `{color}` and `{digit}` |
+| `colorDigits` | code | A code read from coloured objects in the order a sign gives (`{order}`). | A piece template with `{color}` and `{digit}`, and a `thing` ("gem" makes `{order}` read "Red gem, then Blue gem"; left out, just the colours) |
 | `wordSequence` | text | A password of words in order, one word per phone. | `words`, and a piece template with `{ordinal}` and `{word}` |
 | `cipher` | text | A word from `words` in code, shown with `{cipher}` in the prompt. `cipher` is `shift`, `symbols`, `morse`, `numbers` (A=1…Z=26) or `mirror` (A↔Z). | For `shift`, `symbols` and `morse`, write `{key:<puzzle id>}` somewhere the group has to find it: a spot's look or clue, an item's description or closer look, or another puzzle's prompt or piece. The validator checks it can be found in time. |
 | `sequence` | code | A number pattern, shown with `{sequence}` ("3, 7, 11, 15, 19, ?"). The code is the next number. | Nothing else |
@@ -175,7 +177,7 @@ The validator checks there are enough hiding spots for a solo player: at least o
 
 ## Sound and pictures
 
-- **`soundscape`** (on the room, and optionally on a stage) sets the background sound on the TV: `drone` (the default), `workshop`, `carnival`, `sea`, `space`, `haunted`, `manor` (a clock and a fire), `storm`, `train`, `night` (crickets), `lounge` (a murmur and soft chords) or `silence`. The sound is made live in the browser, so there are no audio files to add. The TV also plays short sounds when a lock opens, a new room opens, a code is wrong or a hint is bought, then a gong and a heartbeat in the final minute.
+- **`soundscape`** (on the room, and optionally on a stage) sets the background sound on the TV: `drone` (the default), `workshop`, `carnival`, `sea`, `space`, `haunted`, `manor` (a clock and a fire), `storm`, `train`, `night` (crickets), `lounge` (a murmur and soft chords), `arcade` (a games hall after hours), `concert` (a waiting crowd and the beat through the wall), `stadium` (a cheering crowd), `meadow` (birdsong and soft piano), `cave` (echoing drips), `tension` (a slow pulse and distant footsteps) or `silence`. A scene's `backdrop` takes the same names, for the colour behind its spots. The sound is made live in the browser, so there are no audio files to add. The TV also plays short sounds when a lock opens, a new room opens, a code is wrong or a hint is bought, then a gong and a heartbeat in the final minute.
 - **`artStyle`** describes the look. With an image model set up, the room's cover and each stage are painted once, from the title, synopsis and stage descriptions only. So write stage descriptions that paint a picture, and never put an answer in them unless you mean it to be hidden in plain sight.
 
 ## The AI game master
@@ -237,6 +239,22 @@ The scene is laid out on the 1000 × 600 canvas with spots that don't overlap:
 Across lengths and difficulties it plays 9 puzzles at 30 minutes, 13 at 45 and 15 at 60, plus Hard's extra. The validator plays every one of those through, 200 puzzle sets each, and the content tests check the room clears the bar for shipped rooms (`ContentBarTests`), including that no cipher word is already written somewhere in the room.
 
 The Family rooms (edition 2) follow the same shape with gentler parts: the Pirate Ship's apple-barrel riddle gives a ladle, the ladle fishes the galley key out of the stew pot, and a spyglass put together from a lens (a logic puzzle about the cook's pots) and a tube (a search) reads the shift cipher's key off a buoy far out at sea. Their ciphers are numbers (A = 1), mirror and shift with short words; symbols and Morse only turn up on Hard. Easy deals smaller logic puzzles and number patterns.
+
+## Themed rooms
+
+The five themed Family rooms (#137) show how to make every puzzle belong to its world, rather than a riddle that could sit in any room. Each generator becomes something the world already has:
+
+| Room | Number pattern | Colours | Logic | Lights | Words across phones | Crafting |
+|---|---|---|---|---|---|---|
+| The Night Shift (🎃) | the security camera log | prize tickets | the animatronic band's line-up | the breaker panel | the music box's lullaby | a winding key from two halves |
+| The Hologram Concert | the drum machine's beat | the fans' glow sticks | the instruments on the riser | the light-up stage jacket | the hit song's chorus | the hologram crystal |
+| The Hero Exam | the rescue siren | the rescue teams' scoreboard | the class roll call | the gadget charging dock | the Hero Oath | the power-down gadget |
+| The Last Round (🎃) | a generator's fuel gauge | a generator's wires | the survivors on their spawn pads | a generator's switch panel | the server password | the exit gate's fuse |
+| The Blocklands | the mine's depth sign | the ore wall | the crafting table's block shelf | the ruin's glow lamps | the portal spell | a pickaxe, a torch, flint and steel |
+
+The tools are the world's tools too: the night guard's flashlight for the dark vent, a UV hairclip for glow-in-the-dark writing, power gloves and X-ray goggles, a wrench for the server box, and a pickaxe and bucket (water on lava makes obsidian). Each final lock needs something carried from every stage.
+
+**Inspired by, never the real names.** The built-in shelf is public, so a room can borrow a genre and its moods (an animatronic pizzeria, a virtual pop idol, a hero academy, a survivors' game, a world of blocks) but never another company's characters, names, logos or catchphrases. A host who wants the real names for their own family night can type the theme into *Write a room with AI*, or use the room editor: those rooms stay on their own shelf.
 
 ## Leaderboards
 

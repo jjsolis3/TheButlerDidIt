@@ -30,6 +30,23 @@ const PROPS: Record<string, { emoji: string; tint: string; round?: boolean }> = 
   bed: { emoji: '🛏️', tint: '#5a4a6a' },
   sign: { emoji: '🪧', tint: '#7a6a4a' },
   machine: { emoji: '⚙️', tint: '#56616b', round: true },
+  // For themed rooms (#137).
+  tree: { emoji: '🌳', tint: '#3f6b43', round: true },
+  rock: { emoji: '🪨', tint: '#6b6660', round: true },
+  screen: { emoji: '🖥️', tint: '#3d5068' },
+  arcade: { emoji: '🕹️', tint: '#5a3d6b' },
+  robot: { emoji: '🤖', tint: '#5f6b73' },
+  speaker: { emoji: '🔊', tint: '#4a4a58' },
+  microphone: { emoji: '🎤', tint: '#6a5a7a', round: true },
+  trophy: { emoji: '🏆', tint: '#8a7a3a' },
+  portal: { emoji: '🌀', tint: '#4b3d78', round: true },
+  water: { emoji: '💧', tint: '#2f5f7f', round: true },
+  lava: { emoji: '🌋', tint: '#8a3a1e', round: true },
+  animal: { emoji: '🐾', tint: '#6f7a5a', round: true },
+  clothes: { emoji: '👕', tint: '#5a6a8a' },
+  food: { emoji: '🍕', tint: '#8a5a3a' },
+  vehicle: { emoji: '🚌', tint: '#8a6a2a' },
+  lever: { emoji: '🎚️', tint: '#5f6b73' },
 }
 
 export function PropIcon({ prop, examined }: { prop: string; examined: boolean }) {

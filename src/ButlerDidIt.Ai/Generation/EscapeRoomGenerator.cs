@@ -164,7 +164,8 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
     public static bool IsRiddle(EscapePuzzle p) => p.Kind == PuzzleKind.Text && p.Generator is null;
 
     /// <summary>The backgrounds the screens can draw, picked from the room's (or stage's) sound.</summary>
-    private static readonly Dictionary<string, string> Backdrops = new() { ["workshop"] = "workshop", ["carnival"] = "carnival", ["sea"] = "sea", ["space"] = "space", ["haunted"] = "haunted" };
+    private static readonly Dictionary<string, string> Backdrops = new[] { "workshop", "carnival", "sea", "space", "haunted", "arcade", "concert", "stadium", "meadow", "cave", "tension" }
+        .ToDictionary(b => b, b => b);
 
     /// <summary>Server-side facts the model doesn't get to choose.</summary>
     public static EscapeRoom Normalize(EscapeRoom room, EscapeRoomRequest request)
@@ -289,7 +290,7 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         Reply with a single JSON object in exactly this format (camelCase keys):
         {
           "id": "draft", "title": "...", "synopsis": "2 sentences for the shelf", "contentRating": "{{{(r.ContentRating == ContentRating.Family ? "family" : "mature")}}}",
-          "artStyle": "a few words describing the look", "soundscape": "the background sound: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night or lounge", "minPlayers": 2, "maxPlayers": 8, "timeLimitMinutes": {{{r.Minutes}}},
+          "artStyle": "a few words describing the look", "soundscape": "the background sound: drone, workshop, carnival, sea, space, haunted, manor, storm, train, night, lounge, arcade, concert, stadium, meadow, cave or tension", "minPlayers": 2, "maxPlayers": 8, "timeLimitMinutes": {{{r.Minutes}}},
           "intro": "read on the TV when the clock starts, in the game master's voice",
           "escapedText": "read when they escape", "failedText": "read when time runs out",
           "gameMaster": {"name": "...", "persona": "how they talk, 1-2 sentences", "voice": {"accent": "en-GB", "pitch": 1.0, "rate": 1.0, "style": "two or three words"} },
@@ -322,9 +323,12 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         Generators (codes, cipher text and logic clues are made from them every game; you write only the flavour):
         - "digitFacts": a code whose digits are everyday facts ("the number of legs on a spider"), one per phone. "kind": "code". pieceTemplate must contain {ordinal} and {fact}.
         - "colorDigits": a code read from coloured objects in a colour order; each phone sees one colour and its number. "kind": "code".
-          Give 5 or more "colors"; pieceTemplate must contain {color} and {digit}; put {order} in the prompt or a hint so the group knows the order.
+          Give 5 or more "colors", and "thing": what the coloured objects are ("gem" makes {order} read "Red gem, then Blue gem");
+          pieceTemplate must contain {color} and {digit}; put {order} in the prompt or a hint so the group knows the order.
         - "wordSequence": a password of words in order; each phone remembers one word. "kind": "text". Give 10 or more themed "words";
           pieceTemplate must contain {ordinal} and {word}. Prompts, hints and solvedText may use {answer}.
+          For these three, never write how many digits or words there are: Easy deals one fewer and Hard one more. Write {count}
+          instead ("a {count}-digit lock" reads "a four-digit lock" on Hard).
         - "cipher": a coded word, picked from your "words", shown where the prompt says {cipher}. "kind": "text". "cipher" is one of:
           numbers (A=1…Z=26) or mirror (A↔Z): no key needed; shift, symbols or morse: write "{key:<this puzzle's id>}" in a spot's "look"
           or an item's "inspect" where the group will find it (ideally a spot that needs a tool). {{{(r.ContentRating == ContentRating.Family ? "This is a family room: use numbers, mirror or shift with short words; symbols and morse only on a Hard-only puzzle." : "Symbols and morse make good Hard-only puzzles.")}}}

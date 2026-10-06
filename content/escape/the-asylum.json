@@ -533,7 +533,7 @@
       "minMinutes": 45,
       "title": "The Patient Chart",
       "kind": "code",
-      "prompt": "Clipped to the chart is a little lockbox marked MEDICATION, with a 3-digit dial. Someone has scribbled the code across the chart's pages. Each of you read a different page.",
+      "prompt": "Clipped to the chart is a little lockbox marked MEDICATION, with a {count}-digit dial. Someone has scribbled the code across the chart's pages. Each of you read a different page.",
       "hints": [
         "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
         "In order: {facts}."
@@ -574,7 +574,7 @@
       "id": "medicine-cabinet",
       "title": "The Medicine Cabinet",
       "kind": "code",
-      "prompt": "The glass medicine cabinet has a 3-digit lock. A typed label on the glass reads: '{order}. Take as directed.'",
+      "prompt": "The glass medicine cabinet has a {count}-digit lock. A typed label on the glass reads: '{order}. Take as directed.'",
       "rewards": [
         "pill-bottle"
       ],
@@ -594,6 +594,7 @@
           "green",
           "orange"
         ],
+        "thing": "bottle",
         "pieceTemplate": "You counted the {color} pill bottles on the cabinet's shelves: there were {digit}."
       }
     },
@@ -740,9 +741,9 @@
       "minMinutes": 45,
       "title": "The Tape Player",
       "kind": "text",
-      "prompt": "The reel-to-reel tape player is wired to the gate's second lock. A label on it reads: 'Repeat the Warden's three words, first to last.'",
+      "prompt": "The reel-to-reel tape player is wired to the gate's second lock. A label on it reads: 'Repeat the Warden's {count} words, first to last.'",
       "hints": [
-        "Three phones each remember one word the Warden whispered over the PA.",
+        "Each of {count} phones remembers one word the Warden whispered over the PA.",
         "Say them in order, first to last, like: word word word."
       ],
       "solvedText": "The reels stop turning. '{answer},' the Warden repeats softly. 'Good. You were listening.' One lock on the gate falls open.",

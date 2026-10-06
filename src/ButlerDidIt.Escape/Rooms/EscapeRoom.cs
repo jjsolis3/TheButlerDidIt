@@ -187,6 +187,9 @@ public static class SceneProps
     {
         "rug", "painting", "crate", "pipe", "bookshelf", "clock", "chest", "barrel", "lamp", "window", "desk", "vent",
         "poster", "door", "safe", "plant", "mirror", "shelf", "box", "table", "cabinet", "statue", "drawer", "bed", "sign", "machine",
+        // For themed rooms (#137): a games hall, a stage, a city, a cave.
+        "tree", "rock", "screen", "arcade", "robot", "speaker", "microphone", "trophy", "portal", "water", "lava", "animal",
+        "clothes", "food", "vehicle", "lever",
     };
 }
 
@@ -391,6 +394,12 @@ public sealed class PuzzleGenerator
 
     /// <summary>For ColorDigits: the colours to choose from.</summary>
     public List<string> Colors { get; init; } = [];
+
+    /// <summary>
+    /// For ColorDigits: what the coloured things are, for {order} ("gem" makes "Red gem, then Blue gem"). Left out,
+    /// {order} names just the colours.
+    /// </summary>
+    public string Thing { get; init; } = "";
 }
 
 public sealed record EscapeItem

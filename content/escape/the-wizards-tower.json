@@ -598,7 +598,7 @@
       "minMinutes": 45,
       "title": "The Floating Bookshelf",
       "kind": "code",
-      "prompt": "The floating bookshelf is locked with a 3-digit golden clasp. Each of you caught a different book as it drifted past.",
+      "prompt": "The floating bookshelf is locked with a {count}-digit golden clasp. Each of you caught a different book as it drifted past.",
       "hints": [
         "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
         "In order: {facts}."
@@ -653,7 +653,7 @@
       "id": "ingredient-cabinet",
       "title": "The Ingredient Cabinet",
       "kind": "code",
-      "prompt": "The ingredient cabinet has a 3-digit lock. A spell card on it reads: '{order}! Mix them in that order!'",
+      "prompt": "The ingredient cabinet has a {count}-digit lock. A spell card on it reads: '{order}! Mix them in that order!'",
       "rewards": [
         "wand-core"
       ],
@@ -673,6 +673,7 @@
           "gold",
           "silver"
         ],
+        "thing": "potion",
         "pieceTemplate": "You counted the {color} potion bottles on the shelf: there were {digit}."
       }
     },
@@ -807,9 +808,9 @@
       "minMinutes": 45,
       "title": "The Great Telescope",
       "kind": "text",
-      "prompt": "The great telescope is locked with a word dial. A note in curly handwriting: 'The three star-words, first to last!'",
+      "prompt": "The great telescope is locked with a word dial. A note in curly handwriting: 'The {count} star-words, first to last!'",
       "hints": [
-        "Three phones each remember one star-word Professor Quill whispered.",
+        "Each of {count} phones remembers one star-word Professor Quill whispered.",
         "Say them in order, first to last, like: word word word."
       ],
       "solvedText": "The telescope swings round by itself, and the stars spell out '{answer}' across the sky. Professor Quill sniffles: 'How beautiful!'",

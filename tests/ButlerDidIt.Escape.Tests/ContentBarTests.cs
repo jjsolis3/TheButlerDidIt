@@ -48,6 +48,18 @@ public class ContentBarTests
             p => p.Generator is { Type: GeneratorType.Cipher, Cipher: CipherType.Symbols or CipherType.Morse });
     }
 
+    /// <summary>Every prop a room can name has a drawing on the screens (src/web/src/escape/props.tsx), and every drawing a name.</summary>
+    [Fact]
+    public void Every_prop_the_validator_allows_has_a_drawing()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "src", "web"))) dir = dir.Parent;
+        var source = File.ReadAllText(Path.Combine(dir!.FullName, "src", "web", "src", "escape", "props.tsx"));
+        var drawn = System.Text.RegularExpressions.Regex.Matches(source, @"^\s+(\w+): \{ emoji:", System.Text.RegularExpressions.RegexOptions.Multiline)
+            .Select(m => m.Groups[1].Value).ToHashSet();
+        Assert.Equal(SceneProps.Known.Order(), drawn.Order());
+    }
+
     [Fact]
     public void Every_shipped_room_offers_every_length() =>
         Assert.All(Rooms.Library, r => Assert.Equal([30, 45, 60], r.PlayableLengths));

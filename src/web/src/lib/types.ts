@@ -1152,6 +1152,12 @@ export type Soundscape =
   | 'train'
   | 'night'
   | 'lounge'
+  | 'arcade'
+  | 'concert'
+  | 'stadium'
+  | 'meadow'
+  | 'cave'
+  | 'tension'
 
 export interface EscapeGameMasterView {
   name: string

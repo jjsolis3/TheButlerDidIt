@@ -1,0 +1,1093 @@
+{
+  "id": "the-blocklands",
+  "title": "The Blocklands",
+  "synopsis": "You've woken up in the Blocklands, a world where everything is made of blocks, with nothing but your bare hands. Craft your first tools, light your way down into the caves, mine for what you need and mend the old portal before the night is over.",
+  "contentRating": "family",
+  "theme": "blocks",
+  "artStyle": "a sunny world made entirely of cubes: square trees, square sheep and square clouds, a crafting table, glittering ore in deep caves, glowing lava, and an ancient ruin with a black portal frame, bright voxel cartoon style",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 90,
+  "soundscape": "meadow",
+  "intro": "Hrrm. Another newcomer. I'm Old Pebble, the trader round here. You've woken up in the Blocklands, where everything's made of blocks, and the only way back is the old portal deep under the hills. It's broken, of course. You'll have to craft your own tools, dig deep and mend it yourselves. And the sun's going down. Hrrm. Better start punching some trees.",
+  "escapedText": "You step through the swirling portal... and wake up in your own bed, which is pleasantly not square. On your pillow sits a tiny black block and a note in grumpy handwriting: 'Not bad. Hrrm. Old Pebble.'",
+  "failedText": "The sun sets over the Blocklands and the zombies come shuffling out. Old Pebble sighs and lets you into his shop for the night: 'Hrrm. Try again in the morning.'",
+  "gameMaster": {
+    "name": "Old Pebble",
+    "persona": "A grumpy old blocky trader who has seen a thousand nights in the Blocklands. Says 'Hrrm' a lot, haggles over everything and grumbles when the group is slow, but secretly cheers when they craft something clever. Never scary.",
+    "voice": {
+      "accent": "en-GB",
+      "pitch": 0.85,
+      "rate": 0.95,
+      "style": "grumpy, gravelly, secretly kind"
+    }
+  },
+  "stages": [
+    {
+      "id": "meadow",
+      "title": "The Meadow",
+      "description": "You wake up in a sunny meadow where everything is made of blocks: square trees, square clouds, even square sheep. There's a crafting table, a trader's stall with a grumpy old trader, and a dark cave mouth in the hillside. The sun is already sinking. Better get crafting before night falls.",
+      "puzzles": [
+        "block-shelf",
+        "meadow-search",
+        "trader-sign",
+        "trader-chest",
+        "cave-mouth"
+      ],
+      "scene": {
+        "backdrop": "meadow",
+        "objects": [
+          {
+            "id": "crafting-table",
+            "prop": "table",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "crafting table",
+            "look": "A wooden table with a grid on top, and a shelf of blocks underneath with a number keypad."
+          },
+          {
+            "id": "trader-stall",
+            "prop": "cabinet",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "trader's stall",
+            "look": "Old Pebble's stall, with a till that has a word lock and a sign in a strange sliding code."
+          },
+          {
+            "id": "mossy-boulder",
+            "prop": "rock",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "mossy boulder",
+            "look": "You chip the boulder open with the pickaxe. Carved inside: 'Slide back {key:trader-sign}. Old Pebble.'",
+            "requires": "wooden-pickaxe",
+            "lockedText": "A big mossy boulder. You punch it. Ow. You'll need a pickaxe."
+          },
+          {
+            "id": "dark-stone",
+            "prop": "rock",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "dark stone",
+            "look": "You mine the dark stone with the pickaxe, and out tumble lumps of coal!",
+            "gives": "coal",
+            "requires": "wooden-pickaxe",
+            "lockedText": "A chunk of dark, speckled stone. Your fists won't dent it."
+          },
+          {
+            "id": "cave-mouth-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "cave mouth",
+            "look": "A pitch-black cave in the hillside. Something in there groans: 'Braaains... no, wait... graaains?'"
+          },
+          {
+            "id": "oak-tree",
+            "prop": "tree",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "oak tree",
+            "look": "You punch the tree. It's surprisingly satisfying. Twigs rain down.",
+            "hidesPieces": true
+          },
+          {
+            "id": "bushes",
+            "prop": "plant",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "berry bushes",
+            "look": "Sweet berries and a lot of twigs.",
+            "hidesPieces": true
+          },
+          {
+            "id": "sheep-field",
+            "prop": "animal",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "sheep field",
+            "look": "Square sheep. Baaa. One of them is pink, and one is lying on a pile of twigs.",
+            "hidesPieces": true
+          },
+          {
+            "id": "flower-patch",
+            "prop": "plant",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "flower patch",
+            "look": "Poppies and dandelions, all perfectly square.",
+            "hidesPieces": true
+          },
+          {
+            "id": "pond",
+            "prop": "water",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "little pond",
+            "look": "A square pond with a square fish in it. It blinks at you.",
+            "hidesPieces": true
+          },
+          {
+            "id": "signpost",
+            "prop": "sign",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "signpost",
+            "look": "In Old Pebble's wobbly handwriting: 'back {key:trader-sign}'",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "old-well",
+            "prop": "barrel",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "old well",
+            "look": "On the bucket, scratched very small: back {key:trader-sign}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "haystack",
+            "prop": "crate",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "haystack",
+            "look": "Hay. Lots and lots of hay.",
+            "hidesPieces": true
+          },
+          {
+            "id": "field-bed",
+            "prop": "bed",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "red bed",
+            "look": "A bed in the middle of a field. You'd love a nap, but there's no time.",
+            "hidesPieces": true
+          },
+          {
+            "id": "chicken-coop",
+            "prop": "animal",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "chicken coop",
+            "look": "Bok. Bok bok. An egg rolls out.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "caves",
+      "soundscape": "cave",
+      "title": "The Caves",
+      "description": "The cave winds down and down into the dark. Ore glitters in the walls, an old minecart track disappears into the gloom, an underground lake glimmers, and far below, a pool of glowing orange lava bubbles away. A miners' camp sits abandoned beside the track.",
+      "puzzles": [
+        "ore-wall",
+        "depth-sign",
+        "camp-search",
+        "storeroom",
+        "miner-diary"
+      ],
+      "scene": {
+        "backdrop": "cave",
+        "objects": [
+          {
+            "id": "underground-lake",
+            "prop": "water",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "underground lake",
+            "look": "You fill the bucket to the brim with cold, clear water.",
+            "gives": "water-bucket",
+            "requires": "bucket",
+            "lockedText": "Cold, clear water. You'd need something to carry it in."
+          },
+          {
+            "id": "lava-pool",
+            "prop": "lava",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lava pool",
+            "look": "You pour water over the edge of the lava: HISSSSS! A cloud of steam, and the lava cools into a block of shiny black obsidian. You pry it loose.",
+            "gives": "obsidian",
+            "requires": "water-bucket",
+            "lockedText": "A pool of glowing, bubbling lava. Much too hot to go near. If only you could cool it down..."
+          },
+          {
+            "id": "gravel-pile",
+            "prop": "rock",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "gravel pile",
+            "look": "You dig into the gravel with the pickaxe, and a sharp grey flint pops out!",
+            "gives": "flint",
+            "requires": "wooden-pickaxe",
+            "lockedText": "A loose pile of gravel. It slides through your fingers. You need a tool."
+          },
+          {
+            "id": "vault-door",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "miners' vault",
+            "look": "A stone door with ore set into the wall around it, and a number lock."
+          },
+          {
+            "id": "minecart-track",
+            "prop": "pipe",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "minecart track",
+            "look": "Rails disappearing into the dark. Far away, something clatters."
+          },
+          {
+            "id": "bedroll",
+            "prop": "bed",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "bedroll",
+            "look": "A miner's bedroll. Someone left in a hurry.",
+            "hidesPieces": true
+          },
+          {
+            "id": "old-minecart",
+            "prop": "vehicle",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "old minecart",
+            "look": "A rusty minecart full of cobblestone and one lost glove.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tool-rack",
+            "prop": "shelf",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "tool rack",
+            "look": "Broken pickaxes, a dented helmet and empty hooks.",
+            "hidesPieces": true
+          },
+          {
+            "id": "glow-mushrooms",
+            "prop": "plant",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "glowing mushrooms",
+            "look": "Mushrooms that glow a soft blue. Pretty!",
+            "hidesPieces": true
+          },
+          {
+            "id": "stalagmites",
+            "prop": "rock",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "stalagmites",
+            "look": "Pointy rocks growing up from the floor. Mind your toes.",
+            "hidesPieces": true
+          },
+          {
+            "id": "storeroom-door",
+            "prop": "door",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "storeroom door",
+            "look": "A wooden door with a word lock and a riddle scratched into it."
+          },
+          {
+            "id": "rocky-ledge",
+            "prop": "desk",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "rocky ledge",
+            "look": "A miner's diary lies open. The last page is all numbers."
+          },
+          {
+            "id": "bat-nook",
+            "prop": "vent",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "bat nook",
+            "look": "Squeak! A bat flaps past your ear."
+          },
+          {
+            "id": "depth-board",
+            "prop": "sign",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "depth sign",
+            "look": "A sign nailed to the wall, counting the levels down. The last number has worn off."
+          }
+        ]
+      }
+    },
+    {
+      "id": "portal-ruin",
+      "soundscape": "space",
+      "title": "The Portal Ruin",
+      "description": "At the very bottom of the caves lies an ancient ruin: mossy stone bricks, dark lamps set into the walls, a shelf of dusty books, an enchanting table with a floating book, and in the middle, an old portal frame of black stone with one block missing. Through the gap, you can almost see your own front door.",
+      "puzzles": [
+        "glow-lamps",
+        "enchanting-table",
+        "spell-words",
+        "ruin-sign",
+        "beacon",
+        "portal"
+      ],
+      "scene": {
+        "backdrop": "space",
+        "objects": [
+          {
+            "id": "portal-frame",
+            "prop": "portal",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "portal frame",
+            "look": "A tall frame of black stone blocks, with one block missing and a keypad carved into its base."
+          },
+          {
+            "id": "enchant-table",
+            "prop": "table",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "enchanting table",
+            "look": "A table with a floating, glowing book. The writing is all strange runes."
+          },
+          {
+            "id": "lamp-wall",
+            "prop": "lamp",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "glow lamps",
+            "look": "Lamps set into the stone walls, all dark."
+          },
+          {
+            "id": "rune-stone",
+            "prop": "rock",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "rune stone",
+            "look": "A standing stone with a rune card carved into it: {key:enchanting-table}"
+          },
+          {
+            "id": "ruin-bookshelf",
+            "prop": "bookshelf",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "ancient bookshelf",
+            "look": "Dusty old books, all about portals, potions and pumpkins.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mossy-bricks",
+            "prop": "rug",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "mossy bricks",
+            "look": "Cracked stone bricks, green with moss.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cauldron",
+            "prop": "barrel",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cauldron",
+            "look": "An empty cauldron. It smells of very old soup.",
+            "hidesPieces": true
+          },
+          {
+            "id": "armour-stand",
+            "prop": "statue",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "armour stand",
+            "look": "A stand wearing a rusty helmet and nothing else.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cracked-pillar",
+            "prop": "pipe",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cracked pillar",
+            "look": "A pillar with a crack all the way up. Better not lean on it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "rusty-chest",
+            "prop": "chest",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "rusty chest",
+            "look": "Cobwebs, and a battered old saddle.",
+            "gives": "saddle",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "dusty-book",
+            "prop": "box",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "dusty book",
+            "look": "A book on the floor, with a rune card tucked inside: {key:enchanting-table}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "lectern",
+            "prop": "sign",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "old lectern",
+            "look": "A rune card pinned to the lectern: {key:enchanting-table}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "beacon-base",
+            "prop": "lamp",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "beacon",
+            "look": "A code card under the beacon: {key:beacon}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "old-banner",
+            "prop": "painting",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "old banner",
+            "look": "A banner with a table of dots and dashes stitched into it: {key:beacon}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "ruin-chest",
+            "prop": "chest",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "ruin chest",
+            "look": "Inside, under some string: a code card: {key:beacon}",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "block-shelf",
+      "title": "The Crafting Table",
+      "kind": "code",
+      "prompt": "The crafting table won't work until the blocks on its shelf are in the right order: {items}. Its keypad wants each block's place, far left is 1, in the order listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "dirt",
+          "sand",
+          "gravel",
+          "oak log",
+          "cobblestone"
+        ],
+        "pieceTemplate": "Carved on a crafting recipe: {clue}"
+      },
+      "rewards": [
+        "planks"
+      ],
+      "hints": [
+        "Every phone has a line from the crafting recipes. Read them all out loud.",
+        "Start with the line you're surest about, and try each place in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "Click! The crafting table glows and a drawer slides out, stacked with fresh wooden planks."
+    },
+    {
+      "id": "meadow-search",
+      "title": "Gathering Sticks",
+      "kind": "search",
+      "prompt": "To craft anything at all, you'll need sticks. Search the oak tree, the berry bushes and the sheep field.",
+      "finds": [
+        "oak-tree",
+        "bushes",
+        "sheep-field"
+      ],
+      "rewards": [
+        "sticks"
+      ],
+      "hints": [
+        "Three spots in the meadow are worth a good look.",
+        "Punch the tree, rummage in the leaves and check under the sheep."
+      ],
+      "solvedText": "You gather the twigs into a neat bundle of sticks. One of the sheep looks a bit offended."
+    },
+    {
+      "id": "trader-sign",
+      "title": "The Trader's Sign",
+      "kind": "text",
+      "prompt": "Old Pebble's stall has a sign in his sliding trader's code: {cipher}. It names the snack he'll trade for, and his till has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "melon",
+          "carrot",
+          "apple",
+          "cookie",
+          "potato",
+          "beetroot"
+        ]
+      },
+      "rewards": [
+        "spare-stick"
+      ],
+      "hints": [
+        "Old Pebble wrote a number in more than one place, and one of them is inside something you'll need a tool to open.",
+        "Try each number you found: only one turns this into a snack.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "Old Pebble's till pings open. 'Hrrm. A fair trade,' he grumbles, and hands you a spare stick. 'For a torch. You'll want one down there.'"
+    },
+    {
+      "id": "trader-chest",
+      "minMinutes": 60,
+      "title": "The Trading Chest",
+      "kind": "code",
+      "prompt": "Old Pebble's trading chest has a {count}-digit lock. He's set the code as a quiz, one question for each of you.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Old Pebble mutters to you: 'Hrrm. The {ordinal} digit is {fact}.'"
+      },
+      "hints": [
+        "Every phone holds one digit as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "Inside the chest: a golden pear, a saddle blanket and a very old boot. Old Pebble snatches the pear back. 'Not for sale.'"
+    },
+    {
+      "id": "cave-mouth",
+      "title": "The Cave Mouth",
+      "kind": "use",
+      "prompt": "The cave mouth in the hillside is pitch black, and zombies grumble somewhere inside. You won't get far without a light.",
+      "requires": [
+        "torch"
+      ],
+      "hints": [
+        "You need a torch. What do you craft a torch from?",
+        "Mine coal with the pickaxe, put it on the spare stick, then light the cave mouth."
+      ],
+      "solvedText": "You fix the torch to the cave wall and the darkness pulls back. The zombies grumble and shuffle away. Down you go!"
+    },
+    {
+      "id": "ore-wall",
+      "title": "The Ore Wall",
+      "kind": "code",
+      "prompt": "The miners' vault door has a {count}-digit lock and a sign: '{order}!' The wall around it is striped with ore, and each of you counted one kind.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "gold",
+          "iron",
+          "copper",
+          "emerald",
+          "ruby",
+          "sapphire",
+          "amethyst"
+        ],
+        "thing": "ore",
+        "pieceTemplate": "You counted the {color} ore blocks in the wall: there were {digit}."
+      },
+      "rewards": [
+        "iron-ingot"
+      ],
+      "hints": [
+        "Each phone counted one kind of ore. Say your ore and your number.",
+        "Read them in the sign's order: {order}."
+      ],
+      "solvedText": "The vault door grinds open. Inside, on a stone shelf: one shiny iron ingot."
+    },
+    {
+      "id": "depth-sign",
+      "title": "The Depth Sign",
+      "kind": "code",
+      "prompt": "The miners' depth sign counts the levels on the way down: {sequence}. The last number has worn off, and the minecart's lock wants it.",
+      "generator": {
+        "type": "sequence"
+      },
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "The minecart's brake lets go and it rattles off down the track. Wheee! (Not you. Just the minecart.)"
+    },
+    {
+      "id": "camp-search",
+      "title": "The Miners' Camp",
+      "kind": "search",
+      "prompt": "The miners left their camp in a hurry. Search the bedroll, the old minecart and the tool rack.",
+      "finds": [
+        "bedroll",
+        "old-minecart",
+        "tool-rack"
+      ],
+      "rewards": [
+        "bucket"
+      ],
+      "hints": [
+        "Three spots in the camp are worth a good rummage.",
+        "Look in the bed, in the cart and among the tools."
+      ],
+      "solvedText": "Hanging behind the tool rack: an empty iron bucket. Just the thing for carrying water."
+    },
+    {
+      "id": "storeroom",
+      "minMinutes": 45,
+      "title": "The Storeroom Door",
+      "kind": "text",
+      "prompt": "The miners' storeroom door has a word lock, with a riddle scratched into it: 'The more you take out of me, the bigger I get.'",
+      "answers": [
+        "hole",
+        "a hole",
+        "holes",
+        "tunnel"
+      ],
+      "hints": [
+        "Think about digging.",
+        "You make one when you dig in the ground."
+      ],
+      "solvedText": "The door creaks open. The storeroom is full of cobwebs and one very startled bat.",
+      "variants": [
+        {},
+        {
+          "prompt": "The miners' storeroom door has a word lock, with a riddle scratched into it: 'I have a bed but I never sleep, a mouth but I never eat, and I run all day without any legs.'",
+          "answers": [
+            "river",
+            "a river",
+            "stream"
+          ],
+          "hints": [
+            "Think about water.",
+            "It flows from the hills down to the sea."
+          ]
+        },
+        {
+          "prompt": "The miners' storeroom door has a word lock, with a riddle scratched into it: 'I have a head and a tail, but no body at all. Traders love me.'",
+          "answers": [
+            "coin",
+            "a coin",
+            "coins"
+          ],
+          "hints": [
+            "Think about paying for things.",
+            "You flip it: heads or tails?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "miner-diary",
+      "minMinutes": 60,
+      "title": "The Miner's Diary",
+      "kind": "text",
+      "prompt": "The last page of a miner's diary is written in numbers, where A is 1 and B is 2: {cipher}. It names what they were digging for. The diary's clasp wants it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "diamond",
+          "treasure",
+          "crystal",
+          "geode",
+          "nugget",
+          "gemstone"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "The clasp clicks open. The rest of the diary is a very long list of snacks the miner wished they'd packed."
+    },
+    {
+      "id": "glow-lamps",
+      "minMinutes": 45,
+      "title": "The Glow Lamps",
+      "kind": "switches",
+      "prompt": "The ruin's glow lamps are wired together: switch one and the ones beside it switch too. Light every lamp to wake the ruin!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the lamps in the row below it.",
+        "Switch {answer}."
+      ],
+      "solvedText": "Every lamp blazes and the ruin hums. Along the portal frame, faint purple runes start to glow."
+    },
+    {
+      "id": "enchanting-table",
+      "minMinutes": 45,
+      "title": "The Enchanting Table",
+      "kind": "text",
+      "prompt": "The enchanting table's floating book is written in ancient runes: {cipher}. It names a magic charm for your tools. The book's clasp has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "luck",
+          "flame",
+          "frost",
+          "power",
+          "fortune"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "blanket",
+          "kitchen",
+          "dolphin",
+          "cabinet"
+        ]
+      },
+      "hints": [
+        "There's more than one rune card in the ruin. Only one is the real key.",
+        "Try each card: only one turns the runes into a magic charm for tools.",
+        "It says {answer}."
+      ],
+      "solvedText": "The book snaps shut and your tools sparkle with purple light. Ooh, shiny."
+    },
+    {
+      "id": "spell-words",
+      "minMinutes": 45,
+      "title": "The Portal Spell",
+      "kind": "text",
+      "prompt": "Carved on the portal frame: SPEAK THE OLD WORDS TO WAKE ME. Each of you found one word of the spell in the ruin's dusty books.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "spark",
+          "ember",
+          "glimmer",
+          "shimmer",
+          "echo",
+          "drift",
+          "bloom",
+          "dusk",
+          "whisper",
+          "star",
+          "moss",
+          "glow"
+        ],
+        "pieceTemplate": "A dusty book falls open in your hands: the {ordinal} word of the spell is '{word}'."
+      },
+      "hints": [
+        "Each of you has one word of the spell. Say them in order: first, second, third...",
+        "Put them together in order, like: word word word."
+      ],
+      "solvedText": "'{answer}!' The words echo round the ruin, and the portal frame shivers."
+    },
+    {
+      "id": "ruin-sign",
+      "minMinutes": 60,
+      "title": "The Ancient Sign",
+      "kind": "text",
+      "prompt": "An ancient sign over the portal says where it leads, in a flipped alphabet where A swaps with Z: {cipher}. The sign's word lock wants it.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "village",
+          "hometown",
+          "doorstep",
+          "bedroom",
+          "backyard"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "The sign glows as you read it out. Old Pebble sniffs: 'Hrrm. Took you long enough.'"
+    },
+    {
+      "id": "beacon",
+      "minDifficulty": "hard",
+      "title": "The Beacon",
+      "kind": "text",
+      "prompt": "A beacon in the ruin pulses long and short. Old Pebble says it's spelling who's waiting for you on the other side of the portal: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "pets",
+          "family",
+          "friends"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey",
+          "blanket",
+          "kitchen",
+          "dolphin",
+          "cabinet"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden round the ruin. Only one reads who'd be waiting for you.",
+        "Look under the beacon, at the old banner and in the ruin chest.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "The beacon shines a steady beam straight up through the rock. Somewhere far above, someone is waiting."
+    },
+    {
+      "id": "portal",
+      "title": "The Portal",
+      "kind": "code",
+      "prompt": "The portal frame is missing one block of obsidian, it needs a spark to light it, AND it wants a 3-digit code carved into its base. Old Pebble grumbles: 'Torches in the caves, then lamps in the ruin, then books on the shelf. Hrrm.'",
+      "answers": [
+        "527"
+      ],
+      "requires": [
+        "obsidian",
+        "flint-and-steel"
+      ],
+      "pieces": [
+        "You counted the torches along the cave walls: 5.",
+        "You counted the glow lamps in the ruin: 2.",
+        "You counted the books on the ancient bookshelf: 7."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in Old Pebble's order.",
+        "Torches, then lamps, then books."
+      ],
+      "solvedText": "You slot in the obsidian, strike the flint and steel, and type the code. WHOOSH! The portal fills with swirling purple light. One step, and you're through.",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "816"
+          ],
+          "pieces": [
+            "You counted the torches along the cave walls: 8.",
+            "You counted the glow lamps in the ruin: 1.",
+            "You counted the books on the ancient bookshelf: 6."
+          ]
+        },
+        {
+          "answers": [
+            "394"
+          ],
+          "pieces": [
+            "You counted the torches along the cave walls: 3.",
+            "You counted the glow lamps in the ruin: 9.",
+            "You counted the books on the ancient bookshelf: 4."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "planks",
+      "name": "Wooden planks",
+      "description": "A stack of fresh wooden planks from the crafting table's drawer."
+    },
+    {
+      "id": "sticks",
+      "name": "Bundle of sticks",
+      "description": "Twigs from all over the meadow, tied in a neat bundle."
+    },
+    {
+      "id": "wooden-pickaxe",
+      "name": "Wooden pickaxe",
+      "description": "Your very first pickaxe. It's wobbly, but it can mine stone and dig gravel."
+    },
+    {
+      "id": "coal",
+      "name": "Coal",
+      "description": "Black, dusty lumps of coal. It burns for ages."
+    },
+    {
+      "id": "spare-stick",
+      "name": "Spare stick",
+      "description": "A single stick Old Pebble traded you. 'For a torch,' he said."
+    },
+    {
+      "id": "torch",
+      "name": "Torch",
+      "description": "Coal on a stick, burning bright. Just the thing for a dark cave."
+    },
+    {
+      "id": "bucket",
+      "name": "Empty bucket",
+      "description": "An iron bucket from the miners' camp. It's empty."
+    },
+    {
+      "id": "water-bucket",
+      "name": "Bucket of water",
+      "description": "A bucket full of cold, clear water from the underground lake."
+    },
+    {
+      "id": "obsidian",
+      "name": "Obsidian block",
+      "description": "A block of shiny black stone, made where water met lava. It's the same stone as the portal frame."
+    },
+    {
+      "id": "flint",
+      "name": "Flint",
+      "description": "A sharp grey flint from the gravel pile."
+    },
+    {
+      "id": "iron-ingot",
+      "name": "Iron ingot",
+      "description": "A shiny bar of iron from the miners' vault."
+    },
+    {
+      "id": "flint-and-steel",
+      "name": "Flint and steel",
+      "description": "Strike them together and they make a spark. Perfect for lighting a portal."
+    },
+    {
+      "id": "saddle",
+      "name": "Old saddle",
+      "description": "A battered old saddle. There's nothing to ride down here."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "planks",
+        "sticks"
+      ],
+      "makes": "wooden-pickaxe",
+      "text": "On the crafting table, the planks and sticks become a wooden pickaxe!"
+    },
+    {
+      "items": [
+        "coal",
+        "spare-stick"
+      ],
+      "makes": "torch",
+      "text": "You press the coal onto the stick and it flickers into a bright torch."
+    },
+    {
+      "items": [
+        "flint",
+        "iron-ingot"
+      ],
+      "makes": "flint-and-steel",
+      "text": "You strike the flint against the iron: a shower of sparks! Flint and steel."
+    }
+  ]
+}

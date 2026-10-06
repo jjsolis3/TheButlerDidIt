@@ -14,6 +14,12 @@ const BACKDROPS: Record<string, string> = {
   train: 'linear-gradient(180deg, #2b2320 0%, #1d1715 60%, #110d0b 100%)',
   night: 'linear-gradient(180deg, #121c2e 0%, #0c1320 60%, #060a12 100%)',
   lounge: 'linear-gradient(180deg, #2e1a26 0%, #1f111a 60%, #12090f 100%)',
+  arcade: 'linear-gradient(180deg, #2a1838 0%, #1a0f26 60%, #0c0714 100%)',
+  concert: 'linear-gradient(180deg, #123842 0%, #0c2430 60%, #06131a 100%)',
+  stadium: 'linear-gradient(180deg, #3a1c14 0%, #26120d 60%, #140906 100%)',
+  meadow: 'linear-gradient(180deg, #1f3a28 0%, #162b1d 60%, #0b1710 100%)',
+  cave: 'linear-gradient(180deg, #26232a 0%, #19171c 60%, #0d0c0f 100%)',
+  tension: 'linear-gradient(180deg, #2a1414 0%, #1c0d0d 60%, #0f0606 100%)',
 }
 const DEFAULT_BACKDROP = 'linear-gradient(180deg, #26221d 0%, #191613 60%, #0f0d0b 100%)'
 
@@ -31,6 +37,12 @@ const ICONS: Record<string, string> = {
   train: '🚂',
   night: '🌙',
   lounge: '🎷',
+  arcade: '🕹️',
+  concert: '🎤',
+  stadium: '🏟️',
+  meadow: '🌳',
+  cave: '⛏️',
+  tension: '👣',
 }
 
 /** A big emoji for a room's card while it has no cover picture. */

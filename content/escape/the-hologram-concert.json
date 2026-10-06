@@ -1,0 +1,1089 @@
+{
+  "id": "the-hologram-concert",
+  "title": "The Hologram Concert",
+  "synopsis": "Tonight is Hoshi's first live show: a virtual pop star sung by a computer, who appears on stage as a dazzling hologram. But minutes before the curtain goes up, a cheeky computer bug called Glitch has crashed the show, locked you backstage and scrambled her songs. Get the music back, the hologram shining and the curtain up before the crowd goes home!",
+  "contentRating": "family",
+  "theme": "concert",
+  "artStyle": "a glittering pop concert arena: a bright hologram stage, neon pink, purple and teal lights, glow sticks in the crowd, sparkly costumes backstage and a cheeky little computer-bug mascot, cute anime-inspired cartoon style",
+  "minPlayers": 2,
+  "maxPlayers": 8,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 90,
+  "soundscape": "concert",
+  "intro": "Bzzt! Beep-boop! Hello, humans! I'm Glitch, the cutest little computer bug in the whole arena, and nobody invited me to Hoshi's concert. So I crashed it! Her hologram is switched off, her songs are scrambled and you're locked backstage. Fix everything before the crowd goes home? Ha! Good luck, crew! Bzzt!",
+  "escapedText": "The curtain rises, the lights blaze and Hoshi sparkles into life in front of thousands of happy fans. She winks at you from the stage: 'Thank you, crew! This one's for you!' Even Glitch is bopping along.",
+  "failedText": "The crowd sighs and heads for the exits, and the giant screen shows a winking bug face: GAME OVER, CREW! Glitch giggles: 'Maybe next tour!'",
+  "gameMaster": {
+    "name": "Glitch",
+    "persona": "A cheeky little computer bug who crashed the concert because nobody invited him. Talks in beeps, bzzts and terrible computer puns, teases the crew when they're stuck and sulks (just a little) when they fix something. Mischievous, never mean.",
+    "voice": {
+      "accent": "en-US",
+      "pitch": 1.4,
+      "rate": 1.15,
+      "style": "bleepy, cheeky, fast"
+    }
+  },
+  "stages": [
+    {
+      "id": "dressing-room",
+      "title": "The Dressing Room",
+      "description": "Hoshi's dressing room sparkles with glitter. A big mirror is ringed with light bulbs, costume racks glitter with sequins, and a shelf of little Hoshi figures waves at you. The thump of the crowd comes through the walls, and the door to the sound booth blinks red: CREW ONLY.",
+      "puzzles": [
+        "drum-machine",
+        "dressing-search",
+        "scrambled-song",
+        "costume-lights",
+        "vip-quiz",
+        "dressing-door"
+      ],
+      "scene": {
+        "backdrop": "concert",
+        "objects": [
+          {
+            "id": "lit-mirror",
+            "prop": "mirror",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "lighted mirror",
+            "look": "Under the violet light, glowing letters appear on the glass: FOR MY CREW! And tucked behind the frame: a stage crew pass!",
+            "gives": "stage-pass",
+            "requires": "uv-light",
+            "lockedText": "A big mirror ringed with light bulbs. Something is smudged on the glass, but you can't make it out."
+          },
+          {
+            "id": "glow-poster",
+            "prop": "poster",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "tour poster",
+            "look": "Under the violet light, glow-in-the-dark writing appears around Hoshi's picture: 'Slide back {key:scrambled-song}.'",
+            "requires": "uv-light",
+            "lockedText": "A poster of Hoshi, waving. There's a faint pattern of dots around the edge."
+          },
+          {
+            "id": "drum-pads",
+            "prop": "speaker",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "drum machine",
+            "look": "A little box of glowing pads, beeping out a jumbled beat."
+          },
+          {
+            "id": "hoshi-figures",
+            "prop": "trophy",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "Hoshi figures",
+            "look": "A shelf of little Hoshi figures in different outfits. One of them is wearing a tiny crown."
+          },
+          {
+            "id": "crew-door",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "sound booth door",
+            "look": "A door with a pass reader. Its light is red: CREW ONLY."
+          },
+          {
+            "id": "makeup-table",
+            "prop": "table",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "make-up table",
+            "look": "Glitter, brushes and sparkly star stickers everywhere.",
+            "hidesPieces": true
+          },
+          {
+            "id": "costume-rack",
+            "prop": "clothes",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "costume rack",
+            "look": "Sparkly jackets, a cape covered in stars and a pair of light-up boots.",
+            "hidesPieces": true
+          },
+          {
+            "id": "shoe-boxes",
+            "prop": "box",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "shoe boxes",
+            "look": "Boxes and boxes of glittery boots. One of them rattles.",
+            "hidesPieces": true
+          },
+          {
+            "id": "practice-synth",
+            "prop": "machine",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "practice synth",
+            "look": "A little practice synth. You press a key and it goes 'meep'.",
+            "hidesPieces": true
+          },
+          {
+            "id": "beanbag",
+            "prop": "rug",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "star beanbag",
+            "look": "A giant squishy beanbag shaped like a star. You sink right in.",
+            "hidesPieces": true
+          },
+          {
+            "id": "metronome",
+            "prop": "clock",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "metronome",
+            "look": "Tick, tock. Its little dial is stuck on: back {key:scrambled-song}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "headphone-case",
+            "prop": "box",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "headphone case",
+            "look": "Written inside the lid: back {key:scrambled-song}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "fan-gifts",
+            "prop": "crate",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "fan gifts",
+            "look": "Teddy bears, drawings and a huge banner that says WE LOVE YOU HOSHI."
+          },
+          {
+            "id": "water-cooler",
+            "prop": "water",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "water cooler",
+            "look": "Glug. Glug. Glug."
+          }
+        ]
+      }
+    },
+    {
+      "id": "sound-booth",
+      "title": "The Sound Booth",
+      "description": "The sound booth hums with machines. A mixing desk glows with hundreds of sliders, speaker stacks rumble, and through the window you can see the arena: a sea of fans waving glow sticks in the dark. The band's instruments lie in a jumble by the riser, and the door out to the stage is locked.",
+      "puzzles": [
+        "instrument-riser",
+        "glow-sticks",
+        "lyric-sheet",
+        "fan-letter",
+        "stage-door"
+      ],
+      "scene": {
+        "backdrop": "concert",
+        "objects": [
+          {
+            "id": "mixing-desk",
+            "prop": "lever",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "mixing desk",
+            "look": "Rows and rows of sliders and blinking buttons. A card is taped under the sliders: {key:lyric-sheet}"
+          },
+          {
+            "id": "speaker-stack",
+            "prop": "speaker",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "speaker stack",
+            "look": "Huge speakers, humming quietly. You can feel the bass in your tummy.",
+            "hidesPieces": true
+          },
+          {
+            "id": "riser-spot",
+            "prop": "rug",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "instrument riser",
+            "look": "Empty stands for the band's instruments, all in a jumble."
+          },
+          {
+            "id": "under-desk",
+            "prop": "crate",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "space under the desk",
+            "look": "By the glow stick's green light, you spot a small key on a guitar-pick keyring, taped under the desk!",
+            "gives": "booth-key",
+            "requires": "glow-stick",
+            "lockedText": "It's pitch dark under the desk, and something in there jingles."
+          },
+          {
+            "id": "stage-door-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "stage door",
+            "look": "The door out to the stage, with a keyhole and a word lock. A riddle is scrawled on it in wobbly, glitchy letters."
+          },
+          {
+            "id": "lighting-rig",
+            "prop": "lamp",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "lighting rig",
+            "look": "Coloured lamps, all pointing at the ceiling.",
+            "hidesPieces": true
+          },
+          {
+            "id": "cables",
+            "prop": "pipe",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "cables",
+            "look": "Thick cables snake across the floor. Mind your feet!",
+            "hidesPieces": true
+          },
+          {
+            "id": "producer-laptop",
+            "prop": "screen",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "producer's laptop",
+            "look": "A screensaver of bouncing stars. Boing. Boing.",
+            "hidesPieces": true
+          },
+          {
+            "id": "snack-table",
+            "prop": "food",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "snack table",
+            "look": "Rice crackers, juice boxes and a sign: NO SNACKS NEAR THE MIXING DESK.",
+            "hidesPieces": true
+          },
+          {
+            "id": "headsets",
+            "prop": "microphone",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "crew headsets",
+            "look": "Headsets on hooks. One of them crackles: 'Testing, testing...'",
+            "hidesPieces": true
+          },
+          {
+            "id": "crew-locker",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "crew locker",
+            "look": "A locker with a 3-digit lock and a cue card stuck on the door."
+          },
+          {
+            "id": "lyric-stand",
+            "prop": "sign",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "lyric stand",
+            "look": "Behind the song sheets, a symbol card: {key:lyric-sheet}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "merch-table",
+            "prop": "table",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "merch table",
+            "look": "T-shirts, badges and, under a pile of keyrings, a symbol card: {key:lyric-sheet}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "glow-crate",
+            "prop": "crate",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "glow stick crate",
+            "look": "A big crate of glow sticks for the fans, still in their wrappers.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tour-posters",
+            "prop": "painting",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "tour posters",
+            "look": "Posters from every city on the tour, each signed with a little star.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "the-stage",
+      "soundscape": "stadium",
+      "title": "The Stage",
+      "description": "You step out onto the stage behind the curtain. On the other side, thousands of fans are chanting Hoshi's name. A silver hologram projector points at an empty spot in the middle, a giant screen shows a winking bug face, and a confetti cannon waits by the stage lights. The curtain's keypad blinks, waiting for a code.",
+      "puzzles": [
+        "hit-song",
+        "confetti-cannon",
+        "big-screen",
+        "blinking-projector",
+        "projector",
+        "curtain"
+      ],
+      "scene": {
+        "backdrop": "stadium",
+        "objects": [
+          {
+            "id": "projector-spot",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "hologram projector",
+            "look": "A big silver projector pointing at the middle of the stage. Its crystal slot is empty."
+          },
+          {
+            "id": "curtain-spot",
+            "prop": "door",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "stage curtain",
+            "look": "A huge velvet curtain, shut tight. A keypad on the side asks for a 3-digit code."
+          },
+          {
+            "id": "giant-screen",
+            "prop": "screen",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "giant screen",
+            "look": "A screen as big as a house. It just shows a cheeky bug face, winking."
+          },
+          {
+            "id": "cannon-spot",
+            "prop": "barrel",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "confetti cannon",
+            "look": "A cannon packed with paper confetti, with a word lock on the trigger."
+          },
+          {
+            "id": "mic-stand",
+            "prop": "microphone",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "microphone stand",
+            "look": "Hoshi's microphone stand, with a star on top. It's waiting."
+          },
+          {
+            "id": "front-row",
+            "prop": "rug",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "front row",
+            "look": "Seats for the biggest fans, each with a star-shaped cushion.",
+            "hidesPieces": true
+          },
+          {
+            "id": "stage-lights",
+            "prop": "lamp",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "stage lights",
+            "look": "A row of lamps high above the stage, waiting to switch on.",
+            "hidesPieces": true
+          },
+          {
+            "id": "smoke-machine",
+            "prop": "machine",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "smoke machine",
+            "look": "Pfff! A puff of pink smoke. Oops.",
+            "hidesPieces": true
+          },
+          {
+            "id": "trapdoor",
+            "prop": "rug",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "trapdoor",
+            "look": "A little trapdoor in the stage floor, for surprise entrances.",
+            "hidesPieces": true
+          },
+          {
+            "id": "floor-marks",
+            "prop": "sign",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "floor marks",
+            "look": "Tape marks on the floor: STAND HERE, SPIN HERE, WAVE HERE.",
+            "hidesPieces": true
+          },
+          {
+            "id": "stage-desk",
+            "prop": "desk",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "stage manager's desk",
+            "look": "A code card under the running order: {key:blinking-projector}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "flight-case",
+            "prop": "chest",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "flight case",
+            "look": "Inside the lid, a table of dots and dashes: {key:blinking-projector}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "camera-crane",
+            "prop": "machine",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "camera crane",
+            "look": "A code card taped to the camera: {key:blinking-projector}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "lost-property",
+            "prop": "box",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "lost property",
+            "look": "Hats, scarves and a light-up wristband that only blinks red.",
+            "gives": "wristband",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "drum-machine",
+      "title": "The Drum Machine",
+      "kind": "code",
+      "prompt": "Glitch has jammed Hoshi's drum machine on a wonky beat, and its display counts: {sequence}. Tap in the next number to get it back in time!",
+      "generator": {
+        "type": "sequence"
+      },
+      "rewards": [
+        "crystal-shard"
+      ],
+      "hints": [
+        "Look at how each number changes to get the next one.",
+        "The next number is {answer}."
+      ],
+      "solvedText": "Boom, tss, boom-boom-tss! The beat is back. The drum machine's lid pops open, and inside is a glowing blue crystal shard, labelled HOLOGRAM SPARE PART."
+    },
+    {
+      "id": "dressing-search",
+      "title": "The Lucky Hairclip",
+      "kind": "search",
+      "prompt": "Hoshi never goes on stage without her lucky star hairclip, and Glitch has hidden it. Search the make-up table, the costume rack and the shoe boxes.",
+      "finds": [
+        "makeup-table",
+        "costume-rack",
+        "shoe-boxes"
+      ],
+      "rewards": [
+        "hairclip"
+      ],
+      "hints": [
+        "Three places in the dressing room are worth a proper look.",
+        "Look through the glitter, the sparkly jackets and the boots."
+      ],
+      "solvedText": "In the toe of a glittery boot: Hoshi's lucky star hairclip! There's a tiny button on the back."
+    },
+    {
+      "id": "scrambled-song",
+      "title": "The Scrambled Song",
+      "kind": "text",
+      "prompt": "Glitch has scrambled the title of Hoshi's newest song by sliding every letter along the alphabet: {cipher}. The song file's lock wants its real name, a word from music class.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "harmony",
+          "rhythm",
+          "ballad",
+          "lullaby",
+          "anthem",
+          "tempo"
+        ]
+      },
+      "hints": [
+        "Numbers are written in more than one place in here, and one of them only shows up in the right light.",
+        "Try each number you found: only one turns this into a word from music class.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "The song file unlocks and the dressing room speakers play a few bars of Hoshi's sweet high notes. Somewhere in the wires, Glitch grumbles."
+    },
+    {
+      "id": "costume-lights",
+      "minMinutes": 45,
+      "title": "The Light-Up Jacket",
+      "kind": "switches",
+      "prompt": "Hoshi's light-up stage jacket has gone dark. Its sequin panels are wired together: tap one and the ones beside it flip too. Light up every panel!",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the panels in the row below it.",
+        "Tap {answer}."
+      ],
+      "solvedText": "The jacket blazes with light: pink, purple and starry blue. It's ready for the show!"
+    },
+    {
+      "id": "vip-quiz",
+      "minMinutes": 60,
+      "title": "The VIP Quiz",
+      "kind": "code",
+      "prompt": "The VIP pass printer wants a {count}-digit code, and Glitch has turned it into a fan quiz. You each got a quiz card.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "Your fan quiz card: the {ordinal} digit is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "The printer whirrs and prints a shiny VIP pass for every one of you. Fancy!"
+    },
+    {
+      "id": "dressing-door",
+      "title": "The Sound Booth Door",
+      "kind": "use",
+      "prompt": "The door to the sound booth has a pass reader, and its light is red: CREW ONLY.",
+      "requires": [
+        "stage-pass"
+      ],
+      "hints": [
+        "A crew pass is hidden in here, but you'll only spot it in the right light.",
+        "Shine the hairclip's violet light on the lighted mirror, then show the pass at the door."
+      ],
+      "solvedText": "Bleep! The light turns green and the door swings open. The noise of the crowd gets louder."
+    },
+    {
+      "id": "instrument-riser",
+      "title": "The Instrument Riser",
+      "kind": "code",
+      "prompt": "The band's instruments have to go back on the riser before the show, and Glitch has jumbled the plan: {items}. The riser's keypad wants each instrument's spot, far left is 1, in the order listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "keytar",
+          "drum kit",
+          "violin",
+          "synth",
+          "bass guitar"
+        ],
+        "pieceTemplate": "From the band's stage plan: {clue}"
+      },
+      "rewards": [
+        "crystal-base"
+      ],
+      "hints": [
+        "Every phone has a line of the stage plan. Read them all out loud.",
+        "Start with the line you're surest about, and try each spot in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "Every instrument clicks into place and the riser lights up. A little drawer slides out: inside is a silver star-shaped holder with an empty slot."
+    },
+    {
+      "id": "glow-sticks",
+      "title": "The Glow Sticks",
+      "kind": "code",
+      "prompt": "Out front, the fans are already waving glow sticks! The crew locker has a {count}-digit lock and a cue card: '{order}.' Each of you counted one colour of glow stick in the front row.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "pink",
+          "blue",
+          "green",
+          "yellow",
+          "purple",
+          "orange",
+          "white"
+        ],
+        "thing": "glow stick",
+        "pieceTemplate": "You counted the {color} glow sticks in the front row: there were {digit}."
+      },
+      "rewards": [
+        "glow-stick"
+      ],
+      "hints": [
+        "Each phone counted one colour. Say your colour and your number.",
+        "Read them in the cue card's order: {order}."
+      ],
+      "solvedText": "The locker opens: it's packed with spare glow sticks for the crew. You snap one, and it glows bright green."
+    },
+    {
+      "id": "lyric-sheet",
+      "minMinutes": 45,
+      "title": "The Lyric Sheet",
+      "kind": "text",
+      "prompt": "Glitch has written the last word of Hoshi's new song in his bug symbols: {cipher}. It's a word from outer space. The lyric folder has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "comet",
+          "orbit",
+          "planet",
+          "nebula"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "grape",
+          "brick",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in the booth. Only one is Glitch's real key.",
+        "Try each card: only one turns the symbols into a word from outer space.",
+        "It says {answer}."
+      ],
+      "solvedText": "The folder opens and the last line of the song is back. Tonight, Hoshi will sing about the stars!"
+    },
+    {
+      "id": "fan-letter",
+      "minMinutes": 60,
+      "title": "The Fan Letter",
+      "kind": "text",
+      "prompt": "A fan letter on the desk is written in a secret code, where A is 1 and B is 2: {cipher}. It says what the kid loves most at Hoshi's concerts. The letter box wants the word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "dancing",
+          "singing",
+          "cheering",
+          "clapping",
+          "jumping"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "The letter box opens. Inside are hundreds more letters, every one covered in hearts and stars."
+    },
+    {
+      "id": "stage-door",
+      "title": "The Stage Door",
+      "kind": "text",
+      "prompt": "The door out to the stage has a keyhole and a word lock, and Glitch has scrawled a riddle on it: 'I've got keys, but I can't open a single lock. Play me, and I'll sing for you.'",
+      "answers": [
+        "piano",
+        "pianos",
+        "keyboard",
+        "keyboards"
+      ],
+      "requires": [
+        "booth-key"
+      ],
+      "hints": [
+        "Think about the instruments in the band.",
+        "It has black and white keys."
+      ],
+      "solvedText": "Click, click! The stage door opens, and the roar of the crowd sweeps in. The show is about to start!",
+      "variants": [
+        {},
+        {
+          "prompt": "The door out to the stage has a keyhole and a word lock, and Glitch has scrawled a riddle on it: 'I've a long neck but no head, and strings, but I'm not a puppet.'",
+          "answers": [
+            "guitar",
+            "guitars",
+            "ukulele",
+            "banjo"
+          ],
+          "hints": [
+            "Think about the instruments in the band.",
+            "You strum it or pluck it."
+          ]
+        },
+        {
+          "prompt": "The door out to the stage has a keyhole and a word lock, and Glitch has scrawled a riddle on it: 'You can hear me, hum me and sing me, but you can never hold me in your hand.'",
+          "answers": [
+            "song",
+            "songs",
+            "tune",
+            "music",
+            "melody"
+          ],
+          "hints": [
+            "Think about what Hoshi does on stage.",
+            "It has words and a tune, and you sing it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hit-song",
+      "minMinutes": 45,
+      "title": "Hoshi's Hit Song",
+      "kind": "text",
+      "prompt": "Hoshi's microphone is locked until someone sings the chorus of her biggest hit. Glitch has scrambled the words, but each of you remembers one.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "shine",
+          "sparkle",
+          "dream",
+          "sky",
+          "light",
+          "fly",
+          "glow",
+          "dance",
+          "heart",
+          "wish",
+          "neon",
+          "spin"
+        ],
+        "pieceTemplate": "You remember the {ordinal} word of the chorus: '{word}'."
+      },
+      "hints": [
+        "Each of you remembers one word. Say them in order: first, second, third...",
+        "Sing them together in order, like: word word word."
+      ],
+      "solvedText": "You sing '{answer}!' and the microphone lights up with a happy chime. Out front, the crowd sings it back!"
+    },
+    {
+      "id": "confetti-cannon",
+      "minMinutes": 45,
+      "title": "The Confetti Cannon",
+      "kind": "text",
+      "prompt": "The confetti cannon's trigger has a word lock, and a riddle from Glitch: 'The more of me there is, the less you can see. Switch off the stage lights and you'll find me.'",
+      "answers": [
+        "dark",
+        "darkness",
+        "the dark"
+      ],
+      "hints": [
+        "Think about what happens when the lights go out.",
+        "It's the opposite of light."
+      ],
+      "solvedText": "FWOOMP! The cannon fires a test blast of confetti all over you. It's in your hair. It will be in your hair for weeks.",
+      "variants": [
+        {},
+        {
+          "prompt": "The confetti cannon's trigger has a word lock, and a riddle from Glitch: 'I'm thrown on stage at the end of the show, but nobody gets hurt. I smell lovely and I come in a bunch.'",
+          "answers": [
+            "flowers",
+            "flower",
+            "bouquet",
+            "roses"
+          ],
+          "hints": [
+            "Think about what fans give their favourite star.",
+            "They grow in a garden and smell lovely."
+          ]
+        },
+        {
+          "prompt": "The confetti cannon's trigger has a word lock, and a riddle from Glitch: 'I follow the star wherever she goes: a bright round beam from high above.'",
+          "answers": [
+            "spotlight",
+            "spotlights",
+            "followspot"
+          ],
+          "hints": [
+            "Look up above the stage.",
+            "It's a big lamp that shines on the singer."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "big-screen",
+      "minMinutes": 60,
+      "title": "The Giant Screen",
+      "kind": "text",
+      "prompt": "Glitch has flipped the alphabet on the giant screen, so A shows as Z and B as Y: {cipher}. The screen's lock wants the real word.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "superstar",
+          "applause",
+          "headliner",
+          "fanclub",
+          "autograph",
+          "encore"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "The screen flips back the right way round and flashes the word in giant sparkly letters. The crowd goes wild!"
+    },
+    {
+      "id": "blinking-projector",
+      "minDifficulty": "hard",
+      "title": "The Blinking Projector",
+      "kind": "text",
+      "prompt": "The hologram projector's light blinks long and short, over and over. Glitch says it's something every pop star needs: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "voice",
+          "dancer",
+          "showtime"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "grape",
+          "brick",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey",
+          "triangle",
+          "hospital",
+          "dolphins"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden on the stage. Only one reads something a pop star needs.",
+        "Look at the stage manager's desk, the flight case and the camera crane.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "The projector stops blinking and gives a happy little chime. Glitch mutters: 'Fine. FINE.'"
+    },
+    {
+      "id": "projector",
+      "title": "The Hologram Projector",
+      "kind": "use",
+      "prompt": "Hoshi's hologram projector is ready to go, but Glitch has pinched its crystal. Without one, there's no Hoshi and no show.",
+      "requires": [
+        "light-crystal"
+      ],
+      "rewards": [
+        "curtain-remote"
+      ],
+      "hints": [
+        "You've found a crystal shard and something with an empty slot. Try putting them together.",
+        "Set the shard in the star holder, then fit the crystal into the projector."
+      ],
+      "solvedText": "The crystal clicks in and the projector hums. A beam of light sparkles in the middle of the stage, and there she is: Hoshi! She waves, and drops a little remote into your hands: 'Curtain up when you're ready, crew!'"
+    },
+    {
+      "id": "curtain",
+      "title": "Curtain Up",
+      "kind": "code",
+      "prompt": "The curtain remote needs a 3-digit code before it will lift the curtain. Glitch's last note: 'Stage lights, then floor speakers, then star headbands in the front row!'",
+      "answers": [
+        "583"
+      ],
+      "requires": [
+        "curtain-remote"
+      ],
+      "pieces": [
+        "You counted the stage lights over the stage: 5.",
+        "You counted the floor speakers along the front: 8.",
+        "You counted the star headbands in the front row: 3."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on Glitch's note.",
+        "Stage lights, then floor speakers, then headbands."
+      ],
+      "solvedText": "You press CURTAIN UP. The curtain sweeps open, the lights blaze, the crowd roars, and Hoshi starts to sing. The show is on!",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "269"
+          ],
+          "pieces": [
+            "You counted the stage lights over the stage: 2.",
+            "You counted the floor speakers along the front: 6.",
+            "You counted the star headbands in the front row: 9."
+          ]
+        },
+        {
+          "answers": [
+            "734"
+          ],
+          "pieces": [
+            "You counted the stage lights over the stage: 7.",
+            "You counted the floor speakers along the front: 3.",
+            "You counted the star headbands in the front row: 4."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "crystal-shard",
+      "name": "Crystal shard",
+      "description": "A glowing blue shard of crystal, labelled HOLOGRAM SPARE PART."
+    },
+    {
+      "id": "hairclip",
+      "name": "Star hairclip",
+      "description": "Hoshi's lucky star-shaped hairclip. There's a tiny button on the back.",
+      "inspect": "You press the tiny button. Click! The star glows violet: it's a little UV light. Glow-in-the-dark writing will show up under it.",
+      "inspectGives": "uv-light"
+    },
+    {
+      "id": "uv-light",
+      "name": "UV star light",
+      "description": "Hoshi's hairclip, glowing violet. Hidden glow-in-the-dark writing shows up under it."
+    },
+    {
+      "id": "stage-pass",
+      "name": "Stage crew pass",
+      "description": "A shiny pass on a ribbon: ALL ACCESS, signed with a little star."
+    },
+    {
+      "id": "crystal-base",
+      "name": "Star holder",
+      "description": "A silver holder shaped like a star, with an empty slot in the middle."
+    },
+    {
+      "id": "light-crystal",
+      "name": "Hologram crystal",
+      "description": "The crystal shard, set in its star holder. It hums and glows."
+    },
+    {
+      "id": "glow-stick",
+      "name": "Green glow stick",
+      "description": "A snapped glow stick, glowing bright green. Handy in the dark."
+    },
+    {
+      "id": "booth-key",
+      "name": "Stage door key",
+      "description": "A small key on a guitar-pick keyring."
+    },
+    {
+      "id": "curtain-remote",
+      "name": "Curtain remote",
+      "description": "A remote with one big button, CURTAIN UP, and a little keypad."
+    },
+    {
+      "id": "wristband",
+      "name": "Blinking wristband",
+      "description": "A light-up wristband that only blinks red. It doesn't fit anything here."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "crystal-shard",
+        "crystal-base"
+      ],
+      "makes": "light-crystal",
+      "text": "The shard slides into the star holder and starts to glow. A hologram crystal!"
+    }
+  ]
+}

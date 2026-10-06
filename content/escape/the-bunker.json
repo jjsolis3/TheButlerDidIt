@@ -533,7 +533,7 @@
       "minMinutes": 45,
       "title": "The Steel Locker",
       "kind": "code",
-      "prompt": "The steel locker by the door has a 3-digit dial. Each of you took a gas mask from the hooks, and something is stencilled inside each one.",
+      "prompt": "The steel locker by the door has a {count}-digit dial. Each of you took a gas mask from the hooks, and something is stencilled inside each one.",
       "hints": [
         "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
         "In order: {facts}."
@@ -574,7 +574,7 @@
       "id": "ration-crate",
       "title": "The Ration Crate",
       "kind": "code",
-      "prompt": "The ration crate has a 3-digit padlock. Stamped on the lid: '{order}. All rations are counted.'",
+      "prompt": "The ration crate has a {count}-digit padlock. Stamped on the lid: '{order}. All rations are counted.'",
       "rewards": [
         "field-manual"
       ],
@@ -594,6 +594,7 @@
           "white",
           "red"
         ],
+        "thing": "tin",
         "pieceTemplate": "You counted the {color} ration tins on your shelf: there were {digit}."
       }
     },
@@ -766,9 +767,9 @@
       "minMinutes": 45,
       "title": "The Command Radio",
       "kind": "text",
-      "prompt": "The radio is wired to the blast door's second lock. A card is taped to it: 'Read back the Overseer's three code words, first to last.'",
+      "prompt": "The radio is wired to the blast door's second lock. A card is taped to it: 'Read back the Overseer's {count} code words, first to last.'",
       "hints": [
-        "Three phones each caught one code word in the radio static.",
+        "Each of {count} phones caught one code word in the radio static.",
         "Say them in order, first to last, like: word word word."
       ],
       "solvedText": "The static clears. '{answer},' the Overseer repeats. 'Confirmed. You were listening, recruits.' One lock on the blast door releases.",

@@ -43,6 +43,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   await expect(tv.getByRole('button', { name: /The Tick-Tock Toy Factory/ })).toContainText('Family')
   await tv.getByRole('group', { name: 'Filter rooms' }).getByRole('button', { name: /🎃 Halloween/ }).click()
   await expect(tv.getByRole('button', { name: /The Funhouse After Dark/ })).toBeVisible()
+  await expect(tv.getByRole('button', { name: /The Night Shift/ })).toBeVisible()
   await expect(tv.getByRole('button', { name: /The Tick-Tock Toy Factory/ })).toHaveCount(0)
   await tv.getByRole('button', { name: 'All rooms' }).click()
   await tv.getByRole('tab', { name: /Adults/ }).click()

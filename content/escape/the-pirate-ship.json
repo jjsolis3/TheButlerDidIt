@@ -586,7 +586,7 @@
       "minMinutes": 45,
       "title": "The Spice Chest",
       "kind": "code",
-      "prompt": "The cook's spice chest has a 3-digit lock. Each of you grabbed a different recipe card from the wall.",
+      "prompt": "The cook's spice chest has a {count}-digit lock. Each of you grabbed a different recipe card from the wall.",
       "hints": [
         "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
         "In order: {facts}."
@@ -641,7 +641,7 @@
       "id": "treasure-chest",
       "title": "The Treasure Chest",
       "kind": "code",
-      "prompt": "The captain's treasure chest has a 3-digit lock. Carved on it: '{order}, or no treasure for you!'",
+      "prompt": "The captain's treasure chest has a {count}-digit lock. Carved on it: '{order}, or no treasure for you!'",
       "rewards": [
         "compass-case"
       ],
@@ -661,6 +661,7 @@
           "yellow",
           "white"
         ],
+        "thing": "gem",
         "pieceTemplate": "You counted the {color} gems in your pouch: there were {digit} of them."
       }
     },
@@ -794,9 +795,9 @@
       "minMinutes": 45,
       "title": "The Flag Locker",
       "kind": "text",
-      "prompt": "The flag locker is sealed with a word lock. Captain Sal's note: 'Hoist the three flag words, first to last!'",
+      "prompt": "The flag locker is sealed with a word lock. Captain Sal's note: 'Hoist the {count} flag words, first to last!'",
       "hints": [
-        "Three phones each remember one flag word the lookout shouted.",
+        "Each of {count} phones remembers one flag word the lookout shouted.",
         "Say them in order, first to last, like: word word word."
       ],
       "solvedText": "Up go the flags: '{answer}!' The whole crew cheers, and the seagulls join in.",
