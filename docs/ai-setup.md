@@ -37,7 +37,7 @@ Small local models (Ollama) are fine for the Actor. They often struggle to write
 
 ### Option A: the admin page (easiest)
 1. Sign in with the **first account created on the server**, which is the admin.
-2. Open **AI settings** from the home page (`/admin/ai`).
+2. Open **Admin hub → AI** from the account menu (`/admin/ai`).
 3. **Providers → Add provider.** Pick the type and paste the API key. Keys are encrypted before they are stored and are never shown again.
 4. **Test connection** with a model name to confirm the key works.
 5. **Who does what:** pick a provider and model for Storyteller, Actor and Inspector, then Save. Optionally pick an OpenAI or Gemini provider for Voice (e.g. `tts-1` or `gemini-2.5-flash-preview-tts`) and Illustrator (e.g. `dall-e-3` or `gemini-2.5-flash-image`).

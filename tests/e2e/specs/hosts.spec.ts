@@ -55,7 +55,7 @@ test('a new host signs up with a one-time invite link from the admin', async ({ 
   await admin.getByLabel('Password').fill('password123')
   await admin.getByRole('button', { name: 'Sign in' }).click()
   await admin.waitForURL('**/host/new')
-  await admin.goto('/admin/hosts')
+  await admin.goto('/admin/signups')
   await admin.getByLabel("Who's it for?").fill('Ivy, my cousin')
   await admin.getByLabel('Their email (optional)').fill('ivy@e2e.test')
   await admin.getByLabel('Free access for good (instead of the free trial)').check() // family: no trial clock

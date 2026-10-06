@@ -7,7 +7,10 @@ using Microsoft.Extensions.Options;
 
 namespace ButlerDidIt.Api.Endpoints;
 
-public sealed record HostView(string Id, string DisplayName, string Email, bool EmailConfirmed, bool IsAdmin, int Parties, bool LockedOut, AccessView Access);
+/// <param name="Joined">When the account was made (see <see cref="AppUser.CreatedAt"/>).</param>
+/// <param name="LastParty">When they last created a party, a sign of whether they still play.</param>
+public sealed record HostView(string Id, string DisplayName, string Email, bool EmailConfirmed, bool IsAdmin, int Parties, bool LockedOut, AccessView Access,
+    DateTimeOffset? Joined, DateTimeOffset? LastParty);
 public sealed record ResetLinkView(string Link, int ValidForHours);
 
 /// <summary>
@@ -24,12 +27,13 @@ public static class AdminHostEndpoints
         admin.MapGet("/", async (AppDbContext db, TimeProvider clock, CancellationToken ct) =>
         {
             var now = clock.GetUtcNow();
-            var partyCounts = await db.Parties.AsNoTracking().GroupBy(p => p.HostUserId)
-                .Select(g => new { g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Key, x => x.Count, ct);
+            var parties = await db.Parties.AsNoTracking().GroupBy(p => p.HostUserId)
+                .Select(g => new { g.Key, Count = g.Count(), Last = g.Max(p => p.CreatedAt) }).ToDictionaryAsync(x => x.Key, ct);
             var users = await db.Users.AsNoTracking().OrderBy(u => u.DisplayName).ToListAsync(ct);
             var grants = (await db.AccessGrants.AsNoTracking().ToListAsync(ct)).ToLookup(g => g.UserId);
             return users.Select(u => new HostView(u.Id, u.DisplayName, u.Email ?? "", u.EmailConfirmed, u.IsAdmin,
-                partyCounts.GetValueOrDefault(u.Id), u.LockoutEnd > now, Access.From(u.IsAdmin, grants[u.Id].ToList(), now)));
+                parties.GetValueOrDefault(u.Id)?.Count ?? 0, u.LockoutEnd > now, Access.From(u.IsAdmin, grants[u.Id].ToList(), now),
+                u.CreatedAt, parties.GetValueOrDefault(u.Id)?.Last));
         });
 
         // ---- Free access (#100): both games for good, for family, friends and testers. Taking it away

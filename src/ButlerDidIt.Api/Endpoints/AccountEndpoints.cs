@@ -221,7 +221,7 @@ public static class AccountEndpoints
             var export = new
             {
                 ExportedAt = clock.GetUtcNow(),
-                Account = new { user.DisplayName, user.Email, user.EmailConfirmed, user.IsAdmin },
+                Account = new { user.DisplayName, user.Email, user.EmailConfirmed, user.IsAdmin, Joined = user.CreatedAt },
                 PartySettings = HostPreferences.For(user),
                 // How their games went (#130): the numbers only. Guests' comments are the guests' words, shown on Insights.
                 Plays = await db.PlayRecords.AsNoTracking().Where(r => r.HostUserId == user.Id).OrderBy(r => r.FinishedAt)

@@ -21,7 +21,8 @@ public sealed class AuthOptions
 {
     /// <summary>
     /// Set Auth__AllowRegistration=false after creating your account to make the server invite-only:
-    /// new hosts then need an invite link from the admin (Admin → Hosts).
+    /// new hosts then need an invite link from the admin (Admin → Sign-ups). The admin can also switch
+    /// it there, which overrides this setting (see <see cref="SignUps"/>).
     /// </summary>
     public bool AllowRegistration { get; set; } = true;
 
@@ -64,8 +65,9 @@ public static class AuthEndpoints
         // What the sign-in page should offer: a "Forgot password?" link only makes sense with email,
         // and "Create an account" only while sign-ups are open. The first account (the admin) can
         // always sign up, so a brand-new server offers it even when registration is closed.
-        group.MapGet("/options", async (Microsoft.Extensions.Options.IOptions<AuthOptions> options, IEmailSender email, UserManager<AppUser> users) =>
-            new AuthOptionsView(options.Value.AllowRegistration || !await users.Users.AnyAsync(), email.IsConfigured,
+        group.MapGet("/options", async (Microsoft.Extensions.Options.IOptions<AuthOptions> options, IEmailSender email, UserManager<AppUser> users,
+            AppDbContext db, CancellationToken ct) =>
+            new AuthOptionsView(await SignUps.OpenAsync(db, options.Value, ct) || !await users.Users.AnyAsync(ct), email.IsConfigured,
                 options.Value.RequireConfirmedEmail && email.IsConfigured));
 
         group.MapPost("/register", async (
@@ -92,14 +94,17 @@ public static class AuthEndpoints
                 if (invite.Email is not null && users.NormalizeEmail(invite.Email) != users.NormalizeEmail(req.Email.Trim()))
                     return Results.Problem($"This invite is for {invite.Email}. Sign up with that address, or ask for a new invite.", statusCode: StatusCodes.Status400BadRequest);
             }
-            else if (!isFirstUser && !options.Value.AllowRegistration)
+            else if (!isFirstUser && !await SignUps.OpenAsync(db, options.Value, ct))
                 return Results.Problem("New host accounts need an invite. Ask the admin of this site for a link.", statusCode: StatusCodes.Status403Forbidden);
 
             var displayName = req.DisplayName.Trim();
             if (displayName.Length is < 1 or > 60)
                 return Results.Problem("Display name must be 1 to 60 characters.", statusCode: StatusCodes.Status400BadRequest);
 
-            var user = new AppUser { UserName = req.Email.Trim(), Email = req.Email.Trim(), DisplayName = displayName, IsAdmin = isFirstUser };
+            var user = new AppUser
+            {
+                UserName = req.Email.Trim(), Email = req.Email.Trim(), DisplayName = displayName, IsAdmin = isFirstUser, CreatedAt = clock.GetUtcNow(),
+            };
             // One transaction: the invite is used up only if the account is created (a weak password or a
             // taken email leaves it unused), and two people can't both use one link (see ClaimAsync).
             await using var transaction = await db.Database.BeginTransactionAsync(ct);

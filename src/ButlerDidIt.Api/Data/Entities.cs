@@ -13,6 +13,29 @@ public sealed class AppUser : IdentityUser
 
     /// <summary>The host's usual party settings as jsonb (see Endpoints.HostPreferences), or null for the defaults.</summary>
     public string? Preferences { get; set; }
+
+    /// <summary>
+    /// When the account was made. Accounts from before it was recorded were given the date of their first grant or
+    /// party, the earliest sign of them there is; null when there was none.
+    /// </summary>
+    public DateTimeOffset? CreatedAt { get; set; }
+}
+
+/// <summary>
+/// Settings the admin changes on the admin hub (#102) rather than in the server's environment, so a change needs no
+/// redeploy and reaches every server at once. There is one row (Id 1), and it may not exist yet: each setting is null
+/// until the admin sets it, and null means "as the server's configuration says".
+/// </summary>
+public sealed class SiteSettingsEntity
+{
+    public const int SingleId = 1;
+
+    public int Id { get; set; } = SingleId;
+
+    /// <summary>Whether anyone may sign up (true) or only people with an invite (false). Overrides Auth:AllowRegistration.</summary>
+    public bool? AllowRegistration { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 }
 
 /// <summary>

@@ -191,6 +191,7 @@ public class AccountHubTests(AccountFactory app) : IClassFixture<AccountFactory>
         var json = await res.Content.ReadAsStringAsync();
         var root = JsonDocument.Parse(json).RootElement;
         Assert.Equal(email, root.GetProperty("account").GetProperty("email").GetString());
+        Assert.Equal(DateTimeOffset.UtcNow, root.GetProperty("account").GetProperty("joined").GetDateTimeOffset(), TimeSpan.FromMinutes(5));
         Assert.Equal(party.Code, root.GetProperty("parties")[0].GetProperty("code").GetString());
         Assert.DoesNotContain("passwordHash", json, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("securityStamp", json, StringComparison.OrdinalIgnoreCase);

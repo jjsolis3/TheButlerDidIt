@@ -284,6 +284,7 @@ app.UseAuthorization();
 app.MapHealthChecks("/healthz");
 app.MapAuthEndpoints();
 app.MapAdminHostEndpoints();
+app.MapAdminHubEndpoints();
 app.MapInviteEndpoints();
 app.MapAccountEndpoints();
 app.MapRecapEndpoints();

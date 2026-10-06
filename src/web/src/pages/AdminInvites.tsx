@@ -24,11 +24,12 @@ function describe(i: InviteView) {
 type Made = CreatedInvite & { meantToSend: boolean; copied: boolean }
 
 /**
- * Admin: invite links. While sign-ups are closed (ALLOW_REGISTRATION=false), an invite is how a new
- * host gets an account. Each link works once. The server keeps only a hash of it, so the link can
- * be copied only right after it's made.
+ * Admin: invite links. While sign-ups are closed (the Sign-ups switch, or Auth__AllowRegistration=false), an invite
+ * is how a new host gets an account. Each link works once. The server keeps only a hash of it, so the link can be
+ * copied only right after it's made. `open` is whether anyone can sign up, when the page knows it better than the
+ * sign-in page's options (it just switched it).
  */
-export function InvitesPanel() {
+export function InvitesPanel({ open }: { open?: boolean }) {
   const [invites, setInvites] = useState<InviteView[] | null>(null)
   const [options, setOptions] = useState<AuthOptions | null>(null)
   const [note, setNote] = useState('')
@@ -100,7 +101,7 @@ export function InvitesPanel() {
     <section className="mb-10">
       <h2 className="font-display mb-1 text-2xl">Invites</h2>
       <p className="mb-4 max-w-2xl text-sm text-muted">
-        {options?.allowRegistration === false
+        {(open ?? options?.allowRegistration) === false
           ? 'Sign-ups are invite-only. Make a link for each new host and send it to them. Each link makes one account.'
           : 'Anyone can sign up right now. Invites still work, for example one that only a single email address can use.'}
       </p>

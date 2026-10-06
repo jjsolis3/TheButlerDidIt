@@ -36,7 +36,7 @@ Keep **who you are** separate from **what you may do**.
 | Limiting the expensive part | `DbAiBudget` caps each host's monthly AI spend, and AI usage is logged per host. A plan sets the budget instead of the one global `Ai:MonthlyBudgetUsd`. |
 | Keeping hosts apart | Parties, mysteries and rooms are owned by `HostUserId` / `OwnerUserId`. Guests need a seat token. Joins and sign-ups are rate-limited. |
 | Many families at once | Per-party locks, Redis backplane, Postgres advisory locks, S3 media, keys in the database (architecture §13). |
-| Closing sign-ups | `ALLOW_REGISTRATION=false` (`Auth:AllowRegistration`). Step 1 makes the sign-in page respect it. |
+| Closing sign-ups | `ALLOW_REGISTRATION=false` (`Auth:AllowRegistration`). Step 1 makes the sign-in page respect it; step 7 adds a switch on the admin hub. |
 
 So the platform doesn't need re-architecting. It needs an access layer and the pages around it.
 
@@ -48,7 +48,7 @@ They're ordered so each is useful on its own and later steps build on earlier on
 
 `ALLOW_REGISTRATION=false` already made the server refuse new accounts, but the sign-in page still offered "Create an account", which then failed. `GET /api/auth/options` now reports sign-up as open only while it would work (always on a brand-new server, so the admin can create the first account), and the sign-in page hides the link otherwise.
 
-**Do this today if you don't want strangers signing up:** in Coolify, set `ALLOW_REGISTRATION=false` and redeploy.
+**Do this today if you don't want strangers signing up:** choose **Invites only** on **Admin hub → Sign-ups** (or, in Coolify, set `ALLOW_REGISTRATION=false` and redeploy).
 
 ### 2. Invite-only sign-ups (#97, done)
 
@@ -138,7 +138,13 @@ This is the heart of "pay for murder, escape, or both".
   - **Links still win:** a link that names a room, length or difficulty, such as "Play this room again", overrides the saved settings.
   - **Storage:** `AppUser.Preferences` is one jsonb document (`HostPreferences`), read and written whole, so a new setting needs no migration. The server checks every value (a Family tone on the Family shelf, 30/45/60 minutes), and the data export includes them.
   - **Not included:** the TV's sound switch stays on each device, because it belongs to the TV, not the host.
-- **`/admin`** (admin only): one hub for an overview (hosts, active plans, parties this week, AI spend), hosts, invites, plans and billing, AI, and the sign-up mode.
+- **`/admin`** ("Admin hub", admin only; built): one frame with five tabs.
+  - **Overview:** hosts (new this week, active this month), plans, parties this week and games under way now, games played per week, AI spend this month, ratings and votes, and a checklist of the server's setup (email, media, servers, AI).
+  - **Games:** every mystery and room with plays, rating, solve rate and votes. It flags the ones that need a look and links to their insights.
+  - **Hosts:** today's page, with search, a plan filter, and when each host joined and last hosted.
+  - **Sign-ups:** a switch between "anyone" and "invites only", stored in the database (`SiteSettings`) so it needs no redeploy and overrides `Auth:AllowRegistration`; the invites are below it.
+  - **AI:** today's page.
+  - **Still to come:** a **Plans & billing** tab arrives with Stripe (#101), linking each subscription to the Stripe dashboard.
 
 ### 8. Ready for paying customers (#103)
 

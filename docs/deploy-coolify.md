@@ -33,7 +33,7 @@ In **Environment Variables**, add:
 | Variable | Value | Notes |
 |---|---|---|
 | `POSTGRES_PASSWORD` | a long random string | Used by both containers. Mark it as a secret. |
-| `ALLOW_REGISTRATION` | `true` at first | Set to `false` once your host account exists, so strangers can't sign up. New hosts then need an invite link from you (**Hosts → Invites**). |
+| `ALLOW_REGISTRATION` | `true` at first | Set to `false` once your host account exists, so strangers can't sign up. New hosts then need an invite link from you (**Admin hub → Sign-ups**). You can also switch sign-ups there, which overrides this setting with no redeploy. |
 
 The compose file already sets `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`. This tells ASP.NET Core to trust the `X-Forwarded-Proto` header from the proxy, so the app knows visitors arrived over HTTPS. Secure cookies and correct QR code links depend on it.
 
@@ -48,7 +48,7 @@ To let hosts reset a forgotten password themselves, add SMTP settings from any e
 | `SMTP_FROM` | `The Butler Did It <butler@example.com>` |
 | `REQUIRE_CONFIRMED_EMAIL` | `true` to make new hosts click the link in their welcome email before creating parties |
 
-**Without email**, the sign-in page tells hosts to ask the admin. The admin opens **Hosts & invites** from the account menu (their name, top right) and presses **Make a reset link**, then sends the link to the host. It works once, for 3 hours.
+**Without email**, the sign-in page tells hosts to ask the admin. The admin opens **Admin hub → Hosts** from the account menu (their name, top right) and presses **Make a reset link**, then sends the link to the host. It works once, for 3 hours.
 
 ### Optional: AI game master
 To switch on AI (generated mysteries, NPCs you can question, hints and verdicts), add `AI_PROVIDER_NAME`, `AI_PROVIDER_KIND`, `AI_PROVIDER_API_KEY` and the three `AI_*_MODEL` variables, as in `.env.example`. You can also skip these and set everything up later on the **Admin → AI** page. See [ai-setup.md](ai-setup.md).
@@ -71,8 +71,8 @@ Optionally, in the app service's health check settings, use path `/healthz` on p
 ## 5. First run
 
 1. Visit your domain, choose **Sign in to host → Create an account**. The first account becomes the admin.
-2. Set `ALLOW_REGISTRATION=false` and redeploy to make the site invite-only. (Deployed as a Dockerfile application instead? The variable is `Auth__AllowRegistration`; see the next section.)
-3. To add a host, sign in, open **Hosts & invites** from the account menu (your name, top right) and make an invite under **Invites**. Send them the link by text or chat. With email set up, the site can email it for you. Each link makes one account, and you choose how long it works (a day, a week or 30 days). Add their email address and only that address can use it.
+2. Make the site invite-only: open **Admin hub → Sign-ups** from the account menu (your name, top right) and choose **Invites only**. It takes effect at once, with no redeploy. (Or set `ALLOW_REGISTRATION=false` and redeploy; on a Dockerfile application the variable is `Auth__AllowRegistration`, see the next section. The switch in the hub wins over the variable until you press **Use the server's setting**.)
+3. To add a host, make an invite on the same **Sign-ups** tab. Send them the link by text or chat. With email set up, the site can email it for you. Each link makes one account, and you choose how long it works (a day, a week or 30 days). Add their email address and only that address can use it.
 4. Create a party. Put the stage on a TV and have guests scan the QR code.
 
 ## Deploying the Dockerfile as an application (without Docker Compose)
@@ -85,9 +85,9 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 |---|---|---|
 | `ConnectionStrings__Default` | `Host=<the database's internal host>;Port=5432;Database=…;Username=…;Password=…` | The only database setting the app reads. Copy the internal URL's parts from the database resource. |
 | `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` | Coolify's proxy handles HTTPS. This tells the app visitors arrived over HTTPS, for secure cookies and `https` QR code and invite links. |
-| `Auth__AllowRegistration` | `true` at first, then `false` | `false` makes the site invite-only. |
+| `Auth__AllowRegistration` | `true` at first, then `false` | `false` makes the site invite-only. The admin hub's **Sign-ups** switch overrides it without a redeploy. |
 | `App__PublicUrl` | `https://your.domain` | The address used in emailed and invite links. |
-| `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **AI settings** unreadable. Keys already in `/data/keys` are copied in on the next start. |
+| `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **Admin hub → AI** unreadable. Keys already in `/data/keys` are copied in on the next start. |
 | `Plans__TrialDays` | `14` | Optional: how long a new host's free trial of both games lasts. Hosts who had an account before plans keep both games free. |
 | `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
 | `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room or a mystery, in MB. |
