@@ -948,6 +948,16 @@ export interface EscapePuzzleView {
   heldBy: EscapeHoldView | null
   /** Ciphers: spots in this part of the room with its key (or a decoy) written on them, not yet found */
   keysHidden: number
+  /** The stage's final lock (#134): its code is built from the marks the other puzzles here left */
+  final: boolean
+  /** Once it's solved, in a stage with a final lock: the mark and digit it left for that lock */
+  mark: EscapeMarkView | null
+}
+
+/** A mark a solved puzzle left for its stage's final lock ("⚓" and 7) */
+export interface EscapeMarkView {
+  mark: string
+  digit: number
 }
 
 export type CipherType = 'shift' | 'symbols' | 'morse' | 'numbers' | 'mirror'
@@ -1036,6 +1046,7 @@ export interface EscapeStageView {
   serverNow: string
   feed: EscapeFeedEntry[]
   solvedCount: number
+  /** While it plays, the puzzles found so far (#134); once it's over, every puzzle the game had */
   puzzleCount: number
   hintsUsed: number
   wrongAttempts: number

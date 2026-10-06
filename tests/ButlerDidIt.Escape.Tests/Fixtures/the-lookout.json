@@ -1,0 +1,121 @@
+{
+  "id": "the-lookout",
+  "title": "The Lookout",
+  "synopsis": "A test room for #134: locks the group has to find, and a final lock built from the others.",
+  "contentRating": "mature",
+  "theme": "escape",
+  "artStyle": "a test",
+  "minPlayers": 1,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [30, 45],
+  "hintPenaltySeconds": 60,
+  "intro": "Find every lock.",
+  "escapedText": "Out!",
+  "failedText": "Stuck.",
+  "stages": [
+    {
+      "id": "hold",
+      "title": "The Hold",
+      "description": "A dark hold with a hatch above.",
+      "puzzles": ["hatch"],
+      "scene": {
+        "objects": [
+          { "id": "straw", "prop": "crate", "x": 0, "y": 0, "w": 100, "h": 100, "label": "straw", "look": "Just straw." }
+        ]
+      }
+    },
+    {
+      "id": "deck",
+      "title": "The Deck",
+      "description": "The open deck, and a gangplank that won't come down until every lock up here is open.",
+      "puzzles": ["knots", "flags", "bottle", "signal", "shore", "gangplank"],
+      "scene": {
+        "objects": [
+          { "id": "mast", "prop": "statue", "x": 0, "y": 0, "w": 100, "h": 100, "label": "mast", "look": "A locker at its foot, with a word lock." },
+          { "id": "barrel", "prop": "barrel", "x": 150, "y": 0, "w": 100, "h": 100, "label": "barrel", "look": "A spyglass, rolled under the barrel.", "gives": "spyglass" },
+          { "id": "lifeboat", "prop": "crate", "x": 300, "y": 0, "w": 100, "h": 100, "label": "lifeboat", "look": "Painted on its side: {order:gangplank}." },
+          { "id": "cannon", "prop": "barrel", "x": 450, "y": 0, "w": 100, "h": 100, "label": "cannon", "look": "Full of sand.", "hidesPieces": true },
+          { "id": "rail", "prop": "sign", "x": 600, "y": 0, "w": 100, "h": 100, "label": "rail", "look": "Smooth, salty wood." },
+          { "id": "net", "prop": "rug", "x": 750, "y": 0, "w": 100, "h": 100, "label": "net", "look": "Seaweed, and a little door behind it.", "minDifficulty": "hard" }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "hatch",
+      "title": "The Hatch",
+      "kind": "text",
+      "prompt": "The hatch wants the magic word.",
+      "answers": ["please"],
+      "rewards": ["flag"],
+      "hints": ["Ask nicely."],
+      "solvedText": "Up you go, with a red flag that was tucked under the hatch."
+    },
+    {
+      "id": "knots",
+      "title": "The Knot Board",
+      "kind": "code",
+      "prompt": "How many knots on the board?",
+      "answers": ["12"],
+      "hints": ["A dozen."],
+      "solvedText": "A bottle rolls out from behind the board."
+    },
+    {
+      "id": "flags",
+      "title": "The Flag Locker",
+      "kind": "text",
+      "prompt": "The locker at the foot of the mast wants a colour.",
+      "answers": ["scarlet"],
+      "revealedBy": "spot:mast",
+      "pieces": ["The colour starts with S.", "It's a bright red."],
+      "hints": ["Read your clues out."],
+      "solvedText": "The locker opens."
+    },
+    {
+      "id": "bottle",
+      "title": "The Message in a Bottle",
+      "kind": "text",
+      "prompt": "The message wants a word from the reef.",
+      "answers": ["coral"],
+      "revealedBy": "puzzle:knots",
+      "hints": ["Pink and hard."],
+      "solvedText": "The cork pops."
+    },
+    {
+      "id": "signal",
+      "title": "The Signal",
+      "kind": "text",
+      "prompt": "Wave the red flag at the passing ship. What does it shout back?",
+      "answers": ["ahoy"],
+      "revealedBy": "item:flag",
+      "hints": ["A sailor's hello."],
+      "solvedText": "It waves back."
+    },
+    {
+      "id": "shore",
+      "title": "The Far Shore",
+      "kind": "text",
+      "minMinutes": 45,
+      "prompt": "Through the spyglass: what's that on the horizon?",
+      "answers": ["land"],
+      "revealedBy": "item:spyglass",
+      "hints": ["Land ho!"],
+      "solvedText": "Land ho!"
+    },
+    {
+      "id": "gangplank",
+      "title": "The Gangplank",
+      "kind": "code",
+      "prompt": "The gangplank's keypad wants {count} digits. Every lock on deck left a mark when it opened.",
+      "hints": ["Read the marks in the order painted on the lifeboat.", "The code is {answer}."],
+      "solvedText": "Down it comes.",
+      "generator": { "type": "final", "marks": ["⚓", "🦜", "🐚", "⭐", "🐙"] }
+    }
+  ],
+  "items": [
+    { "id": "flag", "name": "Red flag", "description": "For waving at ships." },
+    { "id": "spyglass", "name": "Spyglass", "description": "See a long way." }
+  ]
+}

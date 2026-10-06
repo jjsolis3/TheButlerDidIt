@@ -289,7 +289,29 @@ public sealed record EscapePuzzle
 
     /// <summary>For deductions: the things in the row, in the order the code reads them (public: the prompt lists them too).</summary>
     public List<string> Lineup { get; init; } = [];
+
+    /// <summary>
+    /// What brings this puzzle into sight (#134): "spot:&lt;id&gt;" (someone searches that spot), "puzzle:&lt;id&gt;" (another
+    /// puzzle is solved) or "item:&lt;id&gt;" (the group holds that item), each in the same stage. Until then the screens
+    /// don't show it at all, and the group has to find it. Null: in sight from the start. A spot or puzzle the game
+    /// leaves out (a shorter or easier game) can't hide anything, so the puzzle is then in sight from the start.
+    /// </summary>
+    public string? RevealedBy { get; init; }
+
+    /// <summary>
+    /// For a stage's final lock (a Final generator, #134): the mark and digit each other puzzle in the stage leaves when
+    /// it's solved. Made from the seed by <see cref="RoomVariants"/>, then finished by <see cref="FinalLocks.Assemble"/>
+    /// for the puzzles the game keeps; never written by hand. A final lock comes into sight once the rest of its stage is solved.
+    /// </summary>
+    public FinalLock? Final { get; init; }
 }
+
+/// <param name="Parts">One for each other puzzle in the stage, in the order the code reads them.</param>
+/// <param name="OrderAt">Where the room writes that order ({order:&lt;id&gt;}), as places like <see cref="EscapePuzzle.KeyAt"/>.</param>
+public sealed record FinalLock(IReadOnlyList<FinalPart> Parts, IReadOnlyList<string> OrderAt);
+
+/// <summary>What a puzzle leaves for its stage's final lock when it's solved: a mark ("⚓") and the digit that goes with it.</summary>
+public sealed record FinalPart(string Puzzle, string Mark, int Digit);
 
 /// <param name="Key">The real key, as written in the room.</param>
 /// <param name="Encoded">The coded text shown in the prompt.</param>
@@ -345,6 +367,14 @@ public enum GeneratorType
 
     /// <summary>The starting lights of a Switches puzzle, always solvable.</summary>
     Switches,
+
+    /// <summary>
+    /// A stage's final lock (#134), a Code puzzle: every other puzzle in its stage leaves a mark and a digit when it's
+    /// solved ("⚓ = 7"), and the code is those digits in the order the room writes with {order:&lt;puzzle id&gt;}
+    /// ("🐚, then ⚓, then 🦜"), somewhere the group has to find it. The marks come from <see cref="PuzzleGenerator.Marks"/>.
+    /// Its prompt and hints may use {count} (how many digits, as a word) and {answer}.
+    /// </summary>
+    Final,
 }
 
 public enum CipherType
@@ -400,6 +430,11 @@ public sealed class PuzzleGenerator
     /// {order} names just the colours.
     /// </summary>
     public string Thing { get; init; } = "";
+
+    /// <summary>
+    /// For Final: the marks the stage's other puzzles leave, one each (emoji or short words). Left out, <see cref="FinalLocks.DefaultMarks"/>.
+    /// </summary>
+    public List<string> Marks { get; init; } = [];
 }
 
 public sealed record EscapeItem

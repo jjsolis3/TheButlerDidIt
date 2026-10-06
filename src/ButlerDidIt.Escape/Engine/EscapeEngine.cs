@@ -169,6 +169,7 @@ public static class EscapeEngine
         // A warning only makes sense when there's real time before it.
         s.LowTimeCued = !s.Ai.GameMaster || room.TimeLimitMinutes < 2 * LowTimeWarning.TotalMinutes;
         Log(s, now, $"🔒 The clock is running: {room.TimeLimitMinutes} minutes.");
+        Reveal(s, room, now, opening: true);
         DealStage(s, room, now);
         Cue(s, CueKind.Start, now, stage: room.Stages[0].Title);
     }
@@ -180,13 +181,22 @@ public static class EscapeEngine
     /// </summary>
     private static void DealStage(EscapeState s, EscapeRoom room, DateTimeOffset now)
     {
-        if (s.Answering != AnswerRule.Dealt || !s.TakesTurns()) return;
-        var seats = new SeededRandom(s.Seed ^ SeededRandom.StableHash("deal")).Pick(s.Players.Select(p => p.SeatId).ToList(), int.MaxValue);
-        var stage = room.Stages[s.StageIndex];
-        var puzzles = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => Holdable(p) && !s.IsSolved(p.Id)).ToList();
-        foreach (var p in puzzles)
-            s.Holds[p.Id] = new PuzzleHold { SeatId = seats[s.DealOffset++ % seats.Count], Active = now };
+        if (!Deals(s)) return;
+        // Only the puzzles in sight: one found later is dealt as it's found (#134).
+        var puzzles = InSight(s, room).Where(p => Holdable(p) && !s.IsSolved(p.Id)).ToList();
+        foreach (var p in puzzles) DealOne(s, p, now);
         if (puzzles.Count > 0) Log(s, now, "🃏 The puzzles are dealt: check your phone for yours.");
+    }
+
+    private static bool Deals(EscapeState s) => s.Answering == AnswerRule.Dealt && s.TakesTurns();
+
+    /// <summary>Gives a puzzle to the next seat round the table, and returns who has it.</summary>
+    private static Guid DealOne(EscapeState s, EscapePuzzle p, DateTimeOffset now)
+    {
+        var seats = new SeededRandom(s.Seed ^ SeededRandom.StableHash("deal")).Pick(s.Players.Select(x => x.SeatId).ToList(), int.MaxValue);
+        var seat = seats[s.DealOffset++ % seats.Count];
+        s.Holds[p.Id] = new PuzzleHold { SeatId = seat, Active = now };
+        return seat;
     }
 
     /// <summary>A puzzle someone can work on. A Search puzzle opens itself as the spots it needs are searched, by anyone.</summary>
@@ -288,7 +298,7 @@ public static class EscapeEngine
         var again = s.Examined.Contains(spot.Id);
         var keys = KeyPuzzlesAt(s, room, spot);
         // Key writing for a puzzle someone else holds (or nobody does yet): the spot isn't theirs to read.
-        var readable = keys.Count == 0 || keys.Any(p => MayFind(s, p, player.SeatId));
+        var readable = keys.Count == 0 || keys.Any(p => MayFind(s, room, p, player.SeatId));
         var found = false;
         if (!again && readable)
         {
@@ -313,7 +323,7 @@ public static class EscapeEngine
             found |= room.Puzzles.Any(p => (p.Kind == PuzzleKind.Search && p.Finds.Contains(spot.Id) && !s.IsSolved(p.Id)) || p.KeyAt.Contains($"object:{spot.Id}"));
         }
 
-        var hidden = s.Pieces.Where(p => p.SpotId == spot.Id && p.IsHidden && MayFind(s, p.PuzzleId, player.SeatId)).ToList();
+        var hidden = s.Pieces.Where(p => p.SpotId == spot.Id && p.IsHidden && MayFind(s, room, p.PuzzleId, player.SeatId)).ToList();
         foreach (var piece in hidden)
             s.Pieces[s.Pieces.IndexOf(piece)] = piece with { SeatId = player.SeatId };
         if (hidden.Count > 0)
@@ -321,6 +331,10 @@ public static class EscapeEngine
             Log(s, c.Now, $"🧩 {player.Name} found a clue piece in the {spot.Label}.");
             found = true;
         }
+
+        // A lock out of sight is found by searching its spot (#134), whoever searches it, even where the writing on it
+        // is someone else's to read. (A spot that needs a tool has already said so above.)
+        if (Reveal(s, room, c.Now, player.Name, searched: spot.Id).Count > 0) found = true;
 
         if (!found)
         {
@@ -347,13 +361,65 @@ public static class EscapeEngine
     /// the group: a key for a later puzzle can't wait for its holder, since this spot will be behind them by then.
     /// </summary>
     private static List<string> KeyPuzzlesAt(EscapeState s, EscapeRoom room, SceneObject spot) =>
-        room.Stages[s.StageIndex].Puzzles
-            .Where(id => !s.IsSolved(id) && room.FindPuzzle(id)!.KeyAt.Contains($"object:{spot.Id}"))
+        InSight(s, room)
+            .Where(p => !s.IsSolved(p.Id) && p.KeyAt.Contains($"object:{spot.Id}"))
+            .Select(p => p.Id)
             .ToList();
 
-    /// <summary>May this player find a puzzle's own things? Anyone may, unless puzzles go to people; then only its holder.</summary>
-    private static bool MayFind(EscapeState s, string puzzleId, Guid seatId) =>
-        !s.TakesTurns() || (s.Holds.TryGetValue(puzzleId, out var hold) && hold.SeatId == seatId);
+    /// <summary>
+    /// May this player find a puzzle's own things (its hidden clue pieces)? Nobody may while the puzzle is out of sight
+    /// (#134): finding a piece would give it away. Then anyone may, unless puzzles go to people; then only its holder.
+    /// </summary>
+    private static bool MayFind(EscapeState s, EscapeRoom room, string puzzleId, Guid seatId) =>
+        room.FindPuzzle(puzzleId) is { } puzzle && Visible(s, puzzle)
+        && (!s.TakesTurns() || (s.Holds.TryGetValue(puzzleId, out var hold) && hold.SeatId == seatId));
+
+    /// <summary>
+    /// Can the group see this puzzle (#134)? One in sight from the start, or one it has found: a puzzle that starts out
+    /// of sight (<see cref="EscapePuzzle.RevealedBy"/>) once its moment has come, and a final lock once the rest of its
+    /// stage is solved. A puzzle out of sight can't be answered, taken, hinted or dealt, and the screens never mention it.
+    /// </summary>
+    public static bool Visible(EscapeState s, EscapePuzzle p) => (p.RevealedBy is null && p.Final is null) || s.Revealed.Contains(p.Id) || s.IsSolved(p.Id);
+
+    /// <summary>The puzzles of the stage in front of the group that it can see, in the stage's order.</summary>
+    public static IEnumerable<EscapePuzzle> InSight(EscapeState s, EscapeRoom room) =>
+        room.Stages[s.StageIndex].Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => Visible(s, p));
+
+    /// <summary>
+    /// Brings into sight every puzzle in the stage whose moment has come (#134): its spot searched (<paramref name="searched"/>
+    /// is the one just searched), its puzzle solved or its item in hand, or, for a final lock, every other puzzle in the
+    /// stage solved. Each one found is announced on the ticker and, when puzzles are dealt, goes to the next player round
+    /// the table. When a stage opens (<paramref name="opening"/>), the ones already due are simply there, dealt with the rest.
+    /// Returns the puzzles found.
+    /// </summary>
+    private static List<EscapePuzzle> Reveal(EscapeState s, EscapeRoom room, DateTimeOffset now, string by = "", string? searched = null, bool opening = false)
+    {
+        if (s.Phase != EscapePhase.Playing) return [];
+        var stage = room.Stages[s.StageIndex];
+        var found = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => !Visible(s, p) && Due(s, stage, p, searched)).ToList();
+        foreach (var p in found)
+        {
+            s.Revealed.Add(p.Id);
+            if (opening) continue;
+            Log(s, now, p.Final is not null ? $"🏁 Every other lock here is open. The final lock: {p.Title}." : $"🔓 {by} found a new lock: {p.Title}.");
+            if (Deals(s) && Holdable(p)) Log(s, now, $"🃏 {p.Title} goes to {NameOf(s, DealOne(s, p, now))}.");
+        }
+        // A Search puzzle found with its spots already searched opens there and then.
+        if (found.Count > 0 && !opening) SolveSearches(s, room, by, now);
+        return found;
+    }
+
+    private static bool Due(EscapeState s, EscapeStage stage, EscapePuzzle p, string? searched)
+    {
+        if (p.Final is not null) return stage.Puzzles.All(id => id == p.Id || s.IsSolved(id));
+        return Reveals.Parse(p.RevealedBy!) switch
+        {
+            (Reveals.Spot, var spot) => spot == searched || s.Examined.Contains(spot),
+            (Reveals.Puzzle, var puzzle) => s.IsSolved(puzzle),
+            (Reveals.Item, var item) => s.Inventory.Contains(item),
+            _ => false,
+        };
+    }
 
     /// <summary>Finishes every Search puzzle in the current stage whose spots have all been searched. True if any was.</summary>
     private static bool SolveSearches(EscapeState s, EscapeRoom room, string by, DateTimeOffset now)
@@ -361,7 +427,7 @@ public static class EscapeEngine
         var any = false;
         while (s.Phase == EscapePhase.Playing
             && room.Stages[s.StageIndex].Puzzles.Select(id => room.FindPuzzle(id)!)
-                .FirstOrDefault(p => p.Kind == PuzzleKind.Search && !s.IsSolved(p.Id) && p.Finds.All(s.Examined.Contains)) is { } done)
+                .FirstOrDefault(p => p.Kind == PuzzleKind.Search && !s.IsSolved(p.Id) && Visible(s, p) && p.Finds.All(s.Examined.Contains)) is { } done)
         {
             Solve(s, room, done, by, now);
             any = true;
@@ -391,6 +457,7 @@ public static class EscapeEngine
             Log(s, c.Now, $"🔍 {player.Name} looked closely at {item.Name}.");
         }
         Cue(s, CueKind.Found, c.Now, by: player.Name, thing: item.Name);
+        Reveal(s, room, c.Now, player.Name);
     }
 
     /// <summary>Two items tried together. A pair that fits makes a new item (both are used up); any other pair is just logged.</summary>
@@ -413,6 +480,7 @@ public static class EscapeEngine
         if (recipe.Text.Length > 0) s.Notebook.Add(new NotebookEntry(c.Now, made, recipe.Text));
         Log(s, c.Now, $"🔧 {player.Name} put {first} and {second} together: {made}.");
         Cue(s, CueKind.Found, c.Now, by: player.Name, thing: made);
+        Reveal(s, room, c.Now, player.Name);
     }
 
     /// <summary>A press flips that light and the ones next to it. All on solves the puzzle.</summary>
@@ -452,7 +520,9 @@ public static class EscapeEngine
             "object" => s.Examined.Contains(id),
             "item" => s.Inventory.Contains(id),
             "inspect" => s.Inspected.Contains(id),
-            _ => room.Stages.FindIndex(st => st.Puzzles.Contains(id)) is var at and >= 0 && at <= s.StageIndex,
+            // Written in a puzzle's own text: read once the group can see it (a puzzle out of sight hasn't been read, #134).
+            _ => room.Stages.FindIndex(st => st.Puzzles.Contains(id)) is var at and >= 0
+                && (at < s.StageIndex || (at == s.StageIndex && room.FindPuzzle(id) is { } p && Visible(s, p))),
         };
     }
 
@@ -588,7 +658,8 @@ public static class EscapeEngine
     private static EscapePuzzle OpenPuzzle(EscapeState s, EscapeRoom room, string puzzleId)
     {
         var stage = room.Stages[s.StageIndex];
-        if (!stage.Puzzles.Contains(puzzleId) || room.FindPuzzle(puzzleId) is not { } puzzle)
+        // One out of sight gets the same answer as one that doesn't exist: nothing gives away that it's there (#134).
+        if (!stage.Puzzles.Contains(puzzleId) || room.FindPuzzle(puzzleId) is not { } puzzle || !Visible(s, puzzle))
             throw new GameRuleException("That isn't in this part of the room.");
         if (s.IsSolved(puzzleId)) throw new GameRuleException("That's already solved.");
         return puzzle;
@@ -604,17 +675,21 @@ public static class EscapeEngine
         s.WrongStreak = 0;
         Log(s, now, $"✓ {by} solved {puzzle.Title}.");
 
-        // One cue per moment: opening a stage or escaping says more than the solve that caused it.
+        // One cue per moment: opening a stage, a final lock appearing or escaping says more than the solve that caused it.
         var stage = room.Stages[s.StageIndex];
         if (!stage.Puzzles.All(s.IsSolved))
         {
-            Cue(s, CueKind.Solved, now, puzzle.Title, by);
+            // A solve, or what it gave, can bring another lock into sight (#134), the stage's final lock among them.
+            var found = Reveal(s, room, now, by);
+            if (found.FirstOrDefault(p => p.Final is not null) is { } final) Cue(s, CueKind.FinalLock, now, final.Title, by);
+            else Cue(s, CueKind.Solved, now, puzzle.Title, by);
             return;
         }
         if (s.StageIndex + 1 < room.Stages.Count)
         {
             s.StageIndex++;
             Log(s, now, $"🚪 {room.Stages[s.StageIndex].Title}");
+            Reveal(s, room, now, by, opening: true);
             DealStage(s, room, now);
             Cue(s, CueKind.StageOpened, now, puzzle.Title, by, room.Stages[s.StageIndex].Title);
         }

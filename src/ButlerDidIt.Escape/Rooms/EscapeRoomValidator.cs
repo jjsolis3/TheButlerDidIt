@@ -7,8 +7,9 @@ namespace ButlerDidIt.Escape.Rooms;
 /// can be typed, and, most importantly, the room can actually be escaped. It proves that by
 /// playing the room the way a group would: in each stage, keep searching every spot they can,
 /// looking closely at every item, putting together every pair that fits and solving every puzzle
-/// whose items (and spots, and cipher key) are in hand, until nothing more happens; if the stage
-/// isn't finished by then, the room is broken.
+/// in sight whose items (and spots, and cipher key) are in hand, until nothing more happens; if the stage
+/// isn't finished by then, the room is broken. Puzzles that start out of sight (#134) only count once
+/// that play has found them, and a final lock once the rest of its stage is solved and its order has been read.
 ///
 /// That play-through is exact, not just hopeful, because items are either used up (by one puzzle
 /// or one recipe) or tools (needed to search a spot or look at an item, never used up), never both:
@@ -37,23 +38,21 @@ public static class EscapeRoomValidator
         if (template.Count > 0) return template;
 
         // Every length and difficulty is its own room to escape: a shorter or easier game must never
-        // need a key from a puzzle it leaves out.
+        // need a key from a puzzle it leaves out. Each puzzle set is built once and cut to every length; none is
+        // kept, since nobody will play them (see RoomVariants.Build).
         var lengths = room.PlayableLengths;
-        foreach (var minutes in lengths)
+        string At(int minutes, EscapeDifficulty difficulty) =>
+            (lengths.Count > 1 ? $"At {minutes} minutes: " : "") + (difficulty == EscapeDifficulty.Normal ? "" : $"On {difficulty}: ");
+        var templated = RoomVariants.IsTemplated(room);
+        foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
         {
-            foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
+            for (var seed = 0; seed < (templated ? seeds : 1); seed++)
             {
-                var at = (lengths.Count > 1 ? $"At {minutes} minutes: " : "") + (difficulty == EscapeDifficulty.Normal ? "" : $"On {difficulty}: ");
-                if (!RoomVariants.IsTemplated(room))
+                var built = RoomVariants.Build(room, seed, difficulty, cache: false);
+                foreach (var minutes in lengths)
                 {
-                    var errors = ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, 0, difficulty), minutes, difficulty));
-                    if (errors.Count > 0) return errors.Select(e => at + e).ToList();
-                    continue;
-                }
-                for (var seed = 0; seed < seeds; seed++)
-                {
-                    var errors = ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty));
-                    if (errors.Count > 0) return errors.Select(e => $"{at}With puzzle set {seed}: {e}").ToList();
+                    var errors = ValidateConcrete(RoomLengths.Cut(built, minutes, difficulty));
+                    if (errors.Count > 0) return errors.Select(e => At(minutes, difficulty) + (templated ? $"With puzzle set {seed}: " : "") + e).ToList();
                 }
             }
         }
@@ -68,10 +67,12 @@ public static class EscapeRoomValidator
     public static List<string> ValidateGame(EscapeRoom room, long seed)
     {
         var errors = new List<string>();
-        foreach (var minutes in room.PlayableLengths)
-            foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
-                errors.AddRange(ValidateConcrete(RoomLengths.Cut(RoomVariants.Build(room, seed, difficulty), minutes, difficulty))
-                    .Select(e => $"At {minutes} minutes on {difficulty}: {e}"));
+        foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
+        {
+            var built = RoomVariants.Build(room, seed, difficulty, cache: false);
+            foreach (var minutes in room.PlayableLengths)
+                errors.AddRange(ValidateConcrete(RoomLengths.Cut(built, minutes, difficulty)).Select(e => $"At {minutes} minutes on {difficulty}: {e}"));
+        }
         return errors;
     }
 
@@ -117,7 +118,7 @@ public static class EscapeRoomValidator
             }
             var kind = g.Type switch
             {
-                GeneratorType.DigitFacts or GeneratorType.ColorDigits or GeneratorType.Sequence or GeneratorType.Deduction => PuzzleKind.Code,
+                GeneratorType.DigitFacts or GeneratorType.ColorDigits or GeneratorType.Sequence or GeneratorType.Deduction or GeneratorType.Final => PuzzleKind.Code,
                 GeneratorType.Switches => PuzzleKind.Switches,
                 _ => PuzzleKind.Text,
             };
@@ -160,7 +161,31 @@ public static class EscapeRoomValidator
                     if (g.PieceTemplate.Length > 0 && !g.PieceTemplate.Contains("{clue}"))
                         errors.Add($"Puzzle '{p.Id}': the piece template must include {{clue}}.");
                     break;
+                case GeneratorType.Final:
+                {
+                    var others = room.StageOf(p.Id)?.Puzzles.Count(id => id != p.Id) ?? 0;
+                    var marks = FinalLocks.MarksOf(g);
+                    if (marks.Distinct().Count() != marks.Count || marks.Any(m => string.IsNullOrWhiteSpace(m) || m.Length > 16 || m.Any(char.IsDigit)))
+                        errors.Add($"Puzzle '{p.Id}': a final lock's marks must all be different and short, with no digits in them.");
+                    if (marks.Count < others)
+                        errors.Add($"Puzzle '{p.Id}': each of the {others} other puzzles in its stage leaves a mark, but it has only {marks.Count} marks.");
+                    if (!RoomVariants.OrderPlaces(room).ContainsKey(p.Id))
+                        errors.Add($"Puzzle '{p.Id}': write the order of its marks somewhere the group can find it, with {{order:{p.Id}}}.");
+                    if (p.Answers.Count > 0 || p.Pieces.Count > 0 || p.Variants.Any(v => v.Answers is not null || v.Pieces is not null))
+                        errors.Add($"Puzzle '{p.Id}': a final lock's code is built from its stage, so it has no answers or clue pieces of its own.");
+                    if (p.RevealedBy is not null)
+                        errors.Add($"Puzzle '{p.Id}': a final lock comes into sight by itself once the rest of its stage is solved, so it can't have revealedBy.");
+                    break;
+                }
             }
+        }
+        foreach (var stage in room.Stages.Where(st => st.Puzzles.Count(id => room.FindPuzzle(id)?.Generator?.Type == GeneratorType.Final) > 1))
+            errors.Add($"Stage '{stage.Id}' has more than one final lock; give it one.");
+        errors.AddRange(RevealErrors(room));
+        var finals = room.Puzzles.Where(p => p.Generator?.Type == GeneratorType.Final).Select(p => p.Id).ToHashSet();
+        foreach (var id in RoomTexts(room).SelectMany(t => FinalLocks.OrderPlaceholder().Matches(t)).Select(m => m.Groups[1].Value).Distinct())
+        {
+            if (!finals.Contains(id)) errors.Add($"The room writes {{order:{id}}}, but '{id}' isn't a final lock.");
         }
         var ciphers = room.Puzzles.Where(p => p.Generator?.Type == GeneratorType.Cipher).Select(p => p.Id).ToHashSet();
         foreach (var id in RoomTexts(room).SelectMany(t => RoomVariants.KeyPlaceholder().Matches(t)).Select(m => m.Groups[1].Value).Distinct())
@@ -168,6 +193,31 @@ public static class EscapeRoomValidator
             if (!ciphers.Contains(id)) errors.Add($"The room writes {{key:{id}}}, but '{id}' isn't a cipher puzzle.");
         }
         return errors;
+    }
+
+    /// <summary>
+    /// What brings a puzzle into sight (#134) must be in its own stage: a spot in its scene or another puzzle there
+    /// (not the final lock, which is always last), or an item that exists. Whether it can actually happen in time is
+    /// for the play-through.
+    /// </summary>
+    private static IEnumerable<string> RevealErrors(EscapeRoom room)
+    {
+        foreach (var p in room.Puzzles.Where(p => p.RevealedBy is not null))
+        {
+            var stage = room.StageOf(p.Id);
+            var (kind, id) = Reveals.Parse(p.RevealedBy!);
+            var error = kind switch
+            {
+                Reveals.Spot when stage?.Scene?.Objects.Any(o => o.Id == id) != true => $"is found by searching '{id}', which isn't a spot in its stage's scene",
+                Reveals.Puzzle when id == p.Id => "can't be found by solving itself",
+                Reveals.Puzzle when stage?.Puzzles.Contains(id) != true => $"is found by solving '{id}', which isn't a puzzle in its stage",
+                Reveals.Puzzle when room.FindPuzzle(id)?.Generator?.Type == GeneratorType.Final => $"is found by solving '{id}', the final lock, but nothing comes after that",
+                Reveals.Item when room.FindItem(id) is null => $"is found by holding item '{id}', which doesn't exist",
+                "" => $"has revealedBy \"{p.RevealedBy}\"; use \"spot:<id>\", \"puzzle:<id>\" or \"item:<id>\"",
+                _ => null,
+            };
+            if (error is not null) yield return $"Puzzle '{p.Id}' {error}.";
+        }
     }
 
     /// <summary>Every piece of text a room can show, for the checks that look at wording.</summary>
@@ -190,6 +240,8 @@ public static class EscapeRoomValidator
         foreach (var p in room.Puzzles)
         {
             foreach (var t in new[] { p.Title, p.Prompt, p.SolvedText }.Concat(p.Pieces).Concat(p.Hints)) yield return t;
+            // A final lock's marks show on the screens too.
+            foreach (var mark in (p.Generator?.Marks ?? []).Concat(p.Final?.Parts.Select(x => x.Mark) ?? [])) yield return mark;
             foreach (var v in p.Variants)
             {
                 foreach (var t in new[] { v.Prompt, v.SolvedText }.OfType<string>().Concat(v.Pieces ?? []).Concat(v.Hints ?? [])) yield return t;
@@ -286,6 +338,10 @@ public static class EscapeRoomValidator
         foreach (var hidden in HidingErrors(room)) errors.Add(hidden);
         foreach (var text in RoomTexts(room).Where(t => RoomVariants.KeyPlaceholder().IsMatch(t)).Take(1))
             errors.Add($"The room writes a key for a puzzle that isn't a cipher: “{text}”.");
+        foreach (var text in RoomTexts(room).Where(t => FinalLocks.OrderPlaceholder().IsMatch(t)).Take(1))
+            errors.Add($"The room writes a final lock's order where the group can't read it (a spot, an item or a puzzle's prompt can hold it): “{text}”.");
+        foreach (var f in room.Puzzles.Where(p => p.Final is { } lk && lk.Parts.Count < FinalLocks.MinParts))
+            errors.Add($"Puzzle '{f.Id}' is a final lock built from {f.Final!.Parts.Count} other puzzles in this game; its stage needs at least {FinalLocks.MinParts}, so the code can't just be guessed.");
 
         if (errors.Count == 0) errors.AddRange(PlayThrough(room));
         if (room.ContentRating == ContentRating.Family) errors.AddRange(FamilyCheck(room));
@@ -346,8 +402,9 @@ public static class EscapeRoomValidator
 
     /// <summary>
     /// Plays the room stage by stage. In each stage it repeats, until nothing changes: search every spot
-    /// it can, look closely at every item it holds, put together every pair that fits, and solve every
-    /// puzzle it's able to. A stage still unfinished after that is stuck.
+    /// it can, look closely at every item it holds, put together every pair that fits, notice every puzzle
+    /// that has come into sight (#134), and solve every puzzle in sight it's able to. A stage still unfinished
+    /// after that is stuck.
     /// </summary>
     private static IEnumerable<string> PlayThrough(EscapeRoom room)
     {
@@ -355,14 +412,37 @@ public static class EscapeRoomValidator
         var held = new HashSet<string>(); // everything ever held, for keys written on an item that's since been used
         var examined = new HashSet<string>();
         var inspected = new HashSet<string>();
-        var seenPuzzles = new HashSet<string>();
+        var seenPuzzles = new HashSet<string>(); // every puzzle the group has had in sight, for keys written in a puzzle's own text
+        var revealed = new HashSet<string>();
         foreach (var stage in room.Stages)
         {
-            var open = stage.Puzzles.Select(id => room.FindPuzzle(id)!).ToList();
-            seenPuzzles.UnionWith(stage.Puzzles);
+            var all = stage.Puzzles.Select(id => room.FindPuzzle(id)!).ToList();
+            var open = all.ToList();
             var spots = stage.Scene?.Objects ?? [];
             var hidingSpots = spots.Where(o => o.HidesPieces).Select(o => o.Id).ToList();
+            // Every item held while this stage is open, as the engine looks each time the group gains one: an "item:" reveal.
+            var heldHere = new HashSet<string>(inventory);
 
+            bool InSight(EscapePuzzle p) => (p.RevealedBy is null && p.Final is null) || revealed.Contains(p.Id);
+            bool Due(EscapePuzzle p) => p.Final is not null
+                ? open.All(o => o == p)
+                : Reveals.Parse(p.RevealedBy!) switch
+                {
+                    (Reveals.Spot, var id) => examined.Contains(id),
+                    (Reveals.Puzzle, var id) => !open.Any(o => o.Id == id),
+                    (Reveals.Item, var id) => heldHere.Contains(id),
+                    _ => false,
+                };
+            bool RevealDue()
+            {
+                var found = open.Where(p => !InSight(p) && Due(p)).ToList();
+                foreach (var p in found)
+                {
+                    revealed.Add(p.Id);
+                    seenPuzzles.Add(p.Id);
+                }
+                return found.Count > 0;
+            }
             bool KeySeen(string place)
             {
                 var (kind, id) = (place[..place.IndexOf(':')], place[(place.IndexOf(':') + 1)..]);
@@ -375,17 +455,30 @@ public static class EscapeRoomValidator
                 };
             }
             bool Solvable(EscapePuzzle p) =>
-                p.Requires.All(inventory.Contains)
+                InSight(p)
+                && p.Requires.All(inventory.Contains)
                 && p.Finds.All(examined.Contains)
                 // With a real key and decoys, the group needs every key it can find, to compare them.
                 && VisibleKeyPlaces(room, p).All(KeySeen)
                 // Its pieces might be hidden in any hiding spot of the stage: all of them may need searching.
-                && (p.Pieces.Count < 2 || hidingSpots.All(examined.Contains));
+                && (p.Pieces.Count < 2 || hidingSpots.All(examined.Contains))
+                // A final lock's code reads in the order the room writes somewhere: the group has to have read it.
+                && (p.Final is null || p.Final.OrderAt.Any(KeySeen));
             void Gain(string? item)
             {
                 if (item is null) return;
                 inventory.Add(item);
                 held.Add(item);
+                heldHere.Add(item);
+            }
+
+            // What's in sight as the stage opens. With nothing at all, the group wouldn't know where to start.
+            RevealDue();
+            seenPuzzles.UnionWith(all.Where(InSight).Select(p => p.Id));
+            if (!all.Any(InSight))
+            {
+                yield return $"Stage '{stage.Id}' opens with nothing in sight: leave at least one of its puzzles without revealedBy, so the group has somewhere to start.";
+                yield break;
             }
 
             for (var progress = true; progress;)
@@ -410,6 +503,7 @@ public static class EscapeRoomValidator
                     Gain(r.Makes);
                     progress = true;
                 }
+                if (RevealDue()) progress = true;
                 foreach (var p in open.Where(Solvable).ToList())
                 {
                     open.Remove(p);
@@ -420,13 +514,22 @@ public static class EscapeRoomValidator
             }
             if (open.Count == 0) continue;
 
-            var stuck = open[0];
+            // A puzzle in sight that can't be solved says more than one that was never found.
+            var stuck = open.FirstOrDefault(InSight) ?? open[0];
             var why = new List<string>();
-            var missing = stuck.Requires.Where(i => !inventory.Contains(i)).Select(i => $"'{i}'").ToList();
-            if (missing.Count > 0) why.Add($"needs {string.Join(", ", missing)}, which nothing earlier gives out");
-            var unsearched = stuck.Finds.Concat(stuck.Pieces.Count >= 2 ? hidingSpots : []).Where(id => !examined.Contains(id)).Distinct().Select(id => $"'{id}'").ToList();
-            if (unsearched.Count > 0) why.Add($"needs {string.Join(", ", unsearched)} searched, which can't be reached");
-            if (!VisibleKeyPlaces(room, stuck).All(KeySeen)) why.Add("has a key somewhere the group can't reach in time");
+            if (!InSight(stuck))
+            {
+                why.Add(stuck.Final is not null ? "is a final lock that never comes into sight" : $"is never found (\"{stuck.RevealedBy}\" can't happen in time)");
+            }
+            else
+            {
+                var missing = stuck.Requires.Where(i => !inventory.Contains(i)).Select(i => $"'{i}'").ToList();
+                if (missing.Count > 0) why.Add($"needs {string.Join(", ", missing)}, which nothing earlier gives out");
+                var unsearched = stuck.Finds.Concat(stuck.Pieces.Count >= 2 ? hidingSpots : []).Where(id => !examined.Contains(id)).Distinct().Select(id => $"'{id}'").ToList();
+                if (unsearched.Count > 0) why.Add($"needs {string.Join(", ", unsearched)} searched, which can't be reached");
+                if (!VisibleKeyPlaces(room, stuck).All(KeySeen)) why.Add("has a key somewhere the group can't reach in time");
+                if (stuck.Final is { } final && !final.OrderAt.Any(KeySeen)) why.Add("is a final lock whose order isn't written anywhere the group can reach");
+            }
             yield return $"Stage '{stage.Id}' can't be finished: puzzle '{stuck.Id}' {string.Join(" and ", why)}.";
             yield break;
         }

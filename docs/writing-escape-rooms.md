@@ -27,7 +27,7 @@ An escape room is one JSON file in `content/escape/`. The app checks every room 
 }
 ```
 
-A stage opens when every puzzle in the stage before it is solved. Solving the last stage is the escape.
+A stage opens when every puzzle in the stage before it is solved, including the ones the group had to find (see *Locks to find, and a final lock*). Solving the last stage is the escape.
 
 ## Puzzles
 
@@ -42,6 +42,7 @@ A stage opens when every puzzle in the stage before it is solved. Solving the la
 | `hints` | Revealed one at a time, each costing time. Every puzzle needs at least one. |
 | `solvedText` | Shown when it's solved. Good for pointing at what just appeared. |
 | `finds` | For `search` puzzles: the ids of the scene spots, in the same stage, that must all be searched. |
+| `revealedBy` | What brings it into sight: `"spot:<id>"`, `"puzzle:<id>"` or `"item:<id>"`. Left out, it's there when the stage opens (see *Locks to find* below). |
 | `minMinutes`, `minDifficulty` | Only played in games at least this long, or at least this hard (see below). |
 
 ## Scenes: spots to search, items to look at, things to put together
@@ -93,6 +94,35 @@ A spot with only a `look` is a **decoy**: searching it turns up nothing, which c
 
 Each item comes from exactly one place: a puzzle's rewards, a spot, a closer look or a recipe. An item is either **used up**, by one puzzle or one recipe, or it's a **tool**, needed to search a spot or look at an item. It can't be both. That way no order of play can leave the group stuck, and the validator's play-through is exact.
 
+## Locks to find, and a final lock (#134)
+
+A real room doesn't hand you a list of locks: you find them. A puzzle with **`revealedBy`** starts out of sight, and turns up when:
+- **`"spot:<id>"`**: someone searches that spot in its stage. Searching the mast finds the flag locker. This works whoever searches it, and a search that finds a lock costs no time.
+- **`"puzzle:<id>"`**: another puzzle in its stage is solved. The knot board opens and a bottle rolls out.
+- **`"item:<id>"`**: the group holds that item, from wherever it came. An item already held when the stage opens means the lock is simply there.
+
+Until then nothing on any screen mentions it: not its title, its prompt or its clue pieces, and its hidden pieces stay where they are even if someone searches their spot. It can't be answered, taken, hinted or dealt, and trying gives the same "That isn't in this part of the room" as a lock that doesn't exist. The TV and phones say how many locks the group has found ("🔓 4 locks found here"), never how many are left. When every lock found is open and the stage still hasn't, they tell the group to keep searching. The game master's prompts only ever count what's been found.
+
+A spot or puzzle that a shorter or easier game leaves out can't hide anything, so its lock is in sight from the start in that game. Every stage has to start with at least one lock in sight, so the group knows where to begin.
+
+**A final lock** is a `code` puzzle with a `final` generator. It appears once every other puzzle in its stage is solved, and each of those leaves a **mark** when it opens: an emoji and a digit ("⚓ 7"), shown as a badge on its card. The code is those digits in an order the room writes somewhere the group has to find, with **`{order:<final lock's id>}`** in a spot's look or clue, an item's description or closer look, or a puzzle's prompt. It reads as the marks in order: "🐚, then ⚓, then 🦜". The marks, digits and order are picked fresh for every puzzle set, so a replay has a new code (#133), and the lock is built from the puzzles this game actually plays, so a longer or harder game has a longer code. Its prompt and hints can use `{count}` (how many digits, as a word) and `{answer}`.
+
+```jsonc
+{ "id": "gangplank", "title": "The Gangplank", "kind": "code", "requires": ["gangplank-key"],
+  "prompt": "The gangplank needs its key AND a {count}-digit code. 'Every lock on my deck left ye a mark…'",
+  "hints": ["The order is painted somewhere on deck.", "Search the lifeboat.", "The code is {answer}."],
+  "generator": { "type": "final", "marks": ["⚓", "🦜", "🐚", "⭐", "🦀", "🌊"] } }
+// …and on the lifeboat: "look": "Painted on its side, in the captain's curly writing: {order:gangplank}."
+```
+
+The validator checks that:
+- every `revealedBy` points into the lock's own stage (or at an item that exists), and the play-through finds each lock before anything needs it;
+- a final lock has no `answers`, `pieces` or `revealedBy` of its own, there's at most one per stage, and it has a mark for every other puzzle in its stage (the default marks are ⭐ 🌙 ☀️ ❤️ 🍀 ⚡ 🔔 💎);
+- every game of it builds from at least three other puzzles, so the code can't simply be guessed;
+- its order is written somewhere every game can reach in time (a Hard-only spot isn't enough).
+
+The **Pirate Ship** (edition 4) is the showcase. In the galley, the cook's pots turn up behind the stove and the spice chest behind the spice rack. In the cabin, the letter box is found on the letters wall, the lanterns' switches on the lanterns, and the desk drawer from a note in the letter box. On the deck, only the knot board is in sight: it opens to a bottle, the mast hides the flag locker, and on Hard, the crow's nest spots the lighthouse. Then the gangplank appears, built from all of them, with its order painted on the lifeboat.
+
 ## Replays: variants and generators
 
 A room plays differently every time. When a party is created, the server picks a **puzzle set**, a number used as the seed. `RoomVariants.Build(room, seed)` then fixes every puzzle for that game:
@@ -124,6 +154,7 @@ There are two ways to make a puzzle vary:
 | `sequence` | code | A number pattern, shown with `{sequence}` ("3, 7, 11, 15, 19, ?"). The code is the next number. | Nothing else |
 | `deduction` | code | A logic puzzle: the things in `words` stand in a row, and each clue piece says something about where they are ("The red jar is right next to the gold jar"). There's exactly one arrangement, and every clue is needed. The code is each thing's spot (1 = far left), in the order `{items}` lists them. | `{items}` in the prompt, at least 3 `words`, and a piece template with `{clue}` (optional) |
 | `switches` | switches | A light panel: pressing a light flips it and its neighbours, and every light must be on. It's made by pressing lights from all-on, so it can always be solved. `{answer}` names the lights to press, for a last hint. | Nothing else |
+| `final` | code | A stage's final lock: the digits the stage's other puzzles leave, in the order written with `{order:<puzzle id>}` (see *Locks to find, and a final lock*). | `{order:<puzzle id>}` somewhere the group can read it, and optionally `marks` |
 
 ```jsonc
 "generator": { "type": "digitFacts", "count": 4, "pieceTemplate": "Written on your palm: the {ordinal} digit is {fact}." },
@@ -143,6 +174,7 @@ What players see and tap for each of the newer pieces:
 - **Logic puzzles** get a grid to mark ✓ and ✗, and a line-up that turns an order into the code. Both are a scratch pad on that phone only.
 - **Number patterns** show their terms large above the keypad.
 - **Hidden clue pieces:** the TV counts the ones still hidden, and a found piece says where it was found.
+- **Locks to find** appear on the TV and phones as they're found, with a ticker line ("🔓 Ada found a new lock: The Flag Locker"). A **final lock** has a 🏁 banner, and shows the marks found so far in the room's order (never the code's). Each opened lock shows its mark as a badge.
 
 ## Difficulty
 

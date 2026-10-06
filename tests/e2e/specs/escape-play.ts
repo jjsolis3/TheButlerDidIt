@@ -64,7 +64,7 @@ export async function startClock(tv: Page) {
 /**
  * Plays the room the way a thorough group would, one move at a time, taking turns on the phones:
  * search every spot it can, look closely at everything, put together what fits, then solve what's open.
- * Returns the moments it saw along the way (a stage's reveal is "reveal").
+ * Returns the moments it saw along the way (a stage's reveal is "reveal", a final lock "final").
  */
 export async function playThrough(tv: Page, phones: Page[], room: RoomFile, answers: Record<string, string | null>, shots: string): Promise<Set<string>> {
   const byId = new Map(room.puzzles.map((p) => [p.id, p]))
@@ -158,6 +158,15 @@ export async function playThrough(tv: Page, phones: Page[], room: RoomFile, answ
       const text = await textOf(card)
       if (text === null || text.startsWith('✅') || puzzle.kind === 'search') continue
       if (await card.getByText(/^You need /).isVisible()) continue
+      // A final lock (#134): it shows the marks the other locks here left, on the TV and the phone, before it's opened.
+      if (text.startsWith('🏁 The final lock') && !shot.has('final')) {
+        shot.add('final')
+        // A deck's last locks can fall within seconds: let the stage's reveal finish, so the TV shows the room.
+        await expect(tv.getByTestId('room-reveal')).toHaveCount(0, { timeout: 30_000 })
+        await expect(tv.getByTestId(`puzzle-${id}`).getByTestId('marks-so-far').getByTestId('mark').first()).toBeVisible()
+        await tv.screenshot({ path: `${SHOTS}/${shots}-final-tv.png` })
+        await card.screenshot({ path: `${SHOTS}/${shots}-final-phone.png` })
+      }
       if (puzzle.kind === 'use') {
         await card.getByRole('button', { name: 'Use it' }).click()
       } else if (puzzle.kind === 'switches') {

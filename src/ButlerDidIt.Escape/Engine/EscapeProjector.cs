@@ -5,7 +5,8 @@ namespace ButlerDidIt.Escape.Engine;
 
 /// <summary>
 /// Turns the state into what each screen may see. Deliberately never copied: puzzle answers,
-/// hints nobody has paid for, other players' clue pieces, and puzzles in stages not yet reached;
+/// hints nobody has paid for, other players' clue pieces, puzzles in stages not yet reached and puzzles
+/// the group hasn't found yet (#134), not even how many;
 /// what's in a spot nobody has searched (and where the hidden pieces are); an item's detail nobody
 /// has looked at closely; the recipes; and the cipher keys, except where the group has found them.
 /// </summary>
@@ -17,7 +18,8 @@ public static class EscapeProjector
         var room = EscapeEngine.RoomFor(s, template);
         var playing = s.Phase != EscapePhase.Lobby;
         var stage = playing && s.Phase == EscapePhase.Playing ? room.Stages[s.StageIndex] : null;
-        var puzzles = stage is null ? [] : stage.Puzzles.Select(id => Puzzle(s, room, room.FindPuzzle(id)!, now)).ToList();
+        // Only the puzzles the group can see (#134): one still out of sight isn't sent, nor counted.
+        var puzzles = stage is null ? [] : EscapeEngine.InSight(s, room).Select(p => Puzzle(s, room, p, now)).ToList();
         var endText = s.Phase switch
         {
             EscapePhase.Escaped => room.EscapedText,
@@ -36,7 +38,10 @@ public static class EscapeProjector
             s.Players.Select(p => new EscapePlayerSummary(p.SeatId, p.Name, p.IsHost, p.PhotoUrl)).ToList(),
             s.StartedAt, s.Deadline, s.EndedAt, now,
             s.Feed,
-            s.Solved.Count, room.Puzzles.Count, s.HintsUsed, s.WrongAttempts,
+            s.Solved.Count,
+            // While it plays, the puzzles found so far: the whole game's count would say how many are still hidden (#134).
+            PuzzleCount: endText is null ? s.Solved.Count + puzzles.Count(p => !p.Solved) : room.Puzzles.Count,
+            s.HintsUsed, s.WrongAttempts,
             endText,
             s.Daily,
             // The puzzle set number only once it's over, so a group can replay it or challenge friends.
@@ -123,7 +128,10 @@ public static class EscapeProjector
                 ? new EscapeHoldView(holder.SeatId, holder.Name, now - hold.Active >= EscapeEngine.TakeOverAfter)
                 : null,
             // A count, never where: finding them is the search.
-            KeysHidden: solved is null ? KeySpotsLeft(s, room, p) : 0);
+            KeysHidden: solved is null ? KeySpotsLeft(s, room, p) : 0,
+            Final: p.Final is not null,
+            // What it left for the stage's final lock, once it's open: the group reads the code from these (#134).
+            Mark: solved is not null && FinalLocks.PartFor(room, p.Id) is { } part ? new EscapeMarkView(part.Mark, part.Digit) : null);
     }
 
     private static int KeySpotsLeft(EscapeState s, EscapeRoom room, EscapePuzzle p)
@@ -150,7 +158,7 @@ public static class EscapeProjector
 
     /// <summary>
     /// The recap of a finished game (#111). It's made only from what the group saw or did: the stages they
-    /// reached and the titles of the puzzles in them (the TV listed those), who opened what and when.
+    /// reached and the titles of the puzzles they found in them (the TV listed those), who opened what and when.
     /// Answers, prompts, hints, solved texts and clue pieces are never copied, so a shared recap doesn't
     /// spoil the room for the next group.
     /// </summary>
@@ -168,15 +176,16 @@ public static class EscapeProjector
         for (var i = 0; i <= s.StageIndex && i < room.Stages.Count; i++)
         {
             var stage = room.Stages[i];
-            var puzzles = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Select(p =>
+            // The puzzles the group found: one never found stays a secret for the next group (#134).
+            var puzzles = stage.Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => EscapeEngine.Visible(s, p)).Select(p =>
             {
                 var hints = s.HintsShown.GetValueOrDefault(p.Id);
                 return solved.TryGetValue(p.Id, out var x)
                     ? new EscapeRecapPuzzle(p.Title, p.Kind, x.SolvedBy, At(x.At), hints)
                     : new EscapeRecapPuzzle(p.Title, p.Kind, null, null, hints);
             }).ToList();
-            // Cleared when its last puzzle opened; the next stage opened at that moment.
-            int? clearedAt = puzzles.All(p => p.SolvedAt is not null) ? puzzles.Select(p => p.SolvedAt!.Value).DefaultIfEmpty(openedAt).Max() : null;
+            // Cleared when its last puzzle opened, found or not; the next stage opened at that moment.
+            int? clearedAt = stage.Puzzles.All(solved.ContainsKey) ? stage.Puzzles.Select(id => At(solved[id].At)).DefaultIfEmpty(openedAt).Max() : null;
             stages.Add(new EscapeRecapStage(i + 1, stage.Title, openedAt, clearedAt, puzzles.Sum(p => p.Hints), puzzles));
             if (clearedAt is { } cleared) openedAt = cleared;
         }

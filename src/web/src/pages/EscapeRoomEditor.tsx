@@ -391,6 +391,7 @@ function PuzzlesTab({ doc, update }: { doc: EscapeRoomDoc; update: Update }) {
     })
   const toggleItem = (field: 'requires' | 'rewards', item: string, on: boolean) =>
     edit((p) => void (p[field] = on ? [...(p[field] ?? []), item] : (p[field] ?? []).filter((x) => x !== item)))
+  const final = puzzle?.generator?.type === 'final'
 
   return (
     <ListDetail
@@ -416,7 +417,12 @@ function PuzzlesTab({ doc, update }: { doc: EscapeRoomDoc; update: Update }) {
               <Select label="In stage" value={stageOf(puzzle.id)} options={doc.stages.map((s) => ({ value: s.id, label: s.title }))} onChange={moveTo} />
             </div>
             <Text label="What everyone sees (the riddle or the lock)" area value={puzzle.prompt} onChange={(v) => edit((p) => void (p.prompt = v))} />
-            {puzzle.generator ? (
+            {final ? (
+              <p className="rounded-lg border border-line bg-bg p-3 text-sm text-muted">
+                🏁 The final lock of its stage. It appears once every other puzzle there is open, and its code is built fresh every game from the marks they leave. Write{' '}
+                <code>{`{order:${puzzle.id}}`}</code> on a spot or an item, where the group can find the order to read the marks in. Its marks are in the JSON tab.
+              </p>
+            ) : puzzle.generator ? (
               <p className="rounded-lg border border-line bg-bg p-3 text-sm text-muted">
                 🎲 This code is made fresh every game ({puzzle.generator.type}), with its clue pieces, so it's never written here. Its settings are in the JSON tab.
               </p>
@@ -433,6 +439,9 @@ function PuzzlesTab({ doc, update }: { doc: EscapeRoomDoc; update: Update }) {
             <Text label="Read out when it opens" area value={puzzle.solvedText} onChange={(v) => edit((p) => void (p.solvedText = v))} />
           </Card>
           <Card>
+            {!final && (
+              <Select label="How the group finds it" value={puzzle.revealedBy ?? ''} options={findOptions(doc, puzzle)} onChange={(v) => edit((p) => void (p.revealedBy = v || null))} />
+            )}
             <ItemPicks label="Needs these items first" items={doc.items} chosen={puzzle.requires ?? []} onChange={(item, on) => toggleItem('requires', item, on)} />
             <ItemPicks label="Gives these items when it opens" items={doc.items} chosen={puzzle.rewards ?? []} onChange={(item, on) => toggleItem('rewards', item, on)} />
             <div className="grid gap-3 sm:grid-cols-2">
@@ -473,6 +482,24 @@ function PuzzlesTab({ doc, update }: { doc: EscapeRoomDoc; update: Update }) {
       )}
     </ListDetail>
   )
+}
+
+/**
+ * What can bring a puzzle into sight (#134): searching a spot or solving another puzzle in its stage, or holding an
+ * item. Left at "in sight", the puzzle is there when the stage opens. A choice that no longer fits (its spot moved
+ * stage) is kept in the list, so the select shows it and the room's check explains what's wrong.
+ */
+function findOptions(doc: EscapeRoomDoc, puzzle: EscapePuzzleDoc): { value: string; label: string }[] {
+  const stage = doc.stages.find((s) => s.puzzles.includes(puzzle.id))
+  const others = (stage?.puzzles ?? []).flatMap((id) => doc.puzzles.filter((p) => p.id === id && p.id !== puzzle.id && p.generator?.type !== 'final'))
+  const options = [
+    { value: '', label: 'In sight from the start' },
+    ...(stage?.scene?.objects ?? []).map((o) => ({ value: `spot:${o.id}`, label: `Searching the ${o.label}` })),
+    ...others.map((p) => ({ value: `puzzle:${p.id}`, label: `Solving ${p.title}` })),
+    ...doc.items.map((i) => ({ value: `item:${i.id}`, label: `Holding ${i.name}` })),
+  ]
+  if (puzzle.revealedBy && !options.some((o) => o.value === puzzle.revealedBy)) options.push({ value: puzzle.revealedBy, label: puzzle.revealedBy })
+  return options
 }
 
 function ItemPicks({ label, items, chosen, onChange }: { label: string; items: EscapeItemDoc[]; chosen: string[]; onChange: (item: string, on: boolean) => void }) {

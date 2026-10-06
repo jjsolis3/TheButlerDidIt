@@ -86,6 +86,10 @@ export default function EscapeHowToPlay() {
           <li>
             <b>Logic puzzles, number patterns and light panels:</b> work them out together. Each has exactly one answer.
           </li>
+          <li>
+            <b>Final locks:</b> in some rooms, an area ends with a final lock that appears once everything else there is open. Each lock you
+            opened left a mark and a number (like ⚓ 7), and the order to read them in is written somewhere in the room.
+          </li>
         </ul>
       </Section>
 
@@ -96,6 +100,11 @@ export default function EscapeHowToPlay() {
           </li>
           <li>
             <b>A wrong answer locks that puzzle for 3 seconds</b>, so guessing every code doesn't work.
+          </li>
+          <li>
+            <b>Not every lock is in sight.</b> Some only turn up when you search the right spot, open another lock or find the right item. The
+            screens count the locks you've found, never how many are left: when everything you've found is open and the area hasn't, keep
+            searching.
           </li>
           <li>
             <b>A search that turns up nothing costs time:</b> 10 seconds on Normal, 20 on Hard (Easy is free). Think before you tap.

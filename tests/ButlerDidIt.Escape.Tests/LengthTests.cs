@@ -55,9 +55,14 @@ public class LengthTests
         Assert.Equal(T0.AddMinutes(30), s.Deadline);
         var view = EscapeProjector.Stage(s, Workshop, T0);
         Assert.Equal(30, view.TimeLimitMinutes);
-        Assert.Equal(RoomLengths.Cut(RoomVariants.Build(Workshop, 5), 30).Puzzles.Count, view.PuzzleCount);
+        // While it plays, the count is what the group has found so far (#134): the first stage's puzzles.
+        var played = RoomLengths.Cut(RoomVariants.Build(Workshop, 5), 30);
+        Assert.Equal(played.Stages[0].Puzzles.Count, view.PuzzleCount);
         // A puzzle this length leaves out can't be tried.
         Assert.Throws<ButlerDidIt.Game.Engine.GameRuleException>(() => EscapeEngine.Apply(s, Workshop, new SubmitAnswer(T0, ada, "cabinet", "x")));
+        // Once it's over, the whole game's count: the puzzles this length plays.
+        s = EscapeEngine.Apply(s, Workshop, new EscapeTick(T0.AddMinutes(30)));
+        Assert.Equal(played.Puzzles.Count, EscapeProjector.Stage(s, Workshop, T0).PuzzleCount);
     }
 
     [Fact]

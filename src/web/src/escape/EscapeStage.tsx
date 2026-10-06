@@ -16,6 +16,7 @@ import { EscapeClock } from './EscapeClock'
 import { GameMasterPanel } from './GameMasterPanel'
 import { DIFFICULTY, KIND_ICON } from './labels'
 import { LeaderboardPanel } from './LeaderboardPanel'
+import { LocksFound, MarkBadge, MarksSoFar } from './Locks'
 import { markSeen, readSeen } from './reveal'
 import { RoomReveal } from './RoomReveal'
 import { Notebook } from './Notebook'
@@ -291,6 +292,7 @@ function TvRoom({ stage, host, error, controls }: { stage: EscapeStageView; host
         <div className="flex min-h-0 flex-col gap-3">
           <Found stage={stage} tv />
           <ErrorText>{error}</ErrorText>
+          <LocksFound stage={stage} />
           <div className="min-h-0 flex-1" data-testid="tv-puzzles">
             {/* Scaled to fit on a TV (1080p and up). A busy stage on a small laptop scrolls this box, as a last resort. */}
             <FitToScreen>
@@ -338,6 +340,7 @@ function StackedRoom({ stage, host, error }: { stage: EscapeStageView; host?: Ho
       <GameMasterPanel gameMaster={stage.gameMaster} narration={stage.narration} />
       <Found stage={stage} />
 
+      <LocksFound stage={stage} />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {stage.puzzles.map((p) => (
           <PuzzleCard key={p.id} puzzle={p} stage={stage} host={host} />
@@ -361,6 +364,7 @@ function PuzzleCard({ puzzle: p, stage, host, compact = false }: { puzzle: Escap
           <span aria-hidden>✅</span>
           <span className="font-display text-lg">{p.title}</span>
           <span className="text-xs text-green-300">opened by {p.solvedBy}</span>
+          {p.mark && <MarkBadge mark={p.mark} />}
         </p>
         <p className="mt-1 line-clamp-2 text-xs text-green-300/80">{p.solvedText}</p>
       </article>
@@ -369,12 +373,13 @@ function PuzzleCard({ puzzle: p, stage, host, compact = false }: { puzzle: Escap
   return (
     <article
       data-testid={`puzzle-${p.id}`}
-      className={`rounded-xl border ${compact ? 'p-3' : 'p-4'} ${p.solved ? 'border-green-600/60 bg-green-900/10' : p.needs.length ? 'border-line bg-surface/60 opacity-80' : 'border-accent/60 bg-surface'}`}
+      className={`rounded-xl border ${compact ? 'p-3' : 'p-4'} ${p.solved ? 'border-green-600/60 bg-green-900/10' : p.needs.length ? 'border-line bg-surface/60 opacity-80' : p.final ? 'border-2 border-accent bg-accent/10' : 'border-accent/60 bg-surface'}`}
     >
+      {p.final && !p.solved && <p className="text-xs font-semibold tracking-widest text-accent uppercase">🏁 The final lock</p>}
       <div className="flex items-start justify-between gap-2">
         <h2 className={`font-display ${compact ? 'text-lg 2xl:text-2xl' : 'text-xl'}`}>{p.title}</h2>
         <span className="shrink-0 text-lg" aria-hidden>
-          {p.solved ? '✅' : p.needs.length ? '🔒' : KIND_ICON[p.kind]}
+          {p.solved ? '✅' : p.needs.length ? '🔒' : p.final ? '🏁' : KIND_ICON[p.kind]}
         </span>
       </div>
       {!p.solved && turns && (
@@ -392,10 +397,11 @@ function PuzzleCard({ puzzle: p, stage, host, compact = false }: { puzzle: Escap
       <p className={`mt-2 text-sm text-ink/90 ${compact ? 'leading-snug 2xl:text-base' : 'leading-relaxed'}`}>{p.prompt}</p>
       {p.solved ? (
         <p className="mt-3 text-sm text-green-300">
-          Opened by {p.solvedBy}. {p.solvedText}
+          Opened by {p.solvedBy}. {p.solvedText} {p.mark && <MarkBadge mark={p.mark} />}
         </p>
       ) : (
         <>
+          {p.final && <MarksSoFar stage={stage} />}
           {p.needs.length > 0 && <p className="mt-3 text-xs text-muted">Needs: {p.needs.join(', ')}</p>}
           {p.pieceCount > 0 && <p className="mt-3 text-xs text-accent">🧩 Clues on {p.pieceCount} phones: read them out!</p>}
           {p.piecesHidden > 0 && (

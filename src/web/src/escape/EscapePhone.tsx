@@ -6,6 +6,7 @@ import { useParty } from '../lib/hub'
 import type { EscapePlayerView, EscapePuzzleView, EscapeStageView } from '../lib/types'
 import { EscapeClock } from './EscapeClock'
 import { ItemInspector } from './ItemInspector'
+import { LocksFound, MarkBadge, MarksSoFar } from './Locks'
 import { Notebook } from './Notebook'
 import { CipherTool, DeductionHelper, SequenceTerms, SwitchGrid } from './PuzzleWidgets'
 import { SceneView } from './SceneView'
@@ -94,6 +95,7 @@ export function EscapePhone({ code, token, onLeave }: { code: string; token: str
 
           <section className="space-y-3">
             <h2 className="text-xs font-semibold tracking-widest text-accent uppercase">In front of you</h2>
+            <LocksFound stage={stage} />
             {/* Yours first, then the ones nobody has taken, then the others', then the solved ones. */}
             {[...stage.puzzles]
               .sort((a, b) => order(a, player.seatId) - order(b, player.seatId))
@@ -186,12 +188,23 @@ function PuzzleCard({ code, puzzle: p, stage, me, invoke }: { code: string; puzz
   const others = stage.players.filter((x) => x.seatId !== me)
 
   return (
-    <article className={`rounded-xl border p-3 ${p.solved ? 'border-green-600/60' : 'border-line'} bg-surface`} data-testid={`phone-puzzle-${p.id}`}>
+    <article
+      className={`rounded-xl border p-3 ${p.solved ? 'border-green-600/60' : p.final ? 'border-2 border-accent' : 'border-line'} bg-surface`}
+      data-testid={`phone-puzzle-${p.id}`}
+    >
+      {p.final && !p.solved && <p className="text-xs font-semibold tracking-widest text-accent uppercase">🏁 The final lock</p>}
       <p className="font-semibold">
         {p.solved ? '✅ ' : p.needs.length ? '🔒 ' : ''}
         {p.title}
+        {p.mark && (
+          <>
+            {' '}
+            <MarkBadge mark={p.mark} />
+          </>
+        )}
       </p>
       <p className="mt-1 text-sm text-ink/90">{p.prompt}</p>
+      {p.final && !p.solved && <MarksSoFar stage={stage} />}
       {!p.solved && p.piecesHidden > 0 && (
         <p className="mt-1 text-xs text-accent">
           🧩 {p.piecesHidden} clue piece{p.piecesHidden === 1 ? '' : 's'} still hidden in the room{finder ? `: ${finder}` : ''}

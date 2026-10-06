@@ -63,6 +63,8 @@ export interface EscapePuzzleDoc {
   generator?: { type: string } | null
   minMinutes?: number | null
   minDifficulty?: EscapeDifficulty | null
+  /** What brings it into sight (#134): "spot:<id>", "puzzle:<id>" or "item:<id>". Left out, it's there from the start. */
+  revealedBy?: string | null
 }
 
 export interface EscapeItemDoc {
