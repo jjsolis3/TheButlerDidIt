@@ -97,7 +97,7 @@ public static partial class RoomVariants
                 return new Made(
                     string.Concat(facts.Select(f => f.Value)),
                     facts.Select((f, i) => g.PieceTemplate.Replace("{ordinal}", Ordinal(i)).Replace("{fact}", f.Text)).ToList(),
-                    Old("", string.Join(", ", facts.Select(f => f.Short))));
+                    Dealt(count, facts: string.Join(", ", facts.Select(f => f.Short))));
             }
             case GeneratorType.ColorDigits:
             {
@@ -108,7 +108,7 @@ public static partial class RoomVariants
                 return new Made(
                     string.Concat(digits),
                     dealt.Select(i => g.PieceTemplate.Replace("{color}", colors[i].ToUpperInvariant()).Replace("{digit}", digits[i].ToString())).ToList(),
-                    Old(string.Join(", then ", colors.Select(c => g.Thing.Length == 0 ? Capitalise(c) : $"{Capitalise(c)} {g.Thing}")), ""));
+                    Dealt(count, order: string.Join(", then ", colors.Select(c => g.Thing.Length == 0 ? Capitalise(c) : $"{Capitalise(c)} {g.Thing}"))));
             }
             case GeneratorType.WordSequence:
             {
@@ -116,7 +116,7 @@ public static partial class RoomVariants
                 return new Made(
                     string.Join(" ", words),
                     words.Select((w, i) => g.PieceTemplate.Replace("{ordinal}", Ordinal(i)).Replace("{word}", w)).ToList(),
-                    Old("", ""));
+                    Dealt(count));
             }
             case GeneratorType.Cipher:
             {
@@ -165,7 +165,15 @@ public static partial class RoomVariants
         _ => g.Words.Distinct(StringComparer.OrdinalIgnoreCase).Count(),
     };
 
-    private static Dictionary<string, string> Old(string order, string facts) => new() { ["{order}"] = order, ["{facts}"] = facts };
+    /// <summary>
+    /// The fills for a code or password dealt across the phones. {count} is how many digits or words this game deals, as a
+    /// word ("a {count}-digit lock" reads "a four-digit lock" on Hard): Easy deals one fewer and Hard one more, so a room's
+    /// text never says the number itself.
+    /// </summary>
+    private static Dictionary<string, string> Dealt(int count, string order = "", string facts = "") =>
+        new() { ["{order}"] = order, ["{facts}"] = facts, ["{count}"] = CountWords[count] };
+
+    private static readonly string[] CountWords = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
     private static Dictionary<string, string> New(params (string Placeholder, string Text)[] fills) => fills.ToDictionary(f => f.Placeholder, f => f.Text);
 
     private static string Fill(string text, Made m)

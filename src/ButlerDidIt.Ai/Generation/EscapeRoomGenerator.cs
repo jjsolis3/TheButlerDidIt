@@ -327,6 +327,8 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
           pieceTemplate must contain {color} and {digit}; put {order} in the prompt or a hint so the group knows the order.
         - "wordSequence": a password of words in order; each phone remembers one word. "kind": "text". Give 10 or more themed "words";
           pieceTemplate must contain {ordinal} and {word}. Prompts, hints and solvedText may use {answer}.
+          For these three, never write how many digits or words there are: Easy deals one fewer and Hard one more. Write {count}
+          instead ("a {count}-digit lock" reads "a four-digit lock" on Hard).
         - "cipher": a coded word, picked from your "words", shown where the prompt says {cipher}. "kind": "text". "cipher" is one of:
           numbers (A=1…Z=26) or mirror (A↔Z): no key needed; shift, symbols or morse: write "{key:<this puzzle's id>}" in a spot's "look"
           or an item's "inspect" where the group will find it (ideally a spot that needs a tool). {{{(r.ContentRating == ContentRating.Family ? "This is a family room: use numbers, mirror or shift with short words; symbols and morse only on a Hard-only puzzle." : "Symbols and morse make good Hard-only puzzles.")}}}

@@ -548,7 +548,7 @@
         "cutter-handles"
       ],
       "hints": [
-        "Every phone holds one of the four digits. Read them out loud, in order.",
+        "Every phone holds one of the {count} digits. Read them out loud, in order.",
         "In order: {facts}."
       ],
       "solvedText": "The lid springs open. Inside, wrapped in oily cloth: a pair of red bolt-cutter handles, with no blades.",

@@ -599,7 +599,7 @@
       "id": "duck-pond",
       "title": "The Duck Pond Prize Box",
       "kind": "code",
-      "prompt": "The duck pond's prize box has a 3-digit lock. The sign says: '{order}!' Each of you fished out one rubber duck.",
+      "prompt": "The duck pond's prize box has a {count}-digit lock. The sign says: '{order}!' Each of you fished out one rubber duck.",
       "rewards": [
         "rubber-duck"
       ],
@@ -852,12 +852,12 @@
       "id": "exit-gate",
       "title": "The Big Gate",
       "kind": "text",
-      "prompt": "The last lock needs the brass key AND a password. Mister Giggles' voice crackles: 'Tell me the three carousel animals, first to last!'",
+      "prompt": "The last lock needs the brass key AND a password. Mister Giggles' voice crackles: 'Tell me the {count} carousel animals, first to last!'",
       "requires": [
         "brass-key"
       ],
       "hints": [
-        "Three phones each remember one carousel animal.",
+        "Each of {count} phones remembers one carousel animal.",
         "Say them in order, first to last, like: animal animal animal."
       ],
       "solvedText": "The brass key turns and the password lights up the gate: {answer}!",

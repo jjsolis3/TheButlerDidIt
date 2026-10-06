@@ -418,6 +418,40 @@ public class ReplayTests
         Assert.Matches(@"'(Red, then Blue|Blue, then Red), or no treasure", RoomVariants.Build(unnamed, 7).FindPuzzle(chest.Id)!.Prompt);
     }
 
+    /// <summary>
+    /// A code or password dealt across the phones is a digit or word longer on Hard and shorter on Easy, so its text says
+    /// {count}: a chest that promised a "3-digit lock" took four digits on Hard.
+    /// </summary>
+    [Fact]
+    public void Codes_dealt_across_the_phones_say_how_long_they_are_at_every_difficulty()
+    {
+        var count = new System.Text.RegularExpressions.Regex(@"\b(\d|two|three|four|five|six|seven|eight|nine|ten)\b[- ](\w+-)?(digit|words?|phones|flag|code words|carousel|favourite|star-words)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        string[] words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+        foreach (var room in Rooms.Library)
+        {
+            foreach (var template in room.Puzzles.Where(p => p.Generator?.Type is GeneratorType.DigitFacts or GeneratorType.ColorDigits or GeneratorType.WordSequence))
+            {
+                foreach (var text in template.Hints.Prepend(template.Prompt).Append(template.SolvedText))
+                    Assert.False(count.IsMatch(text), $"{room.Id}/{template.Id} says how long it is; write {{count}}: {text}");
+                foreach (var level in Enum.GetValues<EscapeDifficulty>())
+                {
+                    var built = RoomVariants.Build(room, 3, level).FindPuzzle(template.Id)!;
+                    var dealt = words[built.Pieces.Count];
+                    foreach (var text in built.Hints.Prepend(built.Prompt))
+                    {
+                        Assert.DoesNotContain("{count}", text);
+                        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(text, @"\b(\w+)-digit"))
+                            Assert.Equal(dealt, m.Groups[1].Value);
+                    }
+                }
+            }
+        }
+        var chest = RoomVariants.Build(Rooms.Get("the-pirate-ship"), 3, EscapeDifficulty.Hard).FindPuzzle("treasure-chest")!;
+        Assert.Contains("has a four-digit lock", chest.Prompt);
+        Assert.Equal(4, chest.Answers[0].Length);
+    }
+
     [Fact]
     public void Broken_generators_are_caught_before_anyone_plays()
     {

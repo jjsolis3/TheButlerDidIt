@@ -639,7 +639,7 @@
       "minMinutes": 60,
       "title": "Gus's Locker",
       "kind": "code",
-      "prompt": "Gus's locker has a 3-digit lock. He loved a quiz, so he wrote each digit as a quiz question on a sticky note, and you've each pocketed one.",
+      "prompt": "Gus's locker has a {count}-digit lock. He loved a quiz, so he wrote each digit as a quiz question on a sticky note, and you've each pocketed one.",
       "generator": {
         "type": "digitFacts",
         "count": 3,
@@ -695,7 +695,7 @@
       "id": "prize-counter",
       "title": "The Prize Counter",
       "kind": "code",
-      "prompt": "The prize counter's cabinet has a 3-digit lock. A sign above it says: '{order}! Count your tickets!' Each of you grabbed a different colour of prize ticket off the floor.",
+      "prompt": "The prize counter's cabinet has a {count}-digit lock. A sign above it says: '{order}! Count your tickets!' Each of you grabbed a different colour of prize ticket off the floor.",
       "generator": {
         "type": "colorDigits",
         "count": 3,

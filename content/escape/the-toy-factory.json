@@ -559,7 +559,7 @@
       "minMinutes": 45,
       "title": "The Teddy Bear Tester",
       "kind": "code",
-      "prompt": "A machine that squeezes teddy bears to test their squeak has jammed. Its reset box has a 3-digit lock. Each of you checked the tag on a different bear.",
+      "prompt": "A machine that squeezes teddy bears to test their squeak has jammed. Its reset box has a {count}-digit lock. Each of you checked the tag on a different bear.",
       "hints": [
         "Every phone holds one of the digits, written as a fact. Say them out loud, in order.",
         "In order: {facts}."
@@ -589,7 +589,7 @@
       "id": "paint-mixer",
       "title": "The Paint Mixer",
       "kind": "code",
-      "prompt": "The paint mixer has a 3-digit lock. Sprocket's sign on it says: '{order}!'",
+      "prompt": "The paint mixer has a {count}-digit lock. Sprocket's sign on it says: '{order}!'",
       "rewards": [
         "paint-tin"
       ],
@@ -745,9 +745,9 @@
       "minMinutes": 45,
       "title": "The Parrot Crate",
       "kind": "text",
-      "prompt": "A toy parrot is stuck inside a crate with a word lock. It squawks: 'Sprocket's three favourite toys, first to last! Squawk!'",
+      "prompt": "A toy parrot is stuck inside a crate with a word lock. It squawks: 'Sprocket's {count} favourite toys, first to last! Squawk!'",
       "hints": [
-        "Three phones each remember one toy from Sprocket's list.",
+        "Each of {count} phones remembers one toy from Sprocket's list.",
         "Say them in order, first to last, like: toy toy toy."
       ],
       "solvedText": "The crate pops open and the parrot flaps out: '{answer}! {answer}!' It lands on your shoulder and won't let go.",
