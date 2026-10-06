@@ -1,95 +1,15 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { Link, useParams } from 'react-router'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useParams } from 'react-router'
+import { Bar, Feel, Section, Stat } from '../components/Stats'
 import { Card, ErrorText, Eyebrow, Heading, Shell } from '../components/ui'
 import { api } from '../lib/api'
+import { FEEL } from '../lib/feel'
+import { percent } from '../lib/numbers'
 import { DEFAULT_PALETTE, ESCAPE_PALETTE, usePalette } from '../lib/theme'
 import type { EscapeInsights, InsightsView, MysteryInsights } from '../lib/types'
 
-/**
- * How difficult it felt, as a diverging bar: too easy and too hard pull opposite ways from "just right", a neutral
- * gray in the middle. Fixed colours, not the theme's, so the two poles always read as opposites; checked for
- * colour-blind separation and contrast against the dark surfaces (the dataviz validator).
- */
-const FEEL = {
-  tooEasy: { label: 'Too easy', color: '#3987e5' },
-  justRight: { label: 'Just right', color: '#383835' },
-  tooHard: { label: 'Too hard', color: '#e66767' },
-} as const
-
-const percent = (part: number, whole: number) => (whole === 0 ? 0 : Math.round((part / whole) * 100))
 const minutes = (seconds: number | null) =>
   seconds === null ? '—' : seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`
-
-/** One headline number. */
-function Stat({ label, value, detail }: { label: string; value: ReactNode; detail?: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-line bg-surface p-4">
-      <p className="text-xs tracking-widest text-muted uppercase">{label}</p>
-      <p className="mt-1 text-3xl font-semibold tabular-nums">{value}</p>
-      {detail && <p className="mt-1 text-xs text-muted">{detail}</p>}
-    </div>
-  )
-}
-
-/** A horizontal bar on a faint track, its value at the tip. One series, so the title says what it is: no legend. */
-function Bar({ label, value, max, note, emphasis = true }: { label: ReactNode; value: number; max: number; note?: string; emphasis?: boolean }) {
-  const width = max === 0 ? 0 : (value / max) * 100
-  return (
-    <li className="grid grid-cols-[minmax(6rem,16rem)_1fr_auto] items-center gap-3 text-sm" title={`${typeof label === 'string' ? label : ''} ${value}${note ? ` (${note})` : ''}`}>
-      <span className="text-ink/90 [overflow-wrap:anywhere]">{label}</span>
-      <span className="h-5 rounded-r bg-bg" aria-hidden>
-        <span
-          className="block h-full rounded-r-[4px]"
-          style={{ width: `${width}%`, background: emphasis ? 'var(--theme-accent)' : 'color-mix(in oklab, var(--theme-ink) 30%, transparent)' }}
-        />
-      </span>
-      <span className="text-right text-muted tabular-nums">
-        {value}
-        {note ? ` · ${note}` : ''}
-      </span>
-    </li>
-  )
-}
-
-function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
-  return (
-    <Card className="space-y-4">
-      <div>
-        <h2 className="font-display text-2xl">{title}</h2>
-        {hint && <p className="text-sm text-muted">{hint}</p>}
-      </div>
-      {children}
-    </Card>
-  )
-}
-
-/** Too easy · just right · too hard, as one bar split by the share of votes, with the counts in the legend under it. */
-function Feel({ votes }: { votes: InsightsView['difficulty'] }) {
-  const total = votes.tooEasy + votes.justRight + votes.tooHard
-  if (total === 0) return <p className="text-sm text-muted">No votes yet.</p>
-  const parts = (['tooEasy', 'justRight', 'tooHard'] as const).filter((k) => votes[k] > 0)
-  return (
-    <div className="space-y-3">
-      {/* 2px gaps between the parts are the surface showing through. */}
-      <div className="flex h-6 gap-[2px] overflow-hidden rounded-[4px]" role="img" aria-label={`How hard it felt: ${parts.map((k) => `${FEEL[k].label} ${votes[k]}`).join(', ')}`}>
-        {parts.map((k) => (
-          <span key={k} style={{ width: `${percent(votes[k], total)}%`, background: FEEL[k].color }} title={`${FEEL[k].label}: ${votes[k]} (${percent(votes[k], total)}%)`} />
-        ))}
-      </div>
-      <ul className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
-        {(['tooEasy', 'justRight', 'tooHard'] as const).map((k) => (
-          <li key={k} className="inline-flex items-center gap-2">
-            <span className="inline-block h-3 w-3 rounded-sm" style={{ background: FEEL[k].color }} aria-hidden />
-            <span className="text-ink/90">{FEEL[k].label}</span>
-            <span className="text-muted tabular-nums">
-              {votes[k]} ({percent(votes[k], total)}%)
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
 
 function MysterySections({ m }: { m: MysteryInsights }) {
   return (
@@ -196,7 +116,9 @@ export default function Insights() {
     api.insights(escape ? 'escape' : 'mystery', id).then(setView, (e: Error) => setError(e.message))
   }, [escape, id])
 
-  const back = escape ? { to: '/escape/rooms', label: 'My escape rooms' } : { to: '/mysteries', label: 'My mysteries' }
+  // Back to wherever they came from: the admin hub's games list passes itself along, else the host's own library.
+  const from = (useLocation().state as { from?: { to: string; label: string } } | null)?.from
+  const back = from ?? (escape ? { to: '/escape/rooms', label: 'My escape rooms' } : { to: '/mysteries', label: 'My mysteries' })
   if (!view)
     return (
       <Shell>

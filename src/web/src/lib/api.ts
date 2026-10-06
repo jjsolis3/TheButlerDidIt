@@ -1,4 +1,7 @@
 import type {
+  AdminGameRow,
+  AdminOverview,
+  SignUpsView,
   EscapeDifficulty,
   AiProviderKind,
   AiRole,
@@ -263,6 +266,12 @@ export const api = {
   generationJob: (id: string) => request<GenerationJob>('GET', `/api/generation/${id}`),
 
   admin: {
+    // The admin hub (#102): the overview, every game with how it plays, and the sign-up switch.
+    overview: () => request<AdminOverview>('GET', '/api/admin/overview'),
+    games: () => request<AdminGameRow[]>('GET', '/api/admin/games'),
+    signUps: () => request<SignUpsView>('GET', '/api/admin/signups'),
+    /** true: anyone may sign up; false: invites only; null: as the server's configuration says. */
+    setSignUps: (open: boolean | null) => request<SignUpsView>('PUT', '/api/admin/signups', { open }),
     hosts: () => request<HostView[]>('GET', '/api/admin/hosts'),
     resetLink: (id: string) => request<{ link: string; validForHours: number }>('POST', `/api/admin/hosts/${encodeURIComponent(id)}/reset-link`),
     giveFreeAccess: (id: string) => request<AccessView>('POST', `/api/admin/hosts/${encodeURIComponent(id)}/free-access`),

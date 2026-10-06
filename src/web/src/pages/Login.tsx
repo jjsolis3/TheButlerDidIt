@@ -129,7 +129,7 @@ export default function Login() {
           )}
         </p>
       )}
-      {/* Sign-ups can be invite-only (ALLOW_REGISTRATION=false). The server enforces it; this only stops
+      {/* Sign-ups can be invite-only (Admin → Sign-ups, or Auth__AllowRegistration=false). The server enforces it; this only stops
           offering a form that would be refused. Shown while the options load, and to anyone with a good invite. */}
       {mode === 'login' && options?.allowRegistration === false && !inviteInfo ? (
         <p className="mt-4 text-center text-sm text-muted">New host accounts are by invitation. Ask the admin of this site for an invite link.</p>

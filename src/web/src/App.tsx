@@ -1,7 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { ConfirmEmail, ConfirmEmailChange, ForgotPassword, ResetPassword } from './pages/Account'
+import Admin from './pages/Admin'
 import AdminAi from './pages/AdminAi'
+import AdminGames from './pages/AdminGames'
 import AdminHosts from './pages/AdminHosts'
+import AdminOverview from './pages/AdminOverview'
+import AdminSignups from './pages/AdminSignups'
 import EscapeHowToPlay from './pages/EscapeHowToPlay'
 import EscapeLanding from './pages/EscapeLanding'
 import EscapeRecap from './pages/EscapeRecap'
@@ -36,8 +40,14 @@ export default function App() {
       <Route path="/escape" element={<EscapeLanding />} />
       <Route path="/login" element={<Login />} />
       <Route path="/host/new" element={<NewParty />} />
-      <Route path="/admin/ai" element={<AdminAi />} />
-      <Route path="/admin/hosts" element={<AdminHosts />} />
+      {/* The admin hub (#102): one frame with a tab bar, each tab its own address. */}
+      <Route path="/admin" element={<Admin />}>
+        <Route index element={<AdminOverview />} />
+        <Route path="games" element={<AdminGames />} />
+        <Route path="hosts" element={<AdminHosts />} />
+        <Route path="signups" element={<AdminSignups />} />
+        <Route path="ai" element={<AdminAi />} />
+      </Route>
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />

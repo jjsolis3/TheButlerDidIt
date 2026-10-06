@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router'
-import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } from '../components/ui'
+import { Button, Card, ErrorText, Field, Heading, inputClass } from '../components/ui'
 import { api } from '../lib/api'
+import { money } from '../lib/numbers'
 import type { AiProviderKind, AiRole, PriceView, ProviderView, RoleView, UsageReport } from '../lib/types'
-import { useMe } from '../lib/useMe'
 
 const KINDS: { id: AiProviderKind; label: string; needsKey: boolean; urlHint: string }[] = [
   { id: 'anthropic', label: 'Claude (Anthropic)', needsKey: true, urlHint: 'Leave blank for the standard Anthropic API.' },
@@ -34,16 +33,13 @@ const MODEL_SUGGESTIONS: Record<string, string[]> = {
   anthropic: ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5'],
 }
 
-const money = (n: number) => `$${n.toFixed(n < 1 ? 4 : 2)}`
-
 /**
  * Admin → AI. Set up providers (Claude, ChatGPT, Gemini, Ollama), choose which
  * model does each job, keep a price list, and watch spending. API keys are sent
  * to the server once and never shown again. The page only learns whether a key is set.
+ * It's a tab of the admin hub, whose frame lets only the admin in.
  */
 export default function AdminAi() {
-  const { me } = useMe()
-  const navigate = useNavigate()
   const [providers, setProviders] = useState<ProviderView[]>([])
   const [roles, setRoles] = useState<RoleView[]>([])
   const [prices, setPrices] = useState<PriceView[]>([])
@@ -63,35 +59,26 @@ export default function AdminAi() {
   }, [])
 
   useEffect(() => {
-    if (me === null) navigate('/login')
     // reload() only sets state after awaiting the network; the rule can't see into it.
     // oxlint-disable-next-line react/set-state-in-effect
-    else if (me?.isAdmin) void reload()
-  }, [me, navigate, reload])
+    void reload()
+  }, [reload])
 
   return (
-    <Shell wide>
-      <Eyebrow>Admin</Eyebrow>
-      <Heading className="mt-2 mb-2">AI game master</Heading>
+    <div>
+      <Heading className="mb-2">AI game master</Heading>
       <p className="mb-6 max-w-2xl text-muted">
         Connect one or more AI providers, then choose which one plays each role. Without AI the game still works;
         these settings add generated mysteries, NPCs you can question, hints and verdicts.
       </p>
-      <ErrorText>{me && !me.isAdmin ? 'Only the admin can manage AI settings.' : error}</ErrorText>
-      {me?.isAdmin && (
-        <div className="space-y-10">
-          <Providers providers={providers} onChange={reload} onError={setError} />
-          <Roles roles={roles} providers={providers} onChange={reload} onError={setError} />
-          <Prices prices={prices} unpriced={usage?.unpricedModels ?? []} onChange={reload} onError={setError} />
-          {usage && <Usage usage={usage} />}
-        </div>
-      )}
-      <p className="mt-10 text-sm">
-        <Link to="/" className="text-muted underline">
-          Back home
-        </Link>
-      </p>
-    </Shell>
+      <ErrorText>{error}</ErrorText>
+      <div className="space-y-10">
+        <Providers providers={providers} onChange={reload} onError={setError} />
+        <Roles roles={roles} providers={providers} onChange={reload} onError={setError} />
+        <Prices prices={prices} unpriced={usage?.unpricedModels ?? []} onChange={reload} onError={setError} />
+        {usage && <Usage usage={usage} />}
+      </div>
+    </div>
   )
 }
 

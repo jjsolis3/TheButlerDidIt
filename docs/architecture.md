@@ -140,11 +140,33 @@ The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the hos
 - **Only starting is gated.** Guests, joining, a party already created (a trial that ends mid-evening never stops one), recaps and the host's own content never are.
 - **The pages show the answer:** `MeResponse.Access` carries it. The host page says what's locked (`AccessNotice`), and the account and Hosts pages show the plan. The server is still what enforces it.
 
-**Invites** (`InviteEndpoints.cs`, #97). With `Auth:AllowRegistration=false`, a new host needs an invite link from the admin (`/login?invite=…`):
+**Invites** (`InviteEndpoints.cs`, #97). While sign-ups are closed (the admin hub's switch, or `Auth:AllowRegistration=false`), a new host needs an invite link from the admin (`/login?invite=…`):
 - **Stored like seat tokens.** The link carries a random 256-bit token, and the database keeps only its SHA-256 hash. The admin's list never shows a link again, and a copy of the database can't be used to sign up.
 - **Used once, in the sign-up's own transaction.** `POST /api/auth/register` claims the invite with one `UPDATE … WHERE UsedAt IS NULL` inside the transaction that creates the account. The UPDATE locks the row, so if two people use one link at the same moment, the second waits, then finds it used. If creating the account fails (a weak password, an email already taken), the rollback leaves the invite unused.
 - **Optional limits:** an invite can be for one email address only (compared the way Identity normalises emails), and it expires after 1 to 30 days.
 - **No separate "closed" mode.** An invite works whether or not sign-ups are open. An admin who wants no new hosts simply makes no invites.
+
+**The admin hub** (`/admin`, #102). One frame (`Admin.tsx`) with a tab bar, each tab its own address, drawn through a nested route and `<Outlet/>`:
+
+| Tab | Page | Endpoints |
+|---|---|---|
+| Overview | `AdminOverview` | `GET /api/admin/overview` |
+| Games | `AdminGames` | `GET /api/admin/games` |
+| Hosts | `AdminHosts` | `/api/admin/hosts` (free access, reset links) |
+| Sign-ups | `AdminSignups` + `InvitesPanel` | `GET`/`PUT /api/admin/signups`, `/api/admin/invites` |
+| AI | `AdminAi` | `/api/admin/ai/*` |
+
+- **Admin only, twice:** the frame shows the tabs only to the admin, and every endpoint has an admin filter (`AdminHubEndpoints.RequireAdmin`), so a host who types the address gets a 403.
+- **The overview** (`AdminOverview` record) is a handful of aggregate queries:
+  - **hosts:** the total, new this week (from `AppUser.CreatedAt`) and active this month;
+  - **plans:** every host's grants put together with `Access.From`, as on the Hosts page, since SQL can't combine grants;
+  - **parties this week:** the ones that left the lobby, with their seats, plus the games under way now;
+  - **games played per week:** from `PlayRecords`, not `Parties`, because the retention job deletes abandoned parties but the records stay;
+  - **AI spend this month, ratings and votes from the last 30 days;**
+  - **the server:** email, media storage and size, one server or several, AI providers and roles. These come from configuration, so the page only reports them.
+- **Games** lists every mystery (a version's games count on its mystery, as on My mysteries) and every room, built-in and hosts' own, with plays, ★, solve rate and the votes. The page flags a game that needs a look (a low rating, votes saying too hard or too easy, few solving it) once it has at least 3 games or votes, and links to its insights, which link back to the list.
+- **Sign-ups switch:** `SiteSettings`, one row (id 1) whose `AllowRegistration` is null until the admin chooses. `SignUps.OpenAsync` reads it on every sign-up and sign-in-page load (the admin's choice, else `Auth:AllowRegistration`), so a switch reaches every server at once with no redeploy. "Use the server's setting" sets it back to null.
+- **`AppUser.CreatedAt`** is set at sign-up. The migration gave older accounts the date of their first grant or party, whichever came first.
 
 ## 7. Content: themes and scenarios
 

@@ -30,6 +30,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<HiddenContentEntity> HiddenContent => Set<HiddenContentEntity>();
     public DbSet<PlayRecord> PlayRecords => Set<PlayRecord>();
     public DbSet<PlayFeedback> PlayFeedback => Set<PlayFeedback>();
+    public DbSet<SiteSettingsEntity> SiteSettings => Set<SiteSettingsEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -37,6 +38,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
 
         // A host's party settings: one small document, read and written whole (#102).
         b.Entity<AppUser>().Property(u => u.Preferences).HasColumnType("jsonb");
+
+        // The admin hub's own settings: one row, whose id is always 1, so it's never generated.
+        b.Entity<SiteSettingsEntity>().Property(s => s.Id).ValueGeneratedNever();
 
         // Leaderboards read one room's escapes, best score first.
         b.Entity<EscapeResult>().HasIndex(r => new { r.RoomId, r.Escaped, r.Score });

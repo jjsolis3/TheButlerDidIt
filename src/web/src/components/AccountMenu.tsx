@@ -80,11 +80,8 @@ export function AccountMenu() {
           {me.isAdmin && (
             <>
               <hr className="my-1 border-line" />
-              <MenuLink to="/admin/hosts" onClick={close}>
-                Hosts & invites
-              </MenuLink>
-              <MenuLink to="/admin/ai" onClick={close}>
-                AI settings
+              <MenuLink to="/admin" onClick={close}>
+                Admin hub
               </MenuLink>
             </>
           )}

@@ -528,6 +528,65 @@ export interface HostView {
   parties: number
   lockedOut: boolean
   access: AccessView
+  /** When the account was made; null for an old account with no sign of it. */
+  joined: string | null
+  /** When they last created a party. */
+  lastParty: string | null
+}
+
+// ---- The admin hub (#102)
+
+export interface AdminOverview {
+  hosts: { total: number; newThisWeek: number; newThisMonth: number; active: number }
+  plans: { plan: AccessPlan; hosts: number }[]
+  parties: { liveNow: number; mysteries: number; escapeRooms: number; guests: number }
+  /** Games played to the end, per week (Monday, UTC), oldest first. */
+  weeks: { week: string; mysteries: number; escapeRooms: number }[]
+  ai: { spentUsd: number; budgetPerHostUsd: number; calls: number; failed: number }
+  ratings: { average: number | null; count: number; tooEasy: number; justRight: number; tooHard: number }
+  signUps: SignUpsView
+  server: {
+    emailEnabled: boolean
+    mediaStorage: 'Local' | 'S3'
+    mediaBytes: number
+    mediaFiles: number
+    severalServers: boolean
+    aiProviders: number
+    aiRoles: AiRole[]
+  }
+}
+
+export interface SignUpsView {
+  open: boolean
+  /** What the server's configuration says (Auth:AllowRegistration). */
+  serverSetting: boolean
+  /** The admin's choice, which wins; null when the configuration decides. */
+  switch: boolean | null
+  openInvites: number
+  emailEnabled: boolean
+  requireConfirmedEmail: boolean
+}
+
+export type ContentOrigin = 'builtIn' | 'shared' | 'host'
+
+export interface AdminGameRow {
+  kind: GameKind
+  id: string
+  title: string
+  shelf: ContentRating
+  origin: ContentOrigin
+  owner: string | null
+  hidden: boolean
+  plays: number
+  recentPlays: number
+  lastPlayed: string | null
+  rating: number | null
+  ratings: number
+  /** Mysteries: the share of accusations that named the killer. Escape rooms: the share of games escaped. */
+  solveRate: number | null
+  tooEasy: number
+  justRight: number
+  tooHard: number
 }
 
 // ---- AI (admin + generation)
