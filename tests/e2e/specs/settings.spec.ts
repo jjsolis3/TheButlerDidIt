@@ -17,8 +17,9 @@ test('a host saves their usual party settings and the host page starts from them
   await page.getByRole('button', { name: /account menu/ }).click()
   await page.getByRole('link', { name: 'Party settings' }).click()
   await expect(page.getByRole('heading', { name: 'Party settings' })).toBeVisible()
+  // Exact names: "Puzzles" would also match "Who answers the puzzles".
   const pick = (group: string, option: string, nth = 0) =>
-    page.getByRole('radiogroup', { name: group }).nth(nth).getByRole('radio', { name: option }).click()
+    page.getByRole('radiogroup', { name: group, exact: true }).nth(nth).getByRole('radio', { name: option }).click()
   await pick('The host page opens on', '🔐 Escape rooms')
   // Murder mysteries: pass & play on the Family shelf, the funny tone.
   await pick('How you play', 'Pass & play', 0)
@@ -30,6 +31,7 @@ test('a host saves their usual party settings and the host page starts from them
   await pick('Length', '⏱️ 30 min')
   await pick('Difficulty', '😈 Hard')
   await pick('Puzzles', "📅 Today's challenge")
+  await pick('Who answers the puzzles', '🃏 Dealt at random') // #132
   await page.screenshot({ path: `${SHOTS}/80-party-settings.png`, fullPage: true })
   await page.getByRole('button', { name: 'Save my settings' }).click()
   await expect(page.getByText('Saved. New parties start like this.')).toBeVisible()
@@ -41,6 +43,7 @@ test('a host saves their usual party settings and the host page starts from them
   await expect(page.getByRole('radio', { name: /On a video call/ })).toBeChecked()
   await expect(page.getByRole('radio', { name: /Hard/ })).toBeChecked()
   await expect(page.getByRole('radio', { name: /Today's challenge/ })).toBeChecked()
+  await expect(page.getByRole('radio', { name: /Dealt at random/ })).toBeChecked()
   // …and the mysteries too.
   await page.getByRole('tab', { name: '🔎 Murder mystery' }).click()
   await expect(page.getByRole('tab', { name: /Family/ })).toHaveAttribute('aria-selected', 'true')
