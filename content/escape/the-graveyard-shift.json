@@ -1,0 +1,1062 @@
+{
+  "id": "the-graveyard-shift",
+  "title": "The Graveyard Shift",
+  "synopsis": "Jamboree Pizza has been shut since 1991, when its manager disappeared in the middle of a birthday party and was never found. The new owner wants it open by spring, so you've taken the graveyard shift to count what's left. At midnight the power drops to reserve, the doors lock, and on the stage, Maestro Tiberius opens his eyes.",
+  "contentRating": "mature",
+  "theme": "pizzeria",
+  "artStyle": "an abandoned eighties pizza restaurant at night, dusty party tables, faded jungle murals, a stage of moth-eaten animatronic animals with glowing eyes, flickering security monitors, VHS grain, cold and eerie",
+  "minPlayers": 2,
+  "maxPlayers": 6,
+  "timeLimitMinutes": 45,
+  "lengths": [
+    30,
+    45,
+    60
+  ],
+  "seasons": [
+    "halloween"
+  ],
+  "edition": 3,
+  "hintPenaltySeconds": 120,
+  "soundscape": "tension",
+  "intro": "Ah. Guests. It has been so very long since we had guests. Welcome to the Jamboree, my dears. I am Maestro Tiberius, and the band and I have been waiting in the dark for thirty-five years. The doors are locked for your safety. The power is on reserve. And the show... the show must go on. Everybody stays until six, my dears. Everybody.",
+  "escapedText": "The service exit bangs open onto a grey dawn and the smell of rain. Behind you, a crackling voice calls out: 'Leaving before the finale? How rude.' You don't stop running until you reach the car. Walt Hargrove's name tag is still in your pocket.",
+  "failedText": "The reserve power hits zero. In the dark, the birthday song starts to play, very slowly, and something in a moth-eaten tailcoat takes your hand. 'There now,' purrs the Maestro. 'Now you'll never miss a show.'",
+  "gameMaster": {
+    "name": "Maestro Tiberius",
+    "persona": "The restaurant's animatronic bandleader: a tiger in a moth-eaten tailcoat whose voice box crackles between a showman's welcome and something much colder. Unfailingly polite. Calls the group 'my dears' and wants them to stay for the show, forever. Knows what happened to Walt, and hints at it.",
+    "voice": {
+      "accent": "en-US",
+      "pitch": 0.75,
+      "rate": 0.9,
+      "style": "crackling, theatrical, cold"
+    }
+  },
+  "stages": [
+    {
+      "id": "dining-hall",
+      "title": "The Dining Hall",
+      "description": "Dust sheets cover the party tables, the jungle murals have faded to grey, and the stage sits behind a moth-eaten curtain. One wall is papered with MISSING posters, every one of them the same man. Over table six, a birthday banner still hangs from 1991. The exits are locked, and the power meter by the kitchen door reads RESERVE.",
+      "puzzles": [
+        "party-table",
+        "dining-search",
+        "walt-note",
+        "balloons",
+        "missing-poster",
+        "kitchen-door"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "show-stage",
+            "prop": "robot",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "show stage",
+            "look": "Behind the curtain, the band stands frozen: a toucan, a gorilla and a crocodile, and an empty space in the middle where the Maestro should be."
+          },
+          {
+            "id": "missing-wall",
+            "prop": "poster",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "missing posters",
+            "look": "Dozens of posters, all the same face: WALT HARGROVE, MANAGER. MISSING SINCE 14 MARCH 1991."
+          },
+          {
+            "id": "table-six",
+            "prop": "food",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "table six",
+            "look": "Paper plates, a birthday cake gone to dust, and a cake stand with a number lock."
+          },
+          {
+            "id": "boarded-hatch",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "boarded-up hatch",
+            "look": "You prise the boards off. Behind them, on a hook inside the serving hatch: a key tagged KITCHEN.",
+            "gives": "kitchen-key",
+            "requires": "crowbar",
+            "lockedText": "A serving hatch, boarded over from this side. The nails are rusted in."
+          },
+          {
+            "id": "power-meter",
+            "prop": "machine",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "power meter",
+            "look": "A needle hovering at RESERVE. It ticks down a hair every few minutes."
+          },
+          {
+            "id": "host-stand",
+            "prop": "sign",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "host stand",
+            "look": "A reservations book open at 14 March 1991. The last booking is for table six, a birthday party of nine.",
+            "hidesPieces": true
+          },
+          {
+            "id": "coat-check",
+            "prop": "clothes",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "coat check",
+            "look": "Coats nobody came back for: a child's raincoat, and a man's jacket with a name tag pinned to it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "prize-booth",
+            "prop": "cabinet",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "prize booth",
+            "look": "Plush toys, dusty and staring. The tickets are still stacked on the counter.",
+            "hidesPieces": true
+          },
+          {
+            "id": "arcade-row",
+            "prop": "arcade",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "arcade machines",
+            "look": "Three cabinets, unplugged. One of them is showing its high-score table anyway.",
+            "hidesPieces": true
+          },
+          {
+            "id": "ball-pit",
+            "prop": "crate",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "ball pit",
+            "look": "Faded plastic balls. Something at the bottom shifts when you lean on the edge.",
+            "hidesPieces": true
+          },
+          {
+            "id": "jukebox",
+            "prop": "speaker",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "jukebox",
+            "look": "It plays one crackling bar of the birthday song when you touch it. Taped to the selector: back {key:walt-note}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "photo-booth",
+            "prop": "box",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "photo booth",
+            "look": "A strip of photos still in the slot: four frames of an empty booth. In the last one, written on the curtain behind: back {key:walt-note}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "dust-sheets",
+            "prop": "rug",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "dust sheets",
+            "look": "Sheets over the tables. Under one of them, the shape of someone sitting very still. It's a mannequin. You think.",
+            "hidesPieces": true
+          },
+          {
+            "id": "party-banner",
+            "prop": "painting",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "birthday banner",
+            "look": "HAPPY BIRTHDAY, in letters faded to grey. A date is written on the back: 14 MARCH 1991.",
+            "hidesPieces": true
+          },
+          {
+            "id": "soda-fountain",
+            "prop": "machine",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "soda fountain",
+            "look": "You press the lever. It coughs out a cupful of dust.",
+            "hidesPieces": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "parts-room",
+      "soundscape": "workshop",
+      "title": "Parts and Service",
+      "description": "The kitchen leads through to the parts room. Spare animatronic heads stare from wire shelves, a bare metal frame hangs on a stand like a coat, and a spare tiger suit sits slumped in a chair. In the corner, the walk-in freezer is chained shut from the outside. The door to the manager's office is locked, with a riddle scratched into the wood.",
+      "puzzles": [
+        "parts-log",
+        "parts-search",
+        "suit-scratches",
+        "relay-panel",
+        "staff-locker",
+        "office-door"
+      ],
+      "scene": {
+        "backdrop": "workshop",
+        "objects": [
+          {
+            "id": "parts-cage",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "parts cage",
+            "look": "A locked wire cage of spare parts, with a keypad and a clipboard of serial numbers."
+          },
+          {
+            "id": "metal-frame",
+            "prop": "robot",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "metal frame",
+            "look": "A bare animatronic frame on a stand, like a coat on a hook. Its glass eyes follow you. They're only glass. They follow you anyway."
+          },
+          {
+            "id": "spare-suit",
+            "prop": "clothes",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "spare tiger suit",
+            "look": "A tiger costume slumped in a chair, its head lolling. Its chest has a clasp with a word lock."
+          },
+          {
+            "id": "walk-in-freezer",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "walk-in freezer",
+            "look": "Chained shut from the outside, and it has been for a very long time. You decide not to wonder why."
+          },
+          {
+            "id": "office-door-spot",
+            "prop": "door",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "office door",
+            "look": "MANAGER, on a brass plate. A keyhole, and a riddle scratched into the wood."
+          },
+          {
+            "id": "spare-heads",
+            "prop": "shelf",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "spare heads",
+            "look": "Rows of spare heads on wire shelves: toucan, gorilla, crocodile. The tiger's shelf is empty.",
+            "hidesPieces": true
+          },
+          {
+            "id": "workbench",
+            "prop": "desk",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "workbench",
+            "look": "Screwdrivers, a soldering iron and a coffee cup with something growing in it.",
+            "hidesPieces": true
+          },
+          {
+            "id": "tool-wall",
+            "prop": "pipe",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "tool wall",
+            "look": "Wrenches hung on painted outlines. One outline is a different shape: a key.",
+            "hidesPieces": true
+          },
+          {
+            "id": "mop-sink",
+            "prop": "barrel",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "mop sink",
+            "look": "Grey water that never drained.",
+            "hidesPieces": true
+          },
+          {
+            "id": "old-radio",
+            "prop": "speaker",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "old radio",
+            "look": "It's playing the Jamboree jingle, very faintly. It isn't plugged in.",
+            "hidesPieces": true
+          },
+          {
+            "id": "staff-lockers",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "staff lockers",
+            "look": "Inside the first locker, a card of little symbols: {key:suit-scratches}"
+          },
+          {
+            "id": "parts-drawer",
+            "prop": "drawer",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "parts drawer",
+            "look": "Under a tray of spare glass eyes, a symbol card: {key:suit-scratches}",
+            "minDifficulty": "normal"
+          },
+          {
+            "id": "freezer-chain",
+            "prop": "box",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "freezer chain",
+            "look": "A symbol card wedged between the links of the chain: {key:suit-scratches}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "grease-mirror",
+            "prop": "mirror",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "parts mirror",
+            "look": "A cracked mirror. Your reflection looks tired. Behind it, the metal frame looks closer than it was."
+          },
+          {
+            "id": "dish-rack",
+            "prop": "shelf",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "dish rack",
+            "look": "Plates stacked for a party that never finished."
+          }
+        ]
+      }
+    },
+    {
+      "id": "walts-office",
+      "soundscape": "drone",
+      "title": "Walt's Office",
+      "description": "Walt Hargrove's office is exactly as he left it in 1991: a desk buried in paperwork, a wall of security monitors gone to static, a tape deck with a cassette still inside, and a calendar stopped in March. The service exit at the back is chained, with a padlock and a keypad. And in the doorway behind you, perfectly still, stands the Maestro.",
+      "puzzles": [
+        "last-tape",
+        "office-window",
+        "stage-lights",
+        "maestro-panel",
+        "service-exit"
+      ],
+      "scene": {
+        "backdrop": "tension",
+        "objects": [
+          {
+            "id": "tape-deck",
+            "prop": "machine",
+            "x": 15,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "tape deck",
+            "look": "A cassette is still in the deck, the tape chewed into loops."
+          },
+          {
+            "id": "monitors",
+            "prop": "screen",
+            "x": 215,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "security monitors",
+            "look": "Static on every screen. Then, for a single frame, the dining hall: the band, and an empty space on the stage."
+          },
+          {
+            "id": "walts-desk",
+            "prop": "desk",
+            "x": 415,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "Walt's desk",
+            "look": "Invoices, a booking for a birthday party on 14 March, and a mug that says WORLD'S BEST BOSS.",
+            "hidesPieces": true
+          },
+          {
+            "id": "service-exit-spot",
+            "prop": "door",
+            "x": 615,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "service exit",
+            "look": "A heavy door, chained, with a padlock and a 3-digit keypad. Grey light shows under the gap."
+          },
+          {
+            "id": "maestro",
+            "prop": "robot",
+            "x": 815,
+            "y": 20,
+            "w": 170,
+            "h": 160,
+            "label": "the Maestro",
+            "look": "A tiger in a moth-eaten tailcoat, standing in the doorway. His chest panel has a socket for a hand crank. His eyes are open."
+          },
+          {
+            "id": "filing-cabinet",
+            "prop": "cabinet",
+            "x": 15,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "filing cabinet",
+            "look": "Staff files. One drawer is labelled INCIDENTS, and it's empty.",
+            "hidesPieces": true
+          },
+          {
+            "id": "calendar",
+            "prop": "sign",
+            "x": 215,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "calendar",
+            "look": "Stopped on March 1991. The 14th is circled twice.",
+            "hidesPieces": true
+          },
+          {
+            "id": "coat-rack",
+            "prop": "clothes",
+            "x": 415,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "coat rack",
+            "look": "Walt's coat is still on its hook. The pockets are empty.",
+            "hidesPieces": true
+          },
+          {
+            "id": "manuals",
+            "prop": "bookshelf",
+            "x": 615,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "training manuals",
+            "look": "ANIMATRONIC SAFETY, CHAPTER 3: NEVER WEAR A SUIT WHILE THE SHOW IS RUNNING.",
+            "hidesPieces": true
+          },
+          {
+            "id": "air-vent",
+            "prop": "vent",
+            "x": 815,
+            "y": 220,
+            "w": 170,
+            "h": 160,
+            "label": "air vent",
+            "look": "You prise the vent cover off. Inside, wrapped in an oily rag: the long steel shaft of a hand crank.",
+            "gives": "crank-shaft",
+            "requires": "crowbar",
+            "lockedText": "A vent cover, screwed in tight. Something metal rattles inside."
+          },
+          {
+            "id": "office-window",
+            "prop": "window",
+            "x": 15,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "office window",
+            "look": "Letters traced in the grime on the glass, from the outside, back to front."
+          },
+          {
+            "id": "desk-lamp",
+            "prop": "lamp",
+            "x": 215,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "desk lamp",
+            "look": "A code card under the lampshade: {key:stage-lights}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "cash-tin",
+            "prop": "box",
+            "x": 415,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "petty cash tin",
+            "look": "No money. Just a code card: {key:stage-lights}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "noticeboard",
+            "prop": "sign",
+            "x": 615,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "staff noticeboard",
+            "look": "A rota for March 1991, and a code card pinned over it: {key:stage-lights}",
+            "minDifficulty": "hard"
+          },
+          {
+            "id": "party-box",
+            "prop": "crate",
+            "x": 815,
+            "y": 420,
+            "w": 170,
+            "h": 160,
+            "label": "party supplies",
+            "look": "Paper hats, streamers and a single party horn that someone has bitten through.",
+            "gives": "party-horn",
+            "minDifficulty": "hard"
+          }
+        ]
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "id": "party-table",
+      "title": "Table Six",
+      "kind": "code",
+      "prompt": "The seating plan for table six, the night Walt disappeared, is pinned to the cake stand: the guests sat in a row along one side, {items}. The cake stand's keypad wants each guest's seat, far left is 1, in the order listed.",
+      "generator": {
+        "type": "deduction",
+        "words": [
+          "birthday girl",
+          "clown",
+          "photographer",
+          "waitress",
+          "uncle"
+        ],
+        "pieceTemplate": "From a statement taken in 1991: {clue}"
+      },
+      "rewards": [
+        "photo"
+      ],
+      "hints": [
+        "Every phone holds a line from an old statement. Read them all out loud.",
+        "Start with the line you're surest about, and try each seat in turn.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The cake stand clicks open. Inside, face down: a Polaroid of the party. Somebody kept it."
+    },
+    {
+      "id": "dining-search",
+      "title": "The Dining Hall",
+      "kind": "search",
+      "prompt": "Those boards and vents won't open with bare hands. Search the host stand, the coat check and the prize booth for something to prise them with.",
+      "finds": [
+        "host-stand",
+        "coat-check",
+        "prize-booth"
+      ],
+      "rewards": [
+        "crowbar"
+      ],
+      "hints": [
+        "Three places near the entrance are worth a proper look.",
+        "Try the reservations book, the old coats and the prize shelves."
+      ],
+      "solvedText": "Behind the prize booth's counter, among the plush toys: a heavy iron crowbar. It's been used before."
+    },
+    {
+      "id": "walt-note",
+      "title": "Walt's Note",
+      "kind": "text",
+      "prompt": "On the back of a party menu, Walt Hargrove's last note, in the sliding code he used for the staff rota: {cipher}. It's what he said the band was doing at night. The register's drawer has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "shift",
+        "words": [
+          "watching",
+          "moving",
+          "breathing",
+          "creeping",
+          "whispering",
+          "wandering"
+        ]
+      },
+      "hints": [
+        "Walt wrote a number in more than one place, and one of them is on the back of something you'll get from table six.",
+        "Try each number you found: only one turns this into a real word.",
+        "Slide every letter back along the alphabet by that many places."
+      ],
+      "solvedText": "The register opens. Inside: the night's takings from 1991, never banked, and a note in Walt's hand: I TOLD THEM. NOBODY LISTENS."
+    },
+    {
+      "id": "balloons",
+      "title": "The Balloons",
+      "kind": "code",
+      "prompt": "Deflated balloons are still tied to the chairs at table six. The birthday card propped against them reads: '{order}.' The card's envelope has a {count}-digit lock. Each of you counted one colour.",
+      "generator": {
+        "type": "colorDigits",
+        "count": 3,
+        "colors": [
+          "red",
+          "blue",
+          "green",
+          "yellow",
+          "purple",
+          "orange",
+          "pink"
+        ],
+        "thing": "balloon",
+        "pieceTemplate": "You counted the {color} balloons on the chairs: there were {digit}."
+      },
+      "hints": [
+        "Each phone counted one colour of balloon. Say your colour and your number.",
+        "Read them in the card's order: {order}."
+      ],
+      "solvedText": "Inside the envelope, a birthday card signed by the whole staff. One signature has been scratched out, hard enough to tear the card."
+    },
+    {
+      "id": "missing-poster",
+      "minMinutes": 60,
+      "title": "The Missing Posters",
+      "kind": "text",
+      "prompt": "Every MISSING poster has the same word stamped across the bottom, in numbers where A is 1 and B is 2: {cipher}. The notice board's glass case has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "numbers",
+        "words": [
+          "unsolved",
+          "unknown",
+          "nameless",
+          "forgotten",
+          "overlooked"
+        ]
+      },
+      "hints": [
+        "Each number is a letter's place in the alphabet.",
+        "1 is A, 2 is B, 3 is C... Count along for each one.",
+        "It says {answer}."
+      ],
+      "solvedText": "The glass case opens. Behind the posters, someone has written on the wall in pencil, over and over: HE NEVER LEFT."
+    },
+    {
+      "id": "kitchen-door",
+      "title": "The Kitchen Door",
+      "kind": "use",
+      "prompt": "The kitchen door is locked, and the only way out of the dining hall is through it.",
+      "requires": [
+        "kitchen-key"
+      ],
+      "hints": [
+        "Something was boarded up so nobody could reach it.",
+        "Prise the boards off the serving hatch with the crowbar, then use the key on the kitchen door."
+      ],
+      "solvedText": "The lock turns. As the door swings open, every light on the stage behind you comes on at once, and then goes out."
+    },
+    {
+      "id": "parts-log",
+      "title": "The Parts Log",
+      "kind": "code",
+      "prompt": "The clipboard on the parts cage lists the serial numbers of the Maestro's replacement parts, one after another: {sequence}. The cage's keypad wants the next serial number.",
+      "generator": {
+        "type": "sequence"
+      },
+      "rewards": [
+        "crank-handle"
+      ],
+      "hints": [
+        "Look at how each serial number changes to get the next one.",
+        "The next serial number is {answer}."
+      ],
+      "solvedText": "The cage swings open. Among the spare parts: the handle of a hand crank, the kind for opening an animatronic's chest panel. Its shaft is missing."
+    },
+    {
+      "id": "parts-search",
+      "title": "The Office Key",
+      "kind": "search",
+      "prompt": "Somewhere in here is the key to the manager's office. Search the spare heads, the workbench and the tool wall.",
+      "finds": [
+        "spare-heads",
+        "workbench",
+        "tool-wall"
+      ],
+      "rewards": [
+        "office-key"
+      ],
+      "hints": [
+        "Three places in the parts room are worth a careful look.",
+        "Check the shelves of heads, the bench and the painted outlines."
+      ],
+      "solvedText": "Hanging in the key-shaped outline on the tool wall, as if it had always been there: a brass key stamped MANAGER."
+    },
+    {
+      "id": "suit-scratches",
+      "minMinutes": 45,
+      "title": "The Spare Suit",
+      "kind": "text",
+      "prompt": "Inside the spare tiger suit's head, someone has scratched a word in a code of little symbols: {cipher}. It's the last thing whoever wore it wanted. The suit's chest clasp has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "symbols",
+        "words": [
+          "help",
+          "home",
+          "hope",
+          "save"
+        ],
+        "decoyWords": [
+          "desk",
+          "lamp",
+          "rock",
+          "worm",
+          "shoe"
+        ]
+      },
+      "hints": [
+        "There's more than one symbol card in the parts room. Only one is the real key.",
+        "Try each card: only one turns the scratches into something a trapped person would want.",
+        "It says {answer}."
+      ],
+      "solvedText": "The clasp opens. The suit is empty. Of course it's empty. Tucked inside the chest, though, is a staff photo from 1991: the whole crew, and Walt in the middle, smiling."
+    },
+    {
+      "id": "relay-panel",
+      "minMinutes": 45,
+      "title": "The Relays",
+      "kind": "switches",
+      "prompt": "The reserve power is draining. In the breaker cupboard, the relays are wired together: flip one and the ones beside it flip too. Get every relay on to bring the lights back.",
+      "generator": {
+        "type": "switches"
+      },
+      "hints": [
+        "Work from the top row down: fix each row using the relays in the row below it.",
+        "Flip {answer}."
+      ],
+      "solvedText": "The strip lights stutter on. In the sudden brightness, you notice that every spare head on the shelves has turned to face the door."
+    },
+    {
+      "id": "staff-locker",
+      "minMinutes": 60,
+      "title": "The Night Supervisor's Locker",
+      "kind": "code",
+      "prompt": "The night supervisor's locker has a {count}-digit lock. The staff wrote their combinations as quiz questions so nobody would forget, and you've each found one.",
+      "generator": {
+        "type": "digitFacts",
+        "count": 3,
+        "pieceTemplate": "A card from the staff room: the {ordinal} digit is {fact}."
+      },
+      "hints": [
+        "Every phone holds one digit as a quiz question. Answer them out loud, in order.",
+        "In order: {facts}."
+      ],
+      "solvedText": "Inside the locker: a uniform, a torch with no batteries and a resignation letter dated 15 March 1991. It just says: I CAN'T WORK NIGHTS ANY MORE."
+    },
+    {
+      "id": "office-door",
+      "title": "The Office Door",
+      "kind": "text",
+      "prompt": "The manager's office has a keyhole and a word lock, and a riddle scratched deep into the wood: 'The more of them you take, the more you leave behind. Walt took a great many of them that night.'",
+      "answers": [
+        "footsteps",
+        "footprints",
+        "steps"
+      ],
+      "requires": [
+        "office-key"
+      ],
+      "hints": [
+        "Think about walking through the restaurant.",
+        "You leave them behind you on a dusty floor."
+      ],
+      "solvedText": "The key turns, and the door opens onto a cold, dark office that smells of old paper. Behind you, somewhere in the kitchen, something heavy takes a step.",
+      "variants": [
+        {},
+        {
+          "prompt": "The manager's office has a keyhole and a word lock, and a riddle scratched deep into the wood: 'I am not alive, yet I grow. I have no lungs, yet I need air. I have no mouth, yet water ends me.'",
+          "answers": [
+            "fire",
+            "a fire",
+            "flame",
+            "flames"
+          ],
+          "hints": [
+            "Think about the birthday candles.",
+            "It burns, and a bucket of water puts it out."
+          ]
+        },
+        {
+          "prompt": "The manager's office has a keyhole and a word lock, and a riddle scratched deep into the wood: 'I am so fragile that saying my name breaks me.'",
+          "answers": [
+            "silence"
+          ],
+          "hints": [
+            "Listen to the restaurant at night.",
+            "It's what you hear when nobody makes a sound."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "last-tape",
+      "minMinutes": 45,
+      "title": "Walt's Last Tape",
+      "kind": "text",
+      "prompt": "The cassette in the tape deck is Walt's last message, chewed by the machine: 'If anyone finds this, the password for the service exit is...' Each of you made out one word through the hiss.",
+      "generator": {
+        "type": "wordSequence",
+        "count": 3,
+        "words": [
+          "candle",
+          "ribbon",
+          "curtain",
+          "lantern",
+          "ticket",
+          "velvet",
+          "carousel",
+          "cradle",
+          "marble",
+          "thimble",
+          "whistle",
+          "spindle"
+        ],
+        "pieceTemplate": "Through the hiss of the tape, you made out the {ordinal} word: '{word}'."
+      },
+      "hints": [
+        "Each of you heard one word of the tape. Say them in order: first, second, third...",
+        "Put them together in order, like: word word word."
+      ],
+      "solvedText": "'{answer},' Walt's voice says, clear for a moment. Then: 'And don't let it near you when the power's low.' The tape snaps."
+    },
+    {
+      "id": "office-window",
+      "minMinutes": 60,
+      "title": "The Office Window",
+      "kind": "text",
+      "prompt": "Someone has traced a word in the grime on the office window, from the outside, in a back-to-front alphabet where A swaps with Z: {cipher}. The window catch has a word lock.",
+      "generator": {
+        "type": "cipher",
+        "cipher": "mirror",
+        "words": [
+          "regret",
+          "forgive",
+          "tonight",
+          "goodbye",
+          "tomorrow"
+        ]
+      },
+      "hints": [
+        "Fold the alphabet in half: the first letter swaps with the last.",
+        "A swaps with Z, B with Y, C with X... Swap every letter back.",
+        "It says {answer}."
+      ],
+      "solvedText": "The catch gives. The window opens onto a brick wall, a foot away. There was never anyone outside to write it."
+    },
+    {
+      "id": "stage-lights",
+      "minDifficulty": "hard",
+      "title": "The Stage Lights",
+      "kind": "text",
+      "prompt": "Through the office door, you can see the stage lights in the dining hall flicker long and short, over and over. The Maestro is spelling out what he wants you to do: {cipher}",
+      "generator": {
+        "type": "cipher",
+        "cipher": "morse",
+        "words": [
+          "abide",
+          "linger",
+          "remain"
+        ],
+        "decoyWords": [
+          "chair",
+          "cloud",
+          "bread",
+          "brick",
+          "piano",
+          "garden",
+          "jungle",
+          "bishop",
+          "pickle",
+          "donkey"
+        ]
+      },
+      "hints": [
+        "There are dots-and-dashes cards hidden in the office. Only one reads what the Maestro wants.",
+        "Look under the desk lamp, in the petty cash tin and on the staff noticeboard.",
+        "Swap each run of dots and dashes for its letter, one at a time."
+      ],
+      "solvedText": "The stage lights go out. In the dark of the dining hall, someone begins to applaud, slowly."
+    },
+    {
+      "id": "maestro-panel",
+      "title": "The Maestro",
+      "kind": "use",
+      "prompt": "The Maestro has followed you into the office, and now he stands between you and the service exit, perfectly still. His chest panel has a socket for a hand crank.",
+      "requires": [
+        "crank"
+      ],
+      "rewards": [
+        "service-key"
+      ],
+      "hints": [
+        "You've found a crank handle and, somewhere, its shaft. Put them together.",
+        "Fit the handle to the shaft, then turn the crank in the Maestro's chest panel."
+      ],
+      "solvedText": "You fit the crank and turn. The Maestro's chest panel creaks open and his eyes go dark. Inside, among the wires: the service exit key, and a brass name tag that says WALT."
+    },
+    {
+      "id": "service-exit",
+      "title": "The Service Exit",
+      "kind": "code",
+      "prompt": "The service exit needs its key AND a 3-digit code. Walt's note is taped to the door: 'Candles on the cake, then chairs at table six, then heads on the shelves.'",
+      "answers": [
+        "947"
+      ],
+      "requires": [
+        "service-key"
+      ],
+      "pieces": [
+        "You counted the candles on the birthday cake: 9.",
+        "You counted the chairs at table six: 4.",
+        "You counted the spare heads on the shelves: 7."
+      ],
+      "hints": [
+        "Three phones remember three numbers. Put them in the order on Walt's note.",
+        "Candles, then chairs, then heads."
+      ],
+      "solvedText": "The padlock drops, the keypad blinks green, and the chain slithers to the floor. Behind you, very softly, the birthday song begins to play.",
+      "variants": [
+        {},
+        {
+          "answers": [
+            "682"
+          ],
+          "pieces": [
+            "You counted the candles on the birthday cake: 6.",
+            "You counted the chairs at table six: 8.",
+            "You counted the spare heads on the shelves: 2."
+          ]
+        },
+        {
+          "answers": [
+            "315"
+          ],
+          "pieces": [
+            "You counted the candles on the birthday cake: 3.",
+            "You counted the chairs at table six: 1.",
+            "You counted the spare heads on the shelves: 5."
+          ]
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "photo",
+      "name": "Polaroid of table six",
+      "description": "A faded Polaroid of the birthday party, everyone smiling. Behind them, slightly blurred, the Maestro is looking straight at the camera.",
+      "inspect": "On the back, in Walt's handwriting: 'If the band moves, slide back {key:walt-note}. W.'"
+    },
+    {
+      "id": "crowbar",
+      "name": "Crowbar",
+      "description": "A heavy iron crowbar. Good for boards, vent covers and anything nailed shut."
+    },
+    {
+      "id": "kitchen-key",
+      "name": "Kitchen key",
+      "description": "A key on a hook, tagged KITCHEN in Walt's handwriting."
+    },
+    {
+      "id": "crank-handle",
+      "name": "Crank handle",
+      "description": "The handle of a hand crank for opening an animatronic's chest panel. The shaft is missing."
+    },
+    {
+      "id": "crank-shaft",
+      "name": "Crank shaft",
+      "description": "A long steel shaft, wrapped in an oily rag. It's the right size for a crank handle."
+    },
+    {
+      "id": "crank",
+      "name": "Hand crank",
+      "description": "The handle and shaft together: a hand crank for an animatronic's chest panel."
+    },
+    {
+      "id": "office-key",
+      "name": "Office key",
+      "description": "A brass key stamped MANAGER."
+    },
+    {
+      "id": "service-key",
+      "name": "Service exit key",
+      "description": "The key to the service exit, found inside the Maestro's chest. It's warm."
+    },
+    {
+      "id": "party-horn",
+      "name": "Bitten party horn",
+      "description": "A paper party horn that someone bit clean through. It doesn't fit anything. You wish you hadn't picked it up."
+    }
+  ],
+  "recipes": [
+    {
+      "items": [
+        "crank-handle",
+        "crank-shaft"
+      ],
+      "makes": "crank",
+      "text": "The shaft slides into the handle and locks with a click: a hand crank."
+    }
+  ]
+}
