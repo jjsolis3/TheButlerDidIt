@@ -594,6 +594,7 @@
           "green",
           "orange"
         ],
+        "thing": "bottle",
         "pieceTemplate": "You counted the {color} pill bottles on the cabinet's shelves: there were {digit}."
       }
     },

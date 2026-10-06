@@ -743,6 +743,7 @@
           "brown",
           "green"
         ],
+        "thing": "ribbon",
         "pieceTemplate": "On the doll's dress you spot a {color} ribbon with the number {digit} stitched into it."
       }
     },

@@ -322,7 +322,8 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         Generators (codes, cipher text and logic clues are made from them every game; you write only the flavour):
         - "digitFacts": a code whose digits are everyday facts ("the number of legs on a spider"), one per phone. "kind": "code". pieceTemplate must contain {ordinal} and {fact}.
         - "colorDigits": a code read from coloured objects in a colour order; each phone sees one colour and its number. "kind": "code".
-          Give 5 or more "colors"; pieceTemplate must contain {color} and {digit}; put {order} in the prompt or a hint so the group knows the order.
+          Give 5 or more "colors", and "thing": what the coloured objects are ("gem" makes {order} read "Red gem, then Blue gem");
+          pieceTemplate must contain {color} and {digit}; put {order} in the prompt or a hint so the group knows the order.
         - "wordSequence": a password of words in order; each phone remembers one word. "kind": "text". Give 10 or more themed "words";
           pieceTemplate must contain {ordinal} and {word}. Prompts, hints and solvedText may use {answer}.
         - "cipher": a coded word, picked from your "words", shown where the prompt says {cipher}. "kind": "text". "cipher" is one of:

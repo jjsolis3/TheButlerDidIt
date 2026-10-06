@@ -673,6 +673,7 @@
           "gold",
           "silver"
         ],
+        "thing": "potion",
         "pieceTemplate": "You counted the {color} potion bottles on the shelf: there were {digit}."
       }
     },

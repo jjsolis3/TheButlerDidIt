@@ -391,6 +391,12 @@ public sealed class PuzzleGenerator
 
     /// <summary>For ColorDigits: the colours to choose from.</summary>
     public List<string> Colors { get; init; } = [];
+
+    /// <summary>
+    /// For ColorDigits: what the coloured things are, for {order} ("gem" makes "Red gem, then Blue gem"). Left out,
+    /// {order} names just the colours.
+    /// </summary>
+    public string Thing { get; init; } = "";
 }
 
 public sealed record EscapeItem

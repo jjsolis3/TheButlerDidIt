@@ -108,7 +108,7 @@ public static partial class RoomVariants
                 return new Made(
                     string.Concat(digits),
                     dealt.Select(i => g.PieceTemplate.Replace("{color}", colors[i].ToUpperInvariant()).Replace("{digit}", digits[i].ToString())).ToList(),
-                    Old(string.Join(", then ", colors.Select(c => $"{Capitalise(c)} duck")), ""));
+                    Old(string.Join(", then ", colors.Select(c => g.Thing.Length == 0 ? Capitalise(c) : $"{Capitalise(c)} {g.Thing}")), ""));
             }
             case GeneratorType.WordSequence:
             {

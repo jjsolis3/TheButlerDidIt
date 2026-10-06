@@ -594,6 +594,7 @@
           "white",
           "red"
         ],
+        "thing": "tin",
         "pieceTemplate": "You counted the {color} ration tins on your shelf: there were {digit}."
       }
     },

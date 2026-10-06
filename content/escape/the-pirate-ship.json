@@ -661,6 +661,7 @@
           "yellow",
           "white"
         ],
+        "thing": "gem",
         "pieceTemplate": "You counted the {color} gems in your pouch: there were {digit} of them."
       }
     },

@@ -619,6 +619,7 @@
           "purple",
           "orange"
         ],
+        "thing": "duck",
         "pieceTemplate": "You fished out a {color} duck. Under it is the number {digit}."
       }
     },

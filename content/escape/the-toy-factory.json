@@ -609,6 +609,7 @@
           "purple",
           "orange"
         ],
+        "thing": "paint pot",
         "pieceTemplate": "You counted the {color} paint pots on your shelf: there were {digit} of them."
       }
     },
