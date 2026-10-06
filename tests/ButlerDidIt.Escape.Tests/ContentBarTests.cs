@@ -165,6 +165,6 @@ public class ContentBarTests
         var fields = views.SelectMany(t => t.GetProperties()).Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var answers = Rooms.Get(id).Puzzles.Where(p => p.Kind == PuzzleKind.Text && p.Generator is null)
             .SelectMany(p => p.Variants.SelectMany(v => v.Answers ?? []).Concat(p.Answers).Select(a => $"{p.Id}: {a}"));
-        Assert.Empty(answers.Where(a => fields.Contains(a[(a.IndexOf(": ") + 2)..])));
+        Assert.DoesNotContain(answers, a => fields.Contains(a[(a.IndexOf(": ") + 2)..]));
     }
 }
