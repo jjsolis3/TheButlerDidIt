@@ -2,19 +2,23 @@ import { expect, test, type Browser } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { SHOTS, loadRoom, playThrough, startClock } from './escape-play'
 
-// The themed Family rooms (#137): each is played through the real screens by two phones, in the quick 30-minute game,
-// from the shelf to the escape. Their scenes, tools, recipes and decoders all have to work in the browser.
+// The themed rooms (#137), five for Families and three for Adults: each is played through the real screens by two phones,
+// in the quick 30-minute game, from the shelf to the escape. Their scenes, tools, recipes and decoders all have to work
+// in the browser.
 
 mkdirSync(SHOTS, { recursive: true })
 const phone = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
 test.use({ actionTimeout: 15_000 })
 
 const ROOMS = [
-  { id: 'the-night-shift', title: 'The Night Shift', first: 'The Security Office', halloween: true },
-  { id: 'the-hologram-concert', title: 'The Hologram Concert', first: 'The Dressing Room', halloween: false },
-  { id: 'the-hero-exam', title: 'The Hero Exam', first: 'The Locker Room', halloween: false },
-  { id: 'the-last-round', title: 'The Last Round', first: 'The Lobby', halloween: true },
-  { id: 'the-blocklands', title: 'The Blocklands', first: 'The Meadow', halloween: false },
+  { id: 'the-night-shift', title: 'The Night Shift', first: 'The Security Office', shelf: 'Family', halloween: true },
+  { id: 'the-hologram-concert', title: 'The Hologram Concert', first: 'The Dressing Room', shelf: 'Family', halloween: false },
+  { id: 'the-hero-exam', title: 'The Hero Exam', first: 'The Locker Room', shelf: 'Family', halloween: false },
+  { id: 'the-last-round', title: 'The Last Round', first: 'The Lobby', shelf: 'Family', halloween: true },
+  { id: 'the-blocklands', title: 'The Blocklands', first: 'The Meadow', shelf: 'Family', halloween: false },
+  { id: 'the-black-notebook', title: 'The Black Notebook', first: "The Scribe's Flat", shelf: 'Adults', halloween: true },
+  { id: 'the-graveyard-shift', title: 'The Graveyard Shift', first: 'The Dining Hall', shelf: 'Adults', halloween: true },
+  { id: 'the-last-login', title: 'The Last Login', first: 'The Silent Lobby', shelf: 'Adults', halloween: true },
 ]
 
 async function joinAs(browser: Browser, code: string, name: string) {
@@ -41,11 +45,11 @@ for (const [n, r] of ROOMS.entries()) {
     await tv.getByRole('button', { name: 'Create account' }).click()
     await tv.waitForURL('**/host/new')
 
-    // On the Family shelf, and under Halloween when it's spooky.
+    // On its shelf (Family or Adults), and under Halloween when it's spooky.
     await tv.getByRole('tab', { name: /Escape room/ }).click()
-    await tv.getByRole('tab', { name: /Family/ }).click()
+    await tv.getByRole('tab', { name: new RegExp(r.shelf) }).click()
     const card = tv.getByRole('button', { name: new RegExp(r.title) })
-    await expect(card).toContainText('Family')
+    await expect(card).toContainText(r.shelf)
     await tv.getByRole('group', { name: 'Filter rooms' }).getByRole('button', { name: /🎃 Halloween/ }).click()
     await expect(card).toHaveCount(r.halloween ? 1 : 0)
     await tv.getByRole('button', { name: 'All rooms' }).click()
