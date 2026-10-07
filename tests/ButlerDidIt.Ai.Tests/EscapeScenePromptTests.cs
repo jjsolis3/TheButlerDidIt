@@ -219,11 +219,11 @@ public class EscapeGeneratorShapeTests
     public void Too_few_puzzles_for_the_clock_are_refused()
     {
         var room = EscapeRoomGenerator.Normalize(FakeRoom(), Request with { Minutes = 60 });
-        Assert.Empty(EscapeRoomGenerator.ShapeErrors(room)); // 11 on Normal: just enough for 60 minutes
+        Assert.Empty(EscapeRoomGenerator.ShapeErrors(room)); // 12 on Normal: enough for 60 minutes
         var shorter = EscapeRoomGenerator.Normalize(FakeRoom(n =>
         {
-            // Two puzzles fewer: 9 on Normal.
-            n["stages"]![2]!["puzzles"] = new JsonArray("buoys", "gull-signal", "lamp-panel");
+            // Two puzzles fewer: 10 on Normal.
+            n["stages"]![2]!["puzzles"] = new JsonArray("buoys", "gull-signal", "lamp-panel", "lamp-door");
             foreach (var id in new[] { "tide-marks", "lamp-lights" })
                 n["puzzles"]!.AsArray().Remove(n["puzzles"]!.AsArray().Single(p => p!["id"]!.GetValue<string>() == id));
         }), Request with { Minutes = 60 });

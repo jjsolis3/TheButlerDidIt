@@ -231,7 +231,9 @@ test('an escape room written by AI from a theme lands on the host shelf, ready t
   await expect(tv.getByRole('heading', { name: 'The Spiral Stairs' })).toBeVisible()
   await expect(ada.getByTestId('scene')).toBeVisible()
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
-  await playThrough(tv, [ada], aiRoom, answers, '95-escape-ai')
+  // Its locks to find turn up as Ada searches and solves, and the lamp room ends on a final lock (#143).
+  const moments = await playThrough(tv, [ada], aiRoom, answers, '95-escape-ai')
+  expect(moments.has('final')).toBe(true)
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
 })
 

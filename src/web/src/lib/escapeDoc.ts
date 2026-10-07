@@ -59,8 +59,8 @@ export interface EscapePuzzleDoc {
   pieces?: string[]
   hints?: string[]
   solvedText: string
-  /** Made fresh every game from the seed: its code (and pieces) aren't written by hand. */
-  generator?: { type: string } | null
+  /** Made fresh every game from the seed: its code (and pieces) aren't written by hand. A final lock's has its marks. */
+  generator?: { type: string; marks?: string[] } | null
   minMinutes?: number | null
   minDifficulty?: EscapeDifficulty | null
   /** What brings it into sight (#134): "spot:<id>", "puzzle:<id>" or "item:<id>". Left out, it's there from the start. */
@@ -72,6 +72,17 @@ export interface EscapeItemDoc {
   name: string
   description: string
   inspect?: string | null
+}
+
+/** The marks a final lock uses when the room names none: the same as FinalLocks.DefaultMarks on the server. */
+export const DEFAULT_MARKS = ['⭐', '🌙', '☀️', '❤️', '🍀', '⚡', '🔔', '💎']
+
+/** Why a new mark can't join a final lock's (the validator's rule: different, short, and no digits), or null if it can. */
+export function markProblem(mark: string, marks: string[]): string | null {
+  if (/\d/.test(mark)) return "A mark can't have digits in it: the code is made of digits."
+  if (mark.length > 16) return 'Keep a mark short: one emoji or symbol.'
+  if (marks.includes(mark)) return 'That mark is already in the list.'
+  return null
 }
 
 /** What GET /api/escape-rooms/{id}/document returns. */

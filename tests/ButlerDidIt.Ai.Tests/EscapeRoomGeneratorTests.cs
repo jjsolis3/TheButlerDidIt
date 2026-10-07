@@ -9,8 +9,8 @@ namespace ButlerDidIt.Ai.Tests;
 public class EscapeRoomGeneratorTests
 {
     private static readonly EscapeRoomRequest Request = new("a haunted lighthouse", ContentRating.Family, 30);
-    // The two riddles, then the logic puzzle's code as the solver's fixed seed builds it.
-    private const string SolvedAll = """{"answers":{"1":"echo","2":"a map","3":"1423"}}""";
+    // The two riddles, then the logic puzzle's code and the final lock's, as the solver's fixed seed builds them.
+    private const string SolvedAll = """{"answers":{"1":"echo","2":"a map","3":"1423","4":"9460"}}""";
 
     private static string FakeRoom() =>
         new StreamReader(typeof(EscapeRoomGenerator).Assembly.GetManifestResourceStream("ButlerDidIt.Ai.Fake.FakeEscapeRoom.json")!).ReadToEnd();
@@ -48,6 +48,10 @@ public class EscapeRoomGeneratorTests
         Assert.All(room.SceneObjects, o => Assert.Matches(@"^spot-\d+$", o.Id));
         Assert.Equal(["spot-2", "spot-3", "spot-4"], room.FindPuzzle("puzzle-2")!.Finds);
         Assert.Contains("{key:puzzle-3}", room.SceneObjects.Single(o => o.Label == "dark alcove").Look);
+        // …and so are the spot and puzzle a lock to find names, and the final lock in "{order:…}" (#143).
+        Assert.Equal($"spot:{room.SceneObjects.Single(o => o.Label == "keeper's desk").Id}", room.FindPuzzle("puzzle-4")!.RevealedBy);
+        Assert.Equal("puzzle:puzzle-10", room.FindPuzzle("puzzle-9")!.RevealedBy);
+        Assert.Contains("{order:puzzle-13}", room.SceneObjects.Single(o => o.Label == "brass plaque").Look);
         // Every stage is a scene, laid out by the server.
         Assert.All(room.Stages, s => Assert.Equal("sea", s.Scene!.Backdrop));
         Assert.Contains(ai.Usage, u => u.Context.Purpose == "escape-room-solve");
@@ -86,6 +90,10 @@ public class EscapeRoomGeneratorTests
         var repair = client.Calls[1].Last().Text!;
         Assert.StartsWith($"TASK: {EscapeRoomGenerator.WriteTask}", repair);
         Assert.Contains("no-such-key", repair);
+        // The format the model was shown has a lock to find and a final lock (#143).
+        var write = client.Calls[0].Last().Text!;
+        Assert.Contains("\"revealedBy\": \"spot:loose-brick\"", write);
+        Assert.Contains("\"type\": \"final\"", write);
     }
 
     [Fact]
@@ -108,6 +116,22 @@ public class EscapeRoomGeneratorTests
     {
         var leaky = GameJson.Deserialize<EscapeRoom>(Edit(n => n["puzzles"]![0]!["prompt"] = "Shout and hear your echo come back. What is it?"));
         Assert.Contains(EscapeRoomGenerator.ShapeErrors(leaky), e => e.Contains("echo-riddle") && e.Contains("gives its own answer away"));
+    }
+
+    [Fact]
+    public void Shape_rules_ask_for_locks_to_find_and_a_final_lock()
+    {
+        var everythingInSight = GameJson.Deserialize<EscapeRoom>(Edit(n =>
+        {
+            foreach (var p in n["puzzles"]!.AsArray()) p!.AsObject().Remove("revealedBy");
+            var puzzles = n["puzzles"]!.AsArray();
+            puzzles.Remove(puzzles.Single(p => p!["id"]!.GetValue<string>() == "lamp-door"));
+            var lamp = n["stages"]![2]!["puzzles"]!.AsArray();
+            lamp.Remove(lamp.Single(id => id!.GetValue<string>() == "lamp-door"));
+        }));
+        var errors = EscapeRoomGenerator.ShapeErrors(everythingInSight);
+        Assert.Contains(errors, e => e.Contains("Hide at least 2 locks") && e.Contains("this room hides 0"));
+        Assert.Contains(errors, e => e.Contains("End the last stage, 'lamp', with a final lock"));
     }
 
     [Fact]
@@ -164,12 +188,50 @@ public class EscapeRoomGeneratorTests
     [Fact]
     public async Task A_logic_puzzle_the_tester_cant_crack_asks_for_plainer_clues()
     {
-        var wrongCode = """{"answers":{"1":"echo","2":"map","3":"9999"}}""";
+        var wrongCode = """{"answers":{"1":"echo","2":"map","3":"9999","4":"9460"}}""";
         var client = new ScriptedChatClient(FakeRoom(), wrongCode, FakeRoom(), SolvedAll);
         var result = await Generate(new TestAi { Client = client });
 
         Assert.Contains("logic puzzle 'bottle-shelf'", client.Calls[2].Last().Text);
         Assert.Contains("pieceTemplate", client.Calls[2].Last().Text);
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void The_tester_sees_a_final_lock_as_the_group_does_with_its_marks_and_where_the_order_is_written()
+    {
+        var room = GameJson.Deserialize<EscapeRoom>(FakeRoom());
+        var prompt = EscapeRoomSolver.Prompt(room);
+        var final = EscapeRoomSolver.Tested(room).Single(t => t.Kind == EscapeRoomSolver.Test.Final).Puzzle;
+
+        // Built from the four locks a Normal game plays in the lamp room: the Hard-only gull signal leaves no mark.
+        Assert.Contains("## Final lock 4: The Door to the Shore", prompt);
+        Assert.Contains("a four-digit keypad", prompt);
+        Assert.DoesNotContain("The Gull Signal", prompt);
+        // Each lock's mark and digit, listed in the stage's order as the screens show them, not the code's…
+        var marks = final.Final!.Parts.ToDictionary(x => x.Puzzle);
+        var listed = new[] { "buoys", "tide-marks", "lamp-lights", "lamp-panel" }.Select(id =>
+            prompt.IndexOf($"Opening \"{room.FindPuzzle(id)!.Title}\" left the mark {marks[id].Mark} and the digit {marks[id].Digit}.", StringComparison.Ordinal)).ToList();
+        Assert.All(listed, at => Assert.True(at > 0));
+        Assert.Equal(listed.Order(), listed);
+        // …and the order, on the spot where the room writes it.
+        Assert.Contains($"Searching the brass plaque shows: A brass plaque, polished by the keeper's sleeve. Engraved on it: {FinalLocks.OrderText(final.Final.Parts)}.", prompt);
+        // Never the code, or the lock's hints.
+        Assert.DoesNotContain(final.Answers[0], prompt);
+        Assert.All(final.Hints, h => Assert.DoesNotContain(h, prompt));
+    }
+
+    [Fact]
+    public async Task A_final_lock_the_tester_cant_open_asks_for_its_order_to_be_written_plainly()
+    {
+        var wrongCode = """{"answers":{"1":"echo","2":"map","3":"1423","4":"1234"}}""";
+        var client = new ScriptedChatClient(FakeRoom(), wrongCode, FakeRoom(), SolvedAll);
+        var result = await Generate(new TestAi { Client = client });
+
+        var repair = client.Calls[2].Last().Text!;
+        Assert.Contains("final lock 'lamp-door'", repair);
+        Assert.Contains("{order:lamp-door}", repair);
+        Assert.DoesNotContain("'bottle-shelf'", repair);
         Assert.Empty(result.Warnings);
     }
 }

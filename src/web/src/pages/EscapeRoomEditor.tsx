@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { EditorCard as Card, JsonTab, Lines, ListDetail, Num, Select, Text } from '../components/EditorFields'
-import { Button, ErrorText, Eyebrow, Shell } from '../components/ui'
+import { Button, ErrorText, Eyebrow, inputClass, Shell } from '../components/ui'
 import { RoomMediaPanel } from '../escape/RoomMediaPanel'
 import { api } from '../lib/api'
-import type { EscapeItemDoc, EscapePuzzleDoc, EscapeRoomDoc, EscapeStageDoc } from '../lib/escapeDoc'
+import { DEFAULT_MARKS, markProblem, type EscapeItemDoc, type EscapePuzzleDoc, type EscapeRoomDoc, type EscapeStageDoc } from '../lib/escapeDoc'
 import { newId } from '../lib/newId'
 import { SOUNDSCAPES } from '../lib/sound'
 import { ESCAPE_PALETTE, usePalette } from '../lib/theme'
@@ -418,10 +418,18 @@ function PuzzlesTab({ doc, update }: { doc: EscapeRoomDoc; update: Update }) {
             </div>
             <Text label="What everyone sees (the riddle or the lock)" area value={puzzle.prompt} onChange={(v) => edit((p) => void (p.prompt = v))} />
             {final ? (
-              <p className="rounded-lg border border-line bg-bg p-3 text-sm text-muted">
-                🏁 The final lock of its stage. It appears once every other puzzle there is open, and its code is built fresh every game from the marks they leave. Write{' '}
-                <code>{`{order:${puzzle.id}}`}</code> on a spot or an item, where the group can find the order to read the marks in. Its marks are in the JSON tab.
-              </p>
+              <>
+                <p className="rounded-lg border border-line bg-bg p-3 text-sm text-muted">
+                  🏁 The final lock of its stage. It appears once every other puzzle there is open, and its code is built fresh every game from the marks they leave. Write{' '}
+                  <code>{`{order:${puzzle.id}}`}</code> on a spot or an item, where the group can find the order to read the marks in.
+                </p>
+                <MarksEditor
+                  key={puzzle.id}
+                  marks={puzzle.generator?.marks ?? []}
+                  needed={(doc.stages.find((s) => s.puzzles.includes(puzzle.id))?.puzzles.length ?? 1) - 1}
+                  onChange={(marks) => edit((p) => void (p.generator = { ...p.generator!, marks: marks.length > 0 ? marks : undefined }))}
+                />
+              </>
             ) : puzzle.generator ? (
               <p className="rounded-lg border border-line bg-bg p-3 text-sm text-muted">
                 🎲 This code is made fresh every game ({puzzle.generator.type}), with its clue pieces, so it's never written here. Its settings are in the JSON tab.
@@ -500,6 +508,73 @@ function findOptions(doc: EscapeRoomDoc, puzzle: EscapePuzzleDoc): { value: stri
   ]
   if (puzzle.revealedBy && !options.some((o) => o.value === puzzle.revealedBy)) options.push({ value: puzzle.revealedBy, label: puzzle.revealedBy })
   return options
+}
+
+/**
+ * A final lock's marks (#143): the emoji its stage's other puzzles leave as they open, one each, picked fresh every game.
+ * With none chosen the lock uses the standard set, which is shown so it can be changed. A mark is removed by tapping it.
+ */
+function MarksEditor({ marks, needed, onChange }: { marks: string[]; needed: number; onChange: (marks: string[]) => void }) {
+  const [draft, setDraft] = useState('')
+  const shown = marks.length > 0 ? marks : DEFAULT_MARKS
+  const mark = draft.trim()
+  const problem = mark ? markProblem(mark, shown) : null
+  const add = () => {
+    if (!mark || problem) return
+    onChange([...shown, mark])
+    setDraft('')
+  }
+  return (
+    <fieldset className="space-y-2">
+      <legend className="text-xs font-semibold tracking-wider text-accent uppercase">Marks the other puzzles leave</legend>
+      <p className="text-sm text-muted">
+        Each of the {needed} other puzzles in this stage leaves one of these when it opens, so it needs at least {needed}.
+        {marks.length === 0 && ' These are the standard marks: change them to suit your room.'}
+      </p>
+      <ul className="flex flex-wrap gap-2" aria-label="Marks">
+        {shown.map((m) => (
+          <li key={m}>
+            <button
+              type="button"
+              aria-label={`Remove ${m}`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line px-3 text-xl hover:border-blood/60"
+              onClick={() => onChange(shown.filter((x) => x !== m))}
+            >
+              {m}
+              <span aria-hidden className="text-xs text-muted">✕</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {shown.length < needed && <ErrorText>Add {needed - shown.length} more: every other puzzle in this stage needs its own mark.</ErrorText>}
+      <div className="flex gap-2">
+        <div className="w-24 shrink-0">
+          <input
+            aria-label="A new mark"
+            className={`${inputClass} text-xl`}
+            value={draft}
+            placeholder="🗝️"
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                add()
+              }
+            }}
+          />
+        </div>
+        <Button variant="ghost" disabled={!mark || !!problem} onClick={add}>
+          Add the mark
+        </Button>
+        {marks.length > 0 && (
+          <Button variant="quiet" onClick={() => onChange([])}>
+            Use the standard marks
+          </Button>
+        )}
+      </div>
+      {problem && <ErrorText>{problem}</ErrorText>}
+    </fieldset>
+  )
 }
 
 function ItemPicks({ label, items, chosen, onChange }: { label: string; items: EscapeItemDoc[]; chosen: string[]; onChange: (item: string, on: boolean) => void }) {

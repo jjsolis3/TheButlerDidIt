@@ -73,11 +73,19 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
                     return new EscapeRoomResult(Anonymize(room), warnings);
                 }
                 solverRetried = true;
-                errors.AddRange(missed.Select(m => m.Logic
-                    ? $"A tester who saw the line-up and every clue of logic puzzle '{m.PuzzleId}' couldn't work out the code. " +
-                      "Make the things being lined up short and clearly different (\"red jar\", \"blue jar\"…), and the pieceTemplate plain, so every clue reads clearly."
-                    : $"A tester who saw only the prompt, the clue pieces and what the room shows for riddle '{m.PuzzleId}' answered \"{m.Guess}\", which isn't accepted. " +
-                      "Make the riddle clearer so there is one fair answer, or add the tester's answer to \"answers\" if it is also correct."));
+                errors.AddRange(missed.Select(m => m.Kind switch
+                {
+                    EscapeRoomSolver.Test.Logic =>
+                        $"A tester who saw the line-up and every clue of logic puzzle '{m.PuzzleId}' couldn't work out the code. " +
+                        "Make the things being lined up short and clearly different (\"red jar\", \"blue jar\"…), and the pieceTemplate plain, so every clue reads clearly.",
+                    EscapeRoomSolver.Test.Final =>
+                        $"A tester who saw final lock '{m.PuzzleId}', the mark and digit each other lock in its stage leaves, and everything that stage shows " +
+                        $"answered \"{m.Guess}\", which isn't its code. Write {{order:{m.PuzzleId}}} plainly in the look of a spot in the same stage " +
+                        "(not a Hard-only one), and say in the lock's prompt that the code is the marks' digits read in an order written in the room.",
+                    _ =>
+                        $"A tester who saw only the prompt, the clue pieces and what the room shows for riddle '{m.PuzzleId}' answered \"{m.Guess}\", which isn't accepted. " +
+                        "Make the riddle clearer so there is one fair answer, or add the tester's answer to \"answers\" if it is also correct.",
+                }));
             }
 
             if (attempt == MaxRepairs) break;
@@ -95,6 +103,8 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
     public static int MinPuzzles(int minutes) => minutes switch { <= 30 => 7, <= 45 => 9, _ => 11 };
     public const int MaxPuzzles = 16;
     public const int MaxSpotsPerStage = 12;
+    /// <summary>The fewest locks the group has to find (puzzles with revealedBy).</summary>
+    public const int MinHidden = 2;
 
     /// <summary>
     /// Rules for rooms the AI writes, on top of the validator's (which hand-written rooms follow too).
@@ -121,6 +131,13 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         if (!room.Puzzles.Any(p => p.MinDifficulty == EscapeDifficulty.Hard) && !room.SceneObjects.Any(o => o.MinDifficulty == EscapeDifficulty.Hard))
             errors.Add("Add something for Hard: a puzzle or a spot with \"minDifficulty\": \"hard\" (an extra cipher, a red herring).");
 
+        // Locks to find, and a final lock to end on (#143): the validator proves they work, these ask for them.
+        var hidden = room.Puzzles.Count(p => p.RevealedBy is not null);
+        if (hidden < MinHidden)
+            errors.Add($"Hide at least {MinHidden} locks with \"revealedBy\" (\"spot:<id>\", \"puzzle:<id>\" or \"item:<id>\" in the same stage), so the group has to find them; this room hides {hidden}.");
+        if (room.Stages.LastOrDefault() is { } last && !last.Puzzles.Any(id => room.FindPuzzle(id)?.Generator?.Type == GeneratorType.Final))
+            errors.Add($"End the last stage, '{last.Id}', with a final lock: a \"code\" puzzle with the \"final\" generator, built from the other locks there.");
+
         // One-tap "use" steps: few, and never a freebie.
         var found = room.SceneObjects.Select(o => o.Gives).Concat(room.Items.Select(i => i.InspectGives)).Concat(room.Recipes.Select(r => r.Makes)).OfType<string>().ToHashSet();
         var uses = room.Puzzles.Where(p => p.Kind == PuzzleKind.Use).ToList();
@@ -144,7 +161,7 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         foreach (var p in room.Puzzles)
         {
             if (p.Kind == PuzzleKind.Code && p.Generator is null)
-                errors.Add($"Puzzle '{p.Id}' is a code: codes must use a generator (digitFacts, colorDigits, sequence or deduction), never fixed answers.");
+                errors.Add($"Puzzle '{p.Id}' is a code: codes must use a generator (digitFacts, colorDigits, sequence, deduction or final), never fixed answers.");
             if (p.Generator?.Type == GeneratorType.ColorDigits && !p.Hints.Prepend(p.Prompt).Any(t => t.Contains("{order}")))
                 errors.Add($"Puzzle '{p.Id}' uses colorDigits, so its prompt or a hint must contain {{order}} (the colour order).");
             if (room.ContentRating == ContentRating.Family && p.Generator is { Type: GeneratorType.Cipher, Cipher: CipherType.Symbols or CipherType.Morse } && p.MinDifficulty != EscapeDifficulty.Hard)
@@ -230,14 +247,23 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
             puzzle!["id"] = ids[puzzle["id"]!.GetValue<string>()];
             if (puzzle["finds"] is System.Text.Json.Nodes.JsonArray finds)
                 puzzle["finds"] = new System.Text.Json.Nodes.JsonArray(finds.Select(f => (System.Text.Json.Nodes.JsonNode?)spots.GetValueOrDefault(f!.GetValue<string>(), f.GetValue<string>())).ToArray());
+            // "spot:<id>" and "puzzle:<id>" name the renamed things too (#143); items keep their ids.
+            if (puzzle["revealedBy"]?.GetValue<string>() is { } by)
+                puzzle["revealedBy"] = Reveals.Parse(by) switch
+                {
+                    (Reveals.Spot, var id) => $"{Reveals.Spot}:{spots.GetValueOrDefault(id, id)}",
+                    (Reveals.Puzzle, var id) => $"{Reveals.Puzzle}:{ids.GetValueOrDefault(id, id)}",
+                    _ => by,
+                };
         }
         foreach (var stage in node["stages"]!.AsArray())
         {
             stage!["puzzles"] = new System.Text.Json.Nodes.JsonArray(stage["puzzles"]!.AsArray().Select(id => (System.Text.Json.Nodes.JsonNode?)ids[id!.GetValue<string>()]).ToArray());
             foreach (var spot in stage["scene"]?["objects"]?.AsArray() ?? []) spot!["id"] = spots[spot["id"]!.GetValue<string>()];
         }
-        // Where a cipher's key is written, "{key:the-cipher}" names the puzzle too.
-        RewriteStrings(node, text => RoomVariants.KeyPlaceholder().Replace(text, m => $"{{key:{ids.GetValueOrDefault(m.Groups[1].Value, m.Groups[1].Value)}}}"));
+        // Where a cipher's key is written, "{key:the-cipher}" names the puzzle too, and so does a final lock's "{order:the-exit}".
+        string Renamed(System.Text.RegularExpressions.Match m, string name) => $"{{{name}:{ids.GetValueOrDefault(m.Groups[1].Value, m.Groups[1].Value)}}}";
+        RewriteStrings(node, text => FinalLocks.OrderPlaceholder().Replace(RoomVariants.KeyPlaceholder().Replace(text, m => Renamed(m, "key")), m => Renamed(m, "order")));
         return node.Deserialize<EscapeRoom>(GameJson.Options)!;
     }
 
@@ -277,6 +303,9 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         - Every stage is a scene with spots to search: some hold items or clues, some hide spare clue pieces, some are decoys that only add atmosphere.
         - Chain things together: a riddle gives half of a tool, a search gives the other half, a recipe puts them together,
           and the tool unlocks a spot where a cipher's key is written. One-tap "use" steps are few, and always need something found.
+        - Not every lock is in sight: the group finds some by searching a spot, opening another lock or holding an item.
+        - The last stage ends with a final lock built from every other lock there: each leaves a mark as it opens, and the
+          order to read the marks in is written somewhere in that stage.
         - Every puzzle is fair: a group that reads the TV, searches the room and shares their phones' pieces can solve it.
         - Riddles have one clear answer that fits the theme. Never put the answer in the prompt, the pieces, or a spot's or item's name.
         - You never invent codes, cipher text or logic clues: they come from generators (see the format), made fresh every game.
@@ -306,8 +335,8 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
             {"id": "a-search", "title": "...", "kind": "search", "prompt": "which spots to search", "finds": ["spot-id", "spot-id"], "rewards": ["other-half"], "hints": ["...", "search the X and the Y"], "solvedText": "..."},
             {"id": "a-cipher", "title": "...", "kind": "text", "prompt": "... {cipher} ...", "hints": ["where the key is", "how to decode", "It says {answer}."], "solvedText": "...",
              "generator": {"type": "cipher", "cipher": "shift", "words": ["six", "themed", "single", "words", "of", "4-10 letters"]}},
-            {"id": "a-pattern", "title": "...", "kind": "code", "prompt": "... {sequence} ...", "hints": ["Look at how each number changes.", "The next number is {answer}."], "solvedText": "...", "generator": {"type": "sequence"}},
-            {"id": "a-logic", "title": "...", "kind": "code", "prompt": "Five things in a row: {items}. The code is each one's place, far left is 1, in the order listed.",
+            {"id": "a-pattern", "title": "...", "kind": "code", "revealedBy": "spot:loose-brick", "prompt": "... {sequence} ...", "hints": ["Look at how each number changes.", "The next number is {answer}."], "solvedText": "...", "generator": {"type": "sequence"}},
+            {"id": "a-logic", "title": "...", "kind": "code", "prompt": "Jars in a row: {items}. The code is each one's place, far left is 1, in the order listed.",
              "hints": ["...", "...", "The code is {answer}."], "rewards": ["item-id"], "solvedText": "...",
              "generator": {"type": "deduction", "words": ["red jar", "blue jar", "green jar", "gold jar", "silver jar"], "pieceTemplate": "Scratched on the shelf: {clue}"}},
             {"id": "a-panel", "title": "...", "kind": "switches", "prompt": "each light flips its neighbours; turn them all on", "hints": ["Work from the top row down.", "Press {answer}."], "solvedText": "...", "generator": {"type": "switches"}},
@@ -315,7 +344,10 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
              "generator": {"type": "digitFacts", "count": 3, "pieceTemplate": "The {ordinal} digit is {fact}." } },
             {"id": "a-password", "title": "...", "kind": "text", "prompt": "...", "requires": ["item-id"], "hints": ["...", "..."], "solvedText": "The word was {answer}!",
              "generator": {"type": "wordSequence", "count": 3, "words": ["ten or more", "themed single words", "..."], "pieceTemplate": "The {ordinal} word is {word}." } },
-            {"id": "a-lock", "title": "...", "kind": "use", "prompt": "...", "requires": ["tool-from-a-recipe"], "rewards": ["other-item"], "hints": ["...", "use the X on the Y"], "solvedText": "..."}
+            {"id": "a-lock", "title": "...", "kind": "use", "prompt": "...", "requires": ["tool-from-a-recipe"], "rewards": ["other-item"], "hints": ["...", "use the X on the Y"], "solvedText": "..."},
+            {"id": "the-exit", "title": "...", "kind": "code", "prompt": "The exit has a {count}-digit keypad. ... every lock in here leaves its mark ...",
+             "hints": ["Every lock you opened in here left a mark and a number. The order is written down in this room.", "Search the X.", "The code is {answer}."], "solvedText": "...",
+             "generator": {"type": "final", "marks": ["🗝️", "🕯️", "🦉", "🌙", "⭐", "🔔", "💎", "🍀"]}}
           ],
           "items": [{"id": "item-id", "name": "Brass locket", "description": "...", "inspect": "what a close look shows (optional; may hold {key:a-cipher})", "inspectRequires": "tool (optional)", "inspectGives": "item-id (optional)"}],
           "recipes": [{"items": ["tool-half", "other-half"], "makes": "tool", "text": "read when they're put together"}]
@@ -338,8 +370,18 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
           shaped like your "words" (same length) that a clue in the prompt rules out, e.g. the prompt says "a word every sailor fears".
         - "sequence": a number pattern shown where the prompt says {sequence}; the group types the next number. "kind": "code".
         - "deduction": a logic puzzle. "words" are 5 different things to line up; the prompt shows them with {items}; each clue piece
-          is the pieceTemplate with {clue}. "kind": "code". The code is each thing's place, in the order listed.
+          is the pieceTemplate with {clue}. "kind": "code". The code is each thing's place, in the order listed. Easy lines up 3 of
+          them, Normal 4 and Hard all 5, so never write how many there are.
         - "switches": a grid of lights. "kind": "switches". Use {answer} only in the last hint.
+        - "final": the last stage's final lock. "kind": "code". It comes into sight by itself once every other puzzle in its stage
+          is solved. Each of those leaves a mark (one of your "marks") and a digit when it opens, and the code is the digits in an
+          order you write as "{order:<this puzzle's id>}" in the "look" of a spot in the same stage, which reads "🦉, then 🗝️, then 🌙".
+          Give 8 "marks": themed emoji, all different, no digits. A final lock has no "answers", "pieces" or "revealedBy". Its prompt
+          says the locks leave marks and uses {count} for the number of digits; a hint says which spot to search; the last hint is "The code is {answer}."
+        Locks to find ("revealedBy" on a puzzle; it's out of sight, and never mentioned on screen, until then):
+        - "spot:<id>": searching that spot finds it. Write it into the spot's "look" ("Behind the painting: a little safe with a keypad.").
+        - "puzzle:<id>": solving that puzzle uncovers it (its "solvedText" can say so). "item:<id>": holding that item shows it.
+        - The spot or puzzle is in the same stage. Every stage keeps at least one puzzle in sight from the start, so the group knows where to begin.
         Rules the room is checked against:
         - Every puzzle id is in exactly one stage. "kind" is "text", "code", "use", "search" or "switches". Codes always use a generator; never write code answers.
         - At least 1 riddle (text, no generator, with "answers"), 1 search, 1 cipher, and 1 deduction or switches; at least one item with "inspect", or one recipe.
@@ -350,17 +392,21 @@ public sealed class EscapeRoomGenerator(AiGateway ai)
         - Every item comes from exactly one place: a puzzle's "rewards", a spot's "gives", an item's "inspectGives" or a recipe's "makes". An item is either
           used up (by a puzzle's "requires" or a recipe) or a tool (a spot's "requires" or an item's "inspectRequires"), never both. Every item used is listed in "items".
         - Every item in "requires" is found before it's needed (in an earlier stage, or earlier in the same stage).
+        - At least {{{MinHidden}}} puzzles have "revealedBy" (never the final lock).
+        - The last stage has exactly one final lock, and at least 3 other puzzles that every game plays (not Hard-only). Its order is
+          written on a spot in that stage that isn't Hard-only.
         - Every puzzle has 2 or 3 hints. Leave out "variants", "lengths" and "minMinutes".
         Reply with the JSON object only, no commentary.
         """;
 }
 
 /// <summary>
-/// The fairness test for what the AI wrote: the Inspector sees each riddle and each logic puzzle as the
-/// group would, and must answer it. For a riddle that's its prompt, its clue pieces, and everything the
-/// stage's spots and the group's items show (a scene riddle's clue can be written on a spot); for a logic
-/// puzzle, its line-up and every clue, as one game builds them. Never the answers or the hints.
-/// Codes, ciphers, patterns and light panels from generators aren't tested: they're correct by
+/// The fairness test for what the AI wrote: the Inspector sees each riddle, each logic puzzle and each final lock as
+/// the group would, and must answer it. For a riddle that's its prompt, its clue pieces, and everything the stage's
+/// spots and the group's items show (a scene riddle's clue can be written on a spot); for a logic puzzle, its line-up
+/// and every clue, as one game builds them; for a final lock, the mark and digit each other lock in its stage leaves,
+/// and everything that stage shows, which is where the order to read them in has to be written (#143). Never the
+/// answers or the hints. Codes, ciphers, patterns and light panels from generators aren't tested: they're correct by
 /// construction, and the validator proves every one can be solved.
 /// </summary>
 public static class EscapeRoomSolver
@@ -368,40 +414,53 @@ public static class EscapeRoomSolver
     /// <summary>The puzzle set the logic puzzles are built from for the test. Any seed would do; a fixed one makes the test repeatable.</summary>
     public const long Seed = 1;
 
-    public sealed record Miss(string PuzzleId, string Guess, bool Logic);
+    public enum Test { Riddle, Logic, Final }
+
+    public sealed record Miss(string PuzzleId, string Guess, Test Kind);
 
     /// <summary>
-    /// What's tested, numbered as in the prompt: the riddles, then the logic puzzles, as one game (<see cref="Seed"/>) builds them.
-    /// Chosen from the room as written: a built puzzle no longer says which generator made it.
+    /// What's tested, numbered as in the prompt: the riddles, the logic puzzles, then the final locks, as one game
+    /// (<see cref="Seed"/>, Normal, the room's own length) builds them. Chosen from the room as written: a built puzzle
+    /// no longer says which generator made it.
     /// </summary>
-    public static List<(EscapePuzzle Puzzle, bool Logic)> Tested(EscapeRoom room)
+    public static List<(EscapePuzzle Puzzle, Test Kind)> Tested(EscapeRoom room)
     {
         var built = RoomVariants.Build(room, Seed);
-        return room.Puzzles.Where(EscapeRoomGenerator.IsRiddle).Select(p => (built.FindPuzzle(p.Id)!, false))
-            .Concat(room.Puzzles.Where(p => p.Generator?.Type == GeneratorType.Deduction && p.MinDifficulty is not EscapeDifficulty.Hard).Select(p => (built.FindPuzzle(p.Id)!, true)))
+        var played = RoomLengths.Cut(built, room.TimeLimitMinutes);
+        return room.Puzzles.Where(EscapeRoomGenerator.IsRiddle).Select(p => (built.FindPuzzle(p.Id)!, Test.Riddle))
+            .Concat(room.Puzzles.Where(p => p.Generator?.Type == GeneratorType.Deduction && p.MinDifficulty is not EscapeDifficulty.Hard).Select(p => (built.FindPuzzle(p.Id)!, Test.Logic)))
+            .Concat(played.Puzzles.Where(p => p.Final is not null).Select(p => (p, Test.Final)))
             .ToList();
     }
 
     public static string Prompt(EscapeRoom room)
     {
-        var built = RoomVariants.Build(room, Seed);
+        // The game a Normal group plays: Hard-only spots are left out, and every final lock's order is written in.
+        var played = RoomLengths.Cut(RoomVariants.Build(room, Seed), room.TimeLimitMinutes);
         var sb = new StringBuilder();
         sb.AppendLine($"TASK: {EscapeRoomGenerator.SolveTask}");
         sb.AppendLine($"You are testing an escape room called \"{room.Title}\". Answer each puzzle below using ONLY what is written there.");
-        sb.AppendLine("For a riddle, give the single most likely answer, one or two words. For a logic puzzle, give the code: digits only.");
+        sb.AppendLine("For a riddle, give the single most likely answer, one or two words. For a logic puzzle or a final lock, give the code: digits only.");
         // Numbered rather than by id: the model names puzzles after their answers ("echo-riddle").
-        foreach (var ((p, logic), i) in Tested(room).Select((t, i) => (t, i)))
+        foreach (var ((p, kind), i) in Tested(room).Select((t, i) => (t, i)))
         {
             sb.AppendLine();
-            sb.AppendLine($"## {(logic ? "Logic puzzle" : "Riddle")} {i + 1}: {p.Title}");
+            sb.AppendLine($"## {kind switch { Test.Logic => "Logic puzzle", Test.Final => "Final lock", _ => "Riddle" }} {i + 1}: {p.Title}");
             sb.AppendLine(p.Prompt);
-            foreach (var piece in p.Pieces) sb.AppendLine($"- {(logic ? "A clue" : "A clue piece")}: {piece}");
-            if (logic) continue;
+            foreach (var piece in p.Pieces) sb.AppendLine($"- {(kind == Test.Logic ? "A clue" : "A clue piece")}: {piece}");
+            if (kind == Test.Logic) continue;
+            var stage = played.Stages.FirstOrDefault(st => st.Id == room.StageOf(p.Id)?.Id);
+            if (kind == Test.Final)
+            {
+                // Listed as the screens show them, in the stage's order: never the code's.
+                var parts = p.Final!.Parts.ToDictionary(x => x.Puzzle);
+                foreach (var other in (stage?.Puzzles ?? []).Where(parts.ContainsKey).Select(id => played.FindPuzzle(id)!))
+                    sb.AppendLine($"- Opening \"{other.Title}\" left the mark {parts[other.Id].Mark} and the digit {parts[other.Id].Digit}. Its card said: {other.Prompt}");
+            }
             // What searching and looking can turn up in this part of the room.
-            var stage = built.Stages.FirstOrDefault(st => st.Puzzles.Contains(p.Id));
-            foreach (var spot in (stage?.Scene?.Objects ?? []).Where(o => o.MinDifficulty is not EscapeDifficulty.Hard))
+            foreach (var spot in stage?.Scene?.Objects ?? [])
                 sb.AppendLine($"- Searching the {spot.Label} shows: {spot.Look}{(spot.Clue is { } clue ? $" (noted: {clue})" : "")}");
-            foreach (var item in built.Items.Where(it => it.Inspect is not null))
+            foreach (var item in played.Items.Where(it => it.Inspect is not null))
                 sb.AppendLine($"- A close look at {item.Name} shows: {item.Inspect}");
         }
         sb.AppendLine();
@@ -419,9 +478,9 @@ public static class EscapeRoomSolver
             var reply = await ai.CompleteJsonAsync<SolverReply>(AiRole.Inspector, Prompt(room),
                 [new ChatMessage(ChatRole.User, "Answer every puzzle.")], context with { Purpose = "escape-room-solve" }, 1_500, ct);
             return tested
-                .Select((t, i) => (t.Puzzle, t.Logic, Guess: reply.Answers.GetValueOrDefault($"{i + 1}") ?? ""))
+                .Select((t, i) => (t.Puzzle, t.Kind, Guess: reply.Answers.GetValueOrDefault($"{i + 1}") ?? ""))
                 .Where(x => !Answers.Matches(x.Puzzle, x.Guess))
-                .Select(x => new Miss(x.Puzzle.Id, x.Guess, x.Logic))
+                .Select(x => new Miss(x.Puzzle.Id, x.Guess, x.Kind))
                 .ToList();
         }
         catch (AiCallFailedException)

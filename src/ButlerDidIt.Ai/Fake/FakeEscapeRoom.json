@@ -40,7 +40,7 @@
       "puzzles": ["lockbox", "map-riddle", "bottle-shelf", "study-door"],
       "scene": {
         "objects": [
-          { "id": "keepers-desk", "prop": "desk", "label": "keeper's desk", "look": "Logbooks and a pot of ink. A lockbox with a 3-digit dial.", "hidesPieces": true },
+          { "id": "keepers-desk", "prop": "desk", "label": "keeper's desk", "look": "Logbooks and a pot of ink. Under the logbooks: a lockbox with a number dial.", "hidesPieces": true },
           { "id": "sea-papers", "prop": "poster", "label": "sea papers", "look": "Old papers about the coast, pinned up in a hurry.", "hidesPieces": true },
           { "id": "armchair", "prop": "bed", "label": "armchair", "look": "A squashy armchair with a blanket. Down the side: a biscuit crumb.", "hidesPieces": true },
           { "id": "coat-stand", "prop": "lamp", "label": "coat stand", "look": "A heavy oilskin coat, still dripping.", "hidesPieces": true },
@@ -55,8 +55,8 @@
     {
       "id": "lamp",
       "title": "The Lamp Room",
-      "description": "The great lamp waits under a glass dome. Buoys bob outside the windows, a panel of lights blinks by the door, and a foghorn sits on the rail.",
-      "puzzles": ["buoys", "tide-marks", "lamp-lights", "gull-signal", "lamp-panel"],
+      "description": "The great lamp waits under a glass dome. Buoys bob outside the windows, a panel of lights blinks by the door, a foghorn sits on the rail and a brass plaque hangs by the stairs.",
+      "puzzles": ["buoys", "tide-marks", "lamp-lights", "gull-signal", "lamp-panel", "lamp-door"],
       "scene": {
         "objects": [
           { "id": "great-lamp", "prop": "lamp", "label": "great lamp", "look": "A huge lamp with an empty space where its lens should be." },
@@ -66,6 +66,7 @@
           { "id": "oil-drum", "prop": "barrel", "label": "oil drum", "look": "Lamp oil, sloshing and full.", "hidesPieces": true },
           { "id": "signal-flags", "prop": "sign", "label": "signal flags", "look": "Flags in every colour, folded neatly.", "hidesPieces": true },
           { "id": "clockwork", "prop": "machine", "label": "clockwork", "look": "Brass gears that turn the lamp.", "hidesPieces": true },
+          { "id": "brass-plaque", "prop": "sign", "label": "brass plaque", "look": "A brass plaque, polished by the keeper's sleeve. Engraved on it: {order:lamp-door}." },
           { "id": "foghorn", "prop": "statue", "label": "foghorn", "look": "In the lantern light, letters scratched inside the horn: {key:gull-signal}", "requires": "lantern", "lockedText": "Something is scratched inside the horn, but it's too dark to read.", "minDifficulty": "hard" },
           { "id": "gull-nest", "prop": "plant", "label": "gull's nest", "look": "A messy nest. You take a feather, just in case.", "gives": "gull-feather", "minDifficulty": "hard" }
         ]
@@ -106,7 +107,8 @@
       "id": "lockbox",
       "title": "The Keeper's Lockbox",
       "kind": "code",
-      "prompt": "A lockbox with a 3-digit dial. Each of you remembers one fact from the keeper's logbook.",
+      "revealedBy": "spot:keepers-desk",
+      "prompt": "A lockbox with a {count}-digit dial. Each of you remembers one fact from the keeper's logbook.",
       "hints": ["Each phone holds one digit as a fact.", "Put the digits in order: first, second, third."],
       "rewards": ["locket"],
       "solvedText": "The lockbox opens. Inside: a silver locket on a chain.",
@@ -125,7 +127,7 @@
       "id": "bottle-shelf",
       "title": "The Bottle Shelf",
       "kind": "code",
-      "prompt": "Five bottles stand in a row on the shelf: {items}. The shelf's lock wants each bottle's place, far left is 1, in the order listed.",
+      "prompt": "Bottles stand in a row on the shelf: {items}. The shelf's lock wants each bottle's place, far left is 1, in the order listed.",
       "generator": { "type": "deduction", "words": ["red bottle", "blue bottle", "green bottle", "gold bottle", "white bottle"], "pieceTemplate": "Scratched on the shelf: {clue}" },
       "hints": ["Every phone has a clue about the bottles.", "Start with the bottle you're surest about.", "The code is {answer}."],
       "solvedText": "The shelf swings back like a door. The keeper's secret cupboard!"
@@ -153,6 +155,7 @@
       "id": "tide-marks",
       "title": "The Tide Marks",
       "kind": "code",
+      "revealedBy": "puzzle:lamp-lights",
       "prompt": "Tide marks are painted up the wall: {sequence}. The keypad wants the next one.",
       "generator": { "type": "sequence" },
       "hints": ["Look at how each number changes.", "The next number is {answer}."],
@@ -165,7 +168,7 @@
       "prompt": "A panel of lights by the door: each one flips itself and its neighbours. Turn them all on.",
       "generator": { "type": "switches" },
       "hints": ["Work from the top row down.", "Press {answer}."],
-      "solvedText": "Every light glows. The clockwork starts to tick."
+      "solvedText": "Every light glows. The clockwork starts to tick, and a little keypad slides out of the wall beside the tide marks."
     },
     {
       "id": "gull-signal",
@@ -186,6 +189,15 @@
       "hints": ["Three phones each remember one sea word.", "Say them in order, first to last."],
       "solvedText": "You fit the lens and say the words: {answer}! The lamp blazes into life.",
       "generator": { "type": "wordSequence", "count": 3, "words": ["anchor", "wave", "gull", "tide", "sail", "shell", "harbour", "compass", "rope", "starfish"], "pieceTemplate": "The keeper hummed a shanty: the {ordinal} word was {word}." }
+    },
+    {
+      "id": "lamp-door",
+      "title": "The Door to the Shore",
+      "kind": "code",
+      "prompt": "The door down to the shore has a {count}-digit keypad, and a note from the keeper: 'Every lock up here leaves its mark when it opens. Read them in the order on my brass plaque.'",
+      "hints": ["Every lock you opened in the lamp room left a mark and a number. The order is written up here.", "Search the brass plaque.", "The code is {answer}."],
+      "solvedText": "The keypad chimes, and the door down to the shore swings open.",
+      "generator": { "type": "final", "marks": ["⚓", "🐚", "🌊", "🦀", "⭐", "🐟", "🧭", "🔔"] }
     }
   ],
   "items": [

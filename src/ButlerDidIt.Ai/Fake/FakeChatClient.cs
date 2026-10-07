@@ -60,8 +60,8 @@ public sealed partial class FakeChatClient : IChatClient
             InspectorPrompts.VerdictTask => Verdicts(system),
             EscapePrompts.NarrationTask => $"Fake game master line for {Moment().Match(system).Groups[1].Value}: tick tock, my little guests.",
             EscapeRoomGenerator.WriteTask => Load("FakeEscapeRoom.json"),
-            // The two riddles, then the logic puzzle's code as the solver's fixed seed builds it (EscapeRoomGeneratorTests proves it).
-            EscapeRoomGenerator.SolveTask => """{"answers":{"1":"an echo","2":"map","3":"1423"}}""",
+            // The two riddles, then the logic puzzle's code and the final lock's, as the solver's fixed seed builds them (EscapeRoomGeneratorTests proves it).
+            EscapeRoomGenerator.SolveTask => """{"answers":{"1":"an echo","2":"map","3":"1423","4":"9460"}}""",
             EscapePrompts.HintTask => "The game master whispers: look again at what the phones in your hands are telling you.",
             _ => "OK",
         };
