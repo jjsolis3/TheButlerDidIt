@@ -659,6 +659,7 @@
       "id": "generator-wires",
       "title": "Generator 1: The Wires",
       "kind": "code",
+      "revealedBy": "spot:gen-wires",
       "prompt": "Generator 1 has a wire box with a {count}-digit lock. Its label says: '{order}!' Each of you peeked under the cover and counted one colour of wire.",
       "generator": {
         "type": "colorDigits",

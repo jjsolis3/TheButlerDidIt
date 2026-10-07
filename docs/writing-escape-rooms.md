@@ -123,6 +123,28 @@ The validator checks that:
 
 The **Pirate Ship** (edition 4) is the showcase. In the galley, the cook's pots turn up behind the stove and the spice chest behind the spice rack. In the cabin, the letter box is found on the letters wall, the lanterns' switches on the lanterns, and the desk drawer from a note in the letter box. On the deck, only the knot board is in sight: it opens to a bottle, the mast hides the flag locker, and on Hard, the crow's nest spots the lighthouse. Then the gangplank appears, built from all of them, with its order painted on the lifeboat.
 
+**Every built-in room** works this way since edition 4 (#143). The old exits, which asked the group to count three things around the room, are now final locks. The content tests (`ContentBarTests`) hold every room to this, at every length and difficulty: at least two locks to find, and a final lock.
+
+| Room | Locks to find (found by) | Final lock: order written on |
+|---|---|---|
+| The Pirate Ship | the cook's pots (stove), spice chest (spice rack), letter box (letters wall), lanterns, desk (the letters), flag locker (mast), bottle (the knot board), lighthouse on Hard (crow's nest) | the gangplank: the lifeboat |
+| The Workshop | the oil drums, tall cabinet, fuse box, trapdoor (doormat) | the steel door: the monitor |
+| The Asylum | the scratched wall (peeling paint), wheelchairs, light board (nurses' desk), staff locker, case file (the patient numbers) | the exit gate: the card index |
+| The Bunker | the decontamination log (clipboard), ration crate, tin labels, footlocker, countdown (the standing orders), switchboard | the blast door: the map table |
+| The Funhouse | the mirror line-up (wobbly mirror), balloon darts, fortune machine, carousel, ticket machine (holding the golden ticket) | the big gate: the costume trunk |
+| The Toy Factory | the tin soldiers (conveyor belt), colour lights, coat rack, parrot crate, delivery note (mail sack) | the loading door: the stacked crates |
+| The Wizard's Tower | the floating candles, Quill's code (spellbook stand), potion labels, rune stones, back-to-front stars (star chart) | the tower door: the star log |
+| The Night Shift | the camera log (supply locker), breaker panel (door buttons), band line-up (show stage), parts cabinet (workbench) | the front doors: the paint cans |
+| The Hologram Concert | the drum machine, light-up jacket (costume rack), glow sticks (crew locker), hit song (microphone stand) | curtain up: the floor marks |
+| The Hero Exam | the hero motto (trophy cabinet), siren (fire station door), team scoreboard, DO NOT PULL lever | the roof hatch: the blueprints |
+| The Last Round | the mystery box (item shop), generator 1's wires, generator 3's switch panel, the hunter's scribbles (old well), lost pet (notice board), gate lever, scribbled sign | the exit gate: the watchtower |
+| The Blocklands | the trading chest (trader's stall), ore wall (miners' vault), storeroom door, glow lamps | the portal: the armour stand |
+| The Black Notebook | the Scribe's diary (top drawer), lift footage, CCTV wall, victims' files, Sable's riddle (water tank), the railing, the true name (holding the notebook) | the stairwell door, in the incident room, so the true name stays the climax: the whiteboard |
+| The Graveyard Shift | table six, the missing posters, parts log (parts cage), spare suit, supervisor's locker (staff lockers), Walt's last tape (tape deck), office window | the service exit: the calendar |
+| The Last Login | the still avatars, leaderboard, generators one and two, ranger's logbook, README (admin console), error log | the exit gate: the wall of screens |
+
+A lock in brackets is found by searching that spot unless it says otherwise; one with no brackets is found on the spot of the same name. Some only play in longer games: a 30-minute game has two to four of them (five on the Pirate Ship on Hard).
+
 ## Replays: variants and generators
 
 A room plays differently every time. When a party is created, the server picks a **puzzle set**, a number used as the seed. `RoomVariants.Build(room, seed)` then fixes every puzzle for that game:
@@ -224,6 +246,8 @@ The AI only writes words. It never changes a puzzle, an answer or the clock.
 
 With a Storyteller model set up, a host can type a theme on the escape shelf ("a haunted lighthouse") and get a new room in this same format, on their own shelf only. The AI writes the story, the riddles and the villain, and it picks which generators fill the codes and passwords. So every code comes from the same proven templates as yours, and nothing it writes is saved unless the validator passes. A tester AI also has to crack each riddle from its prompt and pieces alone. A good hand-written room is still the best model: the AI is shown this format and follows the same rules, and every kind of puzzle here. Its rooms must have a scene in every stage, a search, something to look at or put together, a cipher, a logic puzzle, something for Hard, and few one-tap steps, and it never places the spots itself: the server lays them out. The tester also has to crack each logic puzzle from its clues, and each riddle from everything its part of the room shows. AI rooms come in one length, the one the host asked for.
 
+AI rooms have **locks to find and a final lock** too (#143). The AI must hide at least two locks with `revealedBy`, and end the last stage on a final lock with its own themed marks and its order written on a spot there. The validator proves they can all be found in time. The tester then gets each final lock as a Normal group would: the mark and digit every other lock in its stage leaves, listed in the stage's order rather than the code's, and everything that stage shows. It has to work out the code. If it can't, the AI is asked to write the order plainly on a spot and say so in the lock's prompt, the same single repair a missed riddle gets.
+
 ## Decoy keys
 
 A cipher with only one key has nothing to figure out: find the key, read the word. To make the group think, write the same `{key:<puzzle id>}` in two or three places. Each game picks one place for the real key, and a different one each puzzle set, so "the sill is always right" can't be learned. The other places get **decoy keys**:
@@ -268,7 +292,7 @@ The scene is laid out on the 1000 × 600 canvas with spots that don't overlap:
 - five hiding places, enough for a solo player's extra clue pieces at every difficulty;
 - the spots that matter.
 
-Across lengths and difficulties it plays 9 puzzles at 30 minutes, 13 at 45 and 15 at 60, plus Hard's extra. The validator plays every one of those through, 200 puzzle sets each, and the content tests check the room clears the bar for shipped rooms (`ContentBarTests`), including that no cipher word is already written somewhere in the room.
+Across lengths and difficulties it plays 10 puzzles at 30 minutes, 14 at 45 and 16 at 60, plus Hard's extra. (Edition 4 also hides four of its locks and makes the steel door a final lock: see *Locks to find, and a final lock*.) The validator plays every one of those through, 200 puzzle sets each, and the content tests check the room clears the bar for shipped rooms (`ContentBarTests`), including that no cipher word is already written somewhere in the room.
 
 The Family rooms (edition 2) follow the same shape with gentler parts: the Pirate Ship's apple-barrel riddle gives a ladle, the ladle fishes the galley key out of the stew pot, and a spyglass put together from a lens (a logic puzzle about the cook's pots) and a tube (a search) reads the shift cipher's key off a buoy far out at sea. Their ciphers are numbers (A = 1), mirror and shift with short words; symbols and Morse only turn up on Hard. Easy deals smaller logic puzzles and number patterns.
 
@@ -287,7 +311,7 @@ The themed rooms (#137), five for Families and three for Adults, show how to mak
 | The Graveyard Shift (Adults, 🎃) | the Maestro's parts log | table six's balloons | table six's seating plan | the relays | Walt's last tape | a hand crank for the Maestro's chest |
 | The Last Login (Adults, 🎃) | Nil's leaderboard | generator fuel cans | the still avatars on their pads | the generator breakers | the admin password | an admin keycard |
 
-The tools are the world's tools too: the night guard's flashlight for the dark vent, a UV hairclip for glow-in-the-dark writing, power gloves and X-ray goggles, a wrench for the server box, and a pickaxe and bucket (water on lava makes obsidian). The Adult rooms use a kettle for a key frozen in ice, a torch for under the water tank, a crowbar for boarded hatches and a wireframe lens that sees inside a game's walls. Each final lock needs something carried from every stage.
+The tools are the world's tools too: the night guard's flashlight for the dark vent, a UV hairclip for glow-in-the-dark writing, power gloves and X-ray goggles, a wrench for the server box, and a pickaxe and bucket (water on lava makes obsidian). The Adult rooms use a kettle for a key frozen in ice, a torch for under the water tank, a crowbar for boarded hatches and a wireframe lens that sees inside a game's walls. Each room's way out needs something carried from every stage.
 
 **Adults, not gore.** The Adult cuts keep the tone of the Asylum and the Bunker: dread, suspense and death on the table, but nothing graphic. Family rooms can't mention death at all (the validator refuses it), which is why the notebook thriller is Adults only.
 

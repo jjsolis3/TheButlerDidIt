@@ -575,6 +575,7 @@
       "id": "ration-crate",
       "title": "The Ration Crate",
       "kind": "code",
+      "revealedBy": "spot:ration-crate-spot",
       "prompt": "The ration crate has a {count}-digit padlock. Stamped on the lid: '{order}. All rations are counted.'",
       "rewards": [
         "field-manual"

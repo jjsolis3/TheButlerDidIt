@@ -5,7 +5,7 @@ namespace ButlerDidIt.Escape.Tests;
 /// <summary>
 /// The bar every rebuilt shipped room clears (#85), on top of the validator (which AI-written rooms face
 /// too): a scene to search in every stage, every kind of newer puzzle, enough puzzles for its length,
-/// few one-tap "use" steps, and more for Hard.
+/// few one-tap "use" steps, more for Hard, and locks to find with a final lock to end on.
 /// </summary>
 public class ContentBarTests
 {
@@ -16,8 +16,29 @@ public class ContentBarTests
 
     [Fact]
     public void Every_shipped_room_is_rebuilt() =>
-        // Edition 3: decoy cipher keys (the times before them don't compare).
-        Assert.All(Rooms.Library, r => Assert.True(r.Edition >= 3, $"{r.Id} is on edition 3"));
+        // Edition 4: locks to find and a final lock (#134, #143). The times before them don't compare.
+        Assert.All(Rooms.Library, r => Assert.True(r.Edition >= 4, $"{r.Id} is on edition 4"));
+
+    /// <summary>
+    /// Locks to find, and a final lock (#143): every game, at every length and difficulty, has at least two locks the group
+    /// has to find (one whose spot or puzzle the game leaves out doesn't count: it's in sight), and a final lock. That's
+    /// usually the exit, though a story can put it earlier (the Black Notebook's true name stays its climax). The validator
+    /// already proves each one can be found, and that a final lock has three parts or more.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(RebuiltRooms))]
+    public void Every_game_has_locks_to_find_and_a_final_lock(string id)
+    {
+        var room = Rooms.Get(id);
+        foreach (var minutes in room.PlayableLengths)
+            foreach (var difficulty in Enum.GetValues<EscapeDifficulty>())
+            {
+                var played = RoomLengths.Cut(RoomVariants.Build(room, 1, difficulty, cache: false), minutes, difficulty);
+                var hidden = played.Puzzles.Count(p => p.RevealedBy is not null);
+                Assert.True(hidden >= 2, $"{minutes} minutes on {difficulty}: {hidden} locks to find; aim for at least 2");
+                Assert.True(played.Puzzles.Any(p => p.Final is not null), $"{minutes} minutes on {difficulty}: a final lock");
+            }
+    }
 
     /// <summary>
     /// A cipher that needs a key has one place to find it on Easy, two on Normal and three on Hard: one real, the rest
