@@ -148,12 +148,22 @@ The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the hos
 - **The rules** (`PaidAccess`, pure and unit-tested): an active subscription counts until its renewal plus 2 days (the renewal's webhook can lag), a cancelled one until its paid period ends, a failed renewal for `Billing:GraceDays` from the day it was due, anything else not at all. A renewal that's due but unconfirmed is checked with Stripe before a host is told no (`RefreshIfDueAsync`), so a lost webhook never locks out a paying host.
 - **Plans** are the nine slots in `BillingPrices` (each game and both, monthly and yearly, and passes); a slot with no price isn't sold. Amounts come from Stripe (`BillingCatalog`, cached 10 minutes), and a subscription on an older price of the same Stripe product keeps its games. The admin's **Plans & billing** tab flags a price that can't be sold as set up (missing, archived, wrong mode, wrong kind or interval).
 - **One subscription per host**; changes go through the portal, which prorates. Bought during the free trial, a subscription's first payment waits for the trial's end (`subscription_data.trial_end`).
+- **The renewal terms where the host agrees** (#103): next to the plans, and on Stripe's page by the pay button (`CheckoutRequest.Notice`, sent as Checkout's `custom_text.submit`): how the plan renews or ends, and links to the terms and refund policy.
+
+**Terms, privacy and refunds** (`Legal/LegalPages.cs`, #103). `/terms`, `/privacy` and `/refunds` show Markdown files from `content/legal` (or `Legal:Folder`), through `GET /api/legal/{page}` (public):
+- **The owner edits words, not code.** Notes for the owner are HTML comments, stripped on the server, so they never reach a browser.
+- **The server fills in `{{…}}` words from the settings the site runs on**: the owner's name, contact and state (`Legal:*`), the trial, pass, grace and refund lengths, the retention days, and `{{ServiceProviders}}`, the outside services this site really uses (the AI companies with a role, Stripe when payments are on, email when it's set up, S3 storage, monitoring). A page can't promise one thing while the site does another.
+- **Starter drafts** start with a `<!-- starter draft` line. Until the owner deletes it (after a legal review), the admin sees a note on each page, and the overview's **Legal pages** check lists what's left (`LegalPages.Problem`). Missing details show as "[… not set yet]" rather than being papered over.
+- **The web app reads the Markdown itself** (`lib/markdown.tsx`): headings, paragraphs, lists, bold, italic and links, built as React elements, so nothing in a page can run as code, and links only go to this site, a web address or an email.
+- **Agreement:** the sign-up form says creating an account means agreeing to the terms and privacy policy, and `AppUser.TermsAcceptedAt` records when (it's in the data download).
 
 **Invites** (`InviteEndpoints.cs`, #97). While sign-ups are closed (the admin hub's switch, or `Auth:AllowRegistration=false`), a new host needs an invite link from the admin (`/login?invite=…`):
 - **Stored like seat tokens.** The link carries a random 256-bit token, and the database keeps only its SHA-256 hash. The admin's list never shows a link again, and a copy of the database can't be used to sign up.
 - **Used once, in the sign-up's own transaction.** `POST /api/auth/register` claims the invite with one `UPDATE … WHERE UsedAt IS NULL` inside the transaction that creates the account. The UPDATE locks the row, so if two people use one link at the same moment, the second waits, then finds it used. If creating the account fails (a weak password, an email already taken), the rollback leaves the invite unused.
 - **Optional limits:** an invite can be for one email address only (compared the way Identity normalises emails), and it expires after 1 to 30 days.
 - **No separate "closed" mode.** An invite works whether or not sign-ups are open. An admin who wants no new hosts simply makes no invites.
+
+**The sign-up check** (`Auth/HumanCheck.cs`, #103). With `Turnstile:SiteKey` and `Turnstile:SecretKey` set, the sign-up form shows Cloudflare's Turnstile widget (`components/Turnstile.tsx`, which loads Cloudflare's script only then), and `POST /api/auth/register` sends its one-time token to Cloudflare's `siteverify` before anything else. No answer from Cloudflare means no account. Behind `IHumanCheck`, like `IEmailSender`: `TurnstileCheck`, or `NoHumanCheck` without keys; tests swap in their own.
 
 **The admin hub** (`/admin`, #102). One frame (`Admin.tsx`) with a tab bar, each tab its own address, drawn through a nested route and `<Outlet/>`:
 
@@ -373,6 +383,13 @@ Piper and Stable Diffusion are logged as free, like Ollama. "Test connection" on
 Selfies record their `PartyId`, deliberately without a foreign key: removing the database row must also remove the file on disk, which only application code can do. A replaced or removed selfie is deleted immediately. Generated voices and pictures are shared between parties, so they are never deleted with a party.
 
 Clearing selfie URLs from a finished game goes through the engine (`SetPlayerPhoto`) like any other state change, so the saved state never points at a deleted file.
+
+## 12b. Monitoring (#103)
+
+- **Errors and performance:** OpenTelemetry (`Monitoring/Telemetry.cs`), on only when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. Traces (ASP.NET Core requests, outgoing HTTP, Npgsql commands), metrics (requests, HTTP, runtime, Npgsql) and logs go to one OTLP endpoint through `UseOtlpExporter`, which reads the standard `OTEL_*` variables. Vendor-neutral, so the service is a setting.
+- **Kept out of it:** the visitor's IP address and user agent (removed when each request's trace starts), query strings on outgoing calls (an API key can travel in one), and `/healthz`. The logs already never name anyone.
+- **Uptime:** `/healthz` is ASP.NET Core's health check with a database check (`AddDbContextCheck`), for Coolify and an outside checker.
+- **Alerts** (`Monitoring/AlertWorker.cs`): every hour (one server, the `alerts` cluster lock), AI spending (`AiUsage`) and failed payments (`BillingEvents` of type `invoice.payment_failed`) in the last 24 hours are compared with the week before's daily average (`AlertRules.Jumped`: over a minimum, and more than 3 times a usual day). A jump is stored (`Alerts`, kept 90 days), logged as a warning, emailed to the admins, and listed on the admin overview. Each kind at most once a day.
 
 ## 13. Running more than one server
 

@@ -73,7 +73,10 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
         using (var scope = scopes.CreateScope())
         {
             var cutoff = at.AddDays(-90);
-            await scope.ServiceProvider.GetRequiredService<AppDbContext>().BillingEvents.Where(e => e.ReceivedAt < cutoff).ExecuteDeleteAsync(ct);
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await db.BillingEvents.Where(e => e.ReceivedAt < cutoff).ExecuteDeleteAsync(ct);
+            // The admin's alerts (#103), for the same reason.
+            await db.Alerts.Where(a => a.RaisedAt < cutoff).ExecuteDeleteAsync(ct);
         }
         return new Result(deleted, pruned, photos);
     }

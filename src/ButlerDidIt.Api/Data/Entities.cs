@@ -26,6 +26,12 @@ public sealed class AppUser : IdentityUser
     /// </summary>
     [MaxLength(255)]
     public string? BillingCustomerId { get; set; }
+
+    /// <summary>
+    /// When the host agreed to the terms and privacy policy (#103): at sign-up, where the form says that creating an
+    /// account means agreeing. Null for accounts made before it was recorded.
+    /// </summary>
+    public DateTimeOffset? TermsAcceptedAt { get; set; }
 }
 
 /// <summary>
@@ -186,6 +192,24 @@ public sealed class BillingEventEntity
     public string? CustomerId { get; set; }
 
     public DateTimeOffset ReceivedAt { get; set; }
+}
+
+/// <summary>
+/// Something the admin should look at (#103), raised by <c>AlertWorker</c>: AI spending or failed payments that jumped.
+/// Emailed to the admin and shown on the admin hub's overview; kept 90 days.
+/// </summary>
+public sealed class AlertEntity
+{
+    public Guid Id { get; set; }
+
+    /// <summary>What kind of jump, e.g. "ai-spend": one of a kind a day at most.</summary>
+    [MaxLength(40)]
+    public required string Kind { get; set; }
+
+    [MaxLength(500)]
+    public required string Message { get; set; }
+
+    public DateTimeOffset RaisedAt { get; set; }
 }
 
 public sealed class ThemeEntity

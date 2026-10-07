@@ -45,7 +45,10 @@ export function Field({ label, children, hint }: { label: string; children: Reac
 export const inputClass =
   'w-full rounded-lg border border-line bg-bg px-3 py-2.5 text-base text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none'
 
-/** The page frame: the logo, the account menu (off on a shared game screen) and the content. */
+/**
+ * The page frame: the logo, the account menu, the content, and the terms, privacy and refund links (#103). A shared game
+ * screen (`account={false}`) keeps only the logo and the content.
+ */
 export function Shell({ children, wide = false, account = true }: { children: ReactNode; wide?: boolean; account?: boolean }) {
   return (
     <div className="grain min-h-dvh">
@@ -56,6 +59,21 @@ export function Shell({ children, wide = false, account = true }: { children: Re
         {account && <AccountMenu />}
       </header>
       <main className={`mx-auto px-4 pb-16 ${wide ? 'max-w-6xl' : 'max-w-2xl'}`}>{children}</main>
+      {account && (
+        <footer className="no-print mx-auto max-w-6xl px-4 pb-8">
+          <nav aria-label="Site policies" className="flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-4 text-xs text-muted">
+            <Link to="/terms" className="hover:text-ink hover:underline">
+              Terms
+            </Link>
+            <Link to="/privacy" className="hover:text-ink hover:underline">
+              Privacy
+            </Link>
+            <Link to="/refunds" className="hover:text-ink hover:underline">
+              Refunds
+            </Link>
+          </nav>
+        </footer>
+      )}
     </div>
   )
 }

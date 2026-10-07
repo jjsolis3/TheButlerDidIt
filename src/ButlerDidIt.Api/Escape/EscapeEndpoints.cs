@@ -201,18 +201,23 @@ public static class EscapeEndpoints
             EscapeCatalog rooms, AppDbContext db, PartyService parties, CancellationToken ct) =>
         {
             if (await rooms.FindAsync(db, id, ct) is not { } room) return Results.NotFound();
+            var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var playing = party is null ? null : await parties.FindByCodeAsync(party, ct);
+            var playsIt = playing is { Kind: GameKind.EscapeRoom } && playing.ScenarioId == id;
+            // A host's own room is on nobody else's shelf, so neither is its board (#103): it's for its owner, and for the
+            // screens of a party playing it (the TV and anyone watching send the party's code). Someone else's looks unknown.
+            if (rooms.Find(id) is null && !playsIt && !await db.EscapeRooms.AnyAsync(r => r.Id == id && (r.Shared || r.OwnerUserId == hostId), ct))
+                return Results.NotFound();
             var level = EscapeDifficulty.Normal;
             if (difficulty is not null && (!Enum.TryParse(difficulty, ignoreCase: true, out level) || !Enum.IsDefined(level) || int.TryParse(difficulty, out _)))
                 return Results.Problem("The difficulty is easy, normal or hard.", statusCode: 400);
-            var hostId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var today = PuzzleSets.For(PuzzleChoice.Daily, null, parties.Now).Seed;
 
             var results = db.EscapeResults.AsNoTracking().Where(r => r.RoomId == id && r.Escaped).AtLength(room, minutes ?? room.TimeLimitMinutes).AtDifficulty(level).AtEdition(room);
             if (daily == true) results = results.Where(r => r.Daily && r.Seed == today);
             var ranked = results.OrderBy(r => r.Score).ThenBy(r => r.FinishedAt);
 
-            Guid? partyId = null;
-            if (party is not null && await parties.FindByCodeAsync(party, ct) is { } p && p.HostUserId == hostId) partyId = p.Id;
+            Guid? partyId = playing is not null && playing.HostUserId == hostId ? playing.Id : null;
 
             LeaderboardEntry Entry(EscapeResult r, int rank) => new(rank, r.Score, r.ElapsedSeconds, r.HintsUsed, r.PlayerCount, r.FinishedAt,
                 Mine: hostId is not null && r.HostUserId == hostId,

@@ -215,7 +215,13 @@ function CostumeSelfie({ token, photoUrl }: { token: string; photoUrl: string | 
       )}
       <div className="min-w-0 space-y-1">
         <p className="text-xs font-semibold tracking-wider text-accent uppercase">Costume selfie</p>
-        <p className="text-xs text-muted">Show off your outfit on the big screen. Optional.</p>
+        <p className="text-xs text-muted">
+          Show off your outfit on the big screen. Optional, and deleted after the party. Under 13? Ask a grown-up first.{' '}
+          {/* A new tab, so the guest doesn't leave the game to read it. */}
+          <a href="/privacy#costume-selfies" target="_blank" rel="noopener" className="underline hover:text-ink">
+            How we keep photos
+          </a>
+        </p>
         <div className="flex flex-wrap gap-2">
           <label className={`cursor-pointer text-sm text-accent underline ${busy ? 'pointer-events-none opacity-50' : ''}`}>
             {busy ? 'Uploading…' : photoUrl ? 'Retake' : 'Take a selfie'}

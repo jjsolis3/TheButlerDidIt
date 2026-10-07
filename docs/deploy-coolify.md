@@ -48,7 +48,26 @@ To let hosts reset a forgotten password themselves, add SMTP settings from any e
 | `SMTP_FROM` | `The Butler Did It <butler@example.com>` |
 | `REQUIRE_CONFIRMED_EMAIL` | `true` to make new hosts click the link in their welcome email before creating parties |
 
+**Making sure it reaches inboxes, not spam.** Mail providers trust email that proves it comes from your domain. Before real hosts sign up:
+1. **Use a transactional email provider** (Postmark, Resend, Amazon SES, Mailgun, Brevo…), not a personal Gmail account: they're built for confirmation and reset emails, and keep a good sending reputation.
+2. **Send from your own domain**, e.g. `SMTP_FROM` = `The Butler Did It <butler@yourdomain.com>`, and verify that domain with the provider.
+3. **Add the DNS records the provider shows you** (in your DNS host, e.g. Cloudflare):
+   - **SPF**, a `TXT` record on the domain listing who may send for it, e.g. `v=spf1 include:<the provider's domain> ~all`. A domain has only one SPF record, so if you already have one (for your own mailbox), add the provider's `include:` to it rather than adding a second;
+   - **DKIM**, usually two or three `CNAME` or `TXT` records: the provider signs each email, and these let inboxes check the signature;
+   - **DMARC**, a `TXT` record at `_dmarc.yourdomain.com` that tells inboxes what to do with mail that fails those checks. Start with `v=DMARC1; p=none; rua=mailto:you@yourdomain.com` to get reports, and move to `p=quarantine` once everything passes;
+   - a **custom return-path** (or "bounce domain"), if the provider offers one, so SPF lines up with your domain too.
+4. **Check it:** use **Forgot your password?** to send yourself an email, open it in Gmail and choose **Show original**. SPF, DKIM and DMARC should each say `PASS`. [mail-tester.com](https://www.mail-tester.com) gives a score as well.
+
+The site sends: email confirmations, password resets, email-change links, invites, and alerts to the admin. **Receipts and payment emails come from Stripe**, not from the site. In Stripe, turn on receipts for successful payments and refunds under **Settings → Customer emails**, and the reminders before a renewal and after a failed payment under **Settings → Billing → Subscriptions and emails** (some states require a reminder before a yearly plan renews). Set your support address and branding there too.
+
 **Without email**, the sign-in page tells hosts to ask the admin. The admin opens **Admin hub → Hosts** from the account menu (their name, top right) and presses **Make a reset link**, then sends the link to the host. It works once, for 3 hours.
+
+### Optional: a check that new hosts are people (Cloudflare Turnstile)
+Once anyone can sign up, scripts can make accounts too, each with a free trial (and its AI budget). Sign-ups are already limited per address (`RateLimits__RegisterPerHour`, 10) and can require a confirmed email. To check that a person is filling in the form as well, use Cloudflare's **Turnstile**, which is free and usually needs no clicking:
+1. In the Cloudflare dashboard, open **Turnstile → Add widget**, name it, add your domain (and `localhost` to try it locally), and choose **Managed**.
+2. Copy the **site key** into `TURNSTILE_SITE_KEY` and the **secret key** into `TURNSTILE_SECRET_KEY` (mark it as a secret), and redeploy. For a Dockerfile application, the names are `Turnstile__SiteKey` and `Turnstile__SecretKey`.
+
+The sign-up form then shows the widget and its button waits for it; the server checks each answer with Cloudflare, and refuses the sign-up if Cloudflare can't be reached. Signing in isn't checked. The privacy policy lists Cloudflare by itself, and **Admin hub → Overview** shows the check is on. With only one of the two keys, it stays off.
 
 ### Optional: AI game master
 To switch on AI (generated mysteries, NPCs you can question, hints and verdicts), add `AI_PROVIDER_NAME`, `AI_PROVIDER_KIND`, `AI_PROVIDER_API_KEY` and the three `AI_*_MODEL` variables, as in `.env.example`. You can also skip these and set everything up later on the **Admin → AI** page. See [ai-setup.md](ai-setup.md).
@@ -96,6 +115,9 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 | `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room or a mystery, in MB. |
 | `Media__UploadQuotaMb` | `2048` | Optional: how much each host can upload in all, for both games, in MB. The admin has no limit. |
 | `Billing__Stripe__SecretKey`, `Billing__Stripe__WebhookSecret`, `Billing__Prices__BothMonthly`… | as in [Payments with Stripe](#payments-with-stripe) | Optional: selling plans. The table there gives each one's app name. |
+| `Legal__OperatorName`, `Legal__ContactEmail`, `Legal__State`… | as in [Terms, privacy and refunds](#terms-privacy-and-refunds) | Who runs the site, as the terms and privacy pages name it. Set them before charging anyone. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS`… | as in [Monitoring](#monitoring) | Optional: errors and timings sent to an OpenTelemetry service. |
+| `Turnstile__SiteKey`, `Turnstile__SecretKey` | from Cloudflare Turnstile | Optional: the sign-up form checks that a person is filling it in. See *Optional: a check that new hosts are people* above. |
 
 The Dockerfile already sets the port (8080), the content folder and the data folders. Untick **Buildtime** on secrets such as the connection string: the app only reads them when it runs.
 
@@ -103,7 +125,7 @@ The Dockerfile already sets the port (8080), the content folder and the data fol
 
 If the site is behind Cloudflare's proxy (the orange cloud), its free plan refuses uploads over 100 MB, so leave `Media__MaxVideoMb` at 100 or less.
 
-**3. Health check and backups.** In **Healthcheck**, set the path to `/healthz` and the port to `8080`, so Coolify knows when the app is really up. The Compose stack's nightly `backup` service isn't there, so turn on **Scheduled Backups** on the PostgreSQL database resource instead.
+**3. Health check and backups.** In **Healthcheck**, set the path to `/healthz` and the port to `8080`, so Coolify knows when the app is really up. The Compose stack's nightly `backup` service (and its restore check) isn't there, so turn on **Scheduled Backups** on the PostgreSQL database resource instead, and turn on Coolify's notifications for failed backups. Test a restore yourself every few months: restore the newest backup into a new database resource and point a copy of the app at it.
 
 **Troubleshooting a deploy that rolls back:**
 - **`curl: not found` / `wget: not found`, then "New container is unhealthy".** Coolify checks the health by running `curl` inside the container. Images built before curl was added to the Dockerfile don't have it, so the check fails even though the app is fine. Update to the current code, or switch the health check off until you do. CI checks that curl is in the image, so this can't come back unnoticed.
@@ -140,6 +162,29 @@ Back up the `media` volume too: the database only records where each picture and
 
 **To take a backup right now:** open a terminal on the `backup` service in Coolify and run `/backup.sh`.
 
+### Every backup is test-restored
+
+A backup nobody has restored is only a hope. So straight after each nightly dump, the `backup` service restores it into a scratch database next to the real one (`butlerdidit_restore_check`), checks it, and drops the copy (`deploy/backup/check-restore`, built into the service's image). It fails when:
+- the dump doesn't restore (a broken or truncated file);
+- the app's own tables are missing or empty (the migrations, the host accounts, the mysteries);
+- it holds far fewer host accounts than the live database (the wrong database, or an empty one);
+- or, run by hand, the newest dump is more than 30 hours old (`RESTORE_CHECK_MAX_AGE_HOURS`): backups have stopped.
+
+Each night's result is in the `backup` service's logs, e.g. *Backup restore check passed: … AspNetUsers 12 (now 12), Parties 40 (now 41), … Last migration: 20261007211228_Alerts.*
+
+**Get told when it fails** (or when backups stop altogether). A free [Healthchecks.io](https://healthchecks.io) check is made for this. Create one with a period of 1 day and a grace time of a few hours, then set:
+
+| Variable | Value |
+|---|---|
+| `BACKUP_OK_URL` | the check's ping URL, `https://hc-ping.com/<uuid>`: called after a backup that passed its check |
+| `BACKUP_FAILED_URL` | the same URL with `/fail` on the end: called when the backup or its check failed |
+
+Healthchecks.io then emails you on a failure, and also when no backup arrives at all, which a failure alert alone can't catch. An Uptime Kuma **Push** monitor works too: its push URL with `?status=up` and `?status=down`, and a heartbeat interval of 25 hours.
+
+**To run the check by hand:** in the `backup` service's terminal, run `/hooks/50-check-restore` (the newest dump), or `/hooks/50-check-restore check /backups/daily/<file>` (any other).
+
+A full restore drill, with the app started on the restored copy, is still worth doing once or twice a year, following the steps below on a spare server.
+
 ### Restoring from a backup
 
 1. Stop the `app` service so nothing writes while you restore.
@@ -152,7 +197,7 @@ Back up the `media` volume too: the database only records where each picture and
 
 3. Start `app` again. It applies any newer migrations on startup, so an older backup works with a newer version of the app.
 
-These steps were tested by restoring a dump from the `backup` image into a fresh database. The row counts matched, and the app started healthy on the restored copy.
+These steps were tested by restoring a dump from the `backup` image into a fresh database. The row counts matched, and the app started healthy on the restored copy. The nightly check above does the restore part every night.
 
 ### Automatic clean-up
 
@@ -180,6 +225,54 @@ One server comfortably runs many parties at once, so most hosts never need this.
 **Moving existing media to S3:** copy the `media` volume into the bucket, keeping the folder layout (`2026-09/…`), for example with `rclone copy /path/to/media r2:your-bucket`. The database stores each file's path, so the same paths work in the bucket.
 
 Files are always served through the app (`/media/assets/…`), so the bucket can stay private. For now the app reads a file from the bucket whole before serving it, which is fine for pictures and voices but slow for large uploaded videos; the local volume streams them from disk (#119).
+
+## Monitoring
+
+Three things tell you when something's wrong, so you hear about it before your hosts do.
+
+### 1. Is the site up? (uptime checks)
+
+`https://your.domain/healthz` answers `Healthy` when the app is running and can reach its database, and an error otherwise. Coolify's own health check restarts a stuck container, but doesn't tell you. Point an uptime checker at the address too:
+- **Uptime Kuma** runs on your own server: Coolify can add it in one click. Add an HTTP monitor for `/healthz`, checking every minute, and a notification (email, Telegram, Discord…).
+- **A hosted one** (UptimeRobot, Better Stack…) is better still, because it notices when the whole server is down. Their free plans check every few minutes.
+
+Check from outside the server where you can: a checker on the same machine goes down with it.
+
+### 2. What went wrong? (errors and performance, with OpenTelemetry)
+
+The app can send its errors, logs and timings to any service that speaks **OpenTelemetry** (OTLP): Honeycomb, Grafana Cloud, Axiom, SigNoz, Uptrace, or a collector of your own. You see each request with the database queries and calls to AI providers and Stripe inside it, the exceptions with their stack traces, and the app's logs, all searchable. Switching service is a matter of settings.
+
+It's off until you set the endpoint. On the service's "OpenTelemetry" or "OTLP" page, copy:
+
+| Compose variable (and app setting) | Value |
+|---|---|
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | the OTLP address, e.g. `https://api.honeycomb.io` |
+| `OTEL_EXPORTER_OTLP_HEADERS` | the key it asks for, as `name=value`, e.g. `x-honeycomb-team=your-key`. Mark it as a secret. |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc` (the default) or `http/protobuf`, whichever the service says |
+| `OTEL_SERVICE_NAME` | how the app is named there (`butler-did-it`) |
+| `LEGAL_MONITORING_PROVIDER` (`Legal__MonitoringProvider`) | the service's name, for the privacy policy's list, e.g. `Honeycomb` |
+
+These are OpenTelemetry's standard names, so a Dockerfile application uses the same ones.
+
+**What's sent, and what isn't.** Requests are sent without the visitor's IP address or browser details, calls to other services without their query strings, and the app's logs never contain names, email addresses or what people type. Uptime checks of `/healthz` aren't traced. Once it's on, the privacy policy's list of services says so by itself.
+
+Set up an alert there for errors (for example, "more than 5 errors in 10 minutes") and you'll hear about a broken release straight away.
+
+### 3. Did something jump? (the site's own alerts)
+
+Every hour, the app compares the last 24 hours with a usual day (the average of the week before), and tells the admin when:
+- **AI spending jumped:** a leaked key, or a host running up costs. It shows how much, and **Admin hub → AI** shows who and what.
+- **Failed payments jumped:** cards suddenly failing, or something wrong with Stripe.
+
+Each alert is emailed to every admin account (when email is set up) and listed at the top of **Admin hub → Overview** for a week. A kind of alert is sent at most once a day, and a "jump" is measured against your own usual day, so a growing site isn't alerted all the time.
+
+| Compose variable | App setting | Value |
+|---|---|---|
+| `ALERT_AI_SPEND_MIN_USD` | `Alerts__AiSpendMinUsd` | never alert below this much AI spending in a day ($5) |
+| `ALERT_FAILED_PAYMENTS_MIN` | `Alerts__FailedPaymentsMin` | never alert below this many failed payments in a day (3) |
+| `ALERT_EMAIL` | `Alerts__Email` | where to send them; empty: every admin account |
+| | `Alerts__AiSpendFactor`, `Alerts__FailedPaymentsFactor` | how many times a usual day counts as a jump (3) |
+| | `Alerts__IntervalMinutes` | how often to check (60); `0` turns the alerts off |
 
 ## Payments with Stripe
 
@@ -244,12 +337,48 @@ Under **Settings → Billing → Subscriptions and emails**, choose what happens
 If a webhook ever goes missing, the site still checks with Stripe when a renewal is overdue. You can also press **Sync** next to the host.
 
 ### 6. Going live
-1. Finish the readiness checklist (#103): terms, a privacy policy and a refund policy, which Stripe asks for.
+1. Get the [terms, privacy and refund pages](#terms-privacy-and-refunds) ready: Stripe asks for them, and so does the law.
 2. Activate your Stripe account.
 3. In live mode, create the same products and prices, add the live webhook endpoint, and save the live customer portal.
 4. Swap in the live secret key, the live webhook secret and the live price ids, then redeploy.
 
-**Refunds** are made in the Stripe dashboard. Refunding a subscription's payment doesn't cancel it: cancel the subscription there as well, and the host's games end when it does. A refunded party pass runs out on its own within its hours (#147 would end it at once).
+**Refunds** are made in the Stripe dashboard. Refunding a subscription's payment doesn't cancel it: cancel the subscription there as well, and the host's games end when it does. A refunded party pass runs out on its own within its hours (#147 would end it at once). The site's [refund policy](#terms-privacy-and-refunds) says when you give one.
+
+## Terms, privacy and refunds
+
+The site has a **Terms of Service** (`/terms`), a **Privacy Policy** (`/privacy`) and a **Refund Policy** (`/refunds`). They're linked:
+- at the foot of every page;
+- on the sign-up form, which says that creating an account means agreeing to the terms and privacy policy (the moment each host agreed is recorded, and is in their data download);
+- next to the plans on **Your account**, with the renewal terms;
+- on Stripe's payment page, by the pay button: how the plan renews or ends, and the links to the terms and refund policy.
+
+**They are starter drafts, not legal advice.** They were written for this site as it works today, for customers in the United States, with a 14-day refund for an unused payment. Before you charge anyone, have a lawyer review them. The privacy policy's "Children" section matters most: Family games are meant to be played by children as guests, and a photo of a child is personal information under COPPA. Lines starting `REVIEW:` in the files are questions for your lawyer; they never reach a browser. #149 is the checklist, and #150 a possible change for selfies at Family parties.
+
+**1. Your details.** The pages name you, so set these. Until they're set, the pages show "[… not set yet]" in their place, and the admin hub's overview (**Legal pages**) lists what's missing.
+
+| Compose variable | App setting (Dockerfile application) | Value |
+|---|---|---|
+| `LEGAL_OPERATOR_NAME` | `Legal__OperatorName` | who runs the site: your name, or your business's ("Butler Games LLC") |
+| `LEGAL_CONTACT_EMAIL` | `Legal__ContactEmail` | where people write about their account, their data or a refund |
+| `LEGAL_STATE` | `Legal__State` | the US state whose law governs the terms, usually where you're based |
+| `REFUND_DAYS` | `Legal__RefundDays` | days after a payment in which an unused one is refunded in full (14) |
+| `LEGAL_HOSTING_PROVIDER`, `LEGAL_EMAIL_PROVIDER`, `LEGAL_STORAGE_PROVIDER` | `Legal__HostingProvider`, `Legal__EmailProvider`, `Legal__StorageProvider` | optional: the companies behind your server, your email and (with `MEDIA_STORAGE=S3`) your file storage, e.g. "Hetzner", "Postmark", "Cloudflare R2". Left empty, the privacy policy says "our hosting provider" and so on. |
+
+**2. What fills itself in.** Everything else the pages say about how the site works comes from its own settings, so the pages can't drift from the truth: the trial length, the pass hours, the grace days after a failed payment, the refund days, how long parties and selfies are kept (`Retention__…`), and the list of outside services in the privacy policy. That list names Stripe only when payments are on, the email service only when email is set up, and the AI companies you've given a role under **Admin hub → AI** (Anthropic, OpenAI, Google, ElevenLabs; self-hosted models are described as such). Change a setting and the pages follow.
+
+**3. Review, then mark them reviewed.** Each file starts with a line `<!-- starter draft: … -->`. Once a page has been reviewed, delete that line: the **Legal pages** check turns green when all three are done. Until then, you (and only you) see a "starter draft" note at the top of each page.
+
+**Editing the pages.** They're Markdown files in `content/legal/` (`terms.md`, `privacy.md`, `refunds.md`):
+- headings (`#`, `##`), paragraphs, lists, `**bold**`, `_italic_` and links (`[Privacy Policy](/privacy)`) are shown; anything fancier appears as plain text;
+- notes between `<!--` and `-->` are removed before the page is sent, so they're for you alone;
+- `{{Operator}}`, `{{ContactEmail}}`, `{{State}}`, `{{SiteName}}`, `{{SiteUrl}}`, `{{TrialDays}}`, `{{PassHours}}`, `{{GraceDays}}`, `{{RefundDays}}`, `{{IdlePartyDays}}`, `{{FinishedPartyDays}}`, `{{BackupMonths}}` and `{{ServiceProviders}}` are filled in by the server. A misspelt one shows as it is, so you'll spot it.
+
+Commit and redeploy to publish a change. To edit them on the server instead, mount a folder (a Coolify **Persistent Storage** volume), copy the three files into it, and set `Legal__Folder` to its path (e.g. `/data/legal`).
+
+**4. In Stripe:**
+- Under **Settings → Business → Public details**, add the addresses of your terms and privacy pages (`https://your.domain/terms`, `https://your.domain/privacy`): Stripe shows them on receipts and its pages.
+- **United States only:** the terms say hosts must live in the US. To refuse cards issued elsewhere, add a Radar rule such as `Block if :card_country: != 'US'` (**More → Radar → Rules**; custom rules may need Radar for Fraud Teams).
+- **Giving a refund:** see **Refunds** at the end of [Payments with Stripe](#payments-with-stripe). To check a payment was unused, **Admin hub → Hosts** shows when each host last made a party: if that's before the payment, nothing was started with it.
 
 ## Updating
 

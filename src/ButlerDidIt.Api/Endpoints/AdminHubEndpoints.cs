@@ -22,7 +22,11 @@ public sealed record AdminOverview(
     AdminAiSpend Ai,
     AdminRatings Ratings,
     SignUpsView SignUps,
-    AdminServerView Server);
+    AdminServerView Server,
+    IReadOnlyList<AdminAlert> Alerts);
+
+/// <summary>A jump in AI spending or failed payments in the last 7 days (#103), newest first.</summary>
+public sealed record AdminAlert(string Kind, string Message, DateTimeOffset RaisedAt);
 
 /// <param name="Active">Hosts who created a party in the last 30 days.</param>
 public sealed record AdminHostCounts(int Total, int NewThisWeek, int NewThisMonth, int Active);
@@ -58,8 +62,10 @@ public sealed record SignUpsRequest(bool? Open);
 /// <param name="Payments">"Stripe", "Fake", or null when payments are off (#101).</param>
 /// <param name="PaymentsLive">Stripe with live keys: real cards are charged.</param>
 /// <param name="PaymentsProblem">Something stopping payments from working, in words the admin can act on.</param>
+/// <param name="LegalProblem">What's left to do on the terms, privacy and refund pages (#103), or null when they're ready.</param>
+/// <param name="SignUpCheck">The sign-up form checks that a person is filling it in (Cloudflare Turnstile, #103).</param>
 public sealed record AdminServerView(bool EmailEnabled, string MediaStorage, long MediaBytes, int MediaFiles, bool SeveralServers, int AiProviders, IReadOnlyList<AiRole> AiRoles,
-    string? Payments, bool PaymentsLive, string? PaymentsProblem);
+    string? Payments, bool PaymentsLive, string? PaymentsProblem, string? LegalProblem, bool SignUpCheck);
 
 /// <summary>Where a mystery or room came from.</summary>
 public enum ContentOrigin
@@ -113,7 +119,8 @@ public static class AdminHubEndpoints
         var admin = app.MapGroup("/api/admin").RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(RequireAdmin);
 
         admin.MapGet("/overview", async (AppDbContext db, TimeProvider clock, IOptions<AuthOptions> auth, IOptions<AiOptions> ai,
-            IOptions<MediaOptions> media, IOptions<ScaleOptions> scale, IEmailSender email, ButlerDidIt.Api.Billing.BillingSetup billing, CancellationToken ct) =>
+            IOptions<MediaOptions> media, IOptions<ScaleOptions> scale, IEmailSender email, ButlerDidIt.Api.Billing.BillingSetup billing,
+            ButlerDidIt.Api.Legal.LegalPages legal, IHumanCheck human, CancellationToken ct) =>
         {
             var now = clock.GetUtcNow();
             var weekAgo = now.AddDays(-7);
@@ -173,9 +180,13 @@ public static class AdminHubEndpoints
                 billing.Provider?.LiveMode ?? false,
                 billing.Problem ?? (billing.Provider is { CanVerifyWebhooks: false }
                     ? "The webhook signing secret (Billing__Stripe__WebhookSecret) isn't set, so payments can't reach hosts' accounts."
-                    : null));
+                    : null),
+                legal.Problem(),
+                human.SiteKey is not null);
 
-            return new AdminOverview(hosts, plans, parties, weeks, spend, ratings, await SignUpsAsync(db, auth.Value, email, now, ct), server);
+            var alerts = await db.Alerts.AsNoTracking().Where(a => a.RaisedAt > weekAgo).OrderByDescending(a => a.RaisedAt)
+                .Select(a => new AdminAlert(a.Kind, a.Message, a.RaisedAt)).ToListAsync(ct);
+            return new AdminOverview(hosts, plans, parties, weeks, spend, ratings, await SignUpsAsync(db, auth.Value, email, now, ct), server, alerts);
         });
 
         admin.MapGet("/games", async (AppDbContext db, EscapeCatalog catalog, TimeProvider clock, CancellationToken ct) =>

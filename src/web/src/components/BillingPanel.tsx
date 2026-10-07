@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { formatPrice, planGames } from '../lib/access'
 import { api } from '../lib/api'
 import type { AccessView, BillingView, PlanInterval, PlanOfferView } from '../lib/types'
@@ -113,7 +113,10 @@ export function BillingPanel({ access }: { access: AccessView }) {
                   </li>
                 ))}
             </ul>
-            <p className="text-xs text-muted">Payments are taken by Stripe. Cancel any time from Manage billing: you keep your games until the end of what you've paid for.</p>
+            <p className="text-xs text-muted" data-testid="renewal-terms">
+              A subscription renews automatically, every {every === 'year' ? 'year' : 'month'} at the price shown, until you cancel. Cancel any time from
+              Manage billing: you keep your games until the end of what you've paid for. Payments are taken by Stripe. <Agreeing />
+            </p>
           </Card>
         )}
 
@@ -122,6 +125,9 @@ export function BillingPanel({ access }: { access: AccessView }) {
             <h3 className="font-semibold">🎟️ Party pass</h3>
             <p className="text-sm text-muted">
               {view.passHours} hours of hosting from the moment you pay. Paid once: nothing to cancel.
+            </p>
+            <p className="text-xs text-muted">
+              <Agreeing />
             </p>
             <div className="flex flex-wrap gap-2">
               {passes.map((p) => (
@@ -137,6 +143,23 @@ export function BillingPanel({ access }: { access: AccessView }) {
         <ErrorText>{error}</ErrorText>
       </div>
     </section>
+  )
+}
+
+/** Next to every way to pay (#103): what choosing a plan agrees to, and where the refund rules are. */
+function Agreeing() {
+  return (
+    <>
+      By choosing a plan you agree to our{' '}
+      <Link to="/terms" className="underline hover:text-ink">
+        Terms of Service
+      </Link>
+      . Not using it after all? See our{' '}
+      <Link to="/refunds" className="underline hover:text-ink">
+        Refund Policy
+      </Link>
+      .
+    </>
   )
 }
 

@@ -97,6 +97,20 @@ export default function AdminOverview() {
         )}
       </div>
 
+      {view.alerts.length > 0 && (
+        <section aria-label="Alerts" className="space-y-2 rounded-xl border border-red-300/50 bg-red-300/10 p-4" data-testid="alerts">
+          <h2 className="font-semibold">⚠ Worth a look</h2>
+          <ul className="space-y-2 text-sm">
+            {view.alerts.map((a) => (
+              <li key={`${a.kind}-${a.raisedAt}`}>
+                <span className="text-muted">{new Date(a.raisedAt).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}: </span>
+                {a.message}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4" data-testid="overview-stats">
         <Stat label="Hosts" value={hosts.total} detail={`${hosts.newThisWeek} new this week · ${hosts.active} hosted this month`} />
         <Stat
@@ -210,6 +224,30 @@ export default function AdminOverview() {
               `through Stripe, ${server.paymentsLive ? 'live: real cards are charged.' : 'in test mode: no real cards are charged.'}`
             ) : (
               'through the fake provider, for testing: no money moves.'
+            )}
+          </Check>
+          <Check ok={server.signUpCheck || !signUps.open} title="Sign-up check">
+            {server.signUpCheck
+              ? 'Cloudflare Turnstile checks that each new host is a person, not a script.'
+              : `is off${signUps.open ? ', and anyone can sign up: a script could make accounts, each with a free trial' : ''}. Set TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY to turn it on.`}
+          </Check>
+          <Check ok={!server.legalProblem} title="Legal pages">
+            {server.legalProblem ?? (
+              <>
+                are ready:{' '}
+                <Link to="/terms" className="underline">
+                  terms
+                </Link>
+                ,{' '}
+                <Link to="/privacy" className="underline">
+                  privacy
+                </Link>{' '}
+                and{' '}
+                <Link to="/refunds" className="underline">
+                  refunds
+                </Link>
+                .
+              </>
             )}
           </Check>
           <Check ok title="Servers">

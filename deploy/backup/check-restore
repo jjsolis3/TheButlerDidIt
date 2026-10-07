@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Proves the newest database backup can be restored (#103). A backup nobody has restored is only a hope.
+#
+# It restores the dump into a scratch database next to the real one, checks the tables the app can't run without
+# are there and filled, compares a few row counts with the live database, and drops the scratch copy. It fails
+# (exit 1) on anything wrong: no backup, a backup too old, one that doesn't restore, or one that's empty.
+#
+# The backup image runs every file in /hooks after each backup with the argument "post-backup" (see Dockerfile).
+# A failure there makes the image call its error hook, so WEBHOOK_ERROR_URL hears about it, and WEBHOOK_URL's
+# success call isn't made. Run it by hand too, in the backup service's terminal:
+#
+#   /hooks/50-check-restore                     # the newest backup
+#   /hooks/50-check-restore check FILE.sql.gz   # any other one
+set -Eeuo pipefail
+
+case "${1:-check}" in
+  post-backup | check) ;;
+  *) exit 0 ;; # the image's other moments (pre-backup, error): nothing to do
+esac
+
+# The backup image's own settings; PG* variables win when set.
+DB="${POSTGRES_DB:?Set POSTGRES_DB}"
+export PGHOST="${PGHOST:-${POSTGRES_HOST:-localhost}}"
+export PGPORT="${PGPORT:-${POSTGRES_PORT:-5432}}"
+export PGUSER="${PGUSER:-${POSTGRES_USER:?Set POSTGRES_USER}}"
+export PGPASSWORD="${PGPASSWORD:-${POSTGRES_PASSWORD:-}}"
+export PGOPTIONS="${PGOPTIONS:--c client_min_messages=warning}" # no "does not exist, skipping" notices
+FILE="${2:-${BACKUP_DIR:-/backups}/last/${DB}-latest${BACKUP_SUFFIX:-.sql.gz}}"
+MAX_AGE_HOURS="${RESTORE_CHECK_MAX_AGE_HOURS:-30}"
+SCRATCH="${DB}_restore_check"
+
+fail() {
+  echo "Backup restore check FAILED: $*" >&2
+  exit 1
+}
+
+[ -s "$FILE" ] || fail "there's no backup at $FILE."
+AGE_HOURS=$(( ($(date +%s) - $(stat -L -c %Y "$FILE")) / 3600 ))
+[ "$AGE_HOURS" -le "$MAX_AGE_HOURS" ] || fail "the newest backup, $FILE, is $AGE_HOURS hours old: backups seem to have stopped."
+
+# A fresh scratch database, dropped again however this ends.
+psql -d postgres -v ON_ERROR_STOP=1 -q -c "DROP DATABASE IF EXISTS \"$SCRATCH\" WITH (FORCE)" -c "CREATE DATABASE \"$SCRATCH\"" >/dev/null
+trap 'psql -d postgres -q -c "DROP DATABASE IF EXISTS \"$SCRATCH\" WITH (FORCE)" >/dev/null 2>&1 || true' EXIT
+
+gunzip -c "$FILE" | psql -d "$SCRATCH" -v ON_ERROR_STOP=1 -q >/dev/null || fail "$FILE didn't restore (see the error above)."
+
+count() { psql -d "$1" -At -c "SELECT count(*) FROM \"$2\"" 2>/dev/null; }
+
+# What the app can't run without: its migrations, the host accounts, and the mysteries it seeds at start-up.
+for table in __EFMigrationsHistory AspNetUsers Scenarios; do
+  n=$(count "$SCRATCH" "$table") || fail "the restored copy has no $table table."
+  [ "${n:-0}" -gt 0 ] || fail "$table is empty in the restored copy."
+done
+
+# A backup from last night has about the hosts there are now; far fewer means the wrong (or a broken) database.
+summary=""
+for table in AspNetUsers Parties Scenarios EscapeRooms AccessGrants MediaAssets; do
+  restored=$(count "$SCRATCH" "$table" || echo 0)
+  live=$(count "$DB" "$table" || echo "?")
+  summary="$summary $table $restored (now $live),"
+  if [ "$table" = AspNetUsers ] && [ "$live" != "?" ] && [ $((restored * 2)) -lt "$live" ]; then
+    fail "the backup has $restored host accounts, but the database has $live now."
+  fi
+done
+migration=$(psql -d "$SCRATCH" -At -c 'SELECT "MigrationId" FROM "__EFMigrationsHistory" ORDER BY 1 DESC LIMIT 1')
+
+echo "Backup restore check passed: $FILE ($(du -hL "$FILE" | cut -f1), $AGE_HOURS hours old) restored into a scratch database, now dropped.${summary%,}. Last migration: $migration."

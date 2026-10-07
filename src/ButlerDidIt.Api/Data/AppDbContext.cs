@@ -32,6 +32,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<PlayFeedback> PlayFeedback => Set<PlayFeedback>();
     public DbSet<SiteSettingsEntity> SiteSettings => Set<SiteSettingsEntity>();
     public DbSet<BillingEventEntity> BillingEvents => Set<BillingEventEntity>();
+    public DbSet<AlertEntity> Alerts => Set<AlertEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -93,6 +94,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         // Payments (#101): a webhook finds its host by the provider's customer id.
         b.Entity<AppUser>().HasIndex(u => u.BillingCustomerId).IsUnique();
         b.Entity<BillingEventEntity>().HasIndex(e => e.ReceivedAt);
+        b.Entity<BillingEventEntity>().HasIndex(e => new { e.Type, e.ReceivedAt });
+        b.Entity<AlertEntity>().HasIndex(a => new { a.Kind, a.RaisedAt });
         b.Entity<MediaAsset>().HasIndex(m => m.ContentHash).IsUnique();
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<MediaAsset>().HasIndex(m => m.PartyId);

@@ -14,6 +14,7 @@ import EscapeRoomEditor from './pages/EscapeRoomEditor'
 import Home from './pages/Home'
 import HowToPlay from './pages/HowToPlay'
 import Join from './pages/Join'
+import Legal from './pages/Legal'
 import Login from './pages/Login'
 import NewParty from './pages/NewParty'
 import PassAndPlay from './pages/PassAndPlay'
@@ -64,6 +65,9 @@ export default function App() {
       <Route path="/mysteries" element={<MyMysteries />} />
       <Route path="/how-to-play" element={<HowToPlay />} />
       <Route path="/how-to-play/escape" element={<EscapeHowToPlay />} />
+      <Route path="/terms" element={<Legal page="terms" />} />
+      <Route path="/privacy" element={<Legal page="privacy" />} />
+      <Route path="/refunds" element={<Legal page="refunds" />} />
       <Route path="/mysteries/:id" element={<ScenarioEditor />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:code" element={<Join />} />

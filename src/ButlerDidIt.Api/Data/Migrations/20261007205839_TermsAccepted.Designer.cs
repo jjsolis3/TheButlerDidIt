@@ -3,6 +3,7 @@ using System;
 using ButlerDidIt.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ButlerDidIt.Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261007205839_TermsAccepted")]
+    partial class TermsAccepted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,32 +258,6 @@ namespace ButlerDidIt.Api.Data.Migrations
                     b.ToTable("AiUsage");
                 });
 
-            modelBuilder.Entity("ButlerDidIt.Api.Data.AlertEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Kind")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("character varying(40)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTimeOffset>("RaisedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Kind", "RaisedAt");
-
-                    b.ToTable("Alerts");
-                });
-
             modelBuilder.Entity("ButlerDidIt.Api.Data.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -390,8 +367,6 @@ namespace ButlerDidIt.Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ReceivedAt");
-
-                    b.HasIndex("Type", "ReceivedAt");
 
                     b.ToTable("BillingEvents");
                 });

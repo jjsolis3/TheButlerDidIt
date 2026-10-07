@@ -49,6 +49,7 @@ public interface IBillingProvider
 }
 
 /// <param name="TrialEnd">For a subscription bought during the site's free trial: the first payment waits until then.</param>
+/// <param name="Notice">Shown by the pay button on the payment page (#103): how the plan renews or ends, and the refund policy.</param>
 public sealed record CheckoutRequest(
     string CustomerId,
     string UserId,
@@ -57,7 +58,8 @@ public sealed record CheckoutRequest(
     DateTimeOffset? TrialEnd,
     string SuccessUrl,
     string CancelUrl,
-    bool AutomaticTax);
+    bool AutomaticTax,
+    string? Notice = null);
 
 /// <summary>A subscription as the provider has it now.</summary>
 /// <param name="Status">The provider's word for it, e.g. Stripe's <c>active</c>, <c>past_due</c> or <c>canceled</c>.</param>
