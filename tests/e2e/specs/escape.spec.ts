@@ -52,7 +52,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   // Three lengths; the standard one is picked, and a quicker game plays fewer puzzles.
   await expect(tv.getByRole('radio', { name: /45 minutes/ })).toBeChecked()
   await expect(tv.getByText('⏱️ 30 minutes')).toBeVisible()
-  await expect(tv.getByText(/9 puzzles · a quicker game/)).toBeVisible()
+  await expect(tv.getByText(/10 puzzles · a quicker game/)).toBeVisible()
   // Fresh puzzles by default; today's challenge and replaying a puzzle set are the other choices.
   await expect(tv.getByRole('radio', { name: /Fresh puzzles/ })).toBeChecked()
   await expect(tv.getByRole('radio', { name: /Today's challenge/ })).toBeVisible()
