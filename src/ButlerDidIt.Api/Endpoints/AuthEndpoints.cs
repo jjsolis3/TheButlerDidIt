@@ -225,7 +225,8 @@ public static class AuthEndpoints
     {
         var sp = http.RequestServices;
         var access = await Access.ForAsync(sp.GetRequiredService<AppDbContext>(), u, sp.GetRequiredService<TimeProvider>().GetUtcNow(), http.RequestAborted);
-        return new(u.Id, u.Email ?? "", u.DisplayName, u.IsAdmin, u.EmailConfirmed, access);
+        return new(u.Id, u.Email ?? "", u.DisplayName, u.IsAdmin, u.EmailConfirmed,
+            access with { Payments = sp.GetRequiredService<ButlerDidIt.Api.Billing.BillingSetup>().Enabled });
     }
 
     private static async Task SendConfirmationAsync(AppUser user, UserManager<AppUser> users, IEmailSender email,

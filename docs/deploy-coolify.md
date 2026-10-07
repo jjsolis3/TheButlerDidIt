@@ -57,6 +57,9 @@ For **voices and pictures**, also add `AI_MEDIA_PROVIDER_NAME` (e.g. `OpenAI`), 
 
 To use **local models with Ollama**, deploy Ollama as another Coolify resource (or add it to the compose file). Then set the provider type to `Ollama` and the base URL to its internal address, e.g. `http://ollama:11434`. **Piper** (voices) and a **Stable Diffusion WebUI** (pictures) work the same way, at e.g. `http://piper:5000` and `http://stable-diffusion:7860` (start the WebUI with `--api`).
 
+### Optional: payments
+To sell plans (subscriptions and party passes) with Stripe, add `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and a `STRIPE_PRICE_…` for each plan you sell. Until then the site works as before: hosts get their games from the free trial and from you. See [Payments with Stripe](#payments-with-stripe) below.
+
 ## 4. Deploy
 
 Click **Deploy**. The first build takes a few minutes (it compiles both the React app and the .NET app). On startup the app:
@@ -92,6 +95,7 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 | `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
 | `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room or a mystery, in MB. |
 | `Media__UploadQuotaMb` | `2048` | Optional: how much each host can upload in all, for both games, in MB. The admin has no limit. |
+| `Billing__Stripe__SecretKey`, `Billing__Stripe__WebhookSecret`, `Billing__Prices__BothMonthly`… | as in [Payments with Stripe](#payments-with-stripe) | Optional: selling plans. The table there gives each one's app name. |
 
 The Dockerfile already sets the port (8080), the content folder and the data folders. Untick **Buildtime** on secrets such as the connection string: the app only reads them when it runs.
 
@@ -176,6 +180,76 @@ One server comfortably runs many parties at once, so most hosts never need this.
 **Moving existing media to S3:** copy the `media` volume into the bucket, keeping the folder layout (`2026-09/…`), for example with `rclone copy /path/to/media r2:your-bucket`. The database stores each file's path, so the same paths work in the bucket.
 
 Files are always served through the app (`/media/assets/…`), so the bucket can stay private. For now the app reads a file from the bucket whole before serving it, which is fine for pictures and voices but slow for large uploaded videos; the local volume streams them from disk (#119).
+
+## Payments with Stripe
+
+Hosts can buy a plan on their account page (**Your account → Plans**): a subscription to murder mysteries, escape rooms or both, monthly or yearly, or a one-off **party pass** of one game (or both) for 72 hours. Payments are taken on Stripe's own checkout page, so card numbers never reach your server. Hosts change plan, update their card, see invoices or cancel on Stripe's billing page (**Manage billing**). You never build or run a billing screen.
+
+What hosts get from each:
+- **A subscription** gives its games until the end of what's been paid for. Bought during the free trial, the first payment waits until the trial ends.
+- **Cancelling** keeps the games until the end of the paid period.
+- **A failed renewal** keeps the games for `PAYMENT_GRACE_DAYS` (7) while Stripe retries the card. After that, starting a new game asks them to update their card.
+- **A party pass** starts when it's paid for.
+- **Deleting an account** cancels its subscription first, so nobody is charged for an account that's gone.
+- **Guests never pay**, and a party already under way is never stopped.
+
+Payments stay off until `STRIPE_SECRET_KEY` is set. Start in Stripe's **test mode**: everything below works the same with test keys, and no real money moves.
+
+### 1. Products and prices
+In the Stripe dashboard, under **Product catalog**, add a product for each set of games you sell, e.g. "Murder mysteries", "Escape rooms" and "Both games". On each, add the prices you want:
+- **subscriptions:** a **recurring** price, monthly and/or yearly;
+- **party passes:** a **one-time** price, on the same product or one of its own.
+
+Copy each price's id (`price_…`). Which games a price gives is decided by the setting you put it in, so name the products however you like.
+
+**Changing a price later:** add the new price to the same product and swap the setting. Subscribers on the old price keep their games, because the old price belongs to the same product.
+
+### 2. Settings
+| Compose variable | App setting (Dockerfile application) | Value |
+|---|---|---|
+| `STRIPE_SECRET_KEY` | `Billing__Stripe__SecretKey` | Developers → API keys → **Secret key** (`sk_test_…`, later `sk_live_…`). Mark it as a secret. A restricted key (`rk_…`) works too if it can write Checkout Sessions, Customers, the customer portal and Subscriptions, and read Prices. |
+| `STRIPE_WEBHOOK_SECRET` | `Billing__Stripe__WebhookSecret` | The webhook's signing secret (`whsec_…`), from step 3. Mark it as a secret. |
+| `STRIPE_PRICE_MYSTERIES_MONTHLY`, `…_MYSTERIES_YEARLY` | `Billing__Prices__MysteriesMonthly`, `…MysteriesYearly` | price ids; leave a plan empty to not sell it |
+| `STRIPE_PRICE_ESCAPE_MONTHLY`, `…_ESCAPE_YEARLY` | `Billing__Prices__EscapeRoomsMonthly`, `…EscapeRoomsYearly` | |
+| `STRIPE_PRICE_BOTH_MONTHLY`, `…_BOTH_YEARLY` | `Billing__Prices__BothMonthly`, `…BothYearly` | |
+| `STRIPE_PRICE_MYSTERIES_PASS`, `…_ESCAPE_PASS`, `…_BOTH_PASS` | `Billing__Prices__MysteriesPass`, `…EscapeRoomsPass`, `…BothPass` | one-time price ids |
+| `PASS_HOURS` | `Billing__PassHours` | how long a pass lasts (72) |
+| `PAYMENT_GRACE_DAYS` | `Billing__GraceDays` | days of games after a failed renewal (7) |
+| `STRIPE_AUTOMATIC_TAX` | `Billing__AutomaticTax` | `true` to let Stripe Tax add sales tax or VAT; set Stripe Tax up in the dashboard first |
+
+Set `PUBLIC_URL` too: Stripe sends hosts back to that address after paying.
+
+### 3. The webhook
+Stripe tells the site about payments by calling it. Under **Developers → Webhooks**, add an endpoint:
+- **URL:** `https://your.domain/api/billing/webhook`
+- **Events:** `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid` and `invoice.payment_failed`.
+
+Copy its **signing secret** into `STRIPE_WEBHOOK_SECRET` and redeploy. The site refuses any webhook without a valid signature from that secret, so nobody else can fake a payment.
+
+### 4. Stripe's billing page
+Under **Settings → Billing → Customer portal**, turn on what hosts may do: update their payment method, see invoices, and cancel (choose "at the end of the billing period"). To let them switch plans there, turn on subscription updates and add your products. **Save** it: Stripe needs the portal saved once, in test mode and again in live mode, before **Manage billing** works.
+
+Under **Settings → Billing → Subscriptions and emails**, choose what happens when a renewal fails. Smart Retries, then **cancel the subscription** after the last retry, works well with the grace days.
+
+### 5. Try it
+1. Open **Admin hub → Plans & billing**. It shows:
+   - whether payments are on, and in which mode;
+   - whether the webhook secret is set;
+   - each plan with its price as Stripe has it.
+
+   A plan whose price can't be sold as set up is marked with the reason (a typo, a test-mode price with a live key, a one-time price on a monthly plan…) and isn't offered to hosts.
+2. As a host (not the admin, who never pays), open **Your account → Plans**, choose a plan and pay with Stripe's test card `4242 4242 4242 4242`, any future date and any CVC.
+3. You're sent back to the account page, which confirms the payment. **Plans & billing** shows the subscription and the webhook that arrived.
+
+If a webhook ever goes missing, the site still checks with Stripe when a renewal is overdue. You can also press **Sync** next to the host.
+
+### 6. Going live
+1. Finish the readiness checklist (#103): terms, a privacy policy and a refund policy, which Stripe asks for.
+2. Activate your Stripe account.
+3. In live mode, create the same products and prices, add the live webhook endpoint, and save the live customer portal.
+4. Swap in the live secret key, the live webhook secret and the live price ids, then redeploy.
+
+**Refunds** are made in the Stripe dashboard. Refunding a subscription's payment doesn't cancel it: cancel the subscription there as well, and the host's games end when it does. A refunded party pass runs out on its own within its hours (#147 would end it at once).
 
 ## Updating
 

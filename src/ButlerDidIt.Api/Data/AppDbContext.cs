@@ -31,6 +31,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<PlayRecord> PlayRecords => Set<PlayRecord>();
     public DbSet<PlayFeedback> PlayFeedback => Set<PlayFeedback>();
     public DbSet<SiteSettingsEntity> SiteSettings => Set<SiteSettingsEntity>();
+    public DbSet<BillingEventEntity> BillingEvents => Set<BillingEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -84,7 +85,14 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         {
             e.HasIndex(x => x.UserId); // every access check reads one host's grants
             e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+            // One grant per subscription or pass, however many servers handle its webhooks at once. (Postgres lets any
+            // number of rows share a null in a unique column, so the grants nobody paid for don't collide.)
+            e.HasIndex(x => x.ExternalId).IsUnique();
         });
+        // Payments (#101): a webhook finds its host by the provider's customer id.
+        b.Entity<AppUser>().HasIndex(u => u.BillingCustomerId).IsUnique();
+        b.Entity<BillingEventEntity>().HasIndex(e => e.ReceivedAt);
         b.Entity<MediaAsset>().HasIndex(m => m.ContentHash).IsUnique();
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<MediaAsset>().HasIndex(m => m.PartyId);

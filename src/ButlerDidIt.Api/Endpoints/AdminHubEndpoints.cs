@@ -55,7 +55,11 @@ public sealed record SignUpsView(bool Open, bool ServerSetting, bool? Switch, in
 public sealed record SignUpsRequest(bool? Open);
 
 /// <summary>How the server is set up, read from its configuration, for the things worth checking.</summary>
-public sealed record AdminServerView(bool EmailEnabled, string MediaStorage, long MediaBytes, int MediaFiles, bool SeveralServers, int AiProviders, IReadOnlyList<AiRole> AiRoles);
+/// <param name="Payments">"Stripe", "Fake", or null when payments are off (#101).</param>
+/// <param name="PaymentsLive">Stripe with live keys: real cards are charged.</param>
+/// <param name="PaymentsProblem">Something stopping payments from working, in words the admin can act on.</param>
+public sealed record AdminServerView(bool EmailEnabled, string MediaStorage, long MediaBytes, int MediaFiles, bool SeveralServers, int AiProviders, IReadOnlyList<AiRole> AiRoles,
+    string? Payments, bool PaymentsLive, string? PaymentsProblem);
 
 /// <summary>Where a mystery or room came from.</summary>
 public enum ContentOrigin
@@ -109,7 +113,7 @@ public static class AdminHubEndpoints
         var admin = app.MapGroup("/api/admin").RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(RequireAdmin);
 
         admin.MapGet("/overview", async (AppDbContext db, TimeProvider clock, IOptions<AuthOptions> auth, IOptions<AiOptions> ai,
-            IOptions<MediaOptions> media, IOptions<ScaleOptions> scale, IEmailSender email, CancellationToken ct) =>
+            IOptions<MediaOptions> media, IOptions<ScaleOptions> scale, IEmailSender email, ButlerDidIt.Api.Billing.BillingSetup billing, CancellationToken ct) =>
         {
             var now = clock.GetUtcNow();
             var weekAgo = now.AddDays(-7);
@@ -164,7 +168,12 @@ public static class AdminHubEndpoints
                 await db.MediaAssets.AsNoTracking().CountAsync(ct),
                 scale.Value.MultiInstance,
                 await db.AiProviders.AsNoTracking().CountAsync(ct),
-                await db.AiRoles.AsNoTracking().OrderBy(r => r.Role).Select(r => r.Role).ToListAsync(ct));
+                await db.AiRoles.AsNoTracking().OrderBy(r => r.Role).Select(r => r.Role).ToListAsync(ct),
+                billing.Provider?.Name,
+                billing.Provider?.LiveMode ?? false,
+                billing.Problem ?? (billing.Provider is { CanVerifyWebhooks: false }
+                    ? "The webhook signing secret (Billing__Stripe__WebhookSecret) isn't set, so payments can't reach hosts' accounts."
+                    : null));
 
             return new AdminOverview(hosts, plans, parties, weeks, spend, ratings, await SignUpsAsync(db, auth.Value, email, now, ct), server);
         });

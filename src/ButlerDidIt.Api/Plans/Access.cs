@@ -1,3 +1,4 @@
+using ButlerDidIt.Api.Billing;
 using ButlerDidIt.Api.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,8 +30,12 @@ public enum AccessPlan
     None,
 }
 
-/// <param name="EndsAt">When the plan shown ends; null when it doesn't.</param>
-public sealed record AccessView(bool Mysteries, bool EscapeRooms, AccessPlan Plan, DateTimeOffset? EndsAt)
+/// <param name="EndsAt">When the plan shown ends; null when it doesn't. A subscription that renews counts a little past its renewal date.</param>
+/// <param name="Status">For a paid plan (#101): renewing, cancelled, a payment failed…; null otherwise.</param>
+/// <param name="RenewsAt">For a subscription that renews: when.</param>
+/// <param name="Payments">True when the site sells plans, so pages can say "choose a plan" rather than "ask the admin".</param>
+public sealed record AccessView(bool Mysteries, bool EscapeRooms, AccessPlan Plan, DateTimeOffset? EndsAt,
+    PaidStatus? Status = null, DateTimeOffset? RenewsAt = null, bool Payments = false)
 {
     public bool Allows(GameKind kind) => kind == GameKind.EscapeRoom ? EscapeRooms : Mysteries;
 }
@@ -63,7 +68,7 @@ public static class Access
             GrantKind.Trial => AccessPlan.Trial,
             _ => grants.Any(g => g.Kind == GrantKind.Trial) ? AccessPlan.TrialEnded : AccessPlan.None,
         };
-        return new(games.HasFlag(GameAccess.Mysteries), games.HasFlag(GameAccess.EscapeRooms), plan, shown?.EndsAt);
+        return new(games.HasFlag(GameAccess.Mysteries), games.HasFlag(GameAccess.EscapeRooms), plan, shown?.EndsAt, shown?.Status, shown?.RenewsAt);
     }
 
     private static int Rank(GrantKind kind) => kind switch
@@ -90,12 +95,29 @@ public static class Access
         var sp = ctx.HttpContext.RequestServices;
         var user = await sp.GetRequiredService<UserManager<AppUser>>().GetUserAsync(ctx.HttpContext.User);
         if (user is null) return Results.Unauthorized();
-        var access = await ForAsync(sp.GetRequiredService<AppDbContext>(), user, sp.GetRequiredService<TimeProvider>().GetUtcNow(), ctx.HttpContext.RequestAborted);
+        var db = sp.GetRequiredService<AppDbContext>();
+        var clock = sp.GetRequiredService<TimeProvider>();
+        var ct = ctx.HttpContext.RequestAborted;
+        var access = await ForAsync(db, user, clock.GetUtcNow(), ct);
         if (access.Allows(kind)) return await next(ctx);
+
+        var payments = sp.GetRequiredService<BillingSetup>().Enabled;
+        if (payments && user.BillingCustomerId is not null)
+        {
+            // Before saying no to a paying host: a renewal or a retried payment we haven't heard about may have gone through.
+            await sp.GetRequiredService<BillingService>().RefreshIfDueAsync(user, ct);
+            access = await ForAsync(db, user, clock.GetUtcNow(), ct);
+            if (access.Allows(kind)) return await next(ctx);
+        }
         var game = kind == GameKind.EscapeRoom ? "escape rooms" : "murder mysteries";
-        var message = access.Plan == AccessPlan.TrialEnded
-            ? $"Your free trial has ended. Ask the site's admin for access to {game}."
-            : $"Your plan doesn't include {game}. Ask the site's admin for access.";
+        // With payments on (#101) the host can sort it out themselves; otherwise only the admin can.
+        var message = (access.Plan, payments) switch
+        {
+            (AccessPlan.TrialEnded, true) => $"Your free trial has ended. Choose a plan on your account page to start {game}.",
+            (AccessPlan.TrialEnded, false) => $"Your free trial has ended. Ask the site's admin for access to {game}.",
+            (_, true) => $"Your plan doesn't include {game}. Choose a plan on your account page.",
+            _ => $"Your plan doesn't include {game}. Ask the site's admin for access.",
+        };
         return Results.Problem(message, statusCode: StatusCodes.Status403Forbidden);
     };
 

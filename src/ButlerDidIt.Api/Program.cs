@@ -4,6 +4,7 @@ using ButlerDidIt.Ai;
 using ButlerDidIt.Ai.Generation;
 using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
+using ButlerDidIt.Api.Billing;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Endpoints;
@@ -43,6 +44,7 @@ builder.Services.Configure<MediaOptions>(config.GetSection("Media"));
 builder.Services.Configure<RetentionOptions>(config.GetSection("Retention"));
 builder.Services.Configure<ScaleOptions>(config.GetSection("Scale"));
 builder.Services.Configure<ButlerDidIt.Api.Plans.PlansOptions>(config.GetSection("Plans"));
+builder.Services.Configure<BillingOptions>(config.GetSection("Billing"));
 var scale = config.GetSection("Scale").Get<ScaleOptions>() ?? new ScaleOptions();
 
 // ---------------------------------------------------------------- database
@@ -139,6 +141,10 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy(AuthEndpoints.RegisterRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = registrationsPerHour, Window = TimeSpan.FromHours(1) }));
+    // Checkouts, billing pages and "check my payment": each one calls Stripe, so a stuck button can't run up thousands.
+    o.AddPolicy(BillingEndpoints.RateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
+        http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(5) }));
 });
 
 // ---------------------------------------------------------------- JSON
@@ -205,6 +211,13 @@ else
 builder.Services.AddScoped<MediaService>();
 builder.Services.AddSingleton<MediaWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<MediaWorker>());
+
+// ---------------------------------------------------------------- payments (#101, see "Payments with Stripe" in docs/deploy-coolify.md)
+// Off unless a payment provider is set up. Hosts' access always comes from the provider's own word, read fresh.
+builder.Services.AddSingleton<BillingSetup>();
+builder.Services.AddSingleton<BillingCatalog>();
+builder.Services.AddSingleton<BillingLocks>();
+builder.Services.AddScoped<BillingService>();
 
 var signalR = builder.Services
     .AddSignalR(o => o.AddFilter<GameRuleHubFilter>())
@@ -286,6 +299,7 @@ app.MapAuthEndpoints();
 app.MapAdminHostEndpoints();
 app.MapAdminHubEndpoints();
 app.MapInviteEndpoints();
+app.MapBillingEndpoints();
 app.MapAccountEndpoints();
 app.MapRecapEndpoints();
 app.MapScenarioEditorEndpoints();

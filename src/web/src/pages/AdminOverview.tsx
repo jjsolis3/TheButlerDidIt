@@ -196,6 +196,22 @@ export default function AdminOverview() {
           <Check ok title="Media">
             {`${bytes(server.mediaBytes)} in ${plural(server.mediaFiles, 'file')}, ${server.mediaStorage === 'S3' ? 'in S3 storage' : "in the server's media folder (back it up with the database)"}.`}
           </Check>
+          <Check ok={!server.paymentsProblem} title="Payments">
+            {server.paymentsProblem ? (
+              server.paymentsProblem
+            ) : server.payments === null ? (
+              <>
+                are off: hosts get their games from the free trial and from you.{' '}
+                <Link to="/admin/billing" className="underline">
+                  Selling plans
+                </Link>
+              </>
+            ) : server.payments === 'Stripe' ? (
+              `through Stripe, ${server.paymentsLive ? 'live: real cards are charged.' : 'in test mode: no real cards are charged.'}`
+            ) : (
+              'through the fake provider, for testing: no money moves.'
+            )}
+          </Check>
           <Check ok title="Servers">
             {server.severalServers ? 'Several, sharing one database (Scale__MultiInstance).' : 'One.'}
           </Check>

@@ -13,8 +13,9 @@ export function AccessNotice({ access, game }: { access: AccessView | undefined;
       <div role="status" className="mb-6 rounded-xl border border-blood/50 bg-blood/10 p-4 text-sm">
         <p className="font-semibold">🔒 {gameName(game)} aren't in your plan.</p>
         <p className="mt-1 text-muted">{describeAccess(access).detail}</p>
-        <Link to="/account" className="mt-2 inline-block text-accent underline">
-          Your plan
+        {/* With payments on (#101) the way in is a plan, on the account page. */}
+        <Link to={access.payments ? '/account#plans' : '/account'} className="mt-2 inline-block text-accent underline">
+          {access.payments ? 'Choose a plan' : 'Your plan'}
         </Link>
       </div>
     )

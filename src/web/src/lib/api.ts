@@ -32,6 +32,10 @@ import type {
   WatchResponse,
   AccessView,
   AccountView,
+  AdminBillingView,
+  BillingPlan,
+  BillingView,
+  SyncView,
   AuthOptions,
   CreatedInvite,
   EmailChangeResult,
@@ -267,7 +271,19 @@ export const api = {
     request<GenerationJob>('POST', '/api/generation', { themeSlug, players, contentRating, length, twist: twist || null }),
   generationJob: (id: string) => request<GenerationJob>('GET', `/api/generation/${id}`),
 
+  /**
+   * Payments (#101). Checkout and the billing page are Stripe's own pages: these calls return where to send the browser.
+   * Access never changes from the browser's word: `sync` only asks the server to check with Stripe.
+   */
+  billing: {
+    get: () => request<BillingView>('GET', '/api/billing'),
+    checkout: (plan: BillingPlan) => request<{ url: string }>('POST', '/api/billing/checkout', { plan }),
+    portal: () => request<{ url: string }>('POST', '/api/billing/portal'),
+    sync: (session?: string | null) => request<SyncView>('POST', '/api/billing/sync', { session: session ?? null }),
+  },
   admin: {
+    billing: (refresh = false) => request<AdminBillingView>('GET', `/api/admin/billing${refresh ? '?refresh=true' : ''}`),
+    syncBilling: (id: string) => request<void>('POST', `/api/admin/billing/hosts/${encodeURIComponent(id)}/sync`),
     // The admin hub (#102): the overview, every game with how it plays, and the sign-up switch.
     overview: () => request<AdminOverview>('GET', '/api/admin/overview'),
     games: () => request<AdminGameRow[]>('GET', '/api/admin/games'),

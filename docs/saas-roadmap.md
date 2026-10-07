@@ -66,7 +66,7 @@ A header menu on every page (Your account, Your parties, My mysteries, admin pag
 - **Profile:** name, email (changed only after a confirmation link to the new address), password, and "Sign out everywhere". These are ASP.NET Core Identity's `GenerateChangeEmailTokenAsync`, `ChangePasswordAsync` and `UpdateSecurityStampAsync`.
 - **What you've made:** counts with links to your parties, your mysteries and the rooms the AI wrote for you, and your number of escapes. The lists themselves stay where you use them ("Your parties" on the home page).
 - **Usage:** parties this month and AI spend against your budget.
-- **Plan & billing:** an "Early access" placeholder until step 5 and step 6.
+- **Plan & billing:** the plan and its state; with payments on (step 6), the plans for sale and **Manage billing**.
 - **Your data:** download it; delete your account.
 
 **Why `/api/account/*` takes no user id:** every endpoint acts on the signed-in user, so there's nothing to change in a request to reach someone else's account.
@@ -100,11 +100,11 @@ This is the heart of "pay for murder, escape, or both".
 - **Access is a set of grants** (`AccessGrants`): trial, comp (free access), pass and subscription, each with its games and dates.
   - A host's access is every grant in effect put together.
   - This replaced the one-row-per-host `SubscriptionEntity` first sketched here, because a trial, a pass and a subscription can overlap.
-  - Stripe (#101) will write `Subscription` and `Pass` grants.
+  - Stripe (#101, step 6) writes `Subscription` and `Pass` grants.
 - **The check:** a `RequireGame(GameKind)` endpoint filter on the four create endpoints. The admin always passes.
 - **The admin gives or removes free access** on the Hosts page, and an invite can carry it instead of the trial.
 - **`/api/auth/me` carries the host's access.** The host page says what's locked, and the account page shows the plan. As everywhere else in this app, the page only displays the answer; the server enforces it.
-- **The AI budget per plan** waits for priced plans (#101).
+- **The AI budget per plan** is still one budget for every host; a budget per plan is a follow-up to step 6 (#147).
 
 **Why before payments?** Stripe is just one *source* of access. Hand grants, invites and trials are others. Building the check first means:
 
@@ -116,19 +116,25 @@ This is the heart of "pay for murder, escape, or both".
 
 **Households, later.** One subscription belongs to one host for now. If families want several hosts on one plan, add a `Household` with members and move the subscription onto it. Because every check goes through `Entitlements`, only that service changes.
 
-### 6. Billing with Stripe (#101)
+### 6. Billing with Stripe (#101, done)
+
+How to set it up: "Payments with Stripe" in [deploy-coolify.md](deploy-coolify.md). How it's built: "Payments" in [architecture.md](architecture.md).
 
 - **Checkout** is Stripe's hosted payment page. Card numbers never reach this server, which keeps PCI compliance to the simplest level.
-- **Customer Portal** is Stripe's hosted page for changing card, switching plan, cancelling and invoices, so there are no billing screens to build.
-- **Webhooks are the truth.** The "payment succeeded" redirect is just a page the browser visits, and anyone can visit it. Access changes only when Stripe calls `POST /api/billing/webhook`. The handler:
+- **Customer Portal** is Stripe's hosted page for changing card, switching plan, cancelling and invoices, so there are no billing screens to build. Hosts reach it with **Manage billing** on their account page.
+- **What's sold:** subscriptions to murder mysteries, escape rooms or both, monthly or yearly, and a one-off party pass (72 hours by default). Each is a Stripe price id in the server's settings; a plan without one isn't sold, and the amounts are read from Stripe.
+- **Stripe's word is the truth, read fresh.** The "payment succeeded" redirect is just a page the browser visits, and anyone can visit it. Access changes only from what Stripe says when asked. The webhook handler (`POST /api/billing/webhook`):
   - verifies the `Stripe-Signature` header, so a forged call is refused;
   - records each event id, because Stripe retries and a retried event must count once;
-  - re-reads the subscription from Stripe, because events can arrive out of order.
+  - re-reads the customer's subscriptions from Stripe, because events can arrive out of order.
 
-  The success page says "Confirming your payment…" until `/api/auth/me` shows the new plan.
-- **Grace period:** a `PastDue` host keeps access for a few days while Stripe retries the card.
-- **Behind an interface:** like `IEmailSender` and `IMediaStore`, billing sits behind an `IBillingProvider` with a fake for tests. If handling sales tax or VAT yourself becomes a burden, a *Merchant of Record* (Paddle, Lemon Squeezy) sells on your behalf and handles tax, and switching to one changes one class.
-- **Several servers:** the webhook handler is an idempotent database upsert, so any server can receive it.
+  The success page says "Confirming your payment…" and asks the server to check with Stripe, so the plan shows at once even before the webhook lands.
+- **Grace period:** a `PastDue` host keeps access for `Billing:GraceDays` (7) while Stripe retries the card. A renewal whose webhook went missing is checked with Stripe before a host is told no.
+- **Free trial first:** subscribing during the trial is free until the trial ends.
+- **Behind an interface:** like `IEmailSender` and `IMediaStore`, billing sits behind an `IBillingProvider` with a fake for tests. If handling sales tax or VAT yourself becomes a burden, a *Merchant of Record* (Paddle, Lemon Squeezy) sells on your behalf and handles tax, and switching to one changes one class. Stripe Tax can be switched on meanwhile (`Billing:AutomaticTax`).
+- **Several servers:** the sync is idempotent and takes a per-customer lock across servers, so any server can receive any webhook.
+- **Leaving:** deleting an account cancels its subscription first.
+- **Follow-ups** (#147): an AI budget per plan, and refunds that end a pass at once (today a refunded pass simply runs out).
 
 ### 7. Settings and admin hubs (#102)
 
@@ -138,13 +144,13 @@ This is the heart of "pay for murder, escape, or both".
   - **Links still win:** a link that names a room, length or difficulty, such as "Play this room again", overrides the saved settings.
   - **Storage:** `AppUser.Preferences` is one jsonb document (`HostPreferences`), read and written whole, so a new setting needs no migration. The server checks every value (a Family tone on the Family shelf, 30/45/60 minutes), and the data export includes them.
   - **Not included:** the TV's sound switch stays on each device, because it belongs to the TV, not the host.
-- **`/admin`** ("Admin hub", admin only; built): one frame with five tabs.
+- **`/admin`** ("Admin hub", admin only; built): one frame with six tabs.
   - **Overview:** hosts (new this week, active this month), plans, parties this week and games under way now, games played per week, AI spend this month, ratings and votes, and a checklist of the server's setup (email, media, servers, AI).
   - **Games:** every mystery and room with plays, rating, solve rate and votes. It flags the ones that need a look and links to their insights.
   - **Hosts:** today's page, with search, a plan filter, and when each host joined and last hosted.
   - **Sign-ups:** a switch between "anyone" and "invites only", stored in the database (`SiteSettings`) so it needs no redeploy and overrides `Auth:AllowRegistration`; the invites are below it.
   - **AI:** today's page.
-  - **Still to come:** a **Plans & billing** tab arrives with Stripe (#101), linking each subscription to the Stripe dashboard.
+  - **Plans & billing** (#101): whether payments work (keys, webhooks, the last webhook), each plan's price as Stripe has it with anything wrong with it, and every subscription and pass with a link to the Stripe dashboard and a Sync button.
 
 ### 8. Ready for paying customers (#103)
 
