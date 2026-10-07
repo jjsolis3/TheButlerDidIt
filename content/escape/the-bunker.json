@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 120,
   "soundscape": "drone",
   "intro": "Attention. This is the Overseer. You have been selected for a survival exercise. The surface hatch is sealed. The only way out is the blast door at the far end of this bunker, and it opens only for a team that works like one. Every camera is on you. Every mistake is logged. The exercise begins now.",
@@ -85,7 +85,7 @@
             "w": 170,
             "h": 160,
             "label": "clipboard",
-            "look": "A decontamination log. At the bottom, in the Overseer's neat print: 'Offset {key:decon-log}.'",
+            "look": "The decontamination log. Its last line is in a scramble, and at the bottom, in the Overseer's neat print: 'Offset {key:decon-log}.'",
             "hidesPieces": true
           },
           {
@@ -132,7 +132,7 @@
             "w": 150,
             "h": 330,
             "label": "steel locker",
-            "look": "A steel locker with a three-digit dial."
+            "look": "A steel locker with a combination dial, and a letter lock beneath it."
           },
           {
             "id": "shower-head",
@@ -203,7 +203,7 @@
             "w": 220,
             "h": 140,
             "label": "shelf of tins",
-            "look": "Rows of ration tins, each stamped with a number.",
+            "look": "Rows of ration tins, each stamped with numbers instead of a label. The crate's inner lid will want them read.",
             "hidesPieces": true
           },
           {
@@ -302,7 +302,7 @@
       "id": "command",
       "soundscape": "space",
       "title": "The Command Room",
-      "description": "Banks of switches and dead screens. A radio hisses on a desk beside a map table, a filing locker and a supply box, and at the far end the great blast door waits, with a keyhole and a three-digit keypad.",
+      "description": "Banks of switches and dead screens. A radio hisses on a desk beside a map table, a filing locker and a supply box, and at the far end the great blast door waits, with a keyhole and a keypad.",
       "puzzles": [
         "orders",
         "countdown",
@@ -322,7 +322,7 @@
             "w": 300,
             "h": 180,
             "label": "banks of switches",
-            "look": "Hundreds of switches, all labelled in a code you don't recognise."
+            "look": "Hundreds of switches, all labelled in a code you don't recognise. Behind them: a switchboard with an empty fuse slot."
           },
           {
             "id": "dead-screens",
@@ -367,7 +367,7 @@
             "w": 280,
             "h": 160,
             "label": "map table",
-            "look": "A map of the bunker, with every exit crossed out but one.",
+            "look": "A map of the bunker, with every exit crossed out but one. Beside the last exit, a row of marks in red pencil: {order:blast-door}.",
             "hidesPieces": true
           },
           {
@@ -400,7 +400,7 @@
             "w": 160,
             "h": 520,
             "label": "blast door",
-            "look": "Two metres of steel, a keyhole and a three-digit keypad."
+            "look": "Two metres of steel, a keyhole and a keypad."
           },
           {
             "id": "map-board",
@@ -550,6 +550,7 @@
       "minMinutes": 45,
       "title": "The Decontamination Log",
       "kind": "text",
+      "revealedBy": "spot:clipboard",
       "prompt": "The last line of the decontamination log is in a scramble: {cipher}. The steel locker has a second, letter lock.",
       "generator": {
         "type": "cipher",
@@ -629,6 +630,7 @@
       "minMinutes": 45,
       "title": "The Tin Labels",
       "kind": "text",
+      "revealedBy": "spot:tin-shelf",
       "prompt": "The ration tins are stamped with numbers instead of labels: {cipher}. The crate's inner lid has a letter lock.",
       "generator": {
         "type": "cipher",
@@ -654,6 +656,7 @@
       "minMinutes": 60,
       "title": "The Footlocker",
       "kind": "text",
+      "revealedBy": "spot:footlocker-row",
       "prompt": "One footlocker has a word lock, and a riddle scratched into the lid: 'I have a neck but no head, and two arms but no hands.'",
       "answers": [
         "shirt",
@@ -752,7 +755,8 @@
       "id": "countdown",
       "title": "The Countdown",
       "kind": "code",
-      "prompt": "A screen scrolls numbers: {sequence}. The blast door's first lock wants the next one.",
+      "revealedBy": "puzzle:orders",
+      "prompt": "A screen scrolls numbers: {sequence}. Its keypad wants the next one.",
       "generator": {
         "type": "sequence"
       },
@@ -760,19 +764,18 @@
         "Look at how each number changes to the next.",
         "The next number is {answer}."
       ],
-      "solvedText": "The screen stops scrolling. A heavy bolt in the blast door slides back."
+      "solvedText": "The screen stops scrolling. Somewhere in the walls, a heavy bolt slides back."
     },
     {
       "id": "radio",
-      "minMinutes": 45,
       "title": "The Command Radio",
       "kind": "text",
-      "prompt": "The radio is wired to the blast door's second lock. A card is taped to it: 'Read back the Overseer's {count} code words, first to last.'",
+      "prompt": "The radio's channel lock wants a read-back. A card is taped to it: 'Read back the Overseer's {count} code words, first to last.'",
       "hints": [
         "Each of {count} phones caught one code word in the radio static.",
         "Say them in order, first to last, like: word word word."
       ],
-      "solvedText": "The static clears. '{answer},' the Overseer repeats. 'Confirmed. You were listening, recruits.' One lock on the blast door releases.",
+      "solvedText": "The static clears. '{answer},' the Overseer repeats. 'Confirmed. You were listening, recruits.'",
       "generator": {
         "type": "wordSequence",
         "count": 3,
@@ -798,6 +801,7 @@
       "minMinutes": 45,
       "title": "The Switchboard",
       "kind": "switches",
+      "revealedBy": "spot:switch-banks",
       "prompt": "With the fuse in, the switchboard powers up: each switch lights its lamp and flips the ones beside it. Light every lamp.",
       "requires": [
         "fuse"
@@ -849,46 +853,29 @@
       "id": "blast-door",
       "title": "The Blast Door",
       "kind": "code",
-      "prompt": "The blast door takes the steel key AND a 3-digit code. On the only working screen: 'Your bunk number, then the hour the mess clock stopped, then how many gas masks hung by the showers.'",
-      "answers": [
-        "628"
-      ],
+      "prompt": "The blast door takes the steel key AND a {count}-digit code. On the only working screen: 'Every lock in this room leaves a mark, recruits. Read them in the order marked beside the last exit.'",
       "requires": [
         "launch-key"
       ],
-      "pieces": [
-        "You remember the number painted on your bunk: 6.",
-        "You remember the mess clock: it stopped at 2 o'clock.",
-        "You remember the hooks by the showers: 8 gas masks."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on the screen.",
-        "The bunk, then the clock, then the gas masks."
+        "Every lock you opened in the command room left a mark and a number. The order is marked beside an exit.",
+        "Search the map table.",
+        "The code is {answer}."
       ],
       "solvedText": "The key turns, the keypad flashes green, and somewhere above you, machinery starts to grind.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "413"
-          ],
-          "pieces": [
-            "You remember the number painted on your bunk: 4.",
-            "You remember the mess clock: it stopped at 1 o'clock.",
-            "You remember the hooks by the showers: 3 gas masks."
-          ]
-        },
-        {
-          "answers": [
-            "957"
-          ],
-          "pieces": [
-            "You remember the number painted on your bunk: 9.",
-            "You remember the mess clock: it stopped at 5 o'clock.",
-            "You remember the hooks by the showers: 7 gas masks."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "⭐",
+          "🎖️",
+          "📻",
+          "🔦",
+          "🧭",
+          "⚠️",
+          "🔋",
+          "🗺️"
+        ]
+      }
     }
   ],
   "items": [

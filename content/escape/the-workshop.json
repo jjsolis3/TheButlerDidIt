@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 120,
   "soundscape": "workshop",
   "intro": "Hello. You don't know me, but I know all of you. You have wasted every hour you were given, so tonight I will teach you what an hour is worth. You are chained in my workshop. Everything you need to leave is in this room: keys, tools, and each other. Nobody escapes alone. The clock on the wall is yours. Let the game begin.",
@@ -36,7 +36,7 @@
     {
       "id": "chains",
       "title": "The Chains",
-      "description": "Heavy chains run from your ankles to the pipes. A cassette recorder sits on the floor beside a drain, a bucket and a crate, and five oil drums stand against the wall under a ticking clock, just out of reach.",
+      "description": "Heavy chains run from your ankles to the pipes. A cassette recorder sits on the floor beside a drain, a bucket and a crate, and a row of oil drums stands against the wall under a ticking clock, just out of reach.",
       "puzzles": [
         "tape",
         "floor-search",
@@ -130,7 +130,7 @@
             "w": 200,
             "h": 160,
             "label": "oil drums",
-            "look": "Five drums in a row, each painted a different colour. A locker behind them has a keypad."
+            "look": "A row of oil drums, each painted a different colour. Behind them, bolted to the wall: a locker with a keypad."
           },
           {
             "id": "mirror-shard",
@@ -171,7 +171,7 @@
     {
       "id": "workbench",
       "title": "The Workbench",
-      "description": "Free of the pipes, you stumble to a workbench covered in rusted tools. A steel toolbox and a tall cabinet are both locked. A pegboard, a drawer, a pile of rags and an old calendar surround you. Someone has written on your hands.",
+      "description": "Free of the pipes, you stumble to a workbench covered in rusted tools. A steel toolbox is locked, and a tall cabinet stands in the corner. A pegboard, a drawer, a pile of rags and an old calendar surround you. Someone has written on your hands.",
       "puzzles": [
         "toolbox",
         "mirror-note",
@@ -246,7 +246,7 @@
             "w": 170,
             "h": 420,
             "label": "tall cabinet",
-            "look": "Its letter lock stares back at you. A riddle is painted above it."
+            "look": "A tall cabinet with a letter lock. A riddle is painted above it."
           },
           {
             "id": "steel-toolbox",
@@ -294,6 +294,7 @@
         "tally",
         "doll",
         "message",
+        "trapdoor",
         "exit-door"
       ],
       "scene": {
@@ -307,7 +308,7 @@
             "w": 170,
             "h": 200,
             "label": "fuse box",
-            "look": "One slot is empty. A breaker panel of little bulbs sits dark beside it."
+            "look": "One slot is empty. Beside it, a breaker panel of little bulbs, all dark, waiting for power."
           },
           {
             "id": "wire-cage",
@@ -339,7 +340,7 @@
             "w": 220,
             "h": 90,
             "label": "doormat",
-            "look": "A doormat that says WELCOME. Someone has a sense of humour.",
+            "look": "A doormat that says WELCOME. Someone has a sense of humour. Under it: a little trapdoor with a letter lock.",
             "hidesPieces": true
           },
           {
@@ -361,7 +362,7 @@
             "w": 160,
             "h": 130,
             "label": "monitor",
-            "look": "Static, and now and then a flicker of the doll's grinning face.",
+            "look": "Static, and now and then a flicker of the doll's grinning face. Between the flickers, marks flash up one at a time: {order:exit-door}.",
             "hidesPieces": true
           },
           {
@@ -478,7 +479,8 @@
       "id": "drums",
       "title": "The Oil Drums",
       "kind": "code",
-      "prompt": "The oil drums by the wall: {items}. The locker behind them has a keypad. Stencilled on it: 'Each drum's place, far left is 1, in the order I list them.'",
+      "revealedBy": "spot:drums-wall",
+      "prompt": "The oil drums in front of the locker: {items}. Stencilled on the locker's keypad: 'Each drum's place, far left is 1, in the order I list them.'",
       "generator": {
         "type": "deduction",
         "words": [
@@ -587,6 +589,7 @@
       "minMinutes": 45,
       "title": "The Tall Cabinet",
       "kind": "text",
+      "revealedBy": "spot:tall-cabinet",
       "prompt": "A letter lock on the cabinet. Painted above it: 'The more of me you take, the more you leave behind.'",
       "answers": [
         "footsteps",
@@ -694,6 +697,7 @@
       "minMinutes": 45,
       "title": "The Fuse Box",
       "kind": "switches",
+      "revealedBy": "spot:fuse-box",
       "prompt": "With the fuse in, the breaker panel wakes: each switch lights its bulb and flips the ones beside it. Turn every light on.",
       "requires": [
         "fuse"
@@ -705,7 +709,7 @@
         "Work from the top row down: fix each row using the switches in the row below it.",
         "Press {answer}."
       ],
-      "solvedText": "The lights stutter on. A monitor above the door blinks awake: the Tinkerer's doll, grinning. 'Almost free. Count what saved you.'"
+      "solvedText": "The lights stutter on. On the monitor above the door, the Tinkerer's doll grins. 'Almost free. Remember what each lock left you.'"
     },
     {
       "id": "tally",
@@ -787,49 +791,73 @@
       "solvedText": "The tapping stops. In the silence, the Tinkerer sighs: 'You were paying attention after all.'"
     },
     {
-      "id": "exit-door",
-      "title": "The Steel Door",
-      "kind": "code",
-      "prompt": "The door takes the brass key AND a 3-digit code. On the monitor: 'Enter the hour my clock stopped, then how many tools were in the box, then how many chains held you.'",
+      "id": "trapdoor",
+      "title": "The Trapdoor",
+      "kind": "text",
+      "revealedBy": "spot:doormat",
+      "prompt": "Under the doormat: a little trapdoor with a letter lock. Scratched into the wood: 'What gets wetter the more it dries?'",
       "answers": [
-        "942"
-      ],
-      "requires": [
-        "exit-key"
-      ],
-      "pieces": [
-        "You remember the wall clock's hands: it stopped at 9 o'clock.",
-        "You remember the toolbox: besides the cutter handles it held exactly 4 tools.",
-        "You remember the pipes: there were 2 chains, one on each ankle."
+        "towel",
+        "a towel"
       ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order the monitor asks for.",
-        "The hour, then the tools, then the chains."
+        "Think about the end of a bath.",
+        "You dry yourself with it."
       ],
-      "solvedText": "The keypad flashes green. The key turns. Somewhere above you, a door unlocks.",
+      "solvedText": "The trapdoor creaks up. Underneath: a smell of damp, and a mark scratched into the stone.",
       "variants": [
         {},
         {
+          "prompt": "Under the doormat: a little trapdoor with a letter lock. Scratched into the wood: 'I have one eye, but I can't see a thing.'",
           "answers": [
-            "362"
+            "needle",
+            "a needle"
           ],
-          "pieces": [
-            "You remember the wall clock's hands: it stopped at 3 o'clock.",
-            "You remember the toolbox: besides the cutter handles it held exactly 6 tools.",
-            "You remember the pipes: there were 2 chains, one on each ankle."
+          "hints": [
+            "Think about sewing.",
+            "Thread goes through its eye."
           ]
         },
         {
+          "prompt": "Under the doormat: a little trapdoor with a letter lock. Scratched into the wood: 'I'm tall when I'm young and short when I'm old.'",
           "answers": [
-            "752"
+            "candle",
+            "a candle"
           ],
-          "pieces": [
-            "You remember the wall clock's hands: it stopped at 7 o'clock.",
-            "You remember the toolbox: besides the cutter handles it held exactly 5 tools.",
-            "You remember the pipes: there were 2 chains, one on each ankle."
+          "hints": [
+            "Think about what burns down in the dark.",
+            "It has a wick and melts as it burns."
           ]
         }
       ]
+    },
+    {
+      "id": "exit-door",
+      "title": "The Steel Door",
+      "kind": "code",
+      "prompt": "The door takes the brass key AND a {count}-digit code. Scratched beside the keypad: 'Every lock down here left you a mark. Read them in the order my doll shows you.'",
+      "requires": [
+        "exit-key"
+      ],
+      "hints": [
+        "Every lock you opened at the door left a mark and a number. The order flashes up somewhere.",
+        "Search the monitor.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The keypad flashes green. The key turns. Somewhere above you, a door unlocks.",
+      "generator": {
+        "type": "final",
+        "marks": [
+          "⚙️",
+          "🔩",
+          "🗝️",
+          "🕯️",
+          "⛓️",
+          "🔧",
+          "✂️",
+          "🔦"
+        ]
+      }
     }
   ],
   "items": [

@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "haunted",
   "intro": "Oh my, oh dear, what have you done? You read the spell, and now it's begun! Every door is locked up tight, until you solve my puzzles right. Share your clues and work as one, and you'll be home when the magic's done!",
@@ -69,7 +69,7 @@
             "w": 170,
             "h": 160,
             "label": "spellbook stand",
-            "look": "The huge spellbook, open on its stand. Its pages turn by themselves."
+            "look": "The huge spellbook, open on its stand. Its pages turn by themselves. In one margin, something is scribbled in code."
           },
           {
             "id": "blank-scroll",
@@ -145,7 +145,7 @@
             "w": 170,
             "h": 160,
             "label": "candle shelf",
-            "look": "Candles of every colour, dripping wax. The wax spells nothing at all.",
+            "look": "Candles of every colour, dripping wax. Above the shelf, more candles float in a row beside a little locked box.",
             "hidesPieces": true
           },
           {
@@ -229,7 +229,7 @@
             "w": 220,
             "h": 160,
             "label": "ingredient cabinet",
-            "look": "A cabinet with a 3-digit lock and a spell card stuck to the door."
+            "look": "A cabinet with a combination lock and a spell card stuck to the door."
           },
           {
             "id": "mirror-spot",
@@ -249,7 +249,7 @@
             "w": 220,
             "h": 160,
             "label": "potion shelf",
-            "look": "Bottles in every colour, with labels written in numbers."
+            "look": "Bottles in every colour. The newest one's label is written in runes, and the shelf holds on to it tight."
           },
           {
             "id": "broom-cupboard",
@@ -270,7 +270,7 @@
             "w": 220,
             "h": 160,
             "label": "rune stones",
-            "look": "Stones set in the wall, each carved with a rune. They're all dark."
+            "look": "Stones set in the wall, each carved with a rune. They're all dark, but they wobble when you touch them."
           },
           {
             "id": "jar-shelf",
@@ -448,7 +448,7 @@
             "w": 220,
             "h": 160,
             "label": "star log",
-            "look": "Notes about every star, in very small writing.",
+            "look": "Notes about every star, in very small writing. On the last page, Professor Quill has drawn a row of marks: {order:tower-door}.",
             "hidesPieces": true
           },
           {
@@ -571,7 +571,8 @@
       "id": "candles",
       "title": "The Floating Candles",
       "kind": "code",
-      "prompt": "Five candles float in a row: {items}. A little locked box floats with them: 'Each candle's place, far left is 1, in the order I list them!'",
+      "revealedBy": "spot:candle-shelf",
+      "prompt": "Candles float in a row: {items}. A little locked box floats with them: 'Each candle's place, far left is 1, in the order I list them!'",
       "generator": {
         "type": "deduction",
         "words": [
@@ -615,6 +616,7 @@
       "minMinutes": 45,
       "title": "Quill's Secret Code",
       "kind": "text",
+      "revealedBy": "spot:spellbook-stand",
       "prompt": "Scribbled in the margin of the spellbook: {cipher}. Professor Quill blushes: 'My secret word! Oh, I'd rather not say…'",
       "generator": {
         "type": "cipher",
@@ -681,6 +683,7 @@
       "id": "potion-labels",
       "title": "The Potion Labels",
       "kind": "text",
+      "revealedBy": "spot:potion-shelf",
       "prompt": "The newest potion bottle's label is written in runes. It names a potion ingredient: {cipher}. The shelf won't let go of it until you say what's inside.",
       "generator": {
         "type": "cipher",
@@ -719,6 +722,7 @@
       "minMinutes": 45,
       "title": "The Rune Stones",
       "kind": "switches",
+      "revealedBy": "spot:rune-panel",
       "prompt": "The rune stones flicker. Touch one and it lights, and flips the stones beside it. Light every rune!",
       "generator": {
         "type": "switches"
@@ -805,7 +809,6 @@
     },
     {
       "id": "telescope",
-      "minMinutes": 45,
       "title": "The Great Telescope",
       "kind": "text",
       "prompt": "The great telescope is locked with a word dial. A note in curly handwriting: 'The {count} star-words, first to last!'",
@@ -836,9 +839,9 @@
     },
     {
       "id": "constellation",
-      "minMinutes": 60,
       "title": "The Back-to-Front Stars",
       "kind": "text",
+      "revealedBy": "spot:star-chart",
       "prompt": "A star name on the chart is in Quill's back-to-front alphabet: {cipher}. The chart's lock wants the real name.",
       "generator": {
         "type": "cipher",
@@ -900,46 +903,29 @@
       "id": "tower-door",
       "title": "The Tower Door",
       "kind": "code",
-      "prompt": "The tower's last door needs the star map AND a 3-digit code. Professor Quill's note: 'Floating books in the library, then bubbling cauldrons in the lab, then owls up here in the rafters!'",
-      "answers": [
-        "735"
-      ],
+      "prompt": "The tower's last door needs the star map AND a {count}-digit code. Professor Quill's note: 'Every lock up here left you a little mark. Read them in the order I wrote in my star log!'",
       "requires": [
         "star-map"
       ],
-      "pieces": [
-        "You counted the floating books in the library: 7.",
-        "You remember the potion lab: 3 cauldrons were bubbling.",
-        "You counted the owls in the rafters: 5."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on the note.",
-        "Books, then cauldrons, then owls."
+        "Every lock you opened in the observatory left a mark and a number. The order is written down somewhere.",
+        "Search the star log.",
+        "The code is {answer}."
       ],
       "solvedText": "The star map glows, the keypad twinkles, and the door starts to swing open.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "482"
-          ],
-          "pieces": [
-            "You counted the floating books in the library: 4.",
-            "You remember the potion lab: 8 cauldrons were bubbling.",
-            "You counted the owls in the rafters: 2."
-          ]
-        },
-        {
-          "answers": [
-            "916"
-          ],
-          "pieces": [
-            "You counted the floating books in the library: 9.",
-            "You remember the potion lab: 1 cauldron was bubbling.",
-            "You counted the owls in the rafters: 6."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "⭐",
+          "🌙",
+          "🦉",
+          "🔮",
+          "🧪",
+          "☄️",
+          "📜",
+          "🕯️"
+        ]
+      }
     }
   ],
   "items": [

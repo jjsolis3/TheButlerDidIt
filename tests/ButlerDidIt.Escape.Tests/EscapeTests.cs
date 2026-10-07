@@ -380,9 +380,12 @@ public class ReplayTests
         var seeds = Enumerable.Range(0, 60).Select(i => (long)i).ToList();
         Assert.True(seeds.Select(s => Answer("the-workshop", "toolbox", s)).Distinct().Count() > 40, "the toolbox code varies");
         Assert.True(seeds.Select(s => Answer("the-funhouse", "duck-pond", s)).Distinct().Count() > 40, "the duck-pond code varies");
-        Assert.True(seeds.Select(s => Answer("the-funhouse", "exit-gate", s)).Distinct().Count() > 40, "the gate password varies");
+        Assert.True(seeds.Select(s => Answer("the-funhouse", "carousel-animals", s)).Distinct().Count() > 40, "the carousel password varies");
         Assert.Equal(3, seeds.Select(s => Answer("the-workshop", "cabinet", s)).Distinct().Count()); // every hand-written riddle comes up
-        Assert.Equal(3, seeds.Select(s => Answer("the-workshop", "exit-door", s)).Distinct().Count());
+        Assert.Equal(3, seeds.Select(s => Answer("the-workshop", "trapdoor", s)).Distinct().Count());
+        // A final lock's code is built for each game, from the puzzles it plays (#134).
+        string Final(string room, string puzzle, long seed) => EscapeEngine.RoomFor(EscapeEngine.NewGame(seed), Rooms.Get(room)).FindPuzzle(puzzle)!.Answers[0];
+        Assert.True(seeds.Select(s => Final("the-workshop", "exit-door", s)).Distinct().Count() > 40, "the door's final code varies");
     }
 
     [Fact]
@@ -395,7 +398,7 @@ public class ReplayTests
             Assert.Equal(string.Concat(digits), toolbox.Answers[0]);
             Assert.DoesNotContain("{", toolbox.Hints[1]);
 
-            var gate = RoomVariants.Build(Rooms.Get("the-funhouse"), seed).FindPuzzle("exit-gate")!;
+            var gate = RoomVariants.Build(Rooms.Get("the-funhouse"), seed).FindPuzzle("carousel-animals")!;
             Assert.Equal(gate.Answers[0].ToUpperInvariant(), gate.SolvedText[(gate.SolvedText.IndexOf(": ") + 2)..^1]);
             var ducks = RoomVariants.Build(Rooms.Get("the-funhouse"), seed).FindPuzzle("duck-pond")!;
             Assert.DoesNotContain("{order}", ducks.Prompt);
