@@ -52,7 +52,7 @@ test('an escape room: three phones escape the Workshop together', async ({ brows
   // Three lengths; the standard one is picked, and a quicker game plays fewer puzzles.
   await expect(tv.getByRole('radio', { name: /45 minutes/ })).toBeChecked()
   await expect(tv.getByText('⏱️ 30 minutes')).toBeVisible()
-  await expect(tv.getByText(/9 puzzles · a quicker game/)).toBeVisible()
+  await expect(tv.getByText(/10 puzzles · a quicker game/)).toBeVisible()
   // Fresh puzzles by default; today's challenge and replaying a puzzle set are the other choices.
   await expect(tv.getByRole('radio', { name: /Fresh puzzles/ })).toBeChecked()
   await expect(tv.getByRole('radio', { name: /Today's challenge/ })).toBeVisible()
@@ -231,7 +231,9 @@ test('an escape room written by AI from a theme lands on the host shelf, ready t
   await expect(tv.getByRole('heading', { name: 'The Spiral Stairs' })).toBeVisible()
   await expect(ada.getByTestId('scene')).toBeVisible()
   const answers = (await (await tv.request.get(`/api/parties/${code}/escape-answers`)).json()) as Record<string, string | null>
-  await playThrough(tv, [ada], aiRoom, answers, '95-escape-ai')
+  // Its locks to find turn up as Ada searches and solves, and the lamp room ends on a final lock (#143).
+  const moments = await playThrough(tv, [ada], aiRoom, answers, '95-escape-ai')
+  expect(moments.has('final')).toBe(true)
   await expect(tv.getByRole('heading', { name: 'You escaped!' })).toBeVisible()
 })
 

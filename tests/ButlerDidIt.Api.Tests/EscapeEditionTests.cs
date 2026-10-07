@@ -19,7 +19,7 @@ public class EscapeEditionTests(ApiFactory app) : IClassFixture<ApiFactory>
     public async Task Old_edition_times_drop_off_the_boards_and_the_shelf()
     {
         var workshop = app.Services.GetRequiredService<EscapeCatalog>().Find("the-workshop")!;
-        Assert.Equal(3, workshop.Edition); // rebuilt (2), then given decoy keys (3)
+        Assert.Equal(4, workshop.Edition); // rebuilt (2), given decoy keys (3), then locks to find and a final lock (4)
         using (var scope = app.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -27,12 +27,13 @@ public class EscapeEditionTests(ApiFactory app) : IClassFixture<ApiFactory>
                 Result("the-workshop", 300, null), // from before editions: edition 1
                 Result("the-workshop", 400, 1),
                 Result("the-workshop", 900, 2),
-                Result("the-workshop", 1500, 3));
+                Result("the-workshop", 1200, 3),
+                Result("the-workshop", 1500, 4));
             await db.SaveChangesAsync();
         }
 
         var board = GameJson.Deserialize<Leaderboard>(await app.CreateClient().GetStringAsync("/api/escape-rooms/the-workshop/leaderboard"));
-        Assert.Equal(3, board.Edition);
+        Assert.Equal(4, board.Edition);
         Assert.Equal([1500], board.Top.Select(e => e.Score)); // the fast old times aren't on the new board
 
         var shelf = GameJson.Deserialize<List<EscapeRoomSummary>>(await app.CreateClient().GetStringAsync("/api/escape-rooms"));

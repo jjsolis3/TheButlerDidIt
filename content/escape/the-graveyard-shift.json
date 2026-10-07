@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 120,
   "soundscape": "tension",
   "intro": "Ah. Guests. It has been so very long since we had guests. Welcome to the Jamboree, my dears. I am Maestro Tiberius, and the band and I have been waiting in the dark for thirty-five years. The doors are locked for your safety. The power is on reserve. And the show... the show must go on. Everybody stays until six, my dears. Everybody.",
@@ -66,7 +66,7 @@
             "w": 170,
             "h": 160,
             "label": "missing posters",
-            "look": "Dozens of posters, all the same face: WALT HARGROVE, MANAGER. MISSING SINCE 14 MARCH 1991."
+            "look": "Dozens of posters, all the same face: WALT HARGROVE, MANAGER. MISSING SINCE 14 MARCH 1991. Across the bottom of each, a word stamped in numbers. The notice board's glass case has a word lock."
           },
           {
             "id": "table-six",
@@ -343,7 +343,7 @@
             "w": 170,
             "h": 160,
             "label": "staff lockers",
-            "look": "Inside the first locker, a card of little symbols: {key:suit-scratches}"
+            "look": "Inside the first locker, a card of little symbols: {key:suit-scratches}. The night supervisor's locker beside it has a combination lock."
           },
           {
             "id": "parts-drawer",
@@ -444,7 +444,7 @@
             "w": 170,
             "h": 160,
             "label": "service exit",
-            "look": "A heavy door, chained, with a padlock and a 3-digit keypad. Grey light shows under the gap."
+            "look": "A heavy door, chained, with a padlock and a keypad. Grey light shows under the gap."
           },
           {
             "id": "maestro",
@@ -475,7 +475,7 @@
             "w": 170,
             "h": 160,
             "label": "calendar",
-            "look": "Stopped on March 1991. The 14th is circled twice.",
+            "look": "Stopped on March 1991. The 14th is circled twice. Down the side, Walt has drawn a row of marks: {order:service-exit}.",
             "hidesPieces": true
           },
           {
@@ -577,6 +577,7 @@
       "id": "party-table",
       "title": "Table Six",
       "kind": "code",
+      "revealedBy": "spot:table-six",
       "prompt": "The seating plan for table six, the night Walt disappeared, is pinned to the cake stand: the guests sat in a row along one side, {items}. The cake stand's keypad wants each guest's seat, far left is 1, in the order listed.",
       "generator": {
         "type": "deduction",
@@ -644,6 +645,7 @@
     },
     {
       "id": "balloons",
+      "minMinutes": 45,
       "title": "The Balloons",
       "kind": "code",
       "prompt": "Deflated balloons are still tied to the chairs at table six. The birthday card propped against them reads: '{order}.' The card's envelope has a {count}-digit lock. Each of you counted one colour.",
@@ -673,6 +675,7 @@
       "minMinutes": 60,
       "title": "The Missing Posters",
       "kind": "text",
+      "revealedBy": "spot:missing-wall",
       "prompt": "Every MISSING poster has the same word stamped across the bottom, in numbers where A is 1 and B is 2: {cipher}. The notice board's glass case has a word lock.",
       "generator": {
         "type": "cipher",
@@ -710,6 +713,7 @@
       "id": "parts-log",
       "title": "The Parts Log",
       "kind": "code",
+      "revealedBy": "spot:parts-cage",
       "prompt": "The clipboard on the parts cage lists the serial numbers of the Maestro's replacement parts, one after another: {sequence}. The cage's keypad wants the next serial number.",
       "generator": {
         "type": "sequence"
@@ -747,6 +751,7 @@
       "minMinutes": 45,
       "title": "The Spare Suit",
       "kind": "text",
+      "revealedBy": "spot:spare-suit",
       "prompt": "Inside the spare tiger suit's head, someone has scratched a word in a code of little symbols: {cipher}. It's the last thing whoever wore it wanted. The suit's chest clasp has a word lock.",
       "generator": {
         "type": "cipher",
@@ -792,6 +797,7 @@
       "minMinutes": 60,
       "title": "The Night Supervisor's Locker",
       "kind": "code",
+      "revealedBy": "spot:staff-lockers",
       "prompt": "The night supervisor's locker has a {count}-digit lock. The staff wrote their combinations as quiz questions so nobody would forget, and you've each found one.",
       "generator": {
         "type": "digitFacts",
@@ -851,9 +857,9 @@
     },
     {
       "id": "last-tape",
-      "minMinutes": 45,
       "title": "Walt's Last Tape",
       "kind": "text",
+      "revealedBy": "spot:tape-deck",
       "prompt": "The cassette in the tape deck is Walt's last message, chewed by the machine: 'If anyone finds this, the password for the service exit is...' Each of you made out one word through the hiss.",
       "generator": {
         "type": "wordSequence",
@@ -882,9 +888,9 @@
     },
     {
       "id": "office-window",
-      "minMinutes": 60,
       "title": "The Office Window",
       "kind": "text",
+      "revealedBy": "spot:office-window",
       "prompt": "Someone has traced a word in the grime on the office window, from the outside, in a back-to-front alphabet where A swaps with Z: {cipher}. The window catch has a word lock.",
       "generator": {
         "type": "cipher",
@@ -959,46 +965,29 @@
       "id": "service-exit",
       "title": "The Service Exit",
       "kind": "code",
-      "prompt": "The service exit needs its key AND a 3-digit code. Walt's note is taped to the door: 'Candles on the cake, then chairs at table six, then heads on the shelves.'",
-      "answers": [
-        "947"
-      ],
+      "prompt": "The service exit needs its key AND a {count}-digit code. Walt's note is taped to the door: 'Every lock in here leaves its mark. If you're reading this, use the order on my calendar. And don't look at the Maestro.'",
       "requires": [
         "service-key"
       ],
-      "pieces": [
-        "You counted the candles on the birthday cake: 9.",
-        "You counted the chairs at table six: 4.",
-        "You counted the spare heads on the shelves: 7."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on Walt's note.",
-        "Candles, then chairs, then heads."
+        "Every lock you opened in Walt's office left a mark and a number. The order is written down in here.",
+        "Search the calendar.",
+        "The code is {answer}."
       ],
       "solvedText": "The padlock drops, the keypad blinks green, and the chain slithers to the floor. Behind you, very softly, the birthday song begins to play.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "682"
-          ],
-          "pieces": [
-            "You counted the candles on the birthday cake: 6.",
-            "You counted the chairs at table six: 8.",
-            "You counted the spare heads on the shelves: 2."
-          ]
-        },
-        {
-          "answers": [
-            "315"
-          ],
-          "pieces": [
-            "You counted the candles on the birthday cake: 3.",
-            "You counted the chairs at table six: 1.",
-            "You counted the spare heads on the shelves: 5."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🎂",
+          "🎈",
+          "🔦",
+          "🎟️",
+          "🕯️",
+          "📼",
+          "🍕",
+          "⏰"
+        ]
+      }
     }
   ],
   "items": [

@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "stadium",
   "intro": "HA-HA! Welcome, students, to the Skyline Hero Academy practical exam! I am Captain Comet, retired hero and your examiner today. Your trials: rescue the stranded, work as a team, and stop the villain! Oh, and one small thing: the support class's robot, Doctor Dilemma, has gone a little rogue and locked every door. Heroes help first! BEGIN!",
@@ -79,7 +79,7 @@
             "w": 170,
             "h": 160,
             "label": "trophy cabinet",
-            "look": "Shiny trophies: BEST RESCUE, LOUDEST CHEER, and one that just says TRIED VERY HARD."
+            "look": "Shiny trophies: BEST RESCUE, LOUDEST CHEER, and one that just says TRIED VERY HARD. The cabinet has a word lock, and above the lockers, Captain Comet's motto is painted in code."
           },
           {
             "id": "roll-call-board",
@@ -451,7 +451,7 @@
             "w": 170,
             "h": 160,
             "label": "roof hatch",
-            "look": "A hatch in the ceiling with a card slot and a 3-digit keypad. Daylight peeks round the edges."
+            "look": "A hatch in the ceiling with a card slot and a keypad. Daylight peeks round the edges."
           },
           {
             "id": "levers",
@@ -483,7 +483,7 @@
             "w": 170,
             "h": 160,
             "label": "blueprints",
-            "look": "Drawings of robots, rockets and a giant mechanical hamster wheel.",
+            "look": "Drawings of robots, rockets and a giant mechanical hamster wheel. In the corner of one, Doctor Dilemma has doodled a row of marks: {order:roof-hatch}.",
             "hidesPieces": true
           },
           {
@@ -605,8 +605,10 @@
     },
     {
       "id": "hero-motto",
+      "minMinutes": 45,
       "title": "The Hero Motto",
       "kind": "text",
+      "revealedBy": "spot:trophy-cabinet",
       "prompt": "Captain Comet's hero motto is painted above the lockers in a code from his old hero days: {cipher}. It's the one thing every hero needs most. The trophy cabinet's word lock wants it.",
       "generator": {
         "type": "cipher",
@@ -677,6 +679,7 @@
       "id": "siren",
       "title": "The Siren",
       "kind": "code",
+      "revealedBy": "spot:fire-station",
       "prompt": "The rescue zone's siren wails in bursts, and the fire station's keypad shows the count: {sequence}. Type the next number to switch it off!",
       "generator": {
         "type": "sequence"
@@ -710,6 +713,7 @@
       "id": "hero-teams",
       "title": "The Team Scoreboard",
       "kind": "code",
+      "revealedBy": "spot:scoreboard",
       "prompt": "The rescue scoreboard has a {count}-digit lock and a message: '{order}!' Each of you counted the dummies rescued by one colour of team.",
       "generator": {
         "type": "colorDigits",
@@ -841,7 +845,6 @@
     },
     {
       "id": "hero-oath",
-      "minMinutes": 45,
       "title": "The Hero Oath",
       "kind": "text",
       "prompt": "Nugget the class hamster is locked in Doctor Dilemma's cage, and it only opens for true heroes. Say the Hero Oath! Each of you remembers one word of it.",
@@ -872,9 +875,9 @@
     },
     {
       "id": "do-not-pull",
-      "minMinutes": 45,
       "title": "The DO NOT PULL Lever",
       "kind": "text",
+      "revealedBy": "spot:levers",
       "prompt": "The big lever marked DO NOT PULL has a word lock, and one of Doctor Dilemma's riddles: 'I go up and I go down, but I never move an inch.'",
       "answers": [
         "stairs",
@@ -1001,46 +1004,29 @@
       "id": "roof-hatch",
       "title": "The Roof Hatch",
       "kind": "code",
-      "prompt": "The roof hatch needs the access card AND a 3-digit code. Captain Comet's voice crackles: 'Dummies in the rescue zone, then gadgets on the dock, then trophies in the cabinet!'",
-      "answers": [
-        "648"
-      ],
+      "prompt": "The roof hatch needs the access card AND a {count}-digit code. Captain Comet's voice crackles: 'Every lock in that lair left you a hero mark! Read them in the order Doctor Dilemma doodled on his blueprints!'",
       "requires": [
         "hatch-card"
       ],
-      "pieces": [
-        "You counted the training dummies in the rescue zone: 6.",
-        "You counted the gadgets on the charging dock: 4.",
-        "You counted the trophies in the cabinet: 8."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order Captain Comet said.",
-        "Dummies, then gadgets, then trophies."
+        "Every lock you opened in the lair left a mark and a number. The order is doodled somewhere in here.",
+        "Search the blueprints.",
+        "The code is {answer}."
       ],
       "solvedText": "The hatch swings open onto blue sky and a cheering crowd. Captain Comet strikes his biggest pose yet: 'EXAM... PASSED!'",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "279"
-          ],
-          "pieces": [
-            "You counted the training dummies in the rescue zone: 2.",
-            "You counted the gadgets on the charging dock: 7.",
-            "You counted the trophies in the cabinet: 9."
-          ]
-        },
-        {
-          "answers": [
-            "531"
-          ],
-          "pieces": [
-            "You counted the training dummies in the rescue zone: 5.",
-            "You counted the gadgets on the charging dock: 3.",
-            "You counted the trophies in the cabinet: 1."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "⚡",
+          "🦸",
+          "🛡️",
+          "⭐",
+          "🚀",
+          "🐹",
+          "💥",
+          "🏆"
+        ]
+      }
     }
   ],
   "items": [

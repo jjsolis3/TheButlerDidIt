@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "meadow",
   "intro": "Hrrm. Another newcomer. I'm Old Pebble, the trader round here. You've woken up in the Blocklands, where everything's made of blocks, and the only way back is the old portal deep under the hills. It's broken, of course. You'll have to craft your own tools, dig deep and mend it yourselves. And the sun's going down. Hrrm. Better start punching some trees.",
@@ -62,7 +62,7 @@
             "w": 170,
             "h": 160,
             "label": "trader's stall",
-            "look": "Old Pebble's stall, with a till that has a word lock and a sign in a strange sliding code."
+            "look": "Old Pebble's stall, with a till that has a word lock and a sign in a strange sliding code. Behind the counter, his trading chest has a number lock."
           },
           {
             "id": "mossy-boulder",
@@ -428,7 +428,7 @@
             "w": 170,
             "h": 160,
             "label": "glow lamps",
-            "look": "Lamps set into the stone walls, all dark."
+            "look": "Lamps set into the stone walls, all dark. Each one has a little switch, and they're all wired together."
           },
           {
             "id": "rune-stone",
@@ -481,7 +481,7 @@
             "w": 170,
             "h": 160,
             "label": "armour stand",
-            "look": "A stand wearing a rusty helmet and nothing else.",
+            "look": "A stand wearing a rusty helmet and nothing else. Scratched into the helmet: {order:portal}.",
             "hidesPieces": true
           },
           {
@@ -644,6 +644,7 @@
       "minMinutes": 60,
       "title": "The Trading Chest",
       "kind": "code",
+      "revealedBy": "spot:trader-stall",
       "prompt": "Old Pebble's trading chest has a {count}-digit lock. He's set the code as a quiz, one question for each of you.",
       "generator": {
         "type": "digitFacts",
@@ -674,6 +675,7 @@
       "id": "ore-wall",
       "title": "The Ore Wall",
       "kind": "code",
+      "revealedBy": "spot:vault-door",
       "prompt": "The miners' vault door has a {count}-digit lock and a sign: '{order}!' The wall around it is striped with ore, and each of you counted one kind.",
       "generator": {
         "type": "colorDigits",
@@ -737,6 +739,7 @@
       "minMinutes": 45,
       "title": "The Storeroom Door",
       "kind": "text",
+      "revealedBy": "spot:storeroom-door",
       "prompt": "The miners' storeroom door has a word lock, with a riddle scratched into it: 'The more you take out of me, the bigger I get.'",
       "answers": [
         "hole",
@@ -804,9 +807,9 @@
     },
     {
       "id": "glow-lamps",
-      "minMinutes": 45,
       "title": "The Glow Lamps",
       "kind": "switches",
+      "revealedBy": "spot:lamp-wall",
       "prompt": "The ruin's glow lamps are wired together: switch one and the ones beside it switch too. Light every lamp to wake the ruin!",
       "generator": {
         "type": "switches"
@@ -819,7 +822,6 @@
     },
     {
       "id": "enchanting-table",
-      "minMinutes": 45,
       "title": "The Enchanting Table",
       "kind": "text",
       "prompt": "The enchanting table's floating book is written in ancient runes: {cipher}. It names a magic charm for your tools. The book's clasp has a word lock.",
@@ -859,7 +861,6 @@
     },
     {
       "id": "spell-words",
-      "minMinutes": 45,
       "title": "The Portal Spell",
       "kind": "text",
       "prompt": "Carved on the portal frame: SPEAK THE OLD WORDS TO WAKE ME. Each of you found one word of the spell in the ruin's dusty books.",
@@ -949,47 +950,30 @@
       "id": "portal",
       "title": "The Portal",
       "kind": "code",
-      "prompt": "The portal frame is missing one block of obsidian, it needs a spark to light it, AND it wants a 3-digit code carved into its base. Old Pebble grumbles: 'Torches in the caves, then lamps in the ruin, then books on the shelf. Hrrm.'",
-      "answers": [
-        "527"
-      ],
+      "prompt": "The portal frame is missing one block of obsidian, it needs a spark to light it, AND it wants a {count}-digit code carved into its base. Old Pebble grumbles: 'Every lock down here leaves its mark. Read 'em in the order on that old helmet, hrrm.'",
       "requires": [
         "obsidian",
         "flint-and-steel"
       ],
-      "pieces": [
-        "You counted the torches along the cave walls: 5.",
-        "You counted the glow lamps in the ruin: 2.",
-        "You counted the books on the ancient bookshelf: 7."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in Old Pebble's order.",
-        "Torches, then lamps, then books."
+        "Every lock you opened in the ruin left a mark and a number. The order is scratched somewhere in here.",
+        "Search the armour stand.",
+        "The code is {answer}."
       ],
       "solvedText": "You slot in the obsidian, strike the flint and steel, and type the code. WHOOSH! The portal fills with swirling purple light. One step, and you're through.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "816"
-          ],
-          "pieces": [
-            "You counted the torches along the cave walls: 8.",
-            "You counted the glow lamps in the ruin: 1.",
-            "You counted the books on the ancient bookshelf: 6."
-          ]
-        },
-        {
-          "answers": [
-            "394"
-          ],
-          "pieces": [
-            "You counted the torches along the cave walls: 3.",
-            "You counted the glow lamps in the ruin: 9.",
-            "You counted the books on the ancient bookshelf: 4."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "💎",
+          "🔥",
+          "🌳",
+          "⛏️",
+          "🍎",
+          "🐑",
+          "⭐",
+          "🧱"
+        ]
+      }
     }
   ],
   "items": [

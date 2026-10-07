@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "workshop",
   "intro": "Beep. Boop. INTRUDERS! The Tick-Tock Toy Factory is CLOSED, and I, Sprocket, Foreman of the Night Shift, have locked every door. Want to go home? Then fix my factory! Work together, share what you find, and get out before the morning whistle. Clank!",
@@ -83,7 +83,7 @@
             "w": 220,
             "h": 160,
             "label": "conveyor belt",
-            "look": "Tin soldiers ride past in a line. Stuck in the belt's rollers: nothing but fluff.",
+            "look": "Tin soldiers ride past in a line. Under the belt: a drawer with a keypad.",
             "hidesPieces": true
           },
           {
@@ -188,7 +188,7 @@
             "w": 220,
             "h": 160,
             "label": "paint mixer",
-            "look": "It rumbles and wobbles. A 3-digit lock holds its hatch shut."
+            "look": "It rumbles and wobbles. A combination lock holds its hatch shut."
           },
           {
             "id": "gearbox-spot",
@@ -208,7 +208,7 @@
             "w": 220,
             "h": 160,
             "label": "colour panel",
-            "look": "A panel of little coloured bulbs, all dark. The code chart beside it is written in numbers."
+            "look": "A panel of little coloured bulbs, all dark, with a row of buttons under it."
           },
           {
             "id": "splat-rug",
@@ -229,7 +229,7 @@
             "w": 220,
             "h": 160,
             "label": "coat rack",
-            "look": "Painters' smocks with deep pockets, all full of old paint rags.",
+            "look": "Painters' smocks with deep pockets, all full of old paint rags. Under them hangs a little locked cupboard with a riddle painted on it.",
             "hidesPieces": true
           },
           {
@@ -292,7 +292,7 @@
     {
       "id": "dock",
       "title": "The Shipping Dock",
-      "description": "Crates of toys are stacked high, ready for the delivery trucks. A toy parrot squawks from inside one crate, a clipboard hangs by a trolley and a mail sack, and the big loading door has a slot for a shipping label and a three-digit keypad.",
+      "description": "Crates of toys are stacked high, ready for the delivery trucks. A toy parrot squawks from inside one crate, a clipboard hangs by a trolley and a mail sack, and the big loading door has a slot for a shipping label and a keypad.",
       "puzzles": [
         "delivery-numbers",
         "parrot-crate",
@@ -331,7 +331,7 @@
             "w": 170,
             "h": 160,
             "label": "squawking crate",
-            "look": "A toy parrot peeks through the slats and says 'Squawk!'"
+            "look": "A toy parrot peeks through the slats and says 'Squawk!' The crate has a word lock."
           },
           {
             "id": "crate-stack",
@@ -341,7 +341,7 @@
             "w": 170,
             "h": 160,
             "label": "stacked crates",
-            "look": "Crates of toys, stacked taller than you. Labels everywhere.",
+            "look": "Crates of toys, stacked taller than you. Labels everywhere. The top row is stamped with marks, in order: {order:loading-door}.",
             "hidesPieces": true
           },
           {
@@ -363,7 +363,7 @@
             "w": 170,
             "h": 160,
             "label": "mail sack",
-            "look": "Letters to Sprocket, mostly complaints about squeaky teddies.",
+            "look": "Letters to Sprocket, mostly complaints about squeaky teddies. And a crumpled delivery note, all in code.",
             "hidesPieces": true
           },
           {
@@ -532,7 +532,8 @@
       "id": "tin-soldiers",
       "title": "The Tin Soldier Parade",
       "kind": "code",
-      "prompt": "Five tin soldiers must march in the right order: {items}. The drawer under the belt has a keypad: 'Each soldier's place, first in line is 1, in the order I list them.'",
+      "revealedBy": "spot:conveyor",
+      "prompt": "Tin soldiers must march in the right order: {items}. The drawer under the belt has a keypad: 'Each soldier's place, first in line is 1, in the order I list them.'",
       "generator": {
         "type": "deduction",
         "words": [
@@ -657,6 +658,7 @@
       "minMinutes": 45,
       "title": "The Colour Lights",
       "kind": "switches",
+      "revealedBy": "spot:colour-panel",
       "prompt": "The panel of coloured bulbs flickers on. Each button lights its bulb and flips the ones beside it. Turn every light on to mix the perfect colour.",
       "generator": {
         "type": "switches"
@@ -672,6 +674,7 @@
       "minMinutes": 60,
       "title": "The Painters' Coat Rack",
       "kind": "text",
+      "revealedBy": "spot:smock-rack",
       "prompt": "A little locked cupboard hangs under the coat rack. Its word lock has a riddle painted on it: 'I have a thumb and four fingers, but I'm not alive.'",
       "answers": [
         "glove",
@@ -730,7 +733,7 @@
       "id": "delivery-numbers",
       "title": "The Delivery Numbers",
       "kind": "code",
-      "prompt": "The crate numbers go: {sequence}. The next crate's number is missing, and the dock's keypad wants it.",
+      "prompt": "The crate numbers go: {sequence}. The next crate's number is missing, and the trolley's little keypad wants it.",
       "generator": {
         "type": "sequence"
       },
@@ -742,9 +745,9 @@
     },
     {
       "id": "parrot-crate",
-      "minMinutes": 45,
       "title": "The Parrot Crate",
       "kind": "text",
+      "revealedBy": "spot:parrot-box",
       "prompt": "A toy parrot is stuck inside a crate with a word lock. It squawks: 'Sprocket's {count} favourite toys, first to last! Squawk!'",
       "hints": [
         "Each of {count} phones remembers one toy from Sprocket's list.",
@@ -773,9 +776,9 @@
     },
     {
       "id": "delivery-note",
-      "minMinutes": 60,
       "title": "The Delivery Note",
       "kind": "text",
+      "revealedBy": "spot:mail-sack",
       "prompt": "A crumpled delivery note is in code: {cipher}. The driver's lock wants the word.",
       "generator": {
         "type": "cipher",
@@ -838,46 +841,29 @@
       "id": "loading-door",
       "title": "The Loading Door",
       "kind": "code",
-      "prompt": "The loading door needs the shipping label AND a 3-digit code. Sprocket's note: 'Robots on my assembly line, then mixers in my paint shop, then trucks at my dock!'",
-      "answers": [
-        "524"
-      ],
+      "prompt": "The loading door needs the shipping label AND a {count}-digit code. Sprocket's note: 'Every lock on my dock leaves a mark. Read them in the order stamped on my crates! Tick-tock!'",
       "requires": [
         "shipping-label"
       ],
-      "pieces": [
-        "You counted the robots on the assembly line: 5.",
-        "You remember the paint shop: it had 2 mixers.",
-        "You counted the trucks waiting at the dock: 4."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on Sprocket's note.",
-        "Robots, then mixers, then trucks."
+        "Every lock you opened at the dock left a mark and a number. The order is stamped somewhere.",
+        "Search the stacked crates.",
+        "The code is {answer}."
       ],
       "solvedText": "The label slides into the slot and the keypad plays a jolly jingle. With a clatter, the big door starts to roll up.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "613"
-          ],
-          "pieces": [
-            "You counted the robots on the assembly line: 6.",
-            "You remember the paint shop: it had 1 mixer.",
-            "You counted the trucks waiting at the dock: 3."
-          ]
-        },
-        {
-          "answers": [
-            "835"
-          ],
-          "pieces": [
-            "You counted the robots on the assembly line: 8.",
-            "You remember the paint shop: it had 3 mixers.",
-            "You counted the trucks waiting at the dock: 5."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🧸",
+          "🚂",
+          "🎁",
+          "⭐",
+          "🎈",
+          "🤖",
+          "🧩",
+          "🥁"
+        ]
+      }
     }
   ],
   "items": [

@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url'
 import { SHOTS } from './escape-play'
 
 // The escape room editor (#113): a host makes their own copy of a built-in room, rewords it, adds an answer to a
-// riddle (a new edition), sees a broken change refused, gives it their own cover, intro video and background
-// sound (#110 step 2), and plays their version.
+// riddle (a new edition), sees a broken change refused, changes the final lock's marks (#143), gives it their own
+// cover, intro video and background sound (#110 step 2), and plays their version.
 
 mkdirSync(SHOTS, { recursive: true })
 
@@ -61,6 +61,29 @@ test('a host copies a built-in room, edits it, and plays their own version', asy
   await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled()
   await page.getByLabel('Kind').selectOption('text')
   await expect(check).toContainText('✓ Ready to play')
+
+  // ---- The steel door is the room's final lock (#143): it finds itself, and its marks have their own editor.
+  await page.getByRole('button', { name: 'The Steel Door', exact: true }).click()
+  await expect(page.getByLabel('How the group finds it')).toHaveCount(0)
+  const marks = page.getByRole('group', { name: 'Marks the other puzzles leave' })
+  await expect(marks.getByRole('list', { name: 'Marks' }).getByRole('listitem')).toHaveCount(8)
+  // A mark with a digit in it would muddle the code.
+  await marks.getByLabel('A new mark').fill('🔨7')
+  await expect(marks.getByRole('alert')).toContainText("can't have digits")
+  await expect(marks.getByRole('button', { name: 'Add the mark' })).toBeDisabled()
+  await marks.getByLabel('A new mark').fill('')
+  // The door's stage has six other puzzles, so five marks aren't enough, and the room check agrees.
+  for (const mark of ['⚙️', '🔩', '🗝️']) await marks.getByRole('button', { name: `Remove ${mark}` }).click()
+  await expect(marks.getByRole('alert')).toContainText('Add 1 more')
+  await expect(check).toContainText('to fix')
+  await marks.getByLabel('A new mark').fill('🔨')
+  await marks.getByRole('button', { name: 'Add the mark' }).click()
+  await expect(marks.getByRole('list', { name: 'Marks' }).getByRole('listitem')).toHaveCount(6)
+  await expect(check).toContainText('✓ Ready to play')
+  await marks.screenshot({ path: `${SHOTS}/114-escape-editor-marks.png` })
+  // New marks change the codes the door is built from, so it's a new edition.
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('status')).toContainText('Edition 3')
 
   // ---- Their own cover, intro video and background sound. Each applies at once: there's nothing to save.
   await page.getByRole('button', { name: '🎬 Pictures, video & sound' }).click()

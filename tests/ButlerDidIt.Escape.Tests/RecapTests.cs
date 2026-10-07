@@ -157,7 +157,7 @@ public class RecapTests
         {
             var s = Started(template, seed, minutes);
             var room = EscapeEngine.RoomFor(s, template);
-            s = EscapeEngine.Apply(s, template, new RequestEscapeHint(T0.AddSeconds(1), Seats[0], room.Stages[0].Puzzles[0]));
+            s = EscapeEngine.Apply(s, template, new RequestEscapeHint(T0.AddSeconds(1), Seats[0], EscapeEngine.InSight(s, room).First().Id));
             AssertNoSpoilers(EscapeBot.PlayToEnd(s, template, Seats, T0.AddSeconds(1)), template);
 
             if (room.Stages.Count > 1)

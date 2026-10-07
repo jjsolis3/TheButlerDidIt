@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "carnival",
   "intro": "Honk honk! Welcome, welcome, to Mister Giggles' Funhouse! The carnival is closed, the gates are locked, and I'm the only one with the keys. Want to go home? Then play my games! Work together, share what you find, and escape before the big lights go out. Ha-ha-HONK!",
@@ -114,7 +114,7 @@
             "w": 220,
             "h": 160,
             "label": "wobbly mirror",
-            "look": "You look like a string of spaghetti with a tiny head. Mister Giggles would love that."
+            "look": "You look like a string of spaghetti with a tiny head. Mister Giggles would love that. Beside it: a row of funny mirrors, and a battery box with a keypad."
           },
           {
             "id": "lost-property",
@@ -282,7 +282,7 @@
             "w": 220,
             "h": 160,
             "label": "fortune machine",
-            "look": "A mechanical fortune teller in a glass box. Its crystal ball flickers when you walk past."
+            "look": "A mechanical fortune teller in a glass box. Its crystal ball flickers, and a little word lock waits under the coin slot."
           },
           {
             "id": "balloon-wall",
@@ -292,7 +292,7 @@
             "w": 220,
             "h": 160,
             "label": "balloon wall",
-            "look": "Rows of balloons, each with a number painted on it."
+            "look": "Rows of balloons, each with a number painted on it. Under them: a prize lock with a keypad."
           }
         ]
       }
@@ -305,6 +305,7 @@
         "clown-poster",
         "carousel-sign",
         "juggling-code",
+        "carousel-animals",
         "exit-gate"
       ],
       "scene": {
@@ -318,7 +319,7 @@
             "w": 170,
             "h": 160,
             "label": "big gate",
-            "look": "Tall striped bars and two locks: one for a key, one for a password."
+            "look": "Tall striped bars, a keyhole and a keypad."
           },
           {
             "id": "guard-chair",
@@ -339,7 +340,7 @@
             "w": 170,
             "h": 160,
             "label": "carousel",
-            "look": "The painted animals are frozen mid-gallop. One of them winks at you. Probably."
+            "look": "The painted animals are frozen mid-gallop. One of them winks at you. Probably. Its control box has a password lock."
           },
           {
             "id": "ticket-bin",
@@ -381,7 +382,7 @@
             "w": 170,
             "h": 160,
             "label": "costume trunk",
-            "look": "Floppy shoes, a curly wig and a polka-dot bow tie.",
+            "look": "Floppy shoes, a curly wig and a polka-dot bow tie. Sewn inside the lid, a row of patches: {order:exit-gate}.",
             "hidesPieces": true
           },
           {
@@ -534,7 +535,8 @@
       "id": "mirror-lineup",
       "title": "The Mirror Line-Up",
       "kind": "code",
-      "prompt": "Five funny mirrors stand in a row: {items}. The battery box beside them has a keypad. A sign says: 'Each mirror's place, far left is 1, in the order I list them!'",
+      "revealedBy": "spot:wobbly-mirror",
+      "prompt": "Funny mirrors stand in a row: {items}. The battery box beside them has a keypad. A sign says: 'Each mirror's place, far left is 1, in the order I list them!'",
       "generator": {
         "type": "deduction",
         "words": [
@@ -687,6 +689,7 @@
       "minMinutes": 45,
       "title": "The Ticket Machine",
       "kind": "switches",
+      "revealedBy": "item:prize-ticket",
       "prompt": "The ticket machine gobbles your golden ticket and its lights go wild! Each button lights its bulb and flips the ones beside it. Turn every light on.",
       "requires": [
         "prize-ticket"
@@ -705,6 +708,7 @@
       "minMinutes": 45,
       "title": "The Balloon Darts",
       "kind": "code",
+      "revealedBy": "spot:balloon-wall",
       "prompt": "The numbers on the balloons go: {sequence}. The prize lock wants the next balloon's number.",
       "generator": {
         "type": "sequence"
@@ -720,6 +724,7 @@
       "minMinutes": 60,
       "title": "The Fortune Machine",
       "kind": "text",
+      "revealedBy": "spot:fortune-booth",
       "prompt": "The fortune machine's crystal ball flickers: 'What can you catch but never throw?'",
       "answers": [
         "cold",
@@ -792,7 +797,6 @@
     },
     {
       "id": "carousel-sign",
-      "minMinutes": 60,
       "title": "The Carousel Sign",
       "kind": "text",
       "prompt": "The carousel's sign has lost its letters. Only numbers are left: {cipher}. Say the word to make it spin.",
@@ -849,18 +853,16 @@
       "solvedText": "The juggling pin drops into your hands. 'Not bad!' grumbles Mister Giggles."
     },
     {
-      "id": "exit-gate",
-      "title": "The Big Gate",
+      "id": "carousel-animals",
+      "title": "The Carousel",
       "kind": "text",
-      "prompt": "The last lock needs the brass key AND a password. Mister Giggles' voice crackles: 'Tell me the {count} carousel animals, first to last!'",
-      "requires": [
-        "brass-key"
-      ],
+      "revealedBy": "spot:carousel",
+      "prompt": "The carousel's control box has a password lock. Mister Giggles' voice crackles: 'Tell me the {count} carousel animals, first to last!'",
       "hints": [
         "Each of {count} phones remembers one carousel animal.",
         "Say them in order, first to last, like: animal animal animal."
       ],
-      "solvedText": "The brass key turns and the password lights up the gate: {answer}!",
+      "solvedText": "The carousel tootles round once, and its control box lights up with the password: {answer}!",
       "generator": {
         "type": "wordSequence",
         "count": 3,
@@ -877,6 +879,34 @@
           "dragon"
         ],
         "pieceTemplate": "You rode the carousel earlier: the {ordinal} animal was the {word}."
+      }
+    },
+    {
+      "id": "exit-gate",
+      "title": "The Big Gate",
+      "kind": "code",
+      "prompt": "The big gate needs the brass key AND a {count}-digit code. Mister Giggles' voice crackles: 'Every lock out here left you a funny mark. Read them in the order sewn in my costume trunk! Honk!'",
+      "requires": [
+        "brass-key"
+      ],
+      "hints": [
+        "Every lock you opened at the gate left a mark and a number. The order is sewn somewhere out here.",
+        "Search the costume trunk.",
+        "The code is {answer}."
+      ],
+      "solvedText": "The brass key turns, the keypad plays a silly tune, and the big gate swings open. You're out!",
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🎈",
+          "🤡",
+          "🎪",
+          "🍿",
+          "🎠",
+          "⭐",
+          "🎩",
+          "🦆"
+        ]
       }
     }
   ],

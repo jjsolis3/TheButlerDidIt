@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 120,
   "soundscape": "tension",
   "intro": "SYSTEM: NEW PLAYERS CONNECTED. Hello, survivors. I am Nil. I used to keep this server clean, and I still do. Eleven survivors tried to leave before you. They are still in the lobby, if you would like to say hello. The generators are off. The exit is locked. You may run. Everybody runs.",
@@ -79,7 +79,7 @@
             "w": 170,
             "h": 160,
             "label": "still avatars",
-            "look": "Eleven avatars on the spawn pads, not moving. Their name tags are grey. One of them has turned its head to watch you."
+            "look": "Eleven avatars on the spawn pads, not moving. Their name tags are grey. One of them has turned its head to watch you. At its feet, a pad panel flickers on: READY UP?"
           },
           {
             "id": "chat-screen",
@@ -371,7 +371,7 @@
             "w": 170,
             "h": 160,
             "label": "ranger's logbook",
-            "look": "Eleven names, and the same word in numbers written beside every one."
+            "look": "Eleven names, and the same word in numbers written beside every one. The logbook's strap has a word lock."
           },
           {
             "id": "fuel-shed",
@@ -441,7 +441,7 @@
             "w": 170,
             "h": 160,
             "label": "wall of screens",
-            "look": "Every survivor who ever played, caught mid-run. In the last row, eleven faces you recognise from the lobby."
+            "look": "Every survivor who ever played, caught mid-run. In the last row, eleven faces you recognise from the lobby. Along the bottom of the screens, the lead developer has stuck a row of stickers: {order:exit-gate}."
           },
           {
             "id": "watching-chair",
@@ -461,7 +461,7 @@
             "w": 170,
             "h": 160,
             "label": "exit gate",
-            "look": "A heavy gate in the back wall, with a fob reader and a 3-digit keypad."
+            "look": "A heavy gate in the back wall, with a fob reader and a keypad."
           },
           {
             "id": "cable-tray",
@@ -582,7 +582,8 @@
       "id": "avatar-lineup",
       "title": "The Still Avatars",
       "kind": "code",
-      "prompt": "Some of the still avatars stand on the front row of spawn pads, their names greyed out, so you can only tell them apart by their gear: {items}. The ready-up panel wants each one's pad, far left is 1, in the order listed.",
+      "revealedBy": "spot:avatar-pads",
+      "prompt": "Some of the still avatars stand on the front row of spawn pads, their names greyed out, so you can only tell them apart by their gear: {items}. The pad panel at their feet wants each one's pad, far left is 1, in the order listed.",
       "generator": {
         "type": "deduction",
         "words": [
@@ -646,8 +647,10 @@
     },
     {
       "id": "leaderboard",
+      "minMinutes": 45,
       "title": "The Leaderboard",
       "kind": "code",
+      "revealedBy": "spot:leaderboard-screen",
       "prompt": "The leaderboard counts Nil's wins, round after round: {sequence}. The admin panel under it wants the next number.",
       "generator": {
         "type": "sequence"
@@ -693,6 +696,7 @@
       "id": "fuel-cans",
       "title": "Generator One",
       "kind": "code",
+      "revealedBy": "spot:generator-one",
       "prompt": "Generator one's fuel log has a {count}-digit lock and a note: '{order}.' Each of you counted one colour of fuel can in the shed.",
       "generator": {
         "type": "colorDigits",
@@ -742,6 +746,7 @@
       "minMinutes": 45,
       "title": "Generator Two",
       "kind": "switches",
+      "revealedBy": "spot:generator-two",
       "prompt": "Generator two's breaker lights are linked: flip one and the ones beside it flip too. Light them all to start it.",
       "generator": {
         "type": "switches"
@@ -796,6 +801,7 @@
       "minMinutes": 60,
       "title": "The Ranger's Logbook",
       "kind": "text",
+      "revealedBy": "spot:ranger-logbook",
       "prompt": "The ranger's logbook lists the eleven names, with the same word written beside each one, in numbers where A is 1 and B is 2: {cipher}. The logbook's strap has a word lock.",
       "generator": {
         "type": "cipher",
@@ -863,7 +869,6 @@
     },
     {
       "id": "admin-password",
-      "minMinutes": 45,
       "title": "The Admin Password",
       "kind": "text",
       "prompt": "The admin console wants Nil's password. The eleven pieced it together before the end, and each of you has found one of their notes.",
@@ -894,9 +899,9 @@
     },
     {
       "id": "readme",
-      "minMinutes": 45,
       "title": "The README",
       "kind": "text",
+      "revealedBy": "spot:console",
       "prompt": "The README file on the console has a word lock and a riddle: 'I have keys but no locks. I have space but no room. You can enter, but you can't go inside.'",
       "answers": [
         "keyboard",
@@ -941,6 +946,7 @@
       "minMinutes": 60,
       "title": "The Error Log",
       "kind": "text",
+      "revealedBy": "spot:error-screen",
       "prompt": "The error log's last line is written in a back-to-front alphabet where A swaps with Z: {cipher}. It's what Nil says it will be. The log file has a word lock.",
       "generator": {
         "type": "cipher",
@@ -1019,46 +1025,29 @@
       "id": "exit-gate",
       "title": "The Exit Gate",
       "kind": "code",
-      "prompt": "The exit gate needs the fob AND a 3-digit code. Taped to the keypad, in the lead developer's handwriting: 'Avatars on the back row, then canoes on the rack, then screens on the bottom row.'",
-      "answers": [
-        "648"
-      ],
+      "prompt": "The exit gate needs the fob AND a {count}-digit code. Taped to the keypad, in the lead developer's handwriting: 'Every lock in here leaves its mark when it opens. Read them in the order on the screens, and get out.'",
       "requires": [
         "exit-fob"
       ],
-      "pieces": [
-        "You counted the avatars on the lobby's back row: 6.",
-        "You counted the canoes on the campground rack: 4.",
-        "You counted the screens on the bottom row of the wall: 8."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on the developer's note.",
-        "Avatars, then canoes, then screens."
+        "Every lock you opened in the Admin Room left a mark and a number. The order is written down in here.",
+        "Search the wall of screens.",
+        "The code is {answer}."
       ],
       "solvedText": "The fob beeps, the keypad turns green, and the gate begins to grind open. Behind you, very evenly, something starts to walk.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "927"
-          ],
-          "pieces": [
-            "You counted the avatars on the lobby's back row: 9.",
-            "You counted the canoes on the campground rack: 2.",
-            "You counted the screens on the bottom row of the wall: 7."
-          ]
-        },
-        {
-          "answers": [
-            "351"
-          ],
-          "pieces": [
-            "You counted the avatars on the lobby's back row: 3.",
-            "You counted the canoes on the campground rack: 5.",
-            "You counted the screens on the bottom row of the wall: 1."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🎮",
+          "🕹️",
+          "💾",
+          "👾",
+          "🏆",
+          "⚡",
+          "🔑",
+          "🖥️"
+        ]
+      }
     }
   ],
   "items": [

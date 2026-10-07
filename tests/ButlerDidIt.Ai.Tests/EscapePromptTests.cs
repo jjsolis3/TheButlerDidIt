@@ -41,7 +41,8 @@ public class EscapePromptTests
             {
                 var now = T0.AddMinutes(step);
                 var room = EscapeEngine.RoomFor(s, template);
-                var open = room.Stages[s.StageIndex].Puzzles.Select(id => room.FindPuzzle(id)!).Where(p => !s.IsSolved(p.Id)).ToList();
+                // Only puzzles in sight: a hint can't be asked for one the group hasn't found (#134), so its prompt is never built.
+                var open = EscapeEngine.InSight(s, room).Where(p => !s.IsSolved(p.Id)).ToList();
                 var secret = Secrets(s, template, room, now);
 
                 foreach (var puzzle in open.Where(p => p.Hints.Count > 0))

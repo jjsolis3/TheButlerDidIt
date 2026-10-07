@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 120,
   "soundscape": "haunted",
   "intro": "Good evening, my patients. Lights out was hours ago, and yet here you are, awake. How restless. The doors of my ward are locked, as they have always been. If you want to leave, you will have to earn it, together. I'll be listening on the PA. I am always listening. Your treatment begins now.",
@@ -76,7 +76,7 @@
             "w": 180,
             "h": 200,
             "label": "peeling paint",
-            "look": "Long strips of paint. Behind one, someone has scratched tally marks into the plaster.",
+            "look": "Long strips of paint. Behind one, someone has scratched a line of scrambled letters into the plaster.",
             "hidesPieces": true
           },
           {
@@ -248,7 +248,7 @@
             "w": 170,
             "h": 300,
             "label": "staff locker",
-            "look": "Grey metal, dented. A riddle is written inside its little window."
+            "look": "Grey metal, dented, with a word lock. A riddle is written inside its little window."
           },
           {
             "id": "wheelchairs-spot",
@@ -269,7 +269,7 @@
             "w": 220,
             "h": 160,
             "label": "nurses' desk",
-            "look": "A cold cup of tea, a ringing phone that never rings.",
+            "look": "A cold cup of tea, a ringing phone that never rings. Behind the desk: a board of call lights, all jammed.",
             "hidesPieces": true
           },
           {
@@ -301,7 +301,7 @@
       "id": "records",
       "soundscape": "drone",
       "title": "The Records Room",
-      "description": "Filing cabinets tower to the ceiling, their drawers hanging open. A desk, a card index and a radiator line the room, and an X-ray light box hangs dark on the wall. An old reel-to-reel tape player is wired into the exit gate, which has a heavy keyhole and a three-digit keypad.",
+      "description": "Filing cabinets tower to the ceiling, their drawers hanging open. A desk, a card index and a radiator line the room, an old reel-to-reel tape player sits on a trolley, and an X-ray light box hangs dark on the wall. The exit gate has a heavy keyhole and a keypad.",
       "puzzles": [
         "patient-numbers",
         "tape-player",
@@ -378,7 +378,7 @@
             "w": 180,
             "h": 130,
             "label": "card index",
-            "look": "Index cards in faded ink. One is missing.",
+            "look": "Index cards in faded ink. One is missing. On the rest, the Warden has stamped a row of marks, in order: {order:exit-gate}.",
             "hidesPieces": true
           },
           {
@@ -389,7 +389,7 @@
             "w": 200,
             "h": 360,
             "label": "exit gate",
-            "look": "Iron bars, a heavy keyhole and a three-digit keypad."
+            "look": "Iron bars, a heavy keyhole and a keypad."
           },
           {
             "id": "radiator",
@@ -550,7 +550,8 @@
       "minMinutes": 45,
       "title": "The Scratched Wall",
       "kind": "text",
-      "prompt": "Scratched into the wall above your bed by a previous patient, in a scramble: {cipher}. The chart's lockbox has a second lock that wants the word.",
+      "revealedBy": "spot:peeling-paint",
+      "prompt": "Scratched into the plaster behind the paint by a previous patient, in a scramble: {cipher}. The chart's lockbox has a second lock that wants the word.",
       "generator": {
         "type": "cipher",
         "cipher": "shift",
@@ -602,6 +603,7 @@
       "id": "wheelchairs",
       "title": "The Wheelchairs",
       "kind": "code",
+      "revealedBy": "spot:wheelchairs-spot",
       "prompt": "The wheelchairs in the corridor: {items}. The drawer under the last one has a keypad. A card taped to it: 'Each chair's place, 1 nearest the door, in the order I list them.'",
       "generator": {
         "type": "deduction",
@@ -653,6 +655,7 @@
       "minMinutes": 45,
       "title": "The Light Board",
       "kind": "switches",
+      "revealedBy": "spot:nurses-desk",
       "prompt": "The nurses' station has a board of call lights, all jammed. Each switch flips its light and the ones beside it. Light them all.",
       "generator": {
         "type": "switches"
@@ -668,6 +671,7 @@
       "minMinutes": 60,
       "title": "The Staff Locker",
       "kind": "text",
+      "revealedBy": "spot:staff-locker-spot",
       "prompt": "The orderly's locker has a word lock. Written inside the little window in marker: 'I have keys but open no locks. I have space but no room. You can enter, but you can never go inside.'",
       "answers": [
         "keyboard",
@@ -734,19 +738,18 @@
         "Look at how each number changes to the next.",
         "The next number is {answer}."
       ],
-      "solvedText": "The drawer opens on your own file. The photograph is recent."
+      "solvedText": "The drawer opens on your own file. The photograph is recent, and the case file inside is stamped in symbols."
     },
     {
       "id": "tape-player",
-      "minMinutes": 45,
       "title": "The Tape Player",
       "kind": "text",
-      "prompt": "The reel-to-reel tape player is wired to the gate's second lock. A label on it reads: 'Repeat the Warden's {count} words, first to last.'",
+      "prompt": "The reel-to-reel tape player has a word lock of its own. A label on it reads: 'Repeat the Warden's {count} words, first to last.'",
       "hints": [
         "Each of {count} phones remembers one word the Warden whispered over the PA.",
         "Say them in order, first to last, like: word word word."
       ],
-      "solvedText": "The reels stop turning. '{answer},' the Warden repeats softly. 'Good. You were listening.' One lock on the gate falls open.",
+      "solvedText": "The reels stop turning. '{answer},' the Warden repeats softly. 'Good. You were listening.' The tape player's lock falls open.",
       "generator": {
         "type": "wordSequence",
         "count": 3,
@@ -769,10 +772,10 @@
     },
     {
       "id": "case-file",
-      "minMinutes": 45,
       "title": "The Case File",
       "kind": "text",
-      "prompt": "A case file is stamped in symbols, a word from the doctors' notes: {cipher}. The gate's second keypad has a letter lock too.",
+      "revealedBy": "puzzle:patient-numbers",
+      "prompt": "Your case file is stamped in symbols, a word from the doctors' notes: {cipher}. The file's clasp has a letter lock.",
       "generator": {
         "type": "cipher",
         "cipher": "symbols",
@@ -850,46 +853,29 @@
       "id": "exit-gate",
       "title": "The Exit Gate",
       "kind": "code",
-      "prompt": "The gate takes the master key AND a 3-digit code. Painted on the wall beside it: 'Your cell's number, then the floor you woke on, then how many beds you shared.'",
-      "answers": [
-        "713"
-      ],
+      "prompt": "The gate takes the master key AND a {count}-digit code. Scrawled on the wall beside it, in the Warden's hand: 'Every lock in here leaves its mark on you. File them in order, as my records do.'",
       "requires": [
         "master-key"
       ],
-      "pieces": [
-        "You remember the number stencilled on your cell door: 7.",
-        "You remember the sign in the stairwell: FLOOR 1.",
-        "You remember your cell: 3 iron beds, bolted down."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order painted on the wall.",
-        "The cell number, then the floor, then the beds."
+        "Every lock you opened in the records room left a mark and a number. The order is filed somewhere in here.",
+        "Search the card index.",
+        "The code is {answer}."
       ],
       "solvedText": "The master key turns and the keypad glows green. With a groan of old iron, the gate begins to open.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "425"
-          ],
-          "pieces": [
-            "You remember the number stencilled on your cell door: 4.",
-            "You remember the sign in the stairwell: FLOOR 2.",
-            "You remember your cell: 5 iron beds, bolted down."
-          ]
-        },
-        {
-          "answers": [
-            "936"
-          ],
-          "pieces": [
-            "You remember the number stencilled on your cell door: 9.",
-            "You remember the sign in the stairwell: FLOOR 3.",
-            "You remember your cell: 6 iron beds, bolted down."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "💊",
+          "🗝️",
+          "🕯️",
+          "📋",
+          "🔔",
+          "🧷",
+          "📎",
+          "⏰"
+        ]
+      }
     }
   ],
   "items": [
