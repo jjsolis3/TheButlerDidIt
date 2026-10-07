@@ -36,6 +36,24 @@ public sealed class MediaService(AppDbContext db, MediaGateway media, IMediaStor
             () => media.PaintAsync(prompt, shape, context, ct), ct);
     }
 
+    /// <summary>
+    /// A clip brought to life from a stored picture (#110). Cached by the picture's own hash and the prompt, so the
+    /// same picture is only ever filmed (and paid for) once, and a new picture of the stage makes a new clip.
+    /// </summary>
+    public async Task<Guid> VideoAsync(Guid pictureId, string prompt, AiCallContext context, CancellationToken ct)
+    {
+        var model = await media.DescribeAsync(AiRole.Filmmaker, ct) ?? throw new AiUnavailableException("No clip provider is set up.");
+        var picture = await db.MediaAssets.AsNoTracking().FirstAsync(a => a.Id == pictureId, ct);
+        return await GetOrCreateAsync(MediaKind.Video, $"video|{model}|{picture.ContentHash}|{prompt}", model, prompt, async () =>
+        {
+            await using var stream = await store.OpenReadAsync(picture.Path, ct)
+                ?? throw new AiCallFailedException("The stage's picture is missing, so there's nothing to bring to life.");
+            using var bytes = new MemoryStream();
+            await stream.CopyToAsync(bytes, ct);
+            return await media.FilmAsync(new MediaFile(bytes.ToArray(), picture.ContentType, ""), prompt, context, ct);
+        }, ct);
+    }
+
     private async Task<Guid> GetOrCreateAsync(MediaKind kind, string cacheKey, string provider, string prompt, Func<Task<MediaFile>> create, CancellationToken ct)
     {
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(cacheKey)));
@@ -175,16 +193,23 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         if (roomId is not null)
         {
             var room = await sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().FindAsync(db, roomId, ct);
-            wanted = room is null ? [] : EscapeMediaPlan.For(room, await gateway.VoicesConfiguredAsync(ct), await gateway.ImagesConfiguredAsync(ct));
+            wanted = room is null ? [] : EscapeMediaPlan.For(room, await gateway.VoicesConfiguredAsync(ct), await gateway.ImagesConfiguredAsync(ct),
+                await gateway.FilmsConfiguredAsync(ct));
             if (room is not null)
             {
-                // A moment with the host's own video needs no reading: the video is their telling of it. (Their uploads
-                // themselves are rows under this job's id already, so they count as done below.)
+                // A moment with the host's own video needs no reading, and no clip of the AI's: the video is their telling
+                // of it. (Their uploads themselves are rows under this job's id already, so they count as done below.)
                 var placed = await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == job.ScenarioId).Select(m => m.Key).ToHashSetAsync(ct);
                 var told = new HashSet<string>();
                 if (placed.Contains(EscapeArt.IntroVideo)) told.Add(EscapeArt.IntroVoice);
-                foreach (var stage in room.Stages.Where(s => placed.Contains(EscapeArt.StageVideo(s.Id)))) told.Add(EscapeArt.StageVoice(stage.Id));
-                wanted = wanted.Where(i => !told.Contains(i.Key)).ToList();
+                foreach (var stage in room.Stages.Where(s => placed.Contains(EscapeArt.StageVideo(s.Id))))
+                {
+                    told.Add(EscapeArt.StageVoice(stage.Id));
+                    told.Add(EscapeArt.StageFilm(stage.Id));
+                }
+                // A clip needs its picture: one already there (painted or uploaded), or one this job paints first.
+                var pictures = placed.Concat(wanted.Where(i => i.Role == AiRole.Illustrator).Select(i => i.Key)).ToHashSet();
+                wanted = wanted.Where(i => !told.Contains(i.Key) && (i.From is null || pictures.Contains(i.From))).ToList();
             }
         }
         else
@@ -214,14 +239,35 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         await db.SaveChangesAsync(ct);
         await events.ChangedAsync(job.HostUserId);
 
+        // New art and voices: refresh every screen of every party using this scenario (or room).
+        async Task ShowAsync()
+        {
+            if (roomId is null) catalog.Invalidate(job.ScenarioId);
+            else sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().ForgetArt(roomId);
+            await sp.GetRequiredService<PartyRuntime>().RefreshAsync(roomId ?? job.ScenarioId, ct);
+        }
+
         var context = new AiCallContext(job.HostUserId, JobId: job.Id, Purpose: "media");
+        var shownBeforeClips = false;
         foreach (var item in plan)
         {
+            // Clips take minutes each, and come last: let the pictures and voices made so far show meanwhile.
+            if (item.Role == AiRole.Filmmaker && !shownBeforeClips && job.Done > 0)
+            {
+                shownBeforeClips = true;
+                await ShowAsync();
+            }
             try
             {
-                var assetId = item.Role == AiRole.Voice
-                    ? await media.SpeechAsync(item.Text, item.Voice, context with { Purpose = "voice" }, ct)
-                    : await media.ImageAsync(item.Text, item.Shape, context with { Purpose = "image" }, ct);
+                var assetId = item.Role switch
+                {
+                    AiRole.Voice => await media.SpeechAsync(item.Text, item.Voice, context with { Purpose = "voice" }, ct),
+                    AiRole.Filmmaker => await media.VideoAsync(
+                        await db.ScenarioMedia.AsNoTracking().Where(m => m.ScenarioId == job.ScenarioId && m.Key == item.From).Select(m => (Guid?)m.AssetId).FirstOrDefaultAsync(ct)
+                            ?? throw new AiCallFailedException("There's no picture of this stage to bring to life."),
+                        item.Text, context with { Purpose = "video" }, ct),
+                    _ => await media.ImageAsync(item.Text, item.Shape, context with { Purpose = "image" }, ct),
+                };
                 db.ScenarioMedia.Add(new ScenarioMediaEntity { ScenarioId = job.ScenarioId, Key = item.Key, AssetId = assetId });
                 job.Done++;
             }
@@ -247,10 +293,7 @@ public sealed class MediaWorker(IServiceScopeFactory scopes, TimeProvider clock,
         await db.SaveChangesAsync(ct);
         await events.ChangedAsync(job.HostUserId);
 
-        // New art and voices: refresh every screen of every party using this scenario (or room).
-        if (roomId is null) catalog.Invalidate(job.ScenarioId);
-        else sp.GetRequiredService<ButlerDidIt.Api.Escape.EscapeCatalog>().ForgetArt(roomId);
-        await sp.GetRequiredService<PartyRuntime>().RefreshAsync(roomId ?? job.ScenarioId, ct);
+        await ShowAsync();
     }
 
     /// <summary>Queues preparation for a scenario unless one is already waiting or running.</summary>

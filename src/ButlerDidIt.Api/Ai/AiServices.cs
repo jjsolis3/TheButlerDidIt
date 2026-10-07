@@ -185,7 +185,7 @@ public static class AiConfigSeeder
         {
             var provider = await db.AiProviders.FirstOrDefaultAsync(x => x.Name == r.Provider, ct);
             if (provider is null || string.IsNullOrWhiteSpace(r.Model)) continue;
-            // One media provider is given both media roles by the compose file; one that only speaks or only paints takes just its own (#33).
+            // One media provider is given every media role by the compose file; one that only speaks or only paints takes just its own (#33).
             if (!AiProviderAbilities.Can(provider.Kind, role))
             {
                 scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(AiConfigSeeder))

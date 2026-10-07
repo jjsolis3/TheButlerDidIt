@@ -138,6 +138,7 @@ public static class AiAdminEndpoints
                 {
                     AiRole.Voice => $"The Voice role needs an OpenAI, Gemini, ElevenLabs or Piper provider ({provider.Kind} doesn't make voices).",
                     AiRole.Illustrator => $"The Illustrator role needs an OpenAI, Gemini or Stable Diffusion provider ({provider.Kind} doesn't make pictures).",
+                    AiRole.Filmmaker => $"The Filmmaker role needs an OpenAI (Sora) or Gemini (Veo) provider ({provider.Kind} doesn't make clips).",
                     _ => $"The {role} role needs a chat model; {provider.Name} ({provider.Kind}) only makes {(AiProviderAbilities.Speaks(provider.Kind) ? "voices" : "pictures")}.",
                 }, statusCode: 400);
             // Effort and a refusal fallback are Claude options (#63); other providers would silently ignore them.

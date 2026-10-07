@@ -21,6 +21,9 @@ public static class Live
     /// <summary>Also run the checks that write a whole mystery or escape room: a few minutes and roughly $0.50–$2 per provider.</summary>
     public const string Full = "LIVE_FULL";
 
+    /// <summary>Also make one escape-room clip per provider (#110): a few minutes, and a dollar or more each.</summary>
+    public const string Video = "LIVE_VIDEO";
+
     private static string Env(string name, string fallback) =>
         Environment.GetEnvironmentVariable(name) is { Length: > 0 } value ? value : fallback;
 
@@ -47,6 +50,8 @@ public static class Live
     public static string ElevenLabsModel => Env("LIVE_ELEVENLABS_MODEL", "eleven_multilingual_v2");
     public static string PiperVoice => Env("LIVE_PIPER_VOICE", "default");
     public static string StableDiffusionModel => Env("LIVE_SD_MODEL", "default");
+    public static string OpenAiVideoModel => Env("LIVE_OPENAI_VIDEO_MODEL", "sora-2");
+    public static string GeminiVideoModel => Env("LIVE_GEMINI_VIDEO_MODEL", "veo-3.0-fast-generate-001");
 }
 
 /// <summary>A test that runs only when every one of its environment variables is set; otherwise it's reported as skipped, with how to run it.</summary>

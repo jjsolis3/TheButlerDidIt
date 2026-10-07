@@ -270,7 +270,7 @@ public class PrivacyTests
 
     /// <summary>Every file a stage can have: its picture, video, background sound and the game master's reading of it.</summary>
     private static string[] StageMedia(EscapeStage st) =>
-        [EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id), EscapeArt.StageVoice(st.Id)];
+        [EscapeArt.Stage(st.Id), EscapeArt.StageVideo(st.Id), EscapeArt.StageAmbience(st.Id), EscapeArt.StageVoice(st.Id), EscapeArt.StageFilm(st.Id)];
 
     [Theory]
     [MemberData(nameof(RoomsAndLengths))]
@@ -303,6 +303,7 @@ public class PrivacyTests
             Assert.Equal(art[EscapeArt.StageVideo(current.Id)], shown.StageVideoUrl);
             Assert.Equal(art[EscapeArt.StageAmbience(current.Id)], shown.AmbienceUrl);
             Assert.Equal(art[EscapeArt.StageVoice(current.Id)], shown.StageVoiceUrl);
+            Assert.Equal(art[EscapeArt.StageFilm(current.Id)], shown.StageFilmUrl);
             var hidden = template.Stages.Where(st => st.Id != current.Id).SelectMany(StageMedia).Select(key => art[key]).ToList();
             foreach (var raw in seats.Select(seat => GameJson.Serialize(EscapeProjector.Player(s, template, seat, T0, art))).Prepend(GameJson.Serialize(shown)))
                 foreach (var url in hidden) Assert.DoesNotContain(url, raw);

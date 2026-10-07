@@ -37,6 +37,21 @@ public static class MediaChecks
         else Assert.True(width > height, $"a landscape is wider than tall ({width}×{height})");
     }
 
+    /// <summary>One clip from a painted picture, as a stage's reveal gets (#110): an MP4 of a few seconds.</summary>
+    public static async Task Films(ITestOutputHelper output, string name, AiProviderSettings provider, string model)
+    {
+        using var surface = SkiaSharp.SKSurface.Create(new SkiaSharp.SKImageInfo(1536, 1024));
+        surface.Canvas.Clear(new SkiaSharp.SKColor(40, 30, 60));
+        using var png = surface.Snapshot().Encode(SkiaSharp.SKEncodedImageFormat.Png, 90);
+        var watch = Stopwatch.StartNew();
+        var clip = await Factory.CreateVideos(provider, model).AnimateAsync(new MediaFile(png.ToArray(), "image/png", "png"),
+            "Bring this still picture of an empty, candlelit escape room to life with a slow camera push-in. No people, no text.", CancellationToken.None);
+        Report.Add(output, name, "films a clip", model, $"{clip.Bytes.Length / 1024} KB {clip.ContentType}", ms: watch.ElapsedMilliseconds);
+        Assert.Equal("video/mp4", clip.ContentType);
+        Assert.True(clip.Bytes.Length > 50_000, "a few seconds of video is more than 50 KB");
+        Assert.Equal("ftyp", System.Text.Encoding.ASCII.GetString(clip.Bytes, 4, 4)); // an MP4
+    }
+
     private static bool IsMp3(byte[] b) => b.Length > 3 && (b[0] == 'I' && b[1] == 'D' && b[2] == '3' || b[0] == 0xFF && (b[1] & 0xE0) == 0xE0);
     private static bool IsWav(byte[] b) => b.Length > 12 && b[0] == 'R' && b[1] == 'I' && b[2] == 'F' && b[3] == 'F' && b[8] == 'W' && b[9] == 'A' && b[10] == 'V' && b[11] == 'E';
 
@@ -75,6 +90,7 @@ public class OpenAiMediaLiveTests(ITestOutputHelper output)
     [LiveFact(Live.OpenAiKey)] public Task Speaks() => MediaChecks.Speaks(output, Name, Live.OpenAi, Live.OpenAiSpeechModel);
     [LiveFact(Live.OpenAiKey)] public Task Paints_a_portrait() => MediaChecks.Paints(output, Name, Live.OpenAi, Live.OpenAiImageModel, ImageShape.Portrait);
     [LiveFact(Live.OpenAiKey)] public Task Paints_a_landscape() => MediaChecks.Paints(output, Name, Live.OpenAi, Live.OpenAiImageModel, ImageShape.Landscape);
+    [LiveFact(Live.OpenAiKey, Live.Video)] public Task Films_a_clip() => MediaChecks.Films(output, Name, Live.OpenAi, Live.OpenAiVideoModel);
 }
 
 public class GeminiMediaLiveTests(ITestOutputHelper output)
@@ -84,6 +100,7 @@ public class GeminiMediaLiveTests(ITestOutputHelper output)
     [LiveFact(Live.GeminiKey)] public Task Speaks() => MediaChecks.Speaks(output, Name, Live.Gemini, Live.GeminiSpeechModel);
     [LiveFact(Live.GeminiKey)] public Task Paints_a_portrait() => MediaChecks.Paints(output, Name, Live.Gemini, Live.GeminiImageModel, ImageShape.Portrait);
     [LiveFact(Live.GeminiKey)] public Task Paints_a_landscape() => MediaChecks.Paints(output, Name, Live.Gemini, Live.GeminiImageModel, ImageShape.Landscape);
+    [LiveFact(Live.GeminiKey, Live.Video)] public Task Films_a_clip() => MediaChecks.Films(output, Name, Live.Gemini, Live.GeminiVideoModel);
 }
 
 /// <summary>ElevenLabs (#33): the voice is cast from the account's own list, and comes back as an MP3.</summary>

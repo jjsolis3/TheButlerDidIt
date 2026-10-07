@@ -33,9 +33,16 @@ const KINDS: { id: AiProviderKind; label: string; needsKey: boolean; urlHint: st
 /** What each kind of provider can do (AiProviderAbilities on the server): only those are offered for a role. */
 const VOICES: AiProviderKind[] = ['openAI', 'gemini', 'elevenLabs', 'piper', 'fake']
 const PICTURES: AiProviderKind[] = ['openAI', 'gemini', 'stableDiffusion', 'fake']
+const CLIPS: AiProviderKind[] = ['openAI', 'gemini', 'fake']
 const MEDIA_ONLY: AiProviderKind[] = ['elevenLabs', 'piper', 'stableDiffusion']
 const canDo = (kind: AiProviderKind, role: AiRole) =>
-  role === 'voice' ? VOICES.includes(kind) : role === 'illustrator' ? PICTURES.includes(kind) : !MEDIA_ONLY.includes(kind)
+  role === 'voice'
+    ? VOICES.includes(kind)
+    : role === 'illustrator'
+      ? PICTURES.includes(kind)
+      : role === 'filmmaker'
+        ? CLIPS.includes(kind)
+        : !MEDIA_ONLY.includes(kind)
 const KEYLESS: AiProviderKind[] = ['ollama', 'piper', 'stableDiffusion', 'fake']
 
 const ROLES: { id: AiRole; title: string; body: string; tokens: number }[] = [
@@ -46,6 +53,12 @@ const ROLES: { id: AiRole; title: string; body: string; tokens: number }[] = [
     id: 'voice',
     title: 'Voice',
     body: 'Speaks narration, NPC lines and answers aloud. Needs an OpenAI, Gemini, ElevenLabs or Piper provider and a voice model, e.g. gpt-4o-mini-tts, gemini-2.5-flash-preview-tts, eleven_multilingual_v2, or a Piper voice such as en_GB-vctk-medium ("default" for the server\'s own).',
+    tokens: 0,
+  },
+  {
+    id: 'filmmaker',
+    title: 'Filmmaker',
+    body: "Brings each escape room stage's picture to life as an 8-second clip for its reveal, under the game master's reading. Needs an OpenAI (e.g. sora-2) or Gemini (e.g. veo-3.0-fast-generate-001) provider. Clips cost far more than pictures, so it's off until you set it: each is made once per room. Enter the price of one clip under Prices.",
     tokens: 0,
   },
   {

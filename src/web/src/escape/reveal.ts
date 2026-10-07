@@ -14,9 +14,13 @@ const cue = (c: Partial<CueView> & Pick<CueView, 'type'>): CueView => ({
 /** The video the host uploaded for this moment, if any. */
 export const revealVideo = (view: EscapeStageView, mode: RevealMode) => (mode === 'intro' ? view.introVideoUrl : view.stageVideoUrl)
 
+/** Screens set to reduce motion keep the still picture rather than the AI's clip. */
+const stillsOnly = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
 /**
  * The intro: the room's picture with a slow pan, and its welcome read out. A new stage: its picture, and what the group
- * sees. When the host uploaded a video for the moment, the video plays instead: it's their telling of it.
+ * sees. When the host uploaded a video for the moment, the video plays instead: it's their telling of it. When the AI
+ * brought the stage's picture to life (#110), its clip plays silently in the picture's place, under the reading.
  */
 export function revealCues(view: EscapeStageView, mode: RevealMode): CueView[] {
   const video = revealVideo(view, mode)
@@ -25,7 +29,9 @@ export function revealCues(view: EscapeStageView, mode: RevealMode): CueView[] {
   const text = mode === 'intro' ? view.intro : (view.stage?.description ?? '')
   // The game master's recorded reading (#127) when the AI has made one; otherwise the browser reads the words.
   const clip = mode === 'intro' ? view.introVoiceUrl : view.stageVoiceUrl
-  return [cue({ type: 'image', src: view.artUrl, effect: 'kenburns' }), cue({ type: 'narration', text, voice, src: clip })]
+  const film = mode === 'stage' && view.stageFilmUrl && !stillsOnly() ? view.stageFilmUrl : null
+  const picture = film ? cue({ type: 'image', src: film, effect: 'film' }) : cue({ type: 'image', src: view.artUrl, effect: 'kenburns' })
+  return [picture, cue({ type: 'narration', text, voice, src: clip })]
 }
 
 // Which reveals this device has already shown, per party, so a refresh or a reconnect doesn't play one again.

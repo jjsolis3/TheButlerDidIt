@@ -18,8 +18,9 @@ Set only the ones you want to check, as environment variables. In a Claude Code 
 | `LIVE_PIPER_URL` | A local Piper server, e.g. `http://localhost:5000`: a voice clip |
 | `LIVE_SD_URL` | A local Stable Diffusion WebUI started with `--api`, e.g. `http://localhost:7860`: portrait and landscape pictures |
 | `LIVE_FULL=1` | Also write a whole escape room and a whole mystery with each provider set above |
+| `LIVE_VIDEO=1` | Also make one escape-room clip with Sora (with `LIVE_OPENAI_KEY`) and one with Veo (with `LIVE_GEMINI_KEY`) |
 
-Each check uses a sensible default model. To test the model you actually run, override it: `LIVE_ANTHROPIC_MODEL`, `LIVE_ANTHROPIC_FALLBACK_MODEL`, `LIVE_OPENAI_MODEL`, `LIVE_OPENAI_TTS_MODEL`, `LIVE_OPENAI_IMAGE_MODEL`, `LIVE_GEMINI_MODEL`, `LIVE_GEMINI_TTS_MODEL`, `LIVE_GEMINI_IMAGE_MODEL`, `LIVE_OLLAMA_MODEL`, `LIVE_ELEVENLABS_MODEL` (default `eleven_multilingual_v2`), `LIVE_PIPER_VOICE` and `LIVE_SD_MODEL` (both `default`: the voice or checkpoint the server already has).
+Each check uses a sensible default model. To test the model you actually run, override it: `LIVE_ANTHROPIC_MODEL`, `LIVE_ANTHROPIC_FALLBACK_MODEL`, `LIVE_OPENAI_MODEL`, `LIVE_OPENAI_TTS_MODEL`, `LIVE_OPENAI_IMAGE_MODEL`, `LIVE_GEMINI_MODEL`, `LIVE_GEMINI_TTS_MODEL`, `LIVE_GEMINI_IMAGE_MODEL`, `LIVE_OLLAMA_MODEL`, `LIVE_ELEVENLABS_MODEL` (default `eleven_multilingual_v2`), `LIVE_PIPER_VOICE` and `LIVE_SD_MODEL` (both `default`: the voice or checkpoint the server already has), `LIVE_OPENAI_VIDEO_MODEL` (`sora-2`) and `LIVE_GEMINI_VIDEO_MODEL` (`veo-3.0-fast-generate-001`).
 
 **Network access:** the machine running the checks has to reach the vendor. In a Claude Code cloud environment, api.anthropic.com and generativelanguage.googleapis.com are usually allowed; **api.openai.com and api.elevenlabs.io may need adding** to the environment's allowed domains. Piper and Stable Diffusion have to be reachable from the machine running the checks, so run those on your own machine or network.
 
@@ -36,7 +37,9 @@ Each check prints one table row: provider, check, model, what came back, tokens 
 - **Without `LIVE_FULL`:** a few cents per provider. Short chat replies, one voice clip, and two pictures for OpenAI and Gemini (pictures are the biggest part, roughly $0.04–$0.20 each). ElevenLabs uses about 50 characters of your plan's credit; Piper and Stable Diffusion are free.
 - **With `LIVE_FULL`:** roughly $0.50–$2 more per provider, depending on the model. A mystery is several long calls, and an escape room is one or two long calls plus a tester.
 
-The suite has no budget cap of its own, so keep `LIVE_FULL` for when you mean it.
+- **With `LIVE_VIDEO`:** one 8-second clip per provider, priced per second of video, so a dollar or more each, depending on the model. Each takes a few minutes.
+
+The suite has no budget cap of its own, so keep `LIVE_FULL` and `LIVE_VIDEO` for when you mean it.
 
 ## What each issue still needs by hand
 
@@ -48,4 +51,5 @@ The suite has no budget cap of its own, so keep `LIVE_FULL` for when you mean it
 
   Check these on a real party's media preparation.
 - **#63:** compare the `effort low` and `effort default` rows' times in the report, to decide whether the Actor role should default to low effort.
+- **#110 (clips):** set a Filmmaker role, start a game of a room with the AI on, and watch a stage open: its picture moves while the game master reads it.
 - **#33:** on Admin → AI, **Test connection** for each new provider, then play a scene with its voices or pictures: with ElevenLabs or a many-speaker Piper voice, the narrator and each character should sound different.

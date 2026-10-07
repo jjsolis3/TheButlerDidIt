@@ -54,10 +54,29 @@ public class EscapeMediaPlanTests
 
     [Theory]
     [MemberData(nameof(RoomIds))]
+    public void With_the_filmmaker_each_stage_gets_a_clip_of_its_own_picture_made_last(string roomId)
+    {
+        var room = Library.Value.Single(r => r.Id == roomId);
+        var plan = EscapeMediaPlan.For(room, films: true);
+        var clips = plan.Where(i => i.Role == AiRole.Filmmaker).ToList();
+
+        Assert.Equal(room.Stages.Select(s => EscapeArt.StageFilm(s.Id)), clips.Select(i => i.Key));
+        Assert.Equal(room.Stages.Select(s => EscapeArt.Stage(s.Id)), clips.Select(i => i.From));
+        // After every picture, so the pictures they start from are made first.
+        Assert.True(plan.ToList().IndexOf(clips[0]) > plan.ToList().FindLastIndex(i => i.Role == AiRole.Illustrator));
+        Assert.All(clips, c => Assert.Contains("no people", c.Text));
+        // Off unless the role is set up: clips cost far more than pictures.
+        Assert.DoesNotContain(EscapeMediaPlan.For(room), i => i.Role == AiRole.Filmmaker);
+    }
+
+    [Theory]
+    [MemberData(nameof(RoomIds))]
     public void No_picture_prompt_or_reading_holds_a_puzzle_clue_or_answer(string roomId)
     {
         var template = Library.Value.Single(r => r.Id == roomId);
-        var prompts = string.Join("\n", EscapeMediaPlan.For(template).Select(i => i.Text));
+        // Each prompt is its own request, so each is checked on its own: joined, the digits of one stage's description
+        // run into the next one's, and three copies of a description (picture, reading, clip) can spell a code by chance.
+        var prompts = EscapeMediaPlan.For(template, films: true).Select(i => i.Text).ToList();
         // What the TV shows anyway. A room may hide an answer in plain sight (the Workshop's clock on the wall),
         // so a prompt may only mention an answer if this public text already does.
         var shown = string.Join("\n", template.Stages.SelectMany(s => new[] { s.Title, s.Description }).Prepend(template.Intro).Prepend(template.Synopsis).Prepend(template.Title));
@@ -66,10 +85,13 @@ public class EscapeMediaPlanTests
         {
             foreach (var puzzle in RoomVariants.Build(template, seed).Puzzles)
             {
-                Assert.False(EscapeHintGuard.Leaks(prompts, puzzle) && !EscapeHintGuard.Leaks(shown, puzzle),
-                    $"{roomId}, puzzle set {seed}: a picture prompt or a reading gives away '{puzzle.Id}'.");
-                Assert.DoesNotContain(puzzle.Prompt, prompts);
-                Assert.All(puzzle.Pieces.Concat(puzzle.Hints), t => Assert.DoesNotContain(t, prompts));
+                foreach (var prompt in prompts)
+                {
+                    Assert.False(EscapeHintGuard.Leaks(prompt, puzzle) && !EscapeHintGuard.Leaks(shown, puzzle),
+                        $"{roomId}, puzzle set {seed}: a picture, clip or reading prompt gives away '{puzzle.Id}': {prompt}");
+                    Assert.DoesNotContain(puzzle.Prompt, prompt);
+                    Assert.All(puzzle.Pieces.Concat(puzzle.Hints), t => Assert.DoesNotContain(t, prompt));
+                }
             }
         }
     }

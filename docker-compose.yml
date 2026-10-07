@@ -50,6 +50,8 @@ services:
       Ai__Roles__Voice__Model: "${AI_VOICE_MODEL:-}"
       Ai__Roles__Illustrator__Provider: "${AI_MEDIA_PROVIDER_NAME:-}"
       Ai__Roles__Illustrator__Model: "${AI_IMAGE_MODEL:-}"
+      Ai__Roles__Filmmaker__Provider: "${AI_MEDIA_PROVIDER_NAME:-}"
+      Ai__Roles__Filmmaker__Model: "${AI_VIDEO_MODEL:-}"   # optional, costs money: clips for escape room reveals
       # ---- More than one server (optional; see "Running more than one server" in docs/deploy-coolify.md).
       Scale__MultiInstance: "${SCALE_MULTI_INSTANCE:-false}"
       Scale__Redis: "${REDIS_URL:-}"

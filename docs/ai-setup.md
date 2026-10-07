@@ -36,6 +36,11 @@ The game works with any mix of providers.
 - **Stable Diffusion WebUI** (pictures, local): the model is the checkpoint (`default` for the one the WebUI has loaded). Pictures are painted at the checkpoint's own size, about 1024 pixels for SDXL, SD3 or Flux (a name with `xl`, `sd3` or `flux` in it) and 512–768 for SD 1.5. A picture takes from a few seconds on a graphics card to minutes on a CPU.
 - **Your own OpenAI-compatible voice or picture server** (Kokoro-FastAPI, openedai-speech, LocalAI…): add it as `OpenAI` with its base URL and no key. Characters are cast with OpenAI's six voice names (alloy, echo, fable, onyx, nova, shimmer), which those servers map to their own voices.
 
+**Clips for escape room reveals (optional, costs money).** The **Filmmaker** role brings each stage's picture to life as an 8-second clip. When a new stage opens, the TV plays it silently in the picture's place while the game master reads the stage. It needs an OpenAI provider with a Sora model (`sora-2`, or `sora-2-pro`) or a Gemini provider with a Veo model (`veo-3.0-fast-generate-001`, `veo-3.0-generate-001`, `veo-3.1-generate-preview`).
+- **Cost:** clips cost far more than pictures, since providers charge per second of video. So the role is off until you set it. Each clip is made once per room and shared by every game of it. Enter the price of one 8-second clip in *Per call $* under Prices.
+- **Time:** a clip takes one to five minutes to make. A room's pictures and readings show first, and the clips follow.
+- **Your own video wins:** a stage with a host's own uploaded video gets no clip. A new picture of a stage is filmed again on the next game with the AI on.
+
 **A sensible starting point:** a strong model as the **Storyteller**, since it runs once per mystery and quality matters most. A faster, cheaper model as the **Actor**, since it runs every time a guest asks a question. The Inspector sits in between.
 
 Small local models (Ollama) are fine for the Actor. They often struggle to write a whole valid mystery, so the generator may fail more often; it retries and reports clearly when it gives up.
@@ -76,9 +81,10 @@ AI_MEDIA_API_KEY=sk-...
 AI_MEDIA_BASE_URL=              # only for a server of your own, e.g. Piper's http://piper:5000
 AI_VOICE_MODEL=tts-1
 AI_IMAGE_MODEL=dall-e-3
+AI_VIDEO_MODEL=                 # optional clips for escape room reveals, e.g. sora-2 (OpenAI) or veo-3.0-fast-generate-001 (Gemini)
 ```
 
-The media provider takes both roles. A provider that only makes voices (`ElevenLabs`, `Piper`) or only pictures (`StableDiffusion`) takes just its own: leave the other model empty, or set that role on the admin page. A role the provider can't do is skipped at start-up, with a warning in the log.
+The media provider takes every media role whose model is set: voices, pictures and, with `AI_VIDEO_MODEL`, clips. A provider that only makes voices (`ElevenLabs`, `Piper`) or only pictures (`StableDiffusion`) takes just its own: leave the other models empty, or set those roles on the admin page. A role the provider can't do is skipped at start-up, with a warning in the log.
 
 Environment settings are applied at every start-up and overwrite the same-named provider and role on the admin page. The Claude-only role settings have environment forms too: `Ai__Roles__Actor__Effort=low` and `Ai__Roles__Storyteller__RefusalFallbackModel=claude-opus-4-8`. For several providers, configure them on the admin page, or use the full form `Ai__Providers__1__Name=…`, `Ai__Providers__1__Kind=…` and so on.
 
