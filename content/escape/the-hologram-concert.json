@@ -13,7 +13,7 @@
     45,
     60
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "concert",
   "intro": "Bzzt! Beep-boop! Hello, humans! I'm Glitch, the cutest little computer bug in the whole arena, and nobody invited me to Hoshi's concert. So I crashed it! Her hologram is switched off, her songs are scrambled and you're locked backstage. Fix everything before the crowd goes home? Ha! Good luck, crew! Bzzt!",
@@ -119,7 +119,7 @@
             "w": 170,
             "h": 160,
             "label": "costume rack",
-            "look": "Sparkly jackets, a cape covered in stars and a pair of light-up boots.",
+            "look": "Sparkly jackets, a cape covered in stars and a pair of light-up boots. At the end hangs Hoshi's light-up stage jacket, gone dark: its sequin panels have little switches.",
             "hidesPieces": true
           },
           {
@@ -331,7 +331,7 @@
             "w": 170,
             "h": 160,
             "label": "crew locker",
-            "look": "A locker with a 3-digit lock and a cue card stuck on the door."
+            "look": "A locker with a combination lock and a cue card stuck on the door."
           },
           {
             "id": "lyric-stand",
@@ -414,7 +414,7 @@
             "w": 170,
             "h": 160,
             "label": "stage curtain",
-            "look": "A huge velvet curtain, shut tight. A keypad on the side asks for a 3-digit code."
+            "look": "A huge velvet curtain, shut tight. A keypad on the side blinks, waiting for a code."
           },
           {
             "id": "giant-screen",
@@ -444,7 +444,7 @@
             "w": 170,
             "h": 160,
             "label": "microphone stand",
-            "look": "Hoshi's microphone stand, with a star on top. It's waiting."
+            "look": "Hoshi's microphone stand, with a star on top. The microphone is locked until someone sings the chorus."
           },
           {
             "id": "front-row",
@@ -498,7 +498,7 @@
             "w": 170,
             "h": 160,
             "label": "floor marks",
-            "look": "Tape marks on the floor: STAND HERE, SPIN HERE, WAVE HERE.",
+            "look": "Tape marks on the floor: STAND HERE, SPIN HERE, WAVE HERE. And in glitter tape, a row of sparkly marks: {order:curtain}.",
             "hidesPieces": true
           },
           {
@@ -555,6 +555,7 @@
       "id": "drum-machine",
       "title": "The Drum Machine",
       "kind": "code",
+      "revealedBy": "spot:drum-pads",
       "prompt": "Glitch has jammed Hoshi's drum machine on a wonky beat, and its display counts: {sequence}. Tap in the next number to get it back in time!",
       "generator": {
         "type": "sequence"
@@ -616,6 +617,7 @@
       "minMinutes": 45,
       "title": "The Light-Up Jacket",
       "kind": "switches",
+      "revealedBy": "spot:costume-rack",
       "prompt": "Hoshi's light-up stage jacket has gone dark. Its sequin panels are wired together: tap one and the ones beside it flip too. Light up every panel!",
       "generator": {
         "type": "switches"
@@ -687,6 +689,7 @@
       "id": "glow-sticks",
       "title": "The Glow Sticks",
       "kind": "code",
+      "revealedBy": "spot:crew-locker",
       "prompt": "Out front, the fans are already waving glow sticks! The crew locker has a {count}-digit lock and a cue card: '{order}.' Each of you counted one colour of glow stick in the front row.",
       "generator": {
         "type": "colorDigits",
@@ -823,9 +826,9 @@
     },
     {
       "id": "hit-song",
-      "minMinutes": 45,
       "title": "Hoshi's Hit Song",
       "kind": "text",
+      "revealedBy": "spot:mic-stand",
       "prompt": "Hoshi's microphone is locked until someone sings the chorus of her biggest hit. Glitch has scrambled the words, but each of you remembers one.",
       "generator": {
         "type": "wordSequence",
@@ -854,7 +857,6 @@
     },
     {
       "id": "confetti-cannon",
-      "minMinutes": 45,
       "title": "The Confetti Cannon",
       "kind": "text",
       "prompt": "The confetti cannon's trigger has a word lock, and a riddle from Glitch: 'The more of me there is, the less you can see. Switch off the stage lights and you'll find me.'",
@@ -980,46 +982,29 @@
       "id": "curtain",
       "title": "Curtain Up",
       "kind": "code",
-      "prompt": "The curtain remote needs a 3-digit code before it will lift the curtain. Glitch's last note: 'Stage lights, then floor speakers, then star headbands in the front row!'",
-      "answers": [
-        "583"
-      ],
+      "prompt": "The curtain remote needs a {count}-digit code before it will lift the curtain. Glitch's last note: 'Every lock on this stage left you a sparkly mark. Read them in the order I taped on the floor!'",
       "requires": [
         "curtain-remote"
       ],
-      "pieces": [
-        "You counted the stage lights over the stage: 5.",
-        "You counted the floor speakers along the front: 8.",
-        "You counted the star headbands in the front row: 3."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on Glitch's note.",
-        "Stage lights, then floor speakers, then headbands."
+        "Every lock you opened on the stage left a mark and a number. The order is taped somewhere on the stage.",
+        "Search the floor marks.",
+        "The code is {answer}."
       ],
       "solvedText": "You press CURTAIN UP. The curtain sweeps open, the lights blaze, the crowd roars, and Hoshi starts to sing. The show is on!",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "269"
-          ],
-          "pieces": [
-            "You counted the stage lights over the stage: 2.",
-            "You counted the floor speakers along the front: 6.",
-            "You counted the star headbands in the front row: 9."
-          ]
-        },
-        {
-          "answers": [
-            "734"
-          ],
-          "pieces": [
-            "You counted the stage lights over the stage: 7.",
-            "You counted the floor speakers along the front: 3.",
-            "You counted the star headbands in the front row: 4."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "⭐",
+          "🎤",
+          "🎵",
+          "💖",
+          "✨",
+          "🌙",
+          "🎧",
+          "🌈"
+        ]
+      }
     }
   ],
   "items": [

@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "tension",
   "intro": "Hee hee! A new round! Welcome to The Last Round, survivors. I'm Tagalong, and I LOVE playing tag. The rules are easy: you fix the generators and run for the exit gates, and I... come and find you! The server won't let you log off until you win. Ready? I'll count to ten! One... two...",
@@ -37,7 +37,7 @@
       "id": "lobby",
       "soundscape": "space",
       "title": "The Lobby",
-      "description": "You spawn in the game's lobby: a bright, blocky hall with five glowing spawn pads, an item shop, a trophy wall and a leaderboard. A swirling portal waits to start the round, but it needs the server key. On the leaderboard, one name is at the top: TAGALONG.",
+      "description": "You spawn in the game's lobby: a bright, blocky hall with a row of glowing spawn pads, an item shop, a trophy wall and a leaderboard. A swirling portal waits to start the round, but it needs the server key. On the leaderboard, one name is at the top: TAGALONG.",
       "puzzles": [
         "spawn-pads",
         "lobby-search",
@@ -111,7 +111,7 @@
             "w": 170,
             "h": 160,
             "label": "item shop",
-            "look": "Fizzy colas, medkits and a sign: SHOP CLOSED DURING ROUNDS.",
+            "look": "Fizzy colas, medkits and a sign: SHOP CLOSED DURING ROUNDS. Behind the counter, the skin shop's mystery box has a number lock.",
             "hidesPieces": true
           },
           {
@@ -468,7 +468,7 @@
             "w": 170,
             "h": 160,
             "label": "watchtower",
-            "look": "A wobbly wooden tower. From the top, you can see the whole map.",
+            "look": "A wobbly wooden tower. From the top, you can see the whole map. Carved into the railing at the top: {order:exit-gate}.",
             "hidesPieces": true
           },
           {
@@ -628,6 +628,7 @@
       "minMinutes": 60,
       "title": "The Mystery Box",
       "kind": "code",
+      "revealedBy": "spot:item-shop",
       "prompt": "The skin shop's mystery box has a {count}-digit lock, and the shopkeeper bot has turned the code into a quiz.",
       "generator": {
         "type": "digitFacts",
@@ -718,6 +719,7 @@
       "minMinutes": 45,
       "title": "Generator 3: The Switch Panel",
       "kind": "switches",
+      "revealedBy": "spot:gen-panel",
       "prompt": "Generator 3 has a grid of switch lights, wired together: flip one and the ones beside it flip too. Turn them all on to start it!",
       "generator": {
         "type": "switches"
@@ -733,6 +735,7 @@
       "minMinutes": 45,
       "title": "The Hunter's Scribbles",
       "kind": "text",
+      "revealedBy": "spot:old-well",
       "prompt": "Tagalong has scribbled his favourite playground game all over town, in his blocky symbols: {cipher}. The lockbox on the old well wants the word.",
       "generator": {
         "type": "cipher",
@@ -770,6 +773,7 @@
       "minMinutes": 60,
       "title": "The Lost Pet",
       "kind": "text",
+      "revealedBy": "spot:notice-board",
       "prompt": "Every LOST PET poster on the notice board is written in numbers, where A is 1 and B is 2: {cipher}. The poster's tear-off strip has a word lock. What's lost?",
       "generator": {
         "type": "cipher",
@@ -792,7 +796,6 @@
     },
     {
       "id": "server-password",
-      "minMinutes": 45,
       "title": "The Server Password",
       "kind": "text",
       "prompt": "The gate's chat lock wants the server password, and the admin has sent each of you one word of it in a private message.",
@@ -823,9 +826,9 @@
     },
     {
       "id": "gate-riddle",
-      "minMinutes": 45,
       "title": "The Gate Lever",
       "kind": "text",
+      "revealedBy": "spot:gate-control",
       "prompt": "The gate control box's lever has a word lock and a riddle from Tagalong: 'I'm always running but I never get tired, and when I reach zero, the round is over!'",
       "answers": [
         "timer",
@@ -872,6 +875,7 @@
       "minMinutes": 60,
       "title": "The Scribbled Sign",
       "kind": "text",
+      "revealedBy": "spot:gate-sign",
       "prompt": "Tagalong's sign says what he shouts when he finds someone, written in a back-to-front alphabet where A swaps with Z: {cipher}. The sign's word lock wants it.",
       "generator": {
         "type": "cipher",
@@ -948,46 +952,29 @@
       "id": "exit-gate",
       "title": "The Exit Gate",
       "kind": "code",
-      "prompt": "The exit gates need the keycard AND a 3-digit code. The admin's last message: 'Chickens by the shed, then floodlights on, then crates at the gate!'",
-      "answers": [
-        "472"
-      ],
+      "prompt": "The exit gates need the keycard AND a {count}-digit code. The admin's last message: 'Every lock at the gates left you a mark. Read them in the order carved on the watchtower!'",
       "requires": [
         "gate-keycard"
       ],
-      "pieces": [
-        "You counted the blocky chickens by the tool shed: 4.",
-        "You counted the floodlights at the gate: 7.",
-        "You counted the supply crates by the gate: 2."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order of the admin's message.",
-        "Chickens, then floodlights, then crates."
+        "Every lock you opened at the gates left a mark and a number. The order is carved somewhere up high.",
+        "Search the watchtower.",
+        "The code is {answer}."
       ],
       "solvedText": "BEEP! The gates swing open with a mighty CLANG, and the way out of the map shines in front of you.",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "815"
-          ],
-          "pieces": [
-            "You counted the blocky chickens by the tool shed: 8.",
-            "You counted the floodlights at the gate: 1.",
-            "You counted the supply crates by the gate: 5."
-          ]
-        },
-        {
-          "answers": [
-            "369"
-          ],
-          "pieces": [
-            "You counted the blocky chickens by the tool shed: 3.",
-            "You counted the floodlights at the gate: 6.",
-            "You counted the supply crates by the gate: 9."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🔦",
+          "⚡",
+          "🏃",
+          "⭐",
+          "🔑",
+          "🧱",
+          "🎮",
+          "🏁"
+        ]
+      }
     }
   ],
   "items": [

@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 90,
   "soundscape": "arcade",
   "intro": "Hello, hello! Welcome to the night shift at Pepper's Pizza Playhouse! I'm Pepper the Raccoon, and I LOVE a party. Look: the doors have locked all by themselves, the power is low, and my band is warming up. You'll stay and sing with us forever and ever... unless you can reach the front doors by sunrise. Tee-hee! Let the party begin!",
@@ -77,7 +77,7 @@
             "w": 170,
             "h": 160,
             "label": "door buttons",
-            "look": "Two big red buttons, one for each door. You press one: BZZT. Nothing happens. The doors need more power than this."
+            "look": "Two big red buttons, one for each door. You press one: BZZT. Nothing happens. Under them: a breaker panel, running on backup power."
           },
           {
             "id": "air-vent",
@@ -223,7 +223,7 @@
             "w": 170,
             "h": 160,
             "label": "show stage",
-            "look": "The band stands frozen mid-song, all jumbled up. You could swear the moose just blinked."
+            "look": "The band stands frozen mid-song, all jumbled up. You could swear the moose just blinked. On the edge of the stage, a control panel flashes: PLACES FOR THE MORNING SHOW!"
           },
           {
             "id": "prize-cabinet",
@@ -233,7 +233,7 @@
             "w": 170,
             "h": 160,
             "label": "prize counter",
-            "look": "Shelves of plush toys, bouncy balls and glow sticks, and a cabinet with a 3-digit lock."
+            "look": "Shelves of plush toys, bouncy balls and glow sticks, and a cabinet with a combination lock."
           },
           {
             "id": "claw-machine",
@@ -425,7 +425,7 @@
             "w": 170,
             "h": 160,
             "label": "workbench",
-            "look": "Screwdrivers, a soldering iron and a half-built robot paw that waves at you."
+            "look": "Screwdrivers, a soldering iron and a half-built robot paw that waves at you. Beside it: the spare-parts cabinet, with a word lock and a riddle on a label."
           },
           {
             "id": "front-doors-spot",
@@ -435,7 +435,7 @@
             "w": 170,
             "h": 160,
             "label": "front doors",
-            "look": "Glass doors, chained shut, with a padlock and a 3-digit keypad. Outside, the sky is just starting to turn grey."
+            "look": "Glass doors, chained shut, with a padlock and a keypad. Outside, the sky is just starting to turn grey."
           },
           {
             "id": "dark-corner",
@@ -491,7 +491,7 @@
             "w": 170,
             "h": 160,
             "label": "paint cans",
-            "look": "Paint in every animatronic colour: raccoon grey, moose brown and penguin black.",
+            "look": "Paint in every animatronic colour: raccoon grey, moose brown and penguin black. On the lids, someone has painted a row of marks: {order:front-doors}.",
             "hidesPieces": true
           },
           {
@@ -559,6 +559,7 @@
       "id": "camera-log",
       "title": "The Camera Log",
       "kind": "code",
+      "revealedBy": "spot:supply-locker",
       "prompt": "Every time a camera spots Pepper the Raccoon, the security tablet logs a code: {sequence}. The supply locker's keypad asks: 'What will the next code be?'",
       "generator": {
         "type": "sequence"
@@ -624,6 +625,7 @@
       "minMinutes": 45,
       "title": "The Breaker Panel",
       "kind": "switches",
+      "revealedBy": "spot:door-buttons",
       "prompt": "The office is running on backup power. The breakers are wired together: flip one and the ones beside it flip too. Turn every breaker on!",
       "generator": {
         "type": "switches"
@@ -669,6 +671,7 @@
       "id": "band-lineup",
       "title": "The Band Line-Up",
       "kind": "code",
+      "revealedBy": "spot:show-stage",
       "prompt": "The show stage's control panel flashes: PLACES FOR THE MORNING SHOW! The band is all jumbled up: {items}. The keypad wants each one's place, far left is 1, in the order they're listed.",
       "generator": {
         "type": "deduction",
@@ -837,7 +840,6 @@
     },
     {
       "id": "lullaby",
-      "minMinutes": 45,
       "title": "Pepper's Lullaby",
       "kind": "text",
       "prompt": "A tape recorder by the music box is labelled PEPPER'S LULLABY: SING ALONG TO SEND THE BAND TO SLEEP. Someone has cut the words out and mixed them up. Its word lock wants the lullaby's words, in order.",
@@ -868,9 +870,9 @@
     },
     {
       "id": "parts-cabinet",
-      "minMinutes": 45,
       "title": "The Parts Cabinet",
       "kind": "text",
+      "revealedBy": "spot:workbench",
       "prompt": "The spare-parts cabinet has a word lock and a riddle on a label: 'I've a big round mouth made of mesh, I never eat a thing, but every song in the hall comes out of me.'",
       "answers": [
         "speaker",
@@ -992,46 +994,29 @@
       "id": "front-doors",
       "title": "The Front Doors",
       "kind": "code",
-      "prompt": "The front doors need their key AND a 3-digit code. Gus's last sticky note: 'Party hats in the hall, then tokens in the jar, then heads on the shelf!'",
-      "answers": [
-        "746"
-      ],
+      "prompt": "The front doors need their key AND a {count}-digit code. Gus's last sticky note: 'Every lock back here leaves a mark. Read them in the order painted on the paint cans!'",
       "requires": [
         "front-door-key"
       ],
-      "pieces": [
-        "You counted the party hats in the hall: 7.",
-        "You counted the tokens in the prize jar: 4.",
-        "You counted the spare heads on the shelf: 6."
-      ],
       "hints": [
-        "Three phones remember three numbers. Put them in the order on Gus's note.",
-        "Party hats, then tokens, then heads."
+        "Every lock you opened backstage left a mark and a number. The order is painted somewhere back here.",
+        "Search the paint cans.",
+        "The code is {answer}."
       ],
       "solvedText": "The padlock falls, the keypad plays a cheerful jingle, and the chains slither to the floor. The front doors are open!",
-      "variants": [
-        {},
-        {
-          "answers": [
-            "358"
-          ],
-          "pieces": [
-            "You counted the party hats in the hall: 3.",
-            "You counted the tokens in the prize jar: 5.",
-            "You counted the spare heads on the shelf: 8."
-          ]
-        },
-        {
-          "answers": [
-            "925"
-          ],
-          "pieces": [
-            "You counted the party hats in the hall: 9.",
-            "You counted the tokens in the prize jar: 2.",
-            "You counted the spare heads on the shelf: 5."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🎃",
+          "🍕",
+          "🦝",
+          "🎈",
+          "🔦",
+          "⭐",
+          "🎵",
+          "🎟️"
+        ]
+      }
     }
   ],
   "items": [

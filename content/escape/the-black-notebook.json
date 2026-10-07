@@ -16,7 +16,7 @@
   "seasons": [
     "halloween"
   ],
-  "edition": 3,
+  "edition": 4,
   "hintPenaltySeconds": 120,
   "soundscape": "storm",
   "intro": "Well, well. Detectives. I'm Sable, and that notebook was mine before the Scribe picked it up. I don't take sides. I only watch. The Scribe has locked you in and left you a game, and when the clock runs out, your names go on the last page. Find the notebook, and the name of the hand that writes in it. I'll be on the windowsill, eating plums. Begin.",
@@ -76,7 +76,7 @@
             "w": 170,
             "h": 160,
             "label": "top drawer",
-            "look": "Inside: a diary full of dull school timetables. But the drawer is too shallow for its size. You lift the false bottom, and underneath lies the left half of a torn page of thick black paper.",
+            "look": "Inside: a diary full of dull school timetables. But the drawer is too shallow for its size. You lift the false bottom: underneath lie the left half of a torn page of thick black paper, and the Scribe's real diary, its last line in code.",
             "gives": "page-left",
             "requires": "desk-key",
             "lockedText": "The top drawer is locked. The keyhole is small and brass."
@@ -220,7 +220,7 @@
       "id": "incident-room",
       "soundscape": "tension",
       "title": "The Incident Room",
-      "description": "Back at headquarters, the incident room hums under strip lights. One wall is covered in victims' photographs joined by red string, a bank of CCTV screens shows the city in grey, and the evidence lockers stand in a row. Someone has slipped an envelope under the door, addressed to the task force in the Scribe's handwriting. The stairwell to the roof is locked.",
+      "description": "Back at headquarters, the incident room hums under strip lights. One wall is covered in victims' photographs joined by red string, a bank of CCTV screens shows the city in grey, and the evidence lockers stand in a row. Someone has slipped an envelope under the door, addressed to the task force in the Scribe's handwriting. The stairwell to the roof is locked, with a new keypad by the door.",
       "puzzles": [
         "suspect-lineup",
         "evidence-tags",
@@ -260,7 +260,7 @@
             "w": 170,
             "h": 160,
             "label": "lift footage",
-            "look": "A frozen CCTV frame: the passengers in a lift, the night the notebook changed hands."
+            "look": "A frozen CCTV frame: the passengers in a lift, the night the notebook changed hands. The incident board beside it has a keypad."
           },
           {
             "id": "evidence-locker",
@@ -283,7 +283,7 @@
             "w": 170,
             "h": 160,
             "label": "stairwell door",
-            "look": "The door to the roof stairs. A keyhole, and a word lock somebody fitted recently."
+            "look": "The door to the roof stairs. A keyhole, and a keypad somebody fitted recently."
           },
           {
             "id": "case-files",
@@ -293,7 +293,7 @@
             "w": 170,
             "h": 160,
             "label": "case files",
-            "look": "Boxes of case files. Every one ends the same way: CAUSE OF DEATH, HEART FAILURE.",
+            "look": "Boxes of case files. Every one ends the same way: CAUSE OF DEATH, HEART FAILURE. And every file is stamped with the same word, in numbers.",
             "hidesPieces": true
           },
           {
@@ -315,7 +315,7 @@
             "w": 170,
             "h": 160,
             "label": "whiteboard",
-            "look": "THEORIES, in three different handwritings. Most of them are crossed out.",
+            "look": "THEORIES, in several different handwritings. Most of them are crossed out. Under them, in the Scribe's careful hand, a row of marks: {order:stairwell-door}.",
             "hidesPieces": true
           },
           {
@@ -420,7 +420,7 @@
             "w": 170,
             "h": 160,
             "label": "water tank",
-            "look": "You shine the torch under the tank. Taped to the metal: a small key on a black ribbon.",
+            "look": "You shine the torch under the tank. Taped to the metal: a small key on a black ribbon. The ladder up the tank has a padlock with a word lock.",
             "gives": "lockbox-key",
             "requires": "torch",
             "lockedText": "A rusted water tank. Something is taped to the underside, but it's pitch black under there."
@@ -610,6 +610,7 @@
       "id": "scribe-diary",
       "title": "The Scribe's Diary",
       "kind": "text",
+      "revealedBy": "spot:top-drawer",
       "prompt": "The last line of the Scribe's diary is in code: {cipher}. It's the Scribe's own word for what they're doing to the city. The diary's clasp has a word lock.",
       "generator": {
         "type": "cipher",
@@ -710,6 +711,7 @@
       "id": "suspect-lineup",
       "title": "The Lift Footage",
       "kind": "code",
+      "revealedBy": "spot:lift-still",
       "prompt": "The CCTV still from the night the notebook changed hands shows the passengers in a lift, standing in a row: {items}. The incident board's keypad wants each one's place, far left is 1, in the order listed.",
       "generator": {
         "type": "deduction",
@@ -760,7 +762,6 @@
     },
     {
       "id": "taunting-letter",
-      "minMinutes": 45,
       "title": "The Scribe's Letter",
       "kind": "text",
       "prompt": "The envelope under the door holds a letter in the Scribe's own symbols: {cipher}. It names what the Scribe means to take from the task force next. The envelope's tab has a word lock.",
@@ -803,6 +804,7 @@
       "minMinutes": 45,
       "title": "The CCTV Wall",
       "kind": "switches",
+      "revealedBy": "spot:cctv-screens",
       "prompt": "Half the CCTV feeds are dark. The screens are linked: switch one and the ones beside it switch too. Bring every camera back online.",
       "generator": {
         "type": "switches"
@@ -818,6 +820,7 @@
       "minMinutes": 60,
       "title": "The Victims' Files",
       "kind": "text",
+      "revealedBy": "spot:case-files",
       "prompt": "Every victim's file is stamped with the same word, written in numbers where A is 1 and B is 2: {cipher}. It's the time of day each name was written. The file box has a word lock.",
       "generator": {
         "type": "cipher",
@@ -840,50 +843,30 @@
     {
       "id": "stairwell-door",
       "title": "The Stairwell Door",
-      "kind": "text",
-      "prompt": "The door to the roof stairs has a keyhole and a new word lock, with a riddle in the Scribe's handwriting: 'I have cities, but no houses. I have forests, but no trees. I have rivers, but no water.'",
-      "answers": [
-        "map",
-        "a map",
-        "maps",
-        "atlas"
-      ],
+      "kind": "code",
+      "prompt": "The door to the roof stairs has a keyhole and a {count}-digit keypad somebody fitted recently. A note in the Scribe's careful hand: 'Every lock in this room has marked you, detectives. Read the marks in the order I left on your whiteboard.'",
       "requires": [
         "roof-key"
       ],
       "hints": [
-        "Look at the wall with the pins in it.",
-        "You unfold it to find your way."
+        "Every lock you opened in the incident room left a mark and a number. The order is written up somewhere in here.",
+        "Search the whiteboard.",
+        "The code is {answer}."
       ],
       "solvedText": "The lock clicks and the door swings open onto a stairwell. Rain is falling through the open hatch at the top.",
-      "variants": [
-        {},
-        {
-          "prompt": "The door to the roof stairs has a keyhole and a new word lock, with a riddle in the Scribe's handwriting: 'What gets broken without ever being held?'",
-          "answers": [
-            "promise",
-            "a promise",
-            "promises",
-            "your word"
-          ],
-          "hints": [
-            "Think about what the Scribe swore to the city.",
-            "You make one, and then you keep it. Or you don't."
-          ]
-        },
-        {
-          "prompt": "The door to the roof stairs has a keyhole and a new word lock, with a riddle in the Scribe's handwriting: 'Forward I am heavy, but backward I am not.'",
-          "answers": [
-            "ton",
-            "a ton",
-            "tons"
-          ],
-          "hints": [
-            "Read the word backwards.",
-            "It's a very big weight, and backwards it spells a word for no."
-          ]
-        }
-      ]
+      "generator": {
+        "type": "final",
+        "marks": [
+          "🖋️",
+          "📓",
+          "🕯️",
+          "🔍",
+          "⏳",
+          "🗝️",
+          "☂️",
+          "📷"
+        ]
+      }
     },
     {
       "id": "rooftop-lockbox",
@@ -906,6 +889,7 @@
       "id": "true-name",
       "title": "The True Name",
       "kind": "text",
+      "revealedBy": "item:black-notebook",
       "prompt": "The notebook's owner is the Scribe, and the arrest warrant needs the Scribe's true name. Each of you has pieced together one part of it from the evidence. Say it in order, and the case is closed.",
       "requires": [
         "black-notebook"
@@ -940,6 +924,7 @@
       "minMinutes": 45,
       "title": "Sable's Riddle",
       "kind": "text",
+      "revealedBy": "spot:water-tank",
       "prompt": "The padlock on the water tank's ladder has a word lock. Sable leans over your shoulder, sticky with plum sugar: 'Let me give you one. What is always coming, but never arrives?'",
       "answers": [
         "tomorrow",
@@ -983,6 +968,7 @@
       "minMinutes": 60,
       "title": "The Railing",
       "kind": "text",
+      "revealedBy": "spot:railing",
       "prompt": "Scratched into the wet railing, in a back-to-front alphabet where A swaps with Z: {cipher}. It's the word the Scribe left for whoever came up here. The chain on the railing has a word lock.",
       "generator": {
         "type": "cipher",
