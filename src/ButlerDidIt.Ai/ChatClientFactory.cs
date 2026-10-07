@@ -49,6 +49,9 @@ public sealed class ChatClientFactory(bool allowFake) : IChatClientFactory
         AiProviderKind.Fake when allowFake => new FakeChatClient(),
         AiProviderKind.Fake => throw new AiUnavailableException("The fake AI provider is only allowed in tests."),
 
+        AiProviderKind.ElevenLabs or AiProviderKind.Piper or AiProviderKind.StableDiffusion =>
+            throw new AiUnavailableException($"'{provider.Name}' ({provider.Kind}) makes {(AiProviderAbilities.Speaks(provider.Kind) ? "voices" : "pictures")}, not chat."),
+
         _ => throw new AiUnavailableException($"Unknown AI provider kind {provider.Kind}."),
     };
 

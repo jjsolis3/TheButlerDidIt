@@ -270,8 +270,17 @@ Setup instructions: [ai-setup.md](ai-setup.md).
  MediaGateway ── budget + usage log              ScenarioMedia (scenario, key → asset)
       │                                                          │
  ITextToSpeech / IImageGenerator                   MediaOverlay.Apply ── fills URLs into the
- (OpenAI or Fake)                                  scenario when ContentCatalog loads it
+ (OpenAI, Gemini, ElevenLabs, Piper,               scenario when ContentCatalog loads it
+  Stable Diffusion or Fake)
 ```
+
+**Each media provider is its own small adapter** (`MediaClientFactory`), because voice and picture APIs have no shared .NET interface the way chat has `IChatClient`. `AiProviderAbilities` says which kinds chat, speak or paint, and the admin endpoints only let a role take a provider that can do it. The adapters added in #33:
+- **ElevenLabs** (`ElevenLabsSpeech`): one HTTPS call per clip. Characters are cast with OpenAI's six voice names everywhere in the app, so `ElevenLabsVoices` maps each to one of the account's voices, read from `GET /v1/voices` once an hour: ElevenLabs' default voices by name first, then the account's own by gender, so deep characters stay deep.
+- **Piper** (`PiperSpeech`): a local server, `POST /synthesize` returning WAV (and the text posted to `/` for servers from before 2025). For a voice with several speakers, `PiperVoices` gives each character one, always within the voice's speaker count (read from `/voices` or `/info`).
+- **Stable Diffusion WebUI** (`StableDiffusionImages`): a local AUTOMATIC1111 or Forge, `POST /sdapi/v1/txt2img`, at the size the checkpoint was trained for (`StableDiffusionSizes`).
+- **Local OpenAI-compatible servers** need no key when a base URL is set.
+
+Piper and Stable Diffusion are logged as free, like Ollama. "Test connection" on Admin → AI makes a one-word clip for a voice provider and lists the checkpoints for Stable Diffusion (`IMediaClientFactory.CheckAsync`).
 
 **Why prepare everything up front:** voice clips and pictures take seconds each. Making them while the guests watch would stall every scene. Instead, creating a party queues a job that makes every portrait, the victim and setting pictures, a picture for each clue card, all narration and every NPC line. When it finishes, every screen of every party using that mystery is refreshed.
 

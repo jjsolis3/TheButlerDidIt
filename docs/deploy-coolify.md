@@ -53,9 +53,9 @@ To let hosts reset a forgotten password themselves, add SMTP settings from any e
 ### Optional: AI game master
 To switch on AI (generated mysteries, NPCs you can question, hints and verdicts), add `AI_PROVIDER_NAME`, `AI_PROVIDER_KIND`, `AI_PROVIDER_API_KEY` and the three `AI_*_MODEL` variables, as in `.env.example`. You can also skip these and set everything up later on the **Admin → AI** page. See [ai-setup.md](ai-setup.md).
 
-For **voices and pictures**, also add `AI_MEDIA_PROVIDER_NAME` (e.g. `OpenAI`), `AI_MEDIA_API_KEY`, `AI_VOICE_MODEL` (`tts-1`) and `AI_IMAGE_MODEL` (`dall-e-3`). These use OpenAI even if your main provider is Claude, Gemini or Ollama.
+For **voices and pictures**, also add `AI_MEDIA_PROVIDER_NAME` (e.g. `OpenAI`), `AI_MEDIA_API_KEY`, `AI_VOICE_MODEL` (`tts-1`) and `AI_IMAGE_MODEL` (`dall-e-3`). These use OpenAI even if your main provider is Claude, Gemini or Ollama. `AI_MEDIA_PROVIDER_KIND` can also be `Gemini`, `ElevenLabs` (voices only), `Piper` (local voices) or `StableDiffusion` (local pictures); the local ones need `AI_MEDIA_BASE_URL`. See [ai-setup.md](ai-setup.md).
 
-To use **local models with Ollama**, deploy Ollama as another Coolify resource (or add it to the compose file). Then set the provider type to `Ollama` and the base URL to its internal address, e.g. `http://ollama:11434`.
+To use **local models with Ollama**, deploy Ollama as another Coolify resource (or add it to the compose file). Then set the provider type to `Ollama` and the base URL to its internal address, e.g. `http://ollama:11434`. **Piper** (voices) and a **Stable Diffusion WebUI** (pictures) work the same way, at e.g. `http://piper:5000` and `http://stable-diffusion:7860` (start the WebUI with `--api`).
 
 ## 4. Deploy
 

@@ -143,6 +143,9 @@ public static class Wav
 {
     public static byte[] FromPcm16(byte[] samples, int sampleRate, short channels = 1) => Build(samples, sampleRate, channels, bitsPerSample: 16);
 
+    /// <summary>Whether the bytes start like a WAV file ("RIFF", then "WAVE").</summary>
+    public static bool IsWav(byte[] b) => b.Length > 12 && b[0] == 'R' && b[1] == 'I' && b[2] == 'F' && b[3] == 'F' && b[8] == 'W' && b[9] == 'A' && b[10] == 'V' && b[11] == 'E';
+
     internal static byte[] Build(byte[] samples, int sampleRate, short channels, short bitsPerSample)
     {
         var blockAlign = (short)(channels * bitsPerSample / 8);

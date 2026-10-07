@@ -591,7 +591,7 @@ export interface AdminGameRow {
 
 // ---- AI (admin + generation)
 
-export type AiProviderKind = 'anthropic' | 'openAI' | 'gemini' | 'ollama' | 'fake'
+export type AiProviderKind = 'anthropic' | 'openAI' | 'gemini' | 'ollama' | 'fake' | 'elevenLabs' | 'piper' | 'stableDiffusion'
 export type AiRole = 'storyteller' | 'actor' | 'inspector' | 'voice' | 'illustrator'
 export type MysteryLength = 'short' | 'standard' | 'long'
 export type GenerationStatus = 'queued' | 'running' | 'succeeded' | 'failed'

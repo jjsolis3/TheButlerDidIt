@@ -86,6 +86,22 @@ public class GeminiMediaLiveTests(ITestOutputHelper output)
     [LiveFact(Live.GeminiKey)] public Task Paints_a_landscape() => MediaChecks.Paints(output, Name, Live.Gemini, Live.GeminiImageModel, ImageShape.Landscape);
 }
 
+/// <summary>ElevenLabs (#33): the voice is cast from the account's own list, and comes back as an MP3.</summary>
+public class ElevenLabsMediaLiveTests(ITestOutputHelper output)
+{
+    [LiveFact(Live.ElevenLabsKey)] public Task Speaks() => MediaChecks.Speaks(output, "ElevenLabs", Live.ElevenLabs, Live.ElevenLabsModel);
+}
+
+/// <summary>The local servers (#33): Piper's voices and a Stable Diffusion WebUI's pictures. Free, so every check runs.</summary>
+public class LocalMediaLiveTests(ITestOutputHelper output)
+{
+    [LiveFact(Live.PiperUrl)] public Task Piper_speaks() => MediaChecks.Speaks(output, "Piper", Live.Piper, Live.PiperVoice);
+    [LiveFact(Live.StableDiffusionUrl)] public Task Stable_diffusion_paints_a_portrait() =>
+        MediaChecks.Paints(output, "Stable Diffusion", Live.StableDiffusion, Live.StableDiffusionModel, ImageShape.Portrait);
+    [LiveFact(Live.StableDiffusionUrl)] public Task Stable_diffusion_paints_a_landscape() =>
+        MediaChecks.Paints(output, "Stable Diffusion", Live.StableDiffusion, Live.StableDiffusionModel, ImageShape.Landscape);
+}
+
 /// <summary>The image-size reader is itself checked offline, so a live failure is about the service, not the parser.</summary>
 public class ImageSizeTests
 {

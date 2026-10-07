@@ -58,7 +58,7 @@ public class AdminAiTests(ApiFactory app) : IClassFixture<ApiFactory>
         var voice = await admin.PutAsync("/api/admin/ai/roles/voice",
             Json($$"""{"providerId":"{{localId}}","model":"tts-1","maxOutputTokens":null,"temperature":null}"""));
         Assert.Equal(HttpStatusCode.BadRequest, voice.StatusCode);
-        Assert.Contains("needs an OpenAI or Gemini provider", await voice.Content.ReadAsStringAsync());
+        Assert.Contains("needs an OpenAI, Gemini, ElevenLabs or Piper provider", await voice.Content.ReadAsStringAsync());
 
         // Claude's options (#63): effort and a refusal fallback, saved, shown back, and refused for other providers.
         var claude = await admin.PostAsync("/api/admin/ai/providers",

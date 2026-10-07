@@ -37,7 +37,10 @@ public sealed class AiOptions
     {
         public string Name { get; set; } = "";
 
-        /// <summary>Anthropic, OpenAI, Gemini or Ollama. A string so a blank environment variable can't stop the app starting.</summary>
+        /// <summary>
+        /// Anthropic, OpenAI, Gemini or Ollama; for voices also ElevenLabs or Piper, and for pictures StableDiffusion (#33).
+        /// A string so a blank environment variable can't stop the app starting.
+        /// </summary>
         public string Kind { get; set; } = "";
         public string? BaseUrl { get; set; }
         public string? ApiKey { get; set; }
@@ -99,7 +102,7 @@ public sealed class DbAiUsageSink(IServiceScopeFactory scopes) : IAiUsageSink
         using var scope = scopes.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var price = await db.AiModelPrices.AsNoTracking().FirstOrDefaultAsync(p => p.Model == r.Model, ct);
-        var free = r.ProviderKind is AiProviderKind.Ollama or AiProviderKind.Fake;
+        var free = AiProviderAbilities.Local(r.ProviderKind) || r.ProviderKind == AiProviderKind.Fake;
         var cost = price is null || !r.Success ? 0m : new AiModelPrice(price.InputPerMillion, price.OutputPerMillion, price.PerRequest).Cost(r.InputTokens, r.OutputTokens);
 
         db.AiUsage.Add(new AiUsageEntity
@@ -182,6 +185,13 @@ public static class AiConfigSeeder
         {
             var provider = await db.AiProviders.FirstOrDefaultAsync(x => x.Name == r.Provider, ct);
             if (provider is null || string.IsNullOrWhiteSpace(r.Model)) continue;
+            // One media provider is given both media roles by the compose file; one that only speaks or only paints takes just its own (#33).
+            if (!AiProviderAbilities.Can(provider.Kind, role))
+            {
+                scope.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger(typeof(AiConfigSeeder))
+                    .LogWarning("AI settings: {Provider} ({Kind}) can't do the {Role} role, so it was left out.", provider.Name, provider.Kind, role);
+                continue;
+            }
             var row = await db.AiRoles.FindAsync([role], ct);
             if (row is null)
             {

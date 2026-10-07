@@ -14,6 +14,9 @@ public static class Live
     public const string OpenAiKey = "LIVE_OPENAI_KEY";
     public const string GeminiKey = "LIVE_GEMINI_KEY";
     public const string OllamaUrl = "LIVE_OLLAMA_URL";
+    public const string ElevenLabsKey = "LIVE_ELEVENLABS_KEY";
+    public const string PiperUrl = "LIVE_PIPER_URL";
+    public const string StableDiffusionUrl = "LIVE_SD_URL";
 
     /// <summary>Also run the checks that write a whole mystery or escape room: a few minutes and roughly $0.50–$2 per provider.</summary>
     public const string Full = "LIVE_FULL";
@@ -27,6 +30,9 @@ public static class Live
     public static AiProviderSettings OpenAi => new(Guid.NewGuid(), "OpenAI (live)", AiProviderKind.OpenAI, null, Key(OpenAiKey));
     public static AiProviderSettings Gemini => new(Guid.NewGuid(), "Gemini (live)", AiProviderKind.Gemini, null, Key(GeminiKey));
     public static AiProviderSettings Ollama => new(Guid.NewGuid(), "Ollama (live)", AiProviderKind.Ollama, Key(OllamaUrl), null);
+    public static AiProviderSettings ElevenLabs => new(Guid.NewGuid(), "ElevenLabs (live)", AiProviderKind.ElevenLabs, null, Key(ElevenLabsKey));
+    public static AiProviderSettings Piper => new(Guid.NewGuid(), "Piper (live)", AiProviderKind.Piper, Key(PiperUrl), null);
+    public static AiProviderSettings StableDiffusion => new(Guid.NewGuid(), "Stable Diffusion (live)", AiProviderKind.StableDiffusion, Key(StableDiffusionUrl), null);
 
     // The model each check uses. Override any of them to test the model you run in production.
     public static string AnthropicModel => Env("LIVE_ANTHROPIC_MODEL", "claude-opus-5-5");
@@ -38,6 +44,9 @@ public static class Live
     public static string GeminiSpeechModel => Env("LIVE_GEMINI_TTS_MODEL", "gemini-2.5-flash-preview-tts");
     public static string GeminiImageModel => Env("LIVE_GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image");
     public static string OllamaModel => Env("LIVE_OLLAMA_MODEL", "llama3.1");
+    public static string ElevenLabsModel => Env("LIVE_ELEVENLABS_MODEL", "eleven_multilingual_v2");
+    public static string PiperVoice => Env("LIVE_PIPER_VOICE", "default");
+    public static string StableDiffusionModel => Env("LIVE_SD_MODEL", "default");
 }
 
 /// <summary>A test that runs only when every one of its environment variables is set; otherwise it's reported as skipped, with how to run it.</summary>
