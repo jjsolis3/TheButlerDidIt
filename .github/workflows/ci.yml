@@ -34,6 +34,8 @@ jobs:
       TEST_S3_URL: http://localhost:9000
       TEST_S3_ACCESS_KEY: test
       TEST_S3_SECRET_KEY: test
+      # The Stripe adapter's tests (#101), against Stripe's own simulator.
+      TEST_STRIPE_MOCK_URL: http://localhost:12111
       DOTNET_CLI_TELEMETRY_OPTOUT: "1"
       DOTNET_NOLOGO: "1"
     steps:
@@ -64,6 +66,14 @@ jobs:
           pipx install "moto[server]"
           nohup moto_server -p 9000 > /tmp/moto.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:9000/ > /dev/null && break; sleep 1; done
+
+      # stripe-mock checks each request against Stripe's API definition. Pinned to the version whose API matches the
+      # one Stripe.net pins; GitHub's runners come with Go.
+      - name: Stripe simulator for the payment adapter's tests
+        run: |
+          go install github.com/stripe/stripe-mock@v0.206.0
+          nohup "$(go env GOPATH)/bin/stripe-mock" -http-port 12111 -https-port 12112 > /tmp/stripe-mock.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -u sk_test_123: http://localhost:12111/v1/prices/price_123 > /dev/null && break; sleep 1; done
 
       - name: .NET - build and test
         run: dotnet test --configuration Release

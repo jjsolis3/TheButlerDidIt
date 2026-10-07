@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using ButlerDidIt.Api.Ai;
 using ButlerDidIt.Api.Auth;
+using ButlerDidIt.Api.Billing;
 using ButlerDidIt.Api.Content;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Escape;
@@ -53,10 +54,12 @@ public static class AccountEndpoints
         var group = app.MapGroup("/api/account").RequireAuthorization(AuthPolicies.Host);
 
         group.MapGet("/", async (ClaimsPrincipal principal, UserManager<AppUser> users, AppDbContext db, IEmailSender email,
-            IOptions<AiOptions> ai, TimeProvider clock, CancellationToken ct) =>
+            IOptions<AiOptions> ai, BillingSetup billing, BillingService payments, TimeProvider clock, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
+            // A renewal that's due but unconfirmed is checked with the provider first, so the plan shown is right (#101).
+            await payments.RefreshIfDueAsync(user, ct);
             var now = clock.GetUtcNow();
             var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
 
@@ -75,7 +78,7 @@ public static class AccountEndpoints
                 await db.EscapeRooms.CountAsync(r => r.OwnerUserId == user.Id, ct),
                 await db.EscapeResults.CountAsync(r => r.HostUserId == user.Id && r.Escaped, ct));
             return Results.Ok(new AccountView(user.DisplayName, user.Email ?? "", user.EmailConfirmed, user.IsAdmin, email.IsConfigured, usage, library,
-                await Access.ForAsync(db, user, now, ct)));
+                await Access.ForAsync(db, user, now, ct) with { Payments = billing.Enabled }));
         });
 
         group.MapPut("/profile", async (ProfileRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, HttpContext http) =>
@@ -228,6 +231,9 @@ public static class AccountEndpoints
                     .Select(r => new { r.Kind, r.ContentId, r.FinishedAt, r.PlayerCount, r.DurationSeconds, r.Accusers, r.Correct, r.Escaped, r.HintsUsed })
                     .ToListAsync(ct),
                 Parties = parties, Mysteries = mysteries, EscapeRooms = rooms, Escapes = escapes, AiUsage = aiUsage,
+                // Trials, free access, subscriptions and passes (#100, #101). Payments themselves are at Stripe, on the invoices.
+                Plans = await db.AccessGrants.AsNoTracking().Where(g => g.UserId == user.Id).OrderBy(g => g.StartsAt)
+                    .Select(g => new { g.Kind, g.Games, g.StartsAt, g.EndsAt, g.RevokedAt, g.Status, g.RenewsAt, g.Note }).ToListAsync(ct),
             };
             var json = JsonSerializer.SerializeToUtf8Bytes(export, new JsonSerializerOptions(GameJson.Options) { WriteIndented = true });
             return Results.File(json, "application/json", "butler-did-it-account.json");
@@ -236,7 +242,8 @@ public static class AccountEndpoints
         // ---- Delete the account and what it made. Leaderboard times and AI costs are kept without the
         // name: the times are public anyway, and the costs are the admin's bill.
         group.MapPost("/delete", async (DeleteAccountRequest req, ClaimsPrincipal principal, UserManager<AppUser> users, SignInManager<AppUser> signIn,
-            AppDbContext db, ContentCatalog catalog, EscapeCatalog rooms, ButlerDidIt.Api.Media.MediaService media, HttpContext http, CancellationToken ct) =>
+            AppDbContext db, ContentCatalog catalog, EscapeCatalog rooms, ButlerDidIt.Api.Media.MediaService media, BillingService payments,
+            HttpContext http, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -245,6 +252,18 @@ public static class AccountEndpoints
             if (await CheckPasswordAsync(signIn, user, req.Password) is { } wrong) return wrong;
             if (await db.GenerationJobs.AnyAsync(j => j.HostUserId == user.Id && (j.Status == GenerationStatus.Queued || j.Status == GenerationStatus.Running), ct))
                 return Results.Problem("The AI is still writing something for you. Wait for it to finish, then try again.", statusCode: StatusCodes.Status409Conflict);
+
+            // Their subscription goes first (#101): an account that's gone must never be charged again. If the provider
+            // can't be reached, nothing is deleted, so they're never left paying for an account they can't sign in to.
+            try
+            {
+                await payments.CancelEverythingAsync(user, ct);
+            }
+            catch (BillingException ex)
+            {
+                return Results.Problem($"Your subscription couldn't be cancelled just now, so your account wasn't deleted. Try again in a few minutes. ({ex.Message})",
+                    statusCode: StatusCodes.Status502BadGateway);
+            }
 
             // Parties first, each with its seats, notes and costume selfies (files too). Phones still in one are told it's over.
             var partyIds = await db.Parties.Where(p => p.HostUserId == user.Id).Select(p => p.Id).ToListAsync(ct);
@@ -273,6 +292,7 @@ public static class AccountEndpoints
                 await db.PlayFeedback.Where(f => f.HostUserId == user.Id)
                     .ExecuteUpdateAsync(s => s.SetProperty(f => f.HostUserId, "").SetProperty(f => f.Comment, (string?)null), ct);
                 await db.AiUsage.Where(u => u.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(u => u.HostUserId, ""), ct);
+                await db.AccessGrants.Where(g => g.UserId == user.Id).ExecuteDeleteAsync(ct);
                 await db.MediaJobs.Where(j => j.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(j => j.HostUserId, ""), ct);
                 // A file the admin's copy of one of their rooms still uses stays for that copy, no longer theirs.
                 await db.MediaAssets.Where(a => a.OwnerUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.OwnerUserId, (string?)null), ct);

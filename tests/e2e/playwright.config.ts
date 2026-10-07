@@ -56,6 +56,15 @@ export default defineConfig({
       RateLimits__RegisterPerHour: '500',
       // Escape rooms shuffle their codes for every game; this lets the test ask the server for them.
       Escape__ExposeAnswersForTests: 'true',
+      // Payments (#101) through the fake provider: its own checkout and billing pages, and no money moves.
+      Billing__Provider: 'Fake',
+      Billing__Prices__MysteriesMonthly: 'fake_mysteries_month_800',
+      Billing__Prices__EscapeRoomsMonthly: 'fake_escape_month_800',
+      Billing__Prices__BothMonthly: 'fake_both_month_1200',
+      Billing__Prices__BothYearly: 'fake_both_year_12000',
+      Billing__Prices__BothPass: 'fake_bothpass_once_900',
+      // …and one set up wrong, which the admin's Plans & billing tab must flag (a one-time price on a monthly plan).
+      Billing__Prices__MysteriesYearly: 'fake_wrong_once_100',
       // …and puts the test-only Laboratory (every kind of puzzle) on the shelf, for escape-harder.spec.ts.
       Escape__TestRoomsRoot: fileURLToPath(new URL('../ButlerDidIt.Escape.Tests/Fixtures', import.meta.url)),
       // Keep this run's generated files out of the developer's own media folder.

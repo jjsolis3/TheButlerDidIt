@@ -19,6 +19,13 @@ public sealed class AppUser : IdentityUser
     /// party, the earliest sign of them there is; null when there was none.
     /// </summary>
     public DateTimeOffset? CreatedAt { get; set; }
+
+    /// <summary>
+    /// The host's customer at the payment provider (Stripe's <c>cus_…</c>), made at their first checkout (#101).
+    /// Every payment and subscription of theirs hangs off it, which is how a webhook finds the host.
+    /// </summary>
+    [MaxLength(255)]
+    public string? BillingCustomerId { get; set; }
 }
 
 /// <summary>
@@ -99,10 +106,31 @@ public enum GrantKind
     Subscription,
 }
 
+/// <summary>A paid grant's state at the payment provider, as the host's pages tell it (#101).</summary>
+public enum PaidStatus
+{
+    /// <summary>Paid up, and renews at <see cref="AccessGrantEntity.RenewsAt"/>.</summary>
+    Active,
+
+    /// <summary>A subscription in its free days (bought during the site's free trial): the first payment is at <see cref="AccessGrantEntity.RenewsAt"/>.</summary>
+    Trialing,
+
+    /// <summary>Cancelled, but paid until <see cref="AccessGrantEntity.EndsAt"/>.</summary>
+    Ending,
+
+    /// <summary>A renewal payment failed. The provider retries the card; access lasts the grace days meanwhile.</summary>
+    PastDue,
+
+    /// <summary>Over: cancelled, never paid, or given up on after failed payments.</summary>
+    Ended,
+}
+
 /// <summary>
 /// Access to start games (#100). A host's access is every grant in effect now put together, so a
 /// trial, a party pass and a subscription can overlap without special cases (see Plans/Access.cs).
 /// Grants are never edited into something else: they end, or are revoked, and new ones are added.
+/// The one exception is a subscription's grant, which mirrors the subscription at the payment provider
+/// (#101): its games, dates and status follow every renewal, plan change and cancellation there.
 /// </summary>
 public sealed class AccessGrantEntity
 {
@@ -125,6 +153,39 @@ public sealed class AccessGrantEntity
     public string? Note { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
+
+    /// <summary>
+    /// A paid grant's id at the payment provider (#101): the subscription (<c>sub_…</c>), or the checkout a party pass
+    /// was bought with (<c>cs_…</c>). Unique, so the same payment can never make two grants, however often it's reported.
+    /// </summary>
+    [MaxLength(255)]
+    public string? ExternalId { get; set; }
+
+    /// <summary>A paid grant's state at the provider; null for grants nobody paid for (trials, free access).</summary>
+    public PaidStatus? Status { get; set; }
+
+    /// <summary>When a subscription renews next; null when it won't (cancelled, payment failed, or a pass).</summary>
+    public DateTimeOffset? RenewsAt { get; set; }
+}
+
+/// <summary>
+/// A webhook event from the payment provider that was handled (#101). Stripe sends an event again until it hears back,
+/// and now and then twice anyway, so the ids are kept and a repeat is answered without doing anything. They also tell
+/// the admin when the last one arrived, the first thing to check when payments don't seem to reach the site.
+/// </summary>
+public sealed class BillingEventEntity
+{
+    /// <summary>The provider's event id (Stripe's <c>evt_…</c>).</summary>
+    [Key, MaxLength(255)]
+    public required string Id { get; set; }
+
+    [MaxLength(100)]
+    public required string Type { get; set; }
+
+    [MaxLength(255)]
+    public string? CustomerId { get; set; }
+
+    public DateTimeOffset ReceivedAt { get; set; }
 }
 
 public sealed class ThemeEntity

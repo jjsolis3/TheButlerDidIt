@@ -68,6 +68,13 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
         var deleted = o.IdlePartyDays > 0 ? await DeleteIdlePartiesAsync(at.AddDays(-o.IdlePartyDays), ct) : 0;
         var pruned = o.FinishedPartyDays > 0 ? await PruneFinishedPartiesAsync(at.AddDays(-o.FinishedPartyDays), ct) : 0;
         var photos = await DeleteOrphanPhotosAsync(ct);
+        // Handled payment webhooks (#101) are kept to spot repeats, which Stripe stops sending after three days.
+        // Ninety days leaves the admin plenty to look back on.
+        using (var scope = scopes.CreateScope())
+        {
+            var cutoff = at.AddDays(-90);
+            await scope.ServiceProvider.GetRequiredService<AppDbContext>().BillingEvents.Where(e => e.ReceivedAt < cutoff).ExecuteDeleteAsync(ct);
+        }
         return new Result(deleted, pruned, photos);
     }
 

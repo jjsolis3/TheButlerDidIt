@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import { ConfirmEmail, ConfirmEmailChange, ForgotPassword, ResetPassword } from './pages/Account'
 import Admin from './pages/Admin'
 import AdminAi from './pages/AdminAi'
+import AdminBilling from './pages/AdminBilling'
 import AdminGames from './pages/AdminGames'
 import AdminHosts from './pages/AdminHosts'
 import AdminOverview from './pages/AdminOverview'
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="hosts" element={<AdminHosts />} />
         <Route path="signups" element={<AdminSignups />} />
         <Route path="ai" element={<AdminAi />} />
+        <Route path="billing" element={<AdminBilling />} />
       </Route>
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />

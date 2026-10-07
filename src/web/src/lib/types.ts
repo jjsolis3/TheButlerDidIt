@@ -439,6 +439,102 @@ export interface AccessView {
   plan: AccessPlan
   /** When the plan shown ends; null when it doesn't */
   endsAt: string | null
+  /** For a paid plan (#101): renewing, cancelled, a payment failed…; null otherwise */
+  status: PaidStatus | null
+  /** For a subscription that renews: when */
+  renewsAt: string | null
+  /** True when the site sells plans, so pages say "choose a plan" rather than "ask the admin" */
+  payments: boolean
+}
+
+// ---- Payments (#101, Billing/*.cs)
+export type PaidStatus = 'active' | 'trialing' | 'ending' | 'pastDue' | 'ended'
+export type BillingPlan =
+  | 'mysteriesMonthly'
+  | 'mysteriesYearly'
+  | 'escapeRoomsMonthly'
+  | 'escapeRoomsYearly'
+  | 'bothMonthly'
+  | 'bothYearly'
+  | 'mysteriesPass'
+  | 'escapeRoomsPass'
+  | 'bothPass'
+export type PlanKind = 'subscription' | 'pass'
+export type PlanInterval = 'month' | 'year'
+export type GrantKind = 'trial' | 'comp' | 'pass' | 'subscription'
+
+export interface PlanOfferView {
+  id: BillingPlan
+  mysteries: boolean
+  escapeRooms: boolean
+  kind: PlanKind
+  interval: PlanInterval | null
+  /** In the currency's smallest unit (cents) */
+  amount: number | null
+  currency: string | null
+}
+
+/** What the account page shows about buying. */
+export interface BillingView {
+  enabled: boolean
+  /** The host has paid before, so Stripe's billing page has something for them */
+  canManage: boolean
+  /** The host has a subscription now (changed on Stripe's billing page) */
+  subscribed: boolean
+  passHours: number
+  /** Only plans whose price is set up correctly */
+  plans: PlanOfferView[]
+}
+
+/** The host after their plan was brought up to date, back from a checkout. */
+export interface SyncView {
+  me: Me
+  /** Whether that checkout is paid; null when there was none, or it isn't theirs */
+  paid: boolean | null
+}
+
+/** Admin → Plans & billing. */
+export interface AdminBillingView {
+  enabled: boolean
+  provider: string | null
+  liveMode: boolean
+  /** False when the webhook signing secret is missing */
+  webhooksVerified: boolean
+  problem: string | null
+  passHours: number
+  graceDays: number
+  automaticTax: boolean
+  plans: AdminPlanRow[]
+  lastEvent: { type: string; at: string } | null
+  eventsThisWeek: number
+  paid: AdminPaidRow[]
+}
+
+export interface AdminPlanRow {
+  id: BillingPlan
+  kind: PlanKind
+  priceId: string
+  amount: number | null
+  currency: string | null
+  /** 'month', 'year', or null for a one-time price, as Stripe has it */
+  interval: string | null
+  forSale: boolean
+  problem: string | null
+}
+
+export interface AdminPaidRow {
+  userId: string
+  displayName: string | null
+  email: string | null
+  kind: GrantKind
+  mysteries: boolean
+  escapeRooms: boolean
+  status: PaidStatus | null
+  startsAt: string
+  endsAt: string | null
+  renewsAt: string | null
+  inEffect: boolean
+  dashboardUrl: string | null
 }
 
 /** What the sign-in page can offer on this server. */
@@ -553,6 +649,11 @@ export interface AdminOverview {
     severalServers: boolean
     aiProviders: number
     aiRoles: AiRole[]
+    /** 'Stripe', 'Fake', or null when payments are off (#101) */
+    payments: string | null
+    paymentsLive: boolean
+    /** Something stopping payments from working */
+    paymentsProblem: string | null
   }
 }
 

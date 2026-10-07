@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { BillingPanel, BillingReturn } from '../components/BillingPanel'
 import { Button, Card, ErrorText, Eyebrow, Field, Heading, inputClass, Shell } from '../components/ui'
 import { describeAccess } from '../lib/access'
 import { api } from '../lib/api'
@@ -62,6 +63,9 @@ export default function MyAccount() {
     if (me) api.account.get().then(setAccount, (e: Error) => setError(e.message))
   }, [me, navigate])
 
+  // After a payment or a change on Stripe's billing page (#101): show the plan as it is now.
+  const reload = () => api.account.get().then(setAccount, (e: Error) => setError(e.message))
+
   if (!account)
     return (
       <Shell>
@@ -78,6 +82,7 @@ export default function MyAccount() {
         {account.email}
         {account.isAdmin && <span className="text-accent"> · admin</span>}
       </p>
+      <BillingReturn onChanged={reload} />
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         <Card>
@@ -99,6 +104,8 @@ export default function MyAccount() {
           <AiSpend spent={account.usage.aiSpentThisMonthUsd} budget={account.usage.aiBudgetUsd} />
         </Card>
       </div>
+
+      {account.access.payments && <BillingPanel access={account.access} />}
 
       <Section title="What you've made">
         <ul className="grid gap-2 sm:grid-cols-2">
@@ -315,7 +322,9 @@ function DangerZone({ account }: { account: AccountView }) {
   return (
     <div className="space-y-3">
       <Card>
-        <p className="text-sm">A copy of what your account holds: your details, your parties, the mysteries and rooms you've made, and your escapes.</p>
+        <p className="text-sm">
+          A copy of what your account holds: your details, your plans, your parties, the mysteries and rooms you've made, and your escapes.
+        </p>
         <a href={api.account.exportUrl} download className="mt-3 inline-block text-sm text-accent underline">
           Download my data (JSON)
         </a>
@@ -329,6 +338,7 @@ function DangerZone({ account }: { account: AccountView }) {
             <p className="text-sm text-muted">
               Deletes your account, your parties (with guests' selfies), and the mysteries and escape rooms you made. Leaderboard times stay,
               without your guests' names.
+              {account.access.payments && ' A subscription is cancelled straight away, with nothing more to pay.'}
             </p>
             <Field label="Your password">
               <input className={inputClass} type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
