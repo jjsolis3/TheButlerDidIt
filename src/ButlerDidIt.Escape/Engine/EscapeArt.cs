@@ -16,6 +16,12 @@ public static class EscapeArt
     /// <summary>A video that plays when a stage opens.</summary>
     public static string StageVideo(string stageId) => $"stage-video:{stageId}";
 
+    /// <summary>
+    /// The AI's clip of a stage (#110): its picture brought to life by the Filmmaker role. Unlike the host's own
+    /// video, it only replaces the still picture: the game master still reads the stage over it.
+    /// </summary>
+    public static string StageFilm(string stageId) => $"stage-film:{stageId}";
+
     /// <summary>The game master reading the room's intro aloud as the clock starts (the AI's Voice role, made once per room).</summary>
     public const string IntroVoice = "intro-voice";
 

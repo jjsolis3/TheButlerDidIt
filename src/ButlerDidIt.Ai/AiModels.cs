@@ -14,6 +14,38 @@ public enum AiProviderKind
 
     /// <summary>Canned answers for automated tests. Only allowed when Ai:AllowFakeProvider is true.</summary>
     Fake,
+
+    /// <summary>ElevenLabs: expressive voices. Voices only (#33).</summary>
+    ElevenLabs,
+
+    /// <summary>A local Piper text-to-speech server: free voices, no key. Voices only (#33).</summary>
+    Piper,
+
+    /// <summary>A local Stable Diffusion WebUI (AUTOMATIC1111 or Forge, started with --api): free pictures, no key. Pictures only (#33).</summary>
+    StableDiffusion,
+}
+
+/// <summary>What each kind of provider can do: chat, voices, pictures. The admin page only offers a provider for a role it can do.</summary>
+public static class AiProviderAbilities
+{
+    public static bool Chats(AiProviderKind kind) => kind is not (AiProviderKind.ElevenLabs or AiProviderKind.Piper or AiProviderKind.StableDiffusion);
+    public static bool Speaks(AiProviderKind kind) => kind is AiProviderKind.OpenAI or AiProviderKind.Gemini or AiProviderKind.ElevenLabs or AiProviderKind.Piper or AiProviderKind.Fake;
+    public static bool Paints(AiProviderKind kind) => kind is AiProviderKind.OpenAI or AiProviderKind.Gemini or AiProviderKind.StableDiffusion or AiProviderKind.Fake;
+
+    /// <summary>Video from a picture: OpenAI's Sora and Google's Veo.</summary>
+    public static bool Films(AiProviderKind kind) => kind is AiProviderKind.OpenAI or AiProviderKind.Gemini or AiProviderKind.Fake;
+
+    /// <summary>Whether a provider of this kind can do the role's job.</summary>
+    public static bool Can(AiProviderKind kind, AiRole role) => role switch
+    {
+        AiRole.Voice => Speaks(kind),
+        AiRole.Illustrator => Paints(kind),
+        AiRole.Filmmaker => Films(kind),
+        _ => Chats(kind),
+    };
+
+    /// <summary>Servers on the host's own machine: no key, and nothing to pay per call.</summary>
+    public static bool Local(AiProviderKind kind) => kind is AiProviderKind.Ollama or AiProviderKind.Piper or AiProviderKind.StableDiffusion;
 }
 
 /// <summary>
@@ -36,6 +68,9 @@ public enum AiRole
 
     /// <summary>Paints character portraits and scene art.</summary>
     Illustrator,
+
+    /// <summary>Brings an escape room's stage pictures to life as short clips for its reveals (#110). Off unless set up: clips cost far more than pictures.</summary>
+    Filmmaker,
 }
 
 public sealed record AiProviderSettings(Guid Id, string Name, AiProviderKind Kind, string? BaseUrl, string? ApiKey);

@@ -64,7 +64,9 @@ public static class EscapeProjector
             // Like the stage's picture and video: a later stage's description stays unheard until it opens.
             StageVoiceUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageVoice(stage.Id)),
             Answering: s.TakesTurns() ? s.Answering : AnswerRule.Anyone,
-            SearchPenaltySeconds: EscapeEngine.SearchPenaltySeconds(s.Level));
+            SearchPenaltySeconds: EscapeEngine.SearchPenaltySeconds(s.Level),
+            // Like the stage's picture: a later stage's clip would show it before it opens.
+            StageFilmUrl: stage is null ? null : art?.GetValueOrDefault(EscapeArt.StageFilm(stage.Id)));
     }
 
     private static EscapeSceneView Scene(EscapeState s, EscapeScene scene) => new(

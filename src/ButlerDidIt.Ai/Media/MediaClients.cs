@@ -33,18 +33,26 @@ public interface IMediaClientFactory
 {
     ITextToSpeech CreateSpeech(AiProviderSettings provider, string model);
     IImageGenerator CreateImages(AiProviderSettings provider, string model);
+    IVideoGenerator CreateVideos(AiProviderSettings provider, string model);
+
+    /// <summary>
+    /// Admin → AI's "Test connection" for a provider that doesn't chat: a quick, cheap call that proves the
+    /// server, the key and the model answer. Returns what it found; throws when they don't.
+    /// </summary>
+    Task<string> CheckAsync(AiProviderSettings provider, string model, CancellationToken ct);
 }
 
 /// <summary>
 /// Builds voice and image clients. Media APIs aren't standardised the way chat is
-/// (there's no IChatClient equivalent), so each provider needs its own adapter.
-/// OpenAI (or an OpenAI-compatible server) and Google Gemini are supported; more can be added here.
+/// (there's no IChatClient equivalent), so each provider needs its own adapter:
+/// OpenAI (or an OpenAI-compatible server, local ones included), Google Gemini, ElevenLabs for voices,
+/// and two local servers, Piper for voices and a Stable Diffusion WebUI for pictures (#33).
+/// What each kind can do is in <see cref="AiProviderAbilities"/>.
 /// </summary>
-/// <param name="http">For Gemini's HTTP calls; tests pass one with a stub handler.</param>
-public sealed class MediaClientFactory(bool allowFake, HttpClient? http = null) : IMediaClientFactory
+/// <param name="http">For the HTTP calls of every adapter but OpenAI's SDK; tests pass one with a stub handler.</param>
+/// <param name="videoPoll">How often to ask whether a clip is ready (10 seconds); tests make it instant.</param>
+public sealed class MediaClientFactory(bool allowFake, HttpClient? http = null, TimeSpan? videoPoll = null) : IMediaClientFactory
 {
-    /// <summary>The providers that can make voices and pictures. The admin screen only offers these for those roles.</summary>
-    public static bool SupportsMedia(AiProviderKind kind) => kind is AiProviderKind.OpenAI or AiProviderKind.Gemini or AiProviderKind.Fake;
 
     // One shared client for the app's lifetime (the usual .NET advice): pictures can take a minute to paint.
     private static readonly HttpClient SharedHttp = new() { Timeout = TimeSpan.FromMinutes(3) };
@@ -54,27 +62,70 @@ public sealed class MediaClientFactory(bool allowFake, HttpClient? http = null) 
     {
         AiProviderKind.OpenAI => new OpenAiSpeech(OpenAi(provider).GetAudioClient(model)),
         AiProviderKind.Gemini => new GeminiSpeech(Http, Key(provider), model),
+        AiProviderKind.ElevenLabs => new ElevenLabsSpeech(Http, Key(provider), model, provider.BaseUrl),
+        AiProviderKind.Piper => new PiperSpeech(Http, Url(provider, PiperSpeech.DefaultUrl), model),
         AiProviderKind.Fake when allowFake => new FakeSpeech(),
-        _ => throw new AiUnavailableException($"Voices need an OpenAI or Gemini provider; '{provider.Name}' is {provider.Kind}."),
+        _ => throw new AiUnavailableException($"Voices need an OpenAI, Gemini, ElevenLabs or Piper provider; '{provider.Name}' is {provider.Kind}."),
     };
 
     public IImageGenerator CreateImages(AiProviderSettings provider, string model) => provider.Kind switch
     {
         AiProviderKind.OpenAI => new OpenAiImages(OpenAi(provider).GetImageClient(model), model),
         AiProviderKind.Gemini => new GeminiImages(Http, Key(provider), model),
+        AiProviderKind.StableDiffusion => new StableDiffusionImages(Http, Url(provider, StableDiffusionImages.DefaultUrl), model),
         AiProviderKind.Fake when allowFake => new FakeImages(),
-        _ => throw new AiUnavailableException($"Images need an OpenAI or Gemini provider; '{provider.Name}' is {provider.Kind}."),
+        _ => throw new AiUnavailableException($"Pictures need an OpenAI, Gemini or Stable Diffusion provider; '{provider.Name}' is {provider.Kind}."),
     };
 
     private static string Key(AiProviderSettings p) =>
         string.IsNullOrWhiteSpace(p.ApiKey) ? throw new AiUnavailableException($"The AI provider '{p.Name}' has no API key.") : p.ApiKey;
 
+    public IVideoGenerator CreateVideos(AiProviderSettings provider, string model) => provider.Kind switch
+    {
+        AiProviderKind.OpenAI => new OpenAiVideos(Http, OpenAiKey(provider), provider.BaseUrl, model, VideoPoll),
+        AiProviderKind.Gemini => new GeminiVideos(Http, Key(provider), model, VideoPoll),
+        AiProviderKind.Fake when allowFake => new FakeVideos(),
+        _ => throw new AiUnavailableException($"Clips need an OpenAI (Sora) or Gemini (Veo) provider; '{provider.Name}' is {provider.Kind}."),
+    };
+
+    private TimeSpan VideoPoll => videoPoll ?? TimeSpan.FromSeconds(10);
+
+    public async Task<string> CheckAsync(AiProviderSettings provider, string model, CancellationToken ct)
+    {
+        if (provider.Kind == AiProviderKind.StableDiffusion)
+        {
+            // Painting can take minutes on a CPU; the list of checkpoints answers at once and says whether the model is there.
+            var root = Url(provider, StableDiffusionImages.DefaultUrl).TrimEnd('/');
+            var checkpoints = await StableDiffusionImages.CheckpointsAsync(Http, root, ct);
+            var names = string.Join(", ", checkpoints.Take(8));
+            if (string.IsNullOrWhiteSpace(model) || model.Equals("default", StringComparison.OrdinalIgnoreCase))
+                return $"Connected. It has {checkpoints.Count} checkpoint(s): {names}.";
+            return checkpoints.Any(c => c.StartsWith(model.Trim(), StringComparison.OrdinalIgnoreCase))
+                ? $"Connected, and '{model}' is one of its checkpoints."
+                : throw new AiCallFailedException($"Connected, but '{model}' isn't one of its checkpoints ({names}). Use one of those, or \"default\".");
+        }
+        // A voice: one very short clip proves the key, the model and the voice together.
+        var file = await CreateSpeech(provider, model).SpeakAsync("OK.", VoiceCasting.Narrator, ct);
+        return $"Connected. A short voice clip came back ({Math.Max(1, file.Bytes.Length / 1024)} KB, {file.ContentType}).";
+    }
+
+    private static string Url(AiProviderSettings p, string fallback) => string.IsNullOrWhiteSpace(p.BaseUrl) ? fallback : p.BaseUrl.Trim();
+
+    /// <summary>OpenAI's key, or a stand-in for a compatible server of one's own, which usually takes none.</summary>
+    private static string OpenAiKey(AiProviderSettings p) =>
+        !string.IsNullOrWhiteSpace(p.ApiKey) ? p.ApiKey
+        : !string.IsNullOrWhiteSpace(p.BaseUrl) ? "none"
+        : throw new AiUnavailableException($"The AI provider '{p.Name}' has no API key.");
+
     private static OpenAIClient OpenAi(AiProviderSettings p)
     {
         var options = new OpenAIClientOptions();
-        if (!string.IsNullOrWhiteSpace(p.BaseUrl)) options.Endpoint = new Uri(p.BaseUrl);
-        if (string.IsNullOrWhiteSpace(p.ApiKey)) throw new AiUnavailableException($"The AI provider '{p.Name}' has no API key.");
-        return new OpenAIClient(new ApiKeyCredential(p.ApiKey), options);
+        var local = !string.IsNullOrWhiteSpace(p.BaseUrl);
+        if (local) options.Endpoint = new Uri(p.BaseUrl!);
+        // OpenAI itself needs a key. A compatible server of your own (Kokoro-FastAPI or openedai-speech for voices,
+        // LocalAI for pictures) usually doesn't, but the client insists on some value.
+        if (string.IsNullOrWhiteSpace(p.ApiKey) && !local) throw new AiUnavailableException($"The AI provider '{p.Name}' has no API key.");
+        return new OpenAIClient(new ApiKeyCredential(string.IsNullOrWhiteSpace(p.ApiKey) ? "none" : p.ApiKey), options);
     }
 }
 

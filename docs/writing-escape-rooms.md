@@ -232,7 +232,7 @@ The validator checks there are enough hiding spots for a solo player: at least o
 ## Sound and pictures
 
 - **`soundscape`** (on the room, and optionally on a stage) sets the background sound on the TV: `drone` (the default), `workshop`, `carnival`, `sea`, `space`, `haunted`, `manor` (a clock and a fire), `storm`, `train`, `night` (crickets), `lounge` (a murmur and soft chords), `arcade` (a games hall after hours), `concert` (a waiting crowd and the beat through the wall), `stadium` (a cheering crowd), `meadow` (birdsong and soft piano), `cave` (echoing drips), `tension` (a slow pulse and distant footsteps) or `silence`. A scene's `backdrop` takes the same names, for the colour behind its spots. The sound is made live in the browser, so there are no audio files to add. The TV also plays short sounds when a lock opens, a new room opens, a code is wrong or a hint is bought, then a gong and a heartbeat in the final minute.
-- **`artStyle`** describes the look. With an image model set up, the room's cover and each stage are painted once, from the title, synopsis and stage descriptions only. So write stage descriptions that paint a picture, and never put an answer in them unless you mean it to be hidden in plain sight.
+- **`artStyle`** describes the look. With an image model set up, the room's cover and each stage are painted once, from the title, synopsis and stage descriptions only. With the Filmmaker role set up too, each stage's picture is brought to life as a short clip for its reveal, from the same words. So write stage descriptions that paint a picture, and never put an answer in them unless you mean it to be hidden in plain sight.
 
 ## The AI game master
 

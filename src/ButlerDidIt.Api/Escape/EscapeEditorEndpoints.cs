@@ -111,7 +111,7 @@ public static class EscapeEditorEndpoints
             // stay, unless their stage is gone.
             var stale = StaleArt(old, room);
             // The places that still exist: the ones a host can upload to, and the AI's (its voice clips have no upload place).
-            var slots = EscapeMediaEndpoints.Slots(room).Select(s => s.Key).Concat(EscapeMediaPlan.For(room).Select(i => i.Key)).ToHashSet();
+            var slots = EscapeMediaEndpoints.Slots(room).Select(s => s.Key).Concat(EscapeMediaPlan.For(room, films: true).Select(i => i.Key)).ToHashSet();
             var jobId = EscapeMedia.JobId(id);
             var art = await db.ScenarioMedia.Where(m => m.ScenarioId == jobId)
                 .Select(m => new { m.Key, m.AssetId, Uploaded = db.MediaAssets.Any(a => a.Id == m.AssetId && a.Provider == MediaService.Upload) })
@@ -222,10 +222,10 @@ public static class EscapeEditorEndpoints
         Stages = room.Stages.Select(s => s with { Title = "", Description = "", Soundscape = null }).ToList(),
     });
 
-    /// <summary>The picture and voice keys whose prompt or words changed, or whose stage went: their files no longer match the room.</summary>
+    /// <summary>The picture, voice and clip keys whose prompt or words changed, or whose stage went: their files no longer match the room.</summary>
     internal static HashSet<string> StaleArt(EscapeRoom before, EscapeRoom after)
     {
-        var now = EscapeMediaPlan.For(after).ToDictionary(i => i.Key);
-        return EscapeMediaPlan.For(before).Where(i => !now.TryGetValue(i.Key, out var n) || n != i).Select(i => i.Key).ToHashSet();
+        var now = EscapeMediaPlan.For(after, films: true).ToDictionary(i => i.Key);
+        return EscapeMediaPlan.For(before, films: true).Where(i => !now.TryGetValue(i.Key, out var n) || n != i).Select(i => i.Key).ToHashSet();
     }
 }

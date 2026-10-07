@@ -88,7 +88,8 @@ public static class AiAdminEndpoints
         });
 
         // Sends a tiny request straight to the provider so the admin sees at once whether the key and model work.
-        admin.MapPost("/providers/{id:guid}/test", async (Guid id, TestRequest req, AppDbContext db, AiKeyProtector keys, IChatClientFactory factory, CancellationToken ct) =>
+        admin.MapPost("/providers/{id:guid}/test", async (Guid id, TestRequest req, AppDbContext db, AiKeyProtector keys, IChatClientFactory factory,
+            ButlerDidIt.Ai.Media.IMediaClientFactory media, CancellationToken ct) =>
         {
             var row = await db.AiProviders.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, ct);
             if (row is null) return Results.NotFound();
@@ -96,9 +97,12 @@ public static class AiAdminEndpoints
             try
             {
                 var settings = new AiProviderSettings(row.Id, row.Name, row.Kind, row.BaseUrl, keys.Unprotect(row.EncryptedApiKey));
-                using var client = factory.Create(settings, req.Model);
                 using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
                 timeout.CancelAfter(TimeSpan.FromSeconds(60));
+                // Voices-only and pictures-only providers (#33) are checked with a call of their own kind.
+                if (!AiProviderAbilities.Chats(row.Kind))
+                    return Results.Ok(new TestResult(true, await media.CheckAsync(settings, req.Model, timeout.Token), stopwatch.ElapsedMilliseconds));
+                using var client = factory.Create(settings, req.Model);
                 var reply = await client.GetResponseAsync([new ChatMessage(ChatRole.User, "Reply with the single word OK.")],
                     new ChatOptions { ModelId = req.Model, MaxOutputTokens = 64 }, timeout.Token);
                 return Results.Ok(new TestResult(true, $"Connected. The model replied: \"{Trim(reply.Text, 80)}\"", stopwatch.ElapsedMilliseconds));
@@ -128,9 +132,15 @@ public static class AiAdminEndpoints
             if (string.IsNullOrWhiteSpace(req.Model)) return Results.Problem("Enter a model name, e.g. claude-opus-5 or gpt-5.", statusCode: 400);
             var provider = await db.AiProviders.AsNoTracking().FirstOrDefaultAsync(p => p.Id == req.ProviderId, ct);
             if (provider is null) return Results.Problem("Unknown provider.", statusCode: 400);
-            // Voices and pictures need a media API; only some providers have one (see MediaClientFactory).
-            if (role is AiRole.Voice or AiRole.Illustrator && !ButlerDidIt.Ai.Media.MediaClientFactory.SupportsMedia(provider.Kind))
-                return Results.Problem($"The {role} role needs an OpenAI or Gemini provider ({provider.Kind} doesn't make {(role == AiRole.Voice ? "voices" : "pictures")}).", statusCode: 400);
+            // Each provider does some jobs and not others: voices, pictures, chat (AiProviderAbilities).
+            if (!AiProviderAbilities.Can(provider.Kind, role))
+                return Results.Problem(role switch
+                {
+                    AiRole.Voice => $"The Voice role needs an OpenAI, Gemini, ElevenLabs or Piper provider ({provider.Kind} doesn't make voices).",
+                    AiRole.Illustrator => $"The Illustrator role needs an OpenAI, Gemini or Stable Diffusion provider ({provider.Kind} doesn't make pictures).",
+                    AiRole.Filmmaker => $"The Filmmaker role needs an OpenAI (Sora) or Gemini (Veo) provider ({provider.Kind} doesn't make clips).",
+                    _ => $"The {role} role needs a chat model; {provider.Name} ({provider.Kind}) only makes {(AiProviderAbilities.Speaks(provider.Kind) ? "voices" : "pictures")}.",
+                }, statusCode: 400);
             // Effort and a refusal fallback are Claude options (#63); other providers would silently ignore them.
             if (!string.IsNullOrWhiteSpace(req.Effort) && AiEffort.Normalize(req.Effort) is null)
                 return Results.Problem($"Effort must be one of: {string.Join(", ", AiEffort.Levels)}.", statusCode: 400);

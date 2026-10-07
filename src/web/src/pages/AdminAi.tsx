@@ -6,10 +6,44 @@ import type { AiProviderKind, AiRole, PriceView, ProviderView, RoleView, UsageRe
 
 const KINDS: { id: AiProviderKind; label: string; needsKey: boolean; urlHint: string }[] = [
   { id: 'anthropic', label: 'Claude (Anthropic)', needsKey: true, urlHint: 'Leave blank for the standard Anthropic API.' },
-  { id: 'openAI', label: 'ChatGPT (OpenAI) or any OpenAI-compatible server', needsKey: true, urlHint: 'Leave blank for OpenAI. Set it for compatible servers such as LM Studio or OpenRouter.' },
+  {
+    id: 'openAI',
+    label: 'ChatGPT (OpenAI) or any OpenAI-compatible server',
+    needsKey: true,
+    urlHint:
+      'Leave blank for OpenAI. Set it for compatible servers such as LM Studio or OpenRouter, or your own voice or picture server (Kokoro-FastAPI, openedai-speech, LocalAI), which needs no key.',
+  },
   { id: 'gemini', label: 'Gemini (Google)', needsKey: true, urlHint: "Leave blank to use Google's OpenAI-compatible endpoint." },
   { id: 'ollama', label: 'Ollama (local models)', needsKey: false, urlHint: 'Where Ollama runs, e.g. http://ollama:11434 inside Docker. No key or per-token cost.' },
+  { id: 'elevenLabs', label: 'ElevenLabs (voices only)', needsKey: true, urlHint: 'Leave blank for the ElevenLabs API.' },
+  {
+    id: 'piper',
+    label: 'Piper (local voices, free)',
+    needsKey: false,
+    urlHint: "Where Piper's HTTP server runs, e.g. http://piper:5000 (python3 -m piper.http_server -m en_US-lessac-medium). No key or cost.",
+  },
+  {
+    id: 'stableDiffusion',
+    label: 'Stable Diffusion WebUI (local pictures, free)',
+    needsKey: false,
+    urlHint: 'Where AUTOMATIC1111 or Forge runs, started with --api, e.g. http://stable-diffusion:7860. No key or cost.',
+  },
 ]
+
+/** What each kind of provider can do (AiProviderAbilities on the server): only those are offered for a role. */
+const VOICES: AiProviderKind[] = ['openAI', 'gemini', 'elevenLabs', 'piper', 'fake']
+const PICTURES: AiProviderKind[] = ['openAI', 'gemini', 'stableDiffusion', 'fake']
+const CLIPS: AiProviderKind[] = ['openAI', 'gemini', 'fake']
+const MEDIA_ONLY: AiProviderKind[] = ['elevenLabs', 'piper', 'stableDiffusion']
+const canDo = (kind: AiProviderKind, role: AiRole) =>
+  role === 'voice'
+    ? VOICES.includes(kind)
+    : role === 'illustrator'
+      ? PICTURES.includes(kind)
+      : role === 'filmmaker'
+        ? CLIPS.includes(kind)
+        : !MEDIA_ONLY.includes(kind)
+const KEYLESS: AiProviderKind[] = ['ollama', 'piper', 'stableDiffusion', 'fake']
 
 const ROLES: { id: AiRole; title: string; body: string; tokens: number }[] = [
   { id: 'storyteller', title: 'Storyteller', body: 'Writes whole new mysteries. Use your strongest model; it runs once per mystery.', tokens: 32000 },
@@ -18,23 +52,32 @@ const ROLES: { id: AiRole; title: string; body: string; tokens: number }[] = [
   {
     id: 'voice',
     title: 'Voice',
-    body: 'Speaks narration, NPC lines and answers aloud. Needs an OpenAI or Gemini provider with a text-to-speech model, e.g. gpt-4o-mini-tts or gemini-2.5-flash-preview-tts.',
+    body: 'Speaks narration, NPC lines and answers aloud. Needs an OpenAI, Gemini, ElevenLabs or Piper provider and a voice model, e.g. gpt-4o-mini-tts, gemini-2.5-flash-preview-tts, eleven_multilingual_v2, or a Piper voice such as en_GB-vctk-medium ("default" for the server\'s own).',
+    tokens: 0,
+  },
+  {
+    id: 'filmmaker',
+    title: 'Filmmaker',
+    body: "Brings each escape room stage's picture to life as an 8-second clip for its reveal, under the game master's reading. Needs an OpenAI (e.g. sora-2) or Gemini (e.g. veo-3.0-fast-generate-001) provider. Clips cost far more than pictures, so it's off until you set it: each is made once per room. Enter the price of one clip under Prices.",
     tokens: 0,
   },
   {
     id: 'illustrator',
     title: 'Illustrator',
-    body: "Paints character portraits and scene art in each theme's style. Needs an OpenAI or Gemini provider with an image model, e.g. gpt-image-1 or gemini-2.5-flash-image (Nano Banana).",
+    body: "Paints character portraits and scene art in each theme's style. Needs an OpenAI, Gemini or Stable Diffusion provider and an image model, e.g. gpt-image-1, gemini-2.5-flash-image (Nano Banana), or a Stable Diffusion checkpoint (\"default\" for the one it has loaded).",
     tokens: 0,
   },
 ]
 
 const MODEL_SUGGESTIONS: Record<string, string[]> = {
   anthropic: ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5'],
+  elevenLabs: ['eleven_multilingual_v2', 'eleven_flash_v2_5', 'eleven_v3'],
+  piper: ['default', 'en_GB-vctk-medium', 'en_US-libritts_r-medium', 'en_US-lessac-medium'],
+  stableDiffusion: ['default'],
 }
 
 /**
- * Admin → AI. Set up providers (Claude, ChatGPT, Gemini, Ollama), choose which
+ * Admin → AI. Set up providers (Claude, ChatGPT, Gemini, Ollama; ElevenLabs, Piper and Stable Diffusion for voices and pictures), choose which
  * model does each job, keep a price list, and watch spending. API keys are sent
  * to the server once and never shown again. The page only learns whether a key is set.
  * It's a tab of the admin hub, whose frame lets only the admin in.
@@ -131,7 +174,7 @@ function Providers({ providers, onChange, onError }: { providers: ProviderView[]
                   {p.baseUrl ? ` · ${p.baseUrl}` : ''}
                 </p>
                 <p className="mt-1 text-xs">
-                  {p.hasApiKey ? '🔑 API key saved (encrypted)' : p.kind === 'ollama' || p.kind === 'fake' ? 'No key needed' : '⚠ No API key'}
+                  {p.hasApiKey ? '🔑 API key saved (encrypted)' : KEYLESS.includes(p.kind) ? 'No key needed' : '⚠ No API key'}
                   {p.fromConfig && <span className="ml-2 text-muted">from environment variables</span>}
                 </p>
               </div>
@@ -289,7 +332,7 @@ function RoleCard({
       <div className="space-y-2">
         <select className={inputClass} value={providerId} onChange={(e) => setProviderId(e.target.value)} aria-label={`Provider for ${info.title}`}>
           <option value="">Not set: feature off</option>
-          {providers.map((p) => (
+          {providers.filter((p) => canDo(p.kind, info.id) || p.id === providerId).map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
             </option>

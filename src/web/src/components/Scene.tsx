@@ -3,11 +3,17 @@ import QRCode from 'qrcode'
 import { formatSeconds, useCountdown } from '../lib/clock'
 import type { ClueView, FeedItem, TimerView } from '../lib/types'
 
-/** A full-bleed "shot": the image if there is one, otherwise a candlelit backdrop, with a caption. */
+/**
+ * A full-bleed "shot": the image if there is one (with an optional slow pan, `kenburns`), otherwise a candlelit
+ * backdrop, with a caption. With the `film` effect the source is a short clip instead (an escape room stage brought
+ * to life, #110): it loops silently in the picture's place, under the narration.
+ */
 export function SceneCard({ src, caption, effect }: { src?: string | null; caption?: string | null; effect?: string | null }) {
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-line bg-black shadow-2xl">
-      {src ? (
+      {src && effect === 'film' ? (
+        <video src={src} aria-label={caption ?? undefined} data-testid="scene-film" className="h-full w-full object-cover" muted loop autoPlay playsInline />
+      ) : src ? (
         <img src={src} alt={caption ?? ''} className={`h-full w-full object-cover ${effect === 'kenburns' ? 'kenburns' : ''}`} />
       ) : (
         <div

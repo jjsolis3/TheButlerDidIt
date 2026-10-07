@@ -72,6 +72,7 @@ public static class EscapeMediaEndpoints
 
             var o = options.Value;
             if (await MediaUploads.ReceiveAsync(http, db, media, user, o, EscapeMedia.JobId(id), key, slot.Kind, ct) is { } refused) return refused;
+            await ForgetClipAsync(db, id, slot.Stage, key, ct);
             await ChangedAsync(catalog, runtime, id, ct);
             return Results.Ok(await ViewAsync(db, user, found.Room, canEdit: true, found.BuiltIn, o, ct));
         });
@@ -87,6 +88,7 @@ public static class EscapeMediaEndpoints
             if (!Slots(found.Room).Any(s => s.Key == key)) return Results.NotFound();
 
             await MediaUploads.RemoveAsync(db, media, EscapeMedia.JobId(id), key, ct);
+            await ForgetClipAsync(db, id, Slots(found.Room).First(s => s.Key == key).Stage, key, ct);
             await ChangedAsync(catalog, runtime, id, ct);
             return Results.Ok(await ViewAsync(db, user, found.Room, canEdit: true, found.BuiltIn, options.Value, ct));
         });
@@ -102,6 +104,18 @@ public static class EscapeMediaEndpoints
         var assets = await db.ScenarioMedia.Where(m => jobIds.Contains(m.ScenarioId)).Select(m => m.AssetId).ToListAsync(ct);
         await db.ScenarioMedia.Where(m => jobIds.Contains(m.ScenarioId)).ExecuteDeleteAsync(ct);
         await media.DeleteUnusedUploadsAsync(assets, ct);
+    }
+
+    /// <summary>
+    /// A stage's picture or video changed (uploaded or removed), so the AI's clip of it goes (#110): it shows the old
+    /// picture, or the host's own video now tells the stage. The next preparation with the Filmmaker role films the
+    /// stage's picture again if it needs a clip. The clip's file stays: generated media is shared.
+    /// </summary>
+    private static async Task ForgetClipAsync(AppDbContext db, string roomId, EscapeStage? stage, string key, CancellationToken ct)
+    {
+        if (stage is null || (key != EscapeArt.Stage(stage.Id) && key != EscapeArt.StageVideo(stage.Id))) return;
+        var (jobId, clip) = (EscapeMedia.JobId(roomId), EscapeArt.StageFilm(stage.Id));
+        await db.ScenarioMedia.Where(m => m.ScenarioId == jobId && m.Key == clip).ExecuteDeleteAsync(ct);
     }
 
     /// <summary>New media for a room: forget the cached copy, and show it on every screen of every party playing it.</summary>

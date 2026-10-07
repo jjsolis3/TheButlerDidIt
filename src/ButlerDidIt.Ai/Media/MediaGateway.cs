@@ -20,6 +20,7 @@ public sealed class MediaGateway(
 {
     public Task<bool> VoicesConfiguredAsync(CancellationToken ct = default) => Configured(AiRole.Voice, ct);
     public Task<bool> ImagesConfiguredAsync(CancellationToken ct = default) => Configured(AiRole.Illustrator, ct);
+    public Task<bool> FilmsConfiguredAsync(CancellationToken ct = default) => Configured(AiRole.Filmmaker, ct);
 
     private async Task<bool> Configured(AiRole role, CancellationToken ct) => await settings.GetRoleAsync(role, ct) is not null;
 
@@ -34,6 +35,11 @@ public sealed class MediaGateway(
     public Task<MediaFile> PaintAsync(string prompt, ImageShape shape, AiCallContext context, CancellationToken ct) =>
         CallAsync(AiRole.Illustrator, context, 0,
             (config) => factory.CreateImages(config.Provider, config.Model).PaintAsync(prompt, shape, ct), ct);
+
+    /// <summary>A clip brought to life from <paramref name="picture"/> (#110). Logged as one request, like a picture: priced per clip.</summary>
+    public Task<MediaFile> FilmAsync(MediaFile picture, string prompt, AiCallContext context, CancellationToken ct) =>
+        CallAsync(AiRole.Filmmaker, context, 0,
+            (config) => factory.CreateVideos(config.Provider, config.Model).AnimateAsync(picture, prompt, ct), ct);
 
     private async Task<MediaFile> CallAsync(AiRole role, AiCallContext context, long units, Func<AiRoleSettings, Task<MediaFile>> call, CancellationToken ct)
     {
@@ -73,7 +79,8 @@ public sealed class MediaGateway(
 }
 
 /// <summary>One file the media pipeline should create for a scenario.</summary>
-public sealed record MediaItem(string Key, AiRole Role, string Text, string Voice, ImageShape Shape);
+/// <param name="From">For a clip (the Filmmaker role): the key of the picture it brings to life.</param>
+public sealed record MediaItem(string Key, AiRole Role, string Text, string Voice, ImageShape Shape, string? From = null);
 
 /// <summary>
 /// Works out every voice clip and picture a scenario needs, with the prompt for

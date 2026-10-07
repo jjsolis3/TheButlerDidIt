@@ -22,6 +22,7 @@ const ROLES: Record<AiRole, string> = {
   inspector: 'Inspector',
   voice: 'Voice',
   illustrator: 'Illustrator',
+  filmmaker: 'Filmmaker',
 }
 
 const weekLabel = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(undefined, { day: 'numeric', month: 'short', timeZone: 'UTC' })

@@ -591,8 +591,8 @@ export interface AdminGameRow {
 
 // ---- AI (admin + generation)
 
-export type AiProviderKind = 'anthropic' | 'openAI' | 'gemini' | 'ollama' | 'fake'
-export type AiRole = 'storyteller' | 'actor' | 'inspector' | 'voice' | 'illustrator'
+export type AiProviderKind = 'anthropic' | 'openAI' | 'gemini' | 'ollama' | 'fake' | 'elevenLabs' | 'piper' | 'stableDiffusion'
+export type AiRole = 'storyteller' | 'actor' | 'inspector' | 'voice' | 'illustrator' | 'filmmaker'
 export type MysteryLength = 'short' | 'standard' | 'long'
 export type GenerationStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 
@@ -1083,6 +1083,8 @@ export interface EscapeStageView {
   answering: AnswerRule
   /** What a search that turns up nothing new costs, in seconds (0 on Easy) */
   searchPenaltySeconds: number
+  /** The AI's clip of the stage in front of the group (never a later one), played silently in place of its picture at the reveal, or null */
+  stageFilmUrl: string | null
 }
 
 /** What a room's media place holds (C# MediaKind; a room never holds a "photo", which is a guest's selfie). */

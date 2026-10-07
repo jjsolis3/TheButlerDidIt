@@ -65,7 +65,9 @@ public sealed record EscapeStageView(
     /// <summary>Who may answer a puzzle as the game plays now (#132): Anyone with a single player, whatever was chosen.</summary>
     AnswerRule Answering = AnswerRule.Anyone,
     /// <summary>What a search that turns up nothing new costs, in seconds (0 on Easy).</summary>
-    int SearchPenaltySeconds = 0);
+    int SearchPenaltySeconds = 0,
+    /// <summary>The AI's clip of the stage in front of the group (never a later one), played silently in place of its picture at the reveal (#110), or null.</summary>
+    string? StageFilmUrl = null);
 
 public sealed record EscapeSceneView(int Width, int Height, string Backdrop, IReadOnlyList<EscapeSpotView> Objects);
 

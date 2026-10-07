@@ -24,10 +24,22 @@ The game works with any mix of providers.
 | OpenAI | `OpenAI` | Yes | ChatGPT models. Also any **OpenAI-compatible** server (LM Studio, OpenRouter, vLLM…) by setting the base URL. |
 | Google | `Gemini` | Yes | Gemini models, through Google's OpenAI-compatible endpoint. |
 | Ollama | `Ollama` | No | Runs open models on your own hardware for free. Set the base URL, e.g. `http://ollama:11434`. |
+| ElevenLabs | `ElevenLabs` | Yes | **Voices only**: the most expressive character voices. |
+| Piper | `Piper` | No | **Voices only**, on your own hardware for free. Set the base URL, e.g. `http://piper:5000`. |
+| Stable Diffusion WebUI | `StableDiffusion` | No | **Pictures only**, on your own hardware for free: AUTOMATIC1111 or Forge, started with `--api`. Set the base URL, e.g. `http://stable-diffusion:7860`. |
 
-**Voices and pictures need OpenAI or Gemini.** Claude and Ollama don't make audio or images, so you can use them for the text roles and add OpenAI or Gemini just for media:
+**Voices and pictures need a provider that makes them.** Claude and Ollama don't make audio or images, so you can use them for the text roles and add others just for media:
 - **OpenAI:** text-to-speech (`tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`) for the Voice role, and `gpt-image-1` or `dall-e-3` for the Illustrator.
 - **Gemini:** a TTS model (`gemini-2.5-flash-preview-tts`, `gemini-2.5-pro-preview-tts`) for the Voice role, and a Nano Banana image model (`gemini-2.5-flash-image`, `gemini-3.1-flash-image`, `gemini-3.1-flash-lite-image`, `gemini-3-pro-image`) for the Illustrator. One Gemini provider and key covers the text roles, voices and pictures. Characters get Gemini voices (Charon, Kore, Puck…) matched to their pitch, the same way they would with OpenAI.
+- **ElevenLabs** (voices): a model such as `eleven_multilingual_v2` (the most natural), `eleven_flash_v2_5` (fastest and cheapest) or `eleven_v3`. Characters are cast from your account's voices: ElevenLabs' default voices by name (George narrates; Daniel, Callum and Sarah play deep, low and bright characters), otherwise your own voices by their gender label. A key limited to text-to-speech, which can't list voices, uses a few default voices ElevenLabs documents by id.
+- **Piper** (voices, local): run Piper's HTTP server (`pip install piper-tts[http]`, then `python3 -m piper.http_server -m en_US-lessac-medium`). The model is the Piper voice, or `default` for the one the server started with. A voice with many speakers, such as `en_GB-vctk-medium` or `en_US-libritts_r-medium`, gives each character a speaker of their own; a single-speaker voice reads everyone the same way.
+- **Stable Diffusion WebUI** (pictures, local): the model is the checkpoint (`default` for the one the WebUI has loaded). Pictures are painted at the checkpoint's own size, about 1024 pixels for SDXL, SD3 or Flux (a name with `xl`, `sd3` or `flux` in it) and 512–768 for SD 1.5. A picture takes from a few seconds on a graphics card to minutes on a CPU.
+- **Your own OpenAI-compatible voice or picture server** (Kokoro-FastAPI, openedai-speech, LocalAI…): add it as `OpenAI` with its base URL and no key. Characters are cast with OpenAI's six voice names (alloy, echo, fable, onyx, nova, shimmer), which those servers map to their own voices.
+
+**Clips for escape room reveals (optional, costs money).** The **Filmmaker** role brings each stage's picture to life as an 8-second clip. When a new stage opens, the TV plays it silently in the picture's place while the game master reads the stage. It needs an OpenAI provider with a Sora model (`sora-2`, or `sora-2-pro`) or a Gemini provider with a Veo model (`veo-3.0-fast-generate-001`, `veo-3.0-generate-001`, `veo-3.1-generate-preview`).
+- **Cost:** clips cost far more than pictures, since providers charge per second of video. So the role is off until you set it. Each clip is made once per room and shared by every game of it. Enter the price of one 8-second clip in *Per call $* under Prices.
+- **Time:** a clip takes one to five minutes to make. A room's pictures and readings show first, and the clips follow.
+- **Your own video wins:** a stage with a host's own uploaded video gets no clip. A new picture of a stage is filmed again on the next game with the AI on.
 
 **A sensible starting point:** a strong model as the **Storyteller**, since it runs once per mystery and quality matters most. A faster, cheaper model as the **Actor**, since it runs every time a guest asks a question. The Inspector sits in between.
 
@@ -39,14 +51,16 @@ Small local models (Ollama) are fine for the Actor. They often struggle to write
 1. Sign in with the **first account created on the server**, which is the admin.
 2. Open **Admin hub → AI** from the account menu (`/admin/ai`).
 3. **Providers → Add provider.** Pick the type and paste the API key. Keys are encrypted before they are stored and are never shown again.
-4. **Test connection** with a model name to confirm the key works.
-5. **Who does what:** pick a provider and model for Storyteller, Actor and Inspector, then Save. Optionally pick an OpenAI or Gemini provider for Voice (e.g. `tts-1` or `gemini-2.5-flash-preview-tts`) and Illustrator (e.g. `dall-e-3` or `gemini-2.5-flash-image`).
+4. **Test connection** with a model name to confirm the key works. For a voice provider it records a one-word clip; for Stable Diffusion it lists the checkpoints and says whether yours is one of them (painting a test picture would take too long).
+5. **Who does what:** pick a provider and model for Storyteller, Actor and Inspector, then Save. Optionally pick a provider for Voice (OpenAI, Gemini, ElevenLabs or Piper, e.g. `tts-1` or `eleven_multilingual_v2`) and Illustrator (OpenAI, Gemini or Stable Diffusion, e.g. `dall-e-3` or `default`). Each role only lists the providers that can do it.
    With a Claude provider, two more settings appear:
    - **Effort:** how hard Claude thinks. Lower is faster and cheaper, which suits the Actor's short in-character replies. Leave it on *Model default* for the Storyteller. Claude Haiku 4.5 doesn't take an effort setting, so leave it on *Model default* for Haiku.
    - **Fallback model if Claude declines:** when a safety filter refuses a request, this model retries it within the same call, for example `claude-opus-4-8`.
 6. **Prices:** add prices for any non-Claude models (US$ per million tokens, from the provider's pricing page) so costs are tracked correctly.
    - **Voices** are charged per character, which the usage log records as input tokens. For `tts-1` enter the price per million characters in *In $/1M* (check OpenAI's pricing page).
    - **Pictures** are charged per image: enter it in *Per call $* (for example the price of one `dall-e-3` 1024×1792 image).
+   - **ElevenLabs** is charged per character too: enter your plan's price per million characters in *In $/1M*.
+   - **Piper and Stable Diffusion** run on your own machine, so they're always logged as free, like Ollama.
 
 ### Option B: environment variables (good for Coolify)
 Set these in Coolify's *Environment Variables* tab (see `.env.example`):
@@ -64,9 +78,13 @@ AI_MONTHLY_BUDGET_USD=25
 AI_MEDIA_PROVIDER_NAME=OpenAI
 AI_MEDIA_PROVIDER_KIND=OpenAI   # or Gemini, with e.g. gemini-2.5-flash-preview-tts and gemini-2.5-flash-image
 AI_MEDIA_API_KEY=sk-...
+AI_MEDIA_BASE_URL=              # only for a server of your own, e.g. Piper's http://piper:5000
 AI_VOICE_MODEL=tts-1
 AI_IMAGE_MODEL=dall-e-3
+AI_VIDEO_MODEL=                 # optional clips for escape room reveals, e.g. sora-2 (OpenAI) or veo-3.0-fast-generate-001 (Gemini)
 ```
+
+The media provider takes every media role whose model is set: voices, pictures and, with `AI_VIDEO_MODEL`, clips. A provider that only makes voices (`ElevenLabs`, `Piper`) or only pictures (`StableDiffusion`) takes just its own: leave the other models empty, or set those roles on the admin page. A role the provider can't do is skipped at start-up, with a warning in the log.
 
 Environment settings are applied at every start-up and overwrite the same-named provider and role on the admin page. The Claude-only role settings have environment forms too: `Ai__Roles__Actor__Effort=low` and `Ai__Roles__Storyteller__RefusalFallbackModel=claude-opus-4-8`. For several providers, configure them on the admin page, or use the full form `Ai__Providers__1__Name=…`, `Ai__Providers__1__Kind=…` and so on.
 
@@ -87,7 +105,7 @@ Environment settings are applied at every start-up and overwrite the same-named 
 - **Remixes** send the whole story, including its solution, to the Storyteller, just like generating a mystery. The result must keep everything guests have already seen (bios, costumes, setting, prologue) and pass the validator and the blind solve before it's used.
 - **Content level and tone:** every prompt includes the mystery's rating (Family or Mature), which sets the limits, and the tone the host picked when creating the party, which flavours the AI within them: *Mature* or *Normal* (PG-13, for mixed company) for Adults mysteries, *Normal* or *Funny* (silly, for kids) for Family ones. The tone only changes what the AI says; the written script is the same.
 - **Costume selfies** never go to an AI provider. They are shrunk, stripped of metadata (including GPS location) and stored on your server.
-- **What's sent:** player names and questions go to the AI provider you configured. If that matters to your guests, choose a provider whose data policy you're comfortable with, or run Ollama locally.
+- **What's sent:** player names and questions go to the AI provider you configured. If that matters to your guests, choose a provider whose data policy you're comfortable with, or run everything locally: Ollama for text, Piper for voices and Stable Diffusion for pictures.
 
 To check each provider against its real API before a party, see [Verifying the real AI providers](verifying-providers.md).
 
@@ -100,7 +118,9 @@ To check each provider against its real API before a party, see [Verifying the r
 | Test connection fails with 401/403 | Wrong or revoked API key. |
 | Test connection fails with 404 / "model not found" | Check the model name on the provider's model list. |
 | Generation fails repeatedly | Try a stronger Storyteller model; small models often produce invalid mysteries. |
-| "The Voice role needs an OpenAI or Gemini provider" (or Illustrator) | Claude and Ollama can't make voices or pictures. Add an OpenAI or Gemini provider for those roles. |
+| "The Voice role needs an OpenAI, Gemini, ElevenLabs or Piper provider" (or the Illustrator's) | That provider can't do the job: Claude and Ollama make neither voices nor pictures, ElevenLabs and Piper only voices, Stable Diffusion only pictures. |
+| "The server at … has no Stable Diffusion API" | Start the WebUI with `--api` (add it to `COMMANDLINE_ARGS`). |
+| "…didn't answer with a WAV file. Is it a Piper server?" | The base URL points at something else; Piper's HTTP server listens on port 5000 by default. |
 | "Gemini returned no image" / "no voice clip" | The model name isn't an image or speech model: use a `…-image` model for the Illustrator and a `…-tts` model for the Voice. |
 | "The AI (Claude) declined this request" | A safety filter refused it. Try rewording, or set a *fallback model* for that role on the admin page. |
 | Lobby says some items "couldn't be made" | Usually a picture refused by the provider's safety filter. Press *Fill in anything missing* to retry; the rest of the mystery is unaffected. |

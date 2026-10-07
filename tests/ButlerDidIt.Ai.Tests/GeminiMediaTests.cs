@@ -143,9 +143,9 @@ public class GeminiMediaTests
     {
         var factory = new MediaClientFactory(allowFake: false);
         var claude = Gemini with { Kind = AiProviderKind.Anthropic, Name = "Claude" };
-        Assert.Contains("OpenAI or Gemini", Assert.Throws<AiUnavailableException>(() => factory.CreateImages(claude, "x")).Message);
-        Assert.False(MediaClientFactory.SupportsMedia(AiProviderKind.Ollama));
-        Assert.True(MediaClientFactory.SupportsMedia(AiProviderKind.Gemini));
+        Assert.Contains("OpenAI, Gemini or Stable Diffusion", Assert.Throws<AiUnavailableException>(() => factory.CreateImages(claude, "x")).Message);
+        Assert.False(AiProviderAbilities.Speaks(AiProviderKind.Ollama) || AiProviderAbilities.Paints(AiProviderKind.Ollama));
+        Assert.True(AiProviderAbilities.Speaks(AiProviderKind.Gemini) && AiProviderAbilities.Paints(AiProviderKind.Gemini));
         Assert.Contains("no API key", Assert.Throws<AiUnavailableException>(() => factory.CreateSpeech(Gemini with { ApiKey = null }, "x")).Message);
     }
 }

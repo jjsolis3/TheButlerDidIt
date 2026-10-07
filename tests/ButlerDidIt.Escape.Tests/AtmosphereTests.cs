@@ -72,6 +72,7 @@ public class AtmosphereTests
             [EscapeArt.Ambience] = "/media/room-sound",
             [EscapeArt.StageVideo(first)] = "/media/stage-1-video",
             [EscapeArt.StageAmbience(second)] = "/media/stage-2-sound",
+            [EscapeArt.StageFilm(second)] = "/media/stage-2-clip", // the AI's clip of stage 2's picture (#110)
         };
         var lobby = EscapeProjector.Stage(EscapeEngine.NewGame(7), room, T0, media);
         Assert.Equal("/media/intro", lobby.IntroVideoUrl); // public, like the intro itself
@@ -81,10 +82,12 @@ public class AtmosphereTests
         var s = Started(room);
         var one = EscapeProjector.Stage(s, room, T0, media);
         Assert.Equal("/media/stage-1-video", one.StageVideoUrl);
+        Assert.Null(one.StageFilmUrl); // stage 2's clip waits for stage 2
         Assert.Equal("/media/room-sound", one.AmbienceUrl); // the first stage has no sound of its own: the room's plays
 
         var two = EscapeProjector.Stage(ToStage(s, room, 1), room, T0, media);
         Assert.Null(two.StageVideoUrl);
+        Assert.Equal("/media/stage-2-clip", two.StageFilmUrl);
         Assert.Equal("/media/stage-2-sound", two.AmbienceUrl);
         // Nothing uploaded: the made-up sound, and no videos.
         var plain = EscapeProjector.Stage(s, room, T0);
