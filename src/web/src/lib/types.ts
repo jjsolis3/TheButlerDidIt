@@ -542,6 +542,8 @@ export interface AuthOptions {
   allowRegistration: boolean
   emailEnabled: boolean
   requireConfirmedEmail: boolean
+  /** The site key of the sign-up form's Turnstile widget (#103), or null when the check is off */
+  humanCheckKey: string | null
 }
 
 // ---- The host's own account (AccountEndpoints.cs)
@@ -654,7 +656,22 @@ export interface AdminOverview {
     paymentsLive: boolean
     /** Something stopping payments from working */
     paymentsProblem: string | null
+    /** What's left to do on the terms, privacy and refund pages (#103), or null when they're ready */
+    legalProblem: string | null
+    /** The sign-up form checks that a person is filling it in (Cloudflare Turnstile, #103) */
+    signUpCheck: boolean
   }
+  /** Jumps in AI spending or failed payments in the last 7 days (#103), newest first */
+  alerts: { kind: 'ai-spend' | 'failed-payments'; message: string; raisedAt: string }[]
+}
+
+/** A terms, privacy or refund page (#103): Markdown with the owner's notes removed and the site's details filled in. */
+export interface LegalPage {
+  page: 'terms' | 'privacy' | 'refunds'
+  title: string
+  markdown: string
+  /** Still the starter draft: the admin is reminded to have it reviewed */
+  draft: boolean
 }
 
 export interface SignUpsView {

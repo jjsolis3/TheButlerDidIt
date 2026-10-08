@@ -213,6 +213,7 @@ public static class BillingEndpoints
             var trial = r.TrialEnd is null ? "" : $" Free until {r.TrialEnd.Value:d MMM yyyy}.";
             return Page("Fake checkout", $"""
                 <p>Paying for <code>{Enc(r.PriceId)}</code>: {Enc(what)}.{trial}</p>
+                <p class="notice">{Enc(r.Notice ?? "")}</p>
                 <form method="post" action="/api/billing/fake/checkout/{Enc(id)}/pay"><button type="submit">Pay</button></form>
                 <p><a href="{Enc(r.CancelUrl)}">Cancel and go back</a></p>
                 """);

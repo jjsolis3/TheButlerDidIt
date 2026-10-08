@@ -1,5 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
+import { Turnstile } from '../components/Turnstile'
 import { Button, Card, ErrorText, Field, Heading, inputClass, Shell } from '../components/ui'
 import { api } from '../lib/api'
 import type { AuthOptions, InviteInfo } from '../lib/types'
@@ -26,6 +27,12 @@ export default function Login() {
   const [options, setOptions] = useState<AuthOptions | null>(null)
   const [inviteInfo, setInviteInfo] = useState<InviteInfo | null>(null)
   const [inviteError, setInviteError] = useState<string | null>(null)
+  // The sign-up form's check that a person is filling it in (#103), when the site has one: its token, and a count of
+  // tries, so a failed sign-up draws a fresh widget (a token works once).
+  const [humanToken, setHumanToken] = useState<string | null>(null)
+  const [tries, setTries] = useState(0)
+  const humanCheckKey = mode === 'register' ? options?.humanCheckKey : null
+  const humanCheckFailed = useCallback((message: string) => setError(message), [])
 
   useEffect(() => {
     api.authOptions().then(setOptions, () => setOptions(null))
@@ -59,10 +66,14 @@ export default function Login() {
     setError(null)
     try {
       if (mode === 'login') await api.login(email, password)
-      else await api.register(email, password, displayName, invite && !inviteError ? invite : undefined)
+      else await api.register(email, password, displayName, invite && !inviteError ? invite : undefined, humanToken ?? undefined)
       navigate(safeNext(params.get('next')))
     } catch (err) {
       setError((err as Error).message)
+      if (humanCheckKey) {
+        setHumanToken(null)
+        setTries((n) => n + 1)
+      }
     } finally {
       setBusy(false)
     }
@@ -112,8 +123,23 @@ export default function Login() {
               minLength={8}
             />
           </Field>
+          {humanCheckKey && <Turnstile key={tries} siteKey={humanCheckKey} onToken={setHumanToken} onError={humanCheckFailed} />}
           <ErrorText>{error}</ErrorText>
-          <Button type="submit" disabled={busy} className="w-full">
+          {/* Right by the button, so nobody can miss it: the server records the moment they agreed (#103). */}
+          {mode === 'register' && (
+            <p className="text-sm text-muted" data-testid="signup-terms">
+              By creating an account, you agree to our{' '}
+              <Link to="/terms" className="text-accent underline">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="text-accent underline">
+                Privacy Policy
+              </Link>
+              . You must be 18 or older and live in the United States.
+            </p>
+          )}
+          <Button type="submit" disabled={busy || (!!humanCheckKey && !humanToken)} className="w-full">
             {mode === 'login' ? 'Sign in' : 'Create account'}
           </Button>
         </form>

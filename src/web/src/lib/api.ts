@@ -2,6 +2,7 @@ import type {
   AdminGameRow,
   AnswerRule,
   AdminOverview,
+  LegalPage,
   SignUpsView,
   EscapeDifficulty,
   AiProviderKind,
@@ -136,10 +137,13 @@ async function request<T>(method: string, url: string, body?: unknown, seatToken
 
 export const api = {
   me: () => request<Me>('GET', '/api/auth/me'),
+  /** The terms, privacy and refund pages (#103). Public. */
+  legal: (page: LegalPage['page']) => request<LegalPage>('GET', `/api/legal/${page}`),
   login: (email: string, password: string) => request<Me>('POST', '/api/auth/login', { email, password }),
   /** `invite` is the token from an invite link, needed while sign-ups are closed. */
-  register: (email: string, password: string, displayName: string, invite?: string) =>
-    request<Me>('POST', '/api/auth/register', { email, password, displayName, invite }),
+  /** `humanToken` is the Turnstile widget's answer, when the site checks sign-ups (#103). */
+  register: (email: string, password: string, displayName: string, invite?: string, humanToken?: string) =>
+    request<Me>('POST', '/api/auth/register', { email, password, displayName, invite, humanToken }),
   checkInvite: (token: string) => request<InviteInfo>('POST', '/api/auth/invite', { token }),
   logout: () => request<void>('POST', '/api/auth/logout'),
   authOptions: () => request<AuthOptions>('GET', '/api/auth/options'),

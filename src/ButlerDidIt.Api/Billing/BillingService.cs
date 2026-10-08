@@ -28,6 +28,7 @@ public sealed class BillingService(
     BillingSetup setup,
     BillingCatalog catalog,
     BillingLocks locks,
+    Microsoft.Extensions.Options.IOptions<ButlerDidIt.Api.Legal.LegalOptions> legal,
     TimeProvider clock,
     ILogger<BillingService> log)
 {
@@ -90,7 +91,21 @@ public sealed class BillingService(
             // {CHECKOUT_SESSION_ID} is filled in by Stripe, so the page can ask about this very checkout.
             $"{siteUrl}/account?billing=done&session={{CHECKOUT_SESSION_ID}}",
             $"{siteUrl}/account?billing=cancelled",
-            setup.Options.AutomaticTax), ct);
+            setup.Options.AutomaticTax,
+            Notice(offer.Plan, siteUrl)), ct);
+    }
+
+    /// <summary>
+    /// What the payment page says by its pay button (#103): how the plan renews or ends, and where the terms and refund
+    /// policy are. US auto-renewal laws want the renewal terms right where the customer agrees to them.
+    /// </summary>
+    private string Notice(PlanDefinition plan, string siteUrl)
+    {
+        var refund = $"Not used within {legal.Value.RefundDays} days of a payment? You can have it refunded in full: {siteUrl}/refunds.";
+        var what = plan.Kind == PlanKind.Subscription
+            ? $"Your subscription renews automatically every {(plan.Interval == PlanInterval.Year ? "year" : "month")} until you cancel, which you can do at any time from your account."
+            : $"A single payment for {setup.Options.PassHours} hours of hosting, starting when you pay. It doesn't renew.";
+        return $"{what} {refund} By paying, you agree to our terms: {siteUrl}/terms.";
     }
 
     /// <summary>The provider's billing page for the host: card, plan, cancelling, invoices.</summary>

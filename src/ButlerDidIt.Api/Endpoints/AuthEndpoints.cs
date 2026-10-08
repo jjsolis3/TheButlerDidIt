@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 namespace ButlerDidIt.Api.Endpoints;
 
 /// <param name="Invite">The token from an invite link (<see cref="InviteEndpoints"/>). Needed while registration is closed.</param>
-public sealed record RegisterRequest(string Email, string Password, string DisplayName, string? Invite = null);
+/// <param name="HumanToken">The answer of the sign-up page's Turnstile widget (#103), when the site uses one.</param>
+public sealed record RegisterRequest(string Email, string Password, string DisplayName, string? Invite = null, string? HumanToken = null);
 public sealed record LoginRequest(string Email, string Password);
 /// <param name="Access">Which games this host may start, and the plan that gives them (#100).</param>
 public sealed record MeResponse(string Id, string Email, string DisplayName, bool IsAdmin, bool EmailConfirmed, AccessView Access);
-public sealed record AuthOptionsView(bool AllowRegistration, bool EmailEnabled, bool RequireConfirmedEmail);
+/// <param name="HumanCheckKey">The site key for the sign-up form's Turnstile widget (#103), or null when the check is off.</param>
+public sealed record AuthOptionsView(bool AllowRegistration, bool EmailEnabled, bool RequireConfirmedEmail, string? HumanCheckKey = null);
 public sealed record ForgotRequest(string Email);
 public sealed record ResetRequest(string Email, string Token, string Password);
 public sealed record ConfirmRequest(string UserId, string Token);
@@ -66,9 +68,9 @@ public static class AuthEndpoints
         // and "Create an account" only while sign-ups are open. The first account (the admin) can
         // always sign up, so a brand-new server offers it even when registration is closed.
         group.MapGet("/options", async (Microsoft.Extensions.Options.IOptions<AuthOptions> options, IEmailSender email, UserManager<AppUser> users,
-            AppDbContext db, CancellationToken ct) =>
+            AppDbContext db, IHumanCheck human, CancellationToken ct) =>
             new AuthOptionsView(await SignUps.OpenAsync(db, options.Value, ct) || !await users.Users.AnyAsync(ct), email.IsConfigured,
-                options.Value.RequireConfirmedEmail && email.IsConfigured));
+                options.Value.RequireConfirmedEmail && email.IsConfigured, human.SiteKey));
 
         group.MapPost("/register", async (
             RegisterRequest req,
@@ -81,9 +83,14 @@ public static class AuthEndpoints
             ILogger<AuthOptions> log,
             TimeProvider clock,
             Microsoft.Extensions.Options.IOptions<PlansOptions> plans,
+            IHumanCheck human,
             HttpContext http,
             CancellationToken ct) =>
         {
+            // First, before anything is looked up: a script gets nowhere, whatever else it sends (#103).
+            if (!await human.VerifyAsync(req.HumanToken, http.Connection.RemoteIpAddress?.ToString(), ct))
+                return Results.Problem("Please finish the check that you're a person, just above the button, then try again.", statusCode: StatusCodes.Status400BadRequest);
+
             var isFirstUser = !await users.Users.AnyAsync();
             InviteEntity? invite = null;
             if (!string.IsNullOrWhiteSpace(req.Invite))
@@ -104,6 +111,8 @@ public static class AuthEndpoints
             var user = new AppUser
             {
                 UserName = req.Email.Trim(), Email = req.Email.Trim(), DisplayName = displayName, IsAdmin = isFirstUser, CreatedAt = clock.GetUtcNow(),
+                // The sign-up form says that creating an account means agreeing to the terms and privacy policy.
+                TermsAcceptedAt = clock.GetUtcNow(),
             };
             // One transaction: the invite is used up only if the account is created (a weak password or a
             // taken email leaves it unused), and two people can't both use one link (see ClaimAsync).

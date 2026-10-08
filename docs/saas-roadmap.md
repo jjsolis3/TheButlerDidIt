@@ -152,16 +152,16 @@ How to set it up: "Payments with Stripe" in [deploy-coolify.md](deploy-coolify.m
   - **AI:** today's page.
   - **Plans & billing** (#101): whether payments work (keys, webhooks, the last webhook), each plan's price as Stripe has it with anything wrong with it, and every subscription and pass with a link to the Stripe dashboard and a Sync button.
 
-### 8. Ready for paying customers (#103)
+### 8. Ready for paying customers (#103, built)
 
-- **An isolation test suite:** host B tries everything against host A's parties, kits, mysteries, rooms and usage. The checks exist today but are spread across files; one suite makes them a promise.
-- **Terms, Privacy Policy and refund policy.** Stripe asks for these. Costume selfies and Family games played by children need care: COPPA covers services aimed at under-13s. Guests have no accounts, and selfies are stripped of metadata and deleted by `RetentionWorker`, which helps, but it has to be written down.
-- **Monitoring:** error tracking, uptime checks on `/healthz`, and alerts on AI spend and failed payments.
-- **Backups with a tested restore**, and a transactional email provider (SPF and DKIM) so receipts and reset links arrive.
-- **Bots:** when sign-ups are open, a CAPTCHA (Cloudflare Turnstile) on the form, alongside the existing rate limit and email confirmation.
+- **An isolation test suite** (`IsolationTests`): host B, an ordinary host, tries everything against host A's parties, guests, kits, mysteries, rooms, files, AI spending, payments and account, over HTTP and the live connection. Two tests read the server's own list of routes, so a new endpoint must either need a sign-in or be listed as public on purpose, and every admin route must refuse an ordinary host; the hub's host controls are found by reflection. It found and fixed two things: a host could make a guest's phone at someone else's escape room show "you were removed", and a host's own room's leaderboard could be read by anyone with its id.
+- **Terms, Privacy Policy and Refund Policy** (`/terms`, `/privacy`, `/refunds`): starter drafts in `content/legal` for US customers, with a full refund within 14 days of a payment if no game was started with it. The server fills in the owner's details and everything that must match the site (lengths, retention, the outside services actually used). Linked from every page, at sign-up (the moment of agreement is recorded), next to the plans and on Stripe's payment page. To be reviewed by a lawyer; the admin hub says until then.
+- **Monitoring:** OpenTelemetry (errors, traces, metrics and logs to any OTLP service, without visitors' IP addresses), uptime checks on `/healthz`, and the admin alerted by email and on the overview when AI spending or failed payments jump.
+- **Backups** are restored into a scratch database and checked after every nightly dump, with an optional "OK"/"failed" address to call (e.g. Healthchecks.io). **Email:** the guide covers a transactional provider with SPF, DKIM and DMARC, and Stripe's own receipts.
+- **Bots:** Cloudflare Turnstile on the sign-up form, once its keys are set, alongside the rate limit and email confirmation.
 
 ## Open questions for the owner
 
 - **Prices**, and whether to offer a free tier, a trial, or a one-off party pass.
 - **Branding:** does "The Butler Did It" stay the umbrella name for escape rooms too, or does the escape side get its own name under it?
-- **Who you'll sell to first:** US-only (Stripe plus Stripe Tax is simplest) or international (a Merchant of Record handles VAT for you).
+- **Who you'll sell to first:** US-only, decided (#103): Stripe plus Stripe Tax. International would mean a Merchant of Record, which handles VAT for you.

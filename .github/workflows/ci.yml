@@ -106,3 +106,23 @@ jobs:
       # Coolify's health check runs curl inside the container: without it every deploy is rolled back.
       - name: The image can run its health check
         run: docker run --rm --entrypoint curl butlerdidit:ci --version
+      # The nightly backup restores each dump into a scratch database and checks it (#103). Prove both answers:
+      # a real backup of a (tiny) database passes, and a truncated dump fails.
+      - name: Build the backup image
+        run: docker build -t butlerdidit-backup:ci deploy/backup
+      - name: A backup passes its restore check, and a broken one fails it
+        run: |
+          docker network create backups
+          docker run -d --name db --network backups -e POSTGRES_USER=butler -e POSTGRES_PASSWORD=butler -e POSTGRES_DB=butlerdidit postgres:16-alpine
+          for i in $(seq 30); do docker exec db pg_isready -U butler -d butlerdidit && break; sleep 1; done
+          docker exec db psql -U butler -d butlerdidit -v ON_ERROR_STOP=1 -c '
+            CREATE TABLE "__EFMigrationsHistory" ("MigrationId" text, "ProductVersion" text);
+            INSERT INTO "__EFMigrationsHistory" VALUES ($$20260101000000_Ci$$, $$10.0$$);
+            CREATE TABLE "AspNetUsers" ("Id" text); INSERT INTO "AspNetUsers" VALUES ($$owner$$);
+            CREATE TABLE "Scenarios" ("Id" text); INSERT INTO "Scenarios" VALUES ($$a-mystery$$);'
+          mkdir backups
+          backup() { docker run --rm --network backups -e POSTGRES_HOST=db -e POSTGRES_DB=butlerdidit -e POSTGRES_USER=butler -e POSTGRES_PASSWORD=butler -v "$PWD/backups:/backups" "$@"; }
+          backup --entrypoint /backup.sh butlerdidit-backup:ci | tee backup.log
+          grep -q "Backup restore check passed" backup.log
+          head -c 300 backups/last/butlerdidit-latest.sql.gz > backups/broken.sql.gz
+          if backup --entrypoint /hooks/50-check-restore butlerdidit-backup:ci check /backups/broken.sql.gz; then echo "A broken backup passed"; exit 1; fi

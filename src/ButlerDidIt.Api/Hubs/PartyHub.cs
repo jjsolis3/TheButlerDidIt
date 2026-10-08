@@ -190,11 +190,14 @@ public sealed partial class PartyHub(PartyService parties, PartyRuntime runtime,
     public async Task RemoveSeat(string code, Guid seatId)
     {
         var party = await RequireHostParty(code);
+        // Only a seat at this party. An escape room quietly ignores a player it doesn't have, and the "removed"
+        // message below would otherwise reach a guest at someone else's party (#103).
+        if (!await db.Seats.AnyAsync(s => s.Id == seatId && s.PartyId == party.Id)) throw new HubException("That seat isn't at this party.");
         // Removing the Seat row in the same SaveChanges as the new state means the
         // token stops working at exactly the moment the player leaves the game.
         await runtime.ExecuteAsync(party.Id, (s, now) => s.RemovePlayer(now, seatId), beforeSave: (p, _) =>
         {
-            var seat = db.Seats.Local.FirstOrDefault(x => x.Id == seatId)
+            var seat = db.Seats.Local.FirstOrDefault(x => x.Id == seatId && x.PartyId == p.Id)
                 ?? db.Seats.FirstOrDefault(x => x.Id == seatId && x.PartyId == p.Id);
             if (seat is not null) db.Seats.Remove(seat);
         });

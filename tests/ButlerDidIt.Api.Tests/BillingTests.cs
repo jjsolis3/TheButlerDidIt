@@ -225,6 +225,19 @@ public class BillingTests(BillingFactory app) : IClassFixture<BillingFactory>
     }
 
     [Fact]
+    public async Task The_payment_page_says_how_the_plan_renews_or_ends_and_where_the_refund_policy_is()
+    {
+        var (host, _) = await HostAsync();
+        var page = await app.CreateClient().GetStringAsync((await Read<RedirectView>(await BuyAsync(host, BillingPlan.BothMonthly))).Url);
+        Assert.Contains("Your subscription renews automatically every month until you cancel", page);
+        Assert.Contains("Not used within 14 days of a payment? You can have it refunded in full: http://localhost/refunds.", page);
+        Assert.Contains("By paying, you agree to our terms: http://localhost/terms.", page);
+
+        var pass = await app.CreateClient().GetStringAsync((await Read<RedirectView>(await BuyAsync(host, BillingPlan.EscapeRoomsPass))).Url);
+        Assert.Contains("A single payment for 72 hours of hosting, starting when you pay. It doesn&#39;t renew.", pass);
+    }
+
+    [Fact]
     public async Task Someone_elses_checkout_gives_nothing()
     {
         var (buyer, _) = await HostAsync();

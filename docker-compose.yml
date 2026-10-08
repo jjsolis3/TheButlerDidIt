@@ -67,6 +67,26 @@ services:
       Billing__PassHours: "${PASS_HOURS:-72}"
       Billing__GraceDays: "${PAYMENT_GRACE_DAYS:-7}"
       Billing__AutomaticTax: "${STRIPE_AUTOMATIC_TAX:-false}"
+      # ---- Sign-up check (optional; Cloudflare Turnstile). Off until both keys are set.
+      Turnstile__SiteKey: "${TURNSTILE_SITE_KEY:-}"
+      Turnstile__SecretKey: "${TURNSTILE_SECRET_KEY:-}"
+      # ---- Monitoring (optional; see "Monitoring" in docs/deploy-coolify.md). OpenTelemetry is off until the endpoint is set.
+      OTEL_EXPORTER_OTLP_ENDPOINT: "${OTEL_EXPORTER_OTLP_ENDPOINT:-}"
+      OTEL_EXPORTER_OTLP_HEADERS: "${OTEL_EXPORTER_OTLP_HEADERS:-}"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "${OTEL_EXPORTER_OTLP_PROTOCOL:-grpc}"
+      OTEL_SERVICE_NAME: "${OTEL_SERVICE_NAME:-butler-did-it}"
+      Alerts__AiSpendMinUsd: "${ALERT_AI_SPEND_MIN_USD:-5}"
+      Alerts__FailedPaymentsMin: "${ALERT_FAILED_PAYMENTS_MIN:-3}"
+      Alerts__Email: "${ALERT_EMAIL:-}"
+      # ---- Terms, privacy and refunds (see "Terms, privacy and refunds" in docs/deploy-coolify.md). Set before charging anyone.
+      Legal__OperatorName: "${LEGAL_OPERATOR_NAME:-}"
+      Legal__ContactEmail: "${LEGAL_CONTACT_EMAIL:-}"
+      Legal__State: "${LEGAL_STATE:-}"
+      Legal__RefundDays: "${REFUND_DAYS:-14}"
+      Legal__HostingProvider: "${LEGAL_HOSTING_PROVIDER:-}"
+      Legal__EmailProvider: "${LEGAL_EMAIL_PROVIDER:-}"
+      Legal__StorageProvider: "${LEGAL_STORAGE_PROVIDER:-}"
+      Legal__MonitoringProvider: "${LEGAL_MONITORING_PROVIDER:-}"
       # ---- More than one server (optional; see "Running more than one server" in docs/deploy-coolify.md).
       Scale__MultiInstance: "${SCALE_MULTI_INSTANCE:-false}"
       Scale__Redis: "${REDIS_URL:-}"
@@ -101,10 +121,11 @@ services:
       retries: 10
 
   # Nightly database backups into the `backups` volume: 7 daily, 4 weekly and 6 monthly are kept,
-  # older ones are deleted. These stay on the same server, so also copy them somewhere else
+  # older ones are deleted. After each one, it's restored into a scratch database and checked
+  # (deploy/backup/check-restore). These stay on the same server, so also copy them somewhere else
   # (see "Data and backups" in docs/deploy-coolify.md, which also has the restore steps).
   backup:
-    image: prodrigestivill/postgres-backup-local:16
+    build: ./deploy/backup
     restart: unless-stopped
     environment:
       POSTGRES_HOST: db
@@ -115,6 +136,10 @@ services:
       BACKUP_KEEP_DAYS: "7"
       BACKUP_KEEP_WEEKS: "4"
       BACKUP_KEEP_MONTHS: "6"
+      # Optional: addresses to call when a backup passed its restore check, or failed (e.g. a Healthchecks.io
+      # check, or an Uptime Kuma push monitor). "**None**" is the image's word for "not set".
+      WEBHOOK_POST_BACKUP_URL: "${BACKUP_OK_URL:-**None**}"
+      WEBHOOK_ERROR_URL: "${BACKUP_FAILED_URL:-**None**}"
     volumes:
       - backups:/backups
     depends_on:

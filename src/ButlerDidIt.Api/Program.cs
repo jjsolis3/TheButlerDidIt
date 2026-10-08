@@ -13,7 +13,9 @@ using ButlerDidIt.Api.Games;
 using ButlerDidIt.Api.Hubs;
 using ButlerDidIt.Api.Insights;
 using ButlerDidIt.Api.Kit;
+using ButlerDidIt.Api.Legal;
 using ButlerDidIt.Api.Media;
+using ButlerDidIt.Api.Monitoring;
 using ButlerDidIt.Ai.Media;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Api.Scale;
@@ -45,6 +47,9 @@ builder.Services.Configure<RetentionOptions>(config.GetSection("Retention"));
 builder.Services.Configure<ScaleOptions>(config.GetSection("Scale"));
 builder.Services.Configure<ButlerDidIt.Api.Plans.PlansOptions>(config.GetSection("Plans"));
 builder.Services.Configure<BillingOptions>(config.GetSection("Billing"));
+builder.Services.Configure<LegalOptions>(config.GetSection("Legal"));
+builder.Services.Configure<AlertOptions>(config.GetSection("Alerts"));
+builder.Services.Configure<TurnstileOptions>(config.GetSection("Turnstile"));
 var scale = config.GetSection("Scale").Get<ScaleOptions>() ?? new ScaleOptions();
 
 // ---------------------------------------------------------------- database
@@ -99,6 +104,11 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifes
 builder.Services.Configure<SecurityStampValidatorOptions>(o =>
     o.ValidationInterval = TimeSpan.FromSeconds(config.GetValue("Auth:SessionCheckSeconds", 60)));
 builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+// The sign-up form's check that a person is filling it in (#103): Cloudflare Turnstile once its keys are set, else none.
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IHumanCheck>(sp => sp.GetRequiredService<IOptions<TurnstileOptions>>().Value.Configured
+    ? ActivatorUtilities.CreateInstance<TurnstileCheck>(sp)
+    : new NoHumanCheck());
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(AuthPolicies.Host, p => p.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme).RequireAuthenticatedUser())
@@ -175,6 +185,10 @@ builder.Services.AddScoped<PartyDealer>();
 builder.Services.AddHostedService<PartyTicker>();
 builder.Services.AddSingleton<RetentionWorker>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<RetentionWorker>());
+// Monitoring (#103): OpenTelemetry when OTEL_EXPORTER_OTLP_ENDPOINT is set, and the admin's alerts.
+builder.AddTelemetry();
+builder.Services.AddSingleton<AlertWorker>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<AlertWorker>());
 
 // ---------------------------------------------------------------- AI (see docs/ai-setup.md)
 // Every AI call goes through AiGateway, which picks the provider for the role
@@ -218,6 +232,8 @@ builder.Services.AddSingleton<BillingSetup>();
 builder.Services.AddSingleton<BillingCatalog>();
 builder.Services.AddSingleton<BillingLocks>();
 builder.Services.AddScoped<BillingService>();
+// The terms, privacy and refund pages (#103), which name the services the site uses (payments among them).
+builder.Services.AddSingleton<LegalPages>();
 
 var signalR = builder.Services
     .AddSignalR(o => o.AddFilter<GameRuleHubFilter>())
@@ -300,6 +316,7 @@ app.MapAdminHostEndpoints();
 app.MapAdminHubEndpoints();
 app.MapInviteEndpoints();
 app.MapBillingEndpoints();
+app.MapLegalEndpoints();
 app.MapAccountEndpoints();
 app.MapRecapEndpoints();
 app.MapScenarioEditorEndpoints();

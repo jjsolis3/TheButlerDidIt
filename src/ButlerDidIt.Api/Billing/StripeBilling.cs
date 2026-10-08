@@ -62,6 +62,8 @@ internal sealed class StripeBilling : IBillingProvider
                 options.SubscriptionData = new() { Metadata = metadata, TrialEnd = request.TrialEnd?.UtcDateTime };
             else
                 options.PaymentIntentData = new() { Metadata = metadata };
+            // Stripe shows this right by its pay button: the renewal terms and the refund policy, where they count.
+            if (request.Notice is { Length: > 0 } notice) options.CustomText = new() { Submit = new() { Message = notice } };
             if (request.AutomaticTax)
             {
                 options.AutomaticTax = new() { Enabled = true };

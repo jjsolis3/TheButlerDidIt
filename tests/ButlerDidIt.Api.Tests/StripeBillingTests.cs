@@ -80,7 +80,8 @@ public class StripeBillingTests
         // A subscription bought during the site's trial, with Stripe Tax on, and a party pass.
         var subscription = await stripe.CheckoutAsync(new CheckoutRequest(customer, "user-1", "price_123", PlanKind.Subscription,
             DateTimeOffset.UtcNow.AddDays(10), "https://site.example/account?billing=done&session={CHECKOUT_SESSION_ID}",
-            "https://site.example/account?billing=cancelled", AutomaticTax: true), default);
+            "https://site.example/account?billing=cancelled", AutomaticTax: true,
+            Notice: "Your subscription renews automatically every month until you cancel. Refunds: https://site.example/refunds."), default);
         Assert.StartsWith("https://", subscription);
         var pass = await stripe.CheckoutAsync(new CheckoutRequest(customer, "user-1", "price_123", PlanKind.Pass, null,
             "https://site.example/account?billing=done&session={CHECKOUT_SESSION_ID}", "https://site.example/account?billing=cancelled", AutomaticTax: false), default);
