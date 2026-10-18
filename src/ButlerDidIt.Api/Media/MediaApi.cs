@@ -3,14 +3,20 @@ using ButlerDidIt.Api.Auth;
 using ButlerDidIt.Api.Data;
 using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Game.Engine;
+using ButlerDidIt.Game.Scenarios;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
 
 namespace ButlerDidIt.Api.Media;
 
+public sealed record SelfiesRequest(bool Allow, bool ParentsOk = false);
+public sealed record SelfiesView(bool Allow);
+
 public static class MediaApi
 {
     public const long MaxPhotoBytes = 10 * 1024 * 1024;
+
+    private const string SelfiesOff = "The host hasn't turned costume selfies on for this party.";
 
     public static void MapMediaApi(this IEndpointRouteBuilder app)
     {
@@ -45,10 +51,49 @@ public static class MediaApi
             return Results.Ok(new MediaJobView(job.Id, job.Status, job.Total, job.Done, job.Failed, job.Error));
         }).RequireAuthorization(AuthPolicies.Host);
 
+        // ---- Host: costume selfies on or off (#150). A Family party's guests may be children, so there switching them
+        // on means confirming their parents are happy for them to share a photo. Switching them off deletes the ones taken.
+        app.MapPut("/api/parties/{code}/selfies", async (string code, SelfiesRequest req, ClaimsPrincipal user, PartyService parties, PartyRuntime runtime,
+            AppDbContext db, MediaService mediaService, CancellationToken ct) =>
+        {
+            var party = await parties.FindByCodeAsync(code, ct);
+            if (party is null || party.HostUserId != user.FindFirstValue(ClaimTypes.NameIdentifier)) return Results.NotFound();
+            if (party.Status == PartyStatus.Finished) return Results.Problem("This party has finished.", statusCode: 409);
+            var family = party.ContentLevel == ContentRating.Family;
+            if (req.Allow && family && !req.ParentsOk)
+                return Results.Problem("Guests at a Family party may be children. Turn selfies on only once their parents are happy for them to share a photo.", statusCode: 400);
+
+            // The switch first, then the clean-up: an upload checks the switch under the party's lock, so once it's
+            // off no new selfie gets in, and every one already in is found below.
+            DateTimeOffset? consent = req.Allow && family ? parties.Now : null;
+            await db.Parties.Where(p => p.Id == party.Id)
+                .ExecuteUpdateAsync(u => u.SetProperty(p => p.SelfiesAllowed, req.Allow).SetProperty(p => p.SelfiesConsentAt, consent), ct);
+            var removed = new List<Guid>();
+            var (_, session) = await runtime.ExecuteAsync(party.Id, (s, now) =>
+            {
+                if (req.Allow) return s;
+                foreach (var seatId in s.SeatIds)
+                {
+                    if (MediaStore.AssetIdFromUrl(s.PhotoUrl(seatId)) is not { } asset) continue;
+                    removed.Add(asset);
+                    s = s.SetPlayerPhoto(now, seatId, null);
+                }
+                return s;
+            }, ct: ct);
+            // Gone from the server too, not just from the screens.
+            if (removed.Count > 0) await mediaService.DeleteUploadsAsync(removed, ct);
+            // The phones show or hide their selfie card at once.
+            await runtime.SendToEveryoneAsync(party.Id, session.SeatIds, "selfies", req.Allow);
+            return Results.Ok(new SelfiesView(req.Allow));
+        }).RequireAuthorization(AuthPolicies.Host);
+
         // ---- Guest: costume selfie. Authenticated by the seat token (X-Seat-Token header).
-        app.MapPost("/api/seat/photo", async (HttpRequest request, ClaimsPrincipal user, PartyRuntime runtime, MediaService mediaService, CancellationToken ct) =>
+        app.MapPost("/api/seat/photo", async (HttpRequest request, ClaimsPrincipal user, PartyRuntime runtime, MediaService mediaService, AppDbContext db,
+            CancellationToken ct) =>
         {
             if (user.SeatId() is not { } seatId || user.PartyId() is not { } partyId) return Results.Unauthorized();
+            // Asked again below, under the party's lock; this only saves reading a photo that would be refused.
+            if (!await db.Parties.AnyAsync(p => p.Id == partyId && p.SelfiesAllowed, ct)) return Results.Problem(SelfiesOff, statusCode: 403);
             if (!request.HasFormContentType) return Results.Problem("Send the photo as a form upload.", statusCode: 400);
             var form = await request.ReadFormAsync(ct);
             var file = form.Files.GetFile("photo");
@@ -69,16 +114,29 @@ public static class MediaApi
             var assetId = await mediaService.SaveUploadAsync(MediaKind.Photo, jpeg, "image/jpeg", "jpg", partyId, ct);
             var url = MediaStore.Url(assetId);
             string? previous = null;
-            await runtime.ExecuteAsync(partyId, (s, now) =>
+            var refused = false;
+            await runtime.ChangeAsync(partyId, (party, s, now) =>
             {
+                // The host may have switched selfies off while the photo was on its way (#150).
+                if (!party.SelfiesAllowed)
+                {
+                    refused = true;
+                    return Task.FromResult(s);
+                }
                 previous = s.PhotoUrl(seatId);
-                return s.SetPlayerPhoto(now, seatId, url);
+                return Task.FromResult(s.SetPlayerPhoto(now, seatId, url));
             }, ct: ct);
+            if (refused)
+            {
+                await mediaService.DeleteUploadsAsync([assetId], ct);
+                return Results.Problem(SelfiesOff, statusCode: 403);
+            }
             // A retake replaces the old selfie; don't keep the old one around.
             if (MediaStore.AssetIdFromUrl(previous) is { } old) await mediaService.DeleteUploadsAsync([old], ct);
             return Results.Ok(new { PhotoUrl = url });
         }).RequireAuthorization(AuthPolicies.Seat).DisableAntiforgery();
 
+        // Always allowed, selfies on or off: a guest can always take theirs back.
         app.MapDelete("/api/seat/photo", async (ClaimsPrincipal user, PartyRuntime runtime, MediaService mediaService, CancellationToken ct) =>
         {
             if (user.SeatId() is not { } seatId || user.PartyId() is not { } partyId) return Results.Unauthorized();

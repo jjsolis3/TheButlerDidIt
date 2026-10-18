@@ -297,6 +297,7 @@ public class IsolationTests(IsolationFactory app) : IClassFixture<IsolationFacto
             Refused(HttpStatusCode.NotFound, await b.GetAsync($"/api/parties/{code}/escape-recap"), "A's escape recap");
             Refused(HttpStatusCode.NotFound, await b.GetAsync($"/api/parties/{code}/spectators"), "who's watching A's party");
             Refused(HttpStatusCode.NotFound, await b.PutAsJsonAsync($"/api/parties/{code}/spectators", new AllowSpectatorsRequest(true)), "open A's party to watchers");
+            Refused(HttpStatusCode.NotFound, await b.PutAsJsonAsync($"/api/parties/{code}/selfies", new ButlerDidIt.Api.Media.SelfiesRequest(false)), "delete the selfies at A's party");
             Refused(HttpStatusCode.NotFound, await b.DeleteAsync($"/api/parties/{code}/spectators/{Guid.NewGuid()}"), "send A's watchers away");
         }
 

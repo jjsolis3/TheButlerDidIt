@@ -29,7 +29,21 @@ const PHASE_LABEL: Record<StageView['phase'], string> = {
  */
 export function PlayerScreen({ code, token, onLeave }: { code: string; token: string; onLeave: () => void }) {
   const [removed, setRemoved] = useState(false)
-  const { player, status, fatal, invoke, typing } = useParty({ code, token, joinSeat: true, onRemoved: () => setRemoved(true) })
+  // Whether the host has costume selfies on (#150): read with the party, then kept up to date by the host's switch.
+  const [selfies, setSelfies] = useState(false)
+  const { player, status, fatal, invoke, typing } = useParty({ code, token, joinSeat: true, onRemoved: () => setRemoved(true), onSelfies: setSelfies })
+  // Read again after every reconnect, in case the switch moved while this phone was asleep.
+  useEffect(() => {
+    if (status !== 'connected') return
+    let cancelled = false
+    api.party(code).then(
+      (p) => !cancelled && setSelfies(p.selfiesAllowed),
+      () => {},
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [code, status])
 
   if (removed || fatal) {
     return (
@@ -45,7 +59,7 @@ export function PlayerScreen({ code, token, onLeave }: { code: string; token: st
   return (
     <NpcTypingContext.Provider value={typing}>
       <StatusPill status={status} />
-      <PlayerBody view={player} invoke={invoke} token={token} />
+      <PlayerBody view={player} invoke={invoke} token={token} selfies={selfies} />
       <FeedToasts feed={player.stage.feed} offset="top-28" />
     </NpcTypingContext.Provider>
   )
@@ -53,7 +67,7 @@ export function PlayerScreen({ code, token, onLeave }: { code: string; token: st
 
 type Invoke = <T = void>(method: string, ...args: unknown[]) => Promise<T>
 
-function PlayerBody({ view, invoke, token }: { view: PlayerView; invoke: Invoke; token: string }) {
+function PlayerBody({ view, invoke, token, selfies }: { view: PlayerView; invoke: Invoke; token: string; selfies: boolean }) {
   const stage = view.stage
   const [error, setError] = useState<string | null>(null)
   const run = (method: string, ...args: unknown[]) => {
@@ -61,7 +75,7 @@ function PlayerBody({ view, invoke, token }: { view: PlayerView; invoke: Invoke;
     return invoke(method, ...args).catch((e: Error) => setError(e.message))
   }
 
-  if (stage.phase === 'lobby') return <LobbyPlayer view={view} run={run} error={error} token={token} />
+  if (stage.phase === 'lobby') return <LobbyPlayer view={view} run={run} error={error} token={token} selfies={selfies} />
   return <InGame view={view} run={run} invoke={invoke} error={error} token={token} />
 }
 
@@ -72,11 +86,13 @@ function LobbyPlayer({
   run,
   error,
   token,
+  selfies,
 }: {
   view: PlayerView
   run: (m: string, ...a: unknown[]) => Promise<unknown>
   error: string | null
   token: string
+  selfies: boolean
 }) {
   const stage = view.stage
   const mine = view.dossier?.character
@@ -115,7 +131,7 @@ function LobbyPlayer({
             <p className="text-xs font-semibold tracking-wider text-accent uppercase">What to wear</p>
             <p className="mt-1 text-sm">{mine.costumeTips}</p>
           </div>
-          <CostumeSelfie token={token} photoUrl={stage.players.find((p) => p.seatId === view.seatId)?.photoUrl ?? null} />
+          <CostumeSelfie token={token} allowed={selfies} photoUrl={stage.players.find((p) => p.seatId === view.seatId)?.photoUrl ?? null} />
           <p className="mt-4 text-xs text-muted">Your secrets unlock when the evening begins.</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant={view.ready ? 'ghost' : 'primary'} onClick={() => run('SetReady', !view.ready)}>
@@ -181,16 +197,19 @@ function LobbyPlayer({
 }
 
 /**
- * Guests snap a photo in costume; it replaces their name on the big screen's cast list.
+ * Guests snap a photo in costume; it replaces their name on the big screen's cast list. Only once the host has
+ * selfies on (#150): a Family party starts with them off, since its guests may be children. A selfie taken before
+ * they went off can still be removed.
  * `capture="user"` opens the front camera on phones; on a laptop it's a normal file picker.
  * The server shrinks the photo and strips its location data before anyone else sees it.
  * We don't keep our own copy of the URL: the upload changes the party state, and the new
  * snapshot arrives over SignalR like every other change, so all screens stay in step.
  */
-function CostumeSelfie({ token, photoUrl }: { token: string; photoUrl: string | null }) {
+function CostumeSelfie({ token, allowed, photoUrl }: { token: string; allowed: boolean; photoUrl: string | null }) {
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  if (!allowed && !photoUrl) return null
 
   const upload = async (file: File | undefined) => {
     if (!file) return
@@ -216,25 +235,27 @@ function CostumeSelfie({ token, photoUrl }: { token: string; photoUrl: string | 
       <div className="min-w-0 space-y-1">
         <p className="text-xs font-semibold tracking-wider text-accent uppercase">Costume selfie</p>
         <p className="text-xs text-muted">
-          Show off your outfit on the big screen. Optional, and deleted after the party. Under 13? Ask a grown-up first.{' '}
+          {allowed ? 'Show off your outfit on the big screen. Optional, and deleted after the party.' : 'The host has turned selfies off.'}{' '}
           {/* A new tab, so the guest doesn't leave the game to read it. */}
           <a href="/privacy#costume-selfies" target="_blank" rel="noopener" className="underline hover:text-ink">
             How we keep photos
           </a>
         </p>
         <div className="flex flex-wrap gap-2">
-          <label className={`cursor-pointer text-sm text-accent underline ${busy ? 'pointer-events-none opacity-50' : ''}`}>
-            {busy ? 'Uploading…' : photoUrl ? 'Retake' : 'Take a selfie'}
-            <input
-              ref={input}
-              type="file"
-              accept="image/*"
-              capture="user"
-              className="sr-only"
-              aria-label="Costume selfie"
-              onChange={(e) => void upload(e.target.files?.[0])}
-            />
-          </label>
+          {allowed && (
+            <label className={`cursor-pointer text-sm text-accent underline ${busy ? 'pointer-events-none opacity-50' : ''}`}>
+              {busy ? 'Uploading…' : photoUrl ? 'Retake' : 'Take a selfie'}
+              <input
+                ref={input}
+                type="file"
+                accept="image/*"
+                capture="user"
+                className="sr-only"
+                aria-label="Costume selfie"
+                onChange={(e) => void upload(e.target.files?.[0])}
+              />
+            </label>
+          )}
           {photoUrl && !busy && (
             <button className="text-sm text-muted underline hover:text-ink" onClick={() => void api.removePhoto(token)}>
               Remove

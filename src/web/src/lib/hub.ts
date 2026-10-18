@@ -28,6 +28,8 @@ interface Options {
   onCheer?: (cheer: CheerEvent) => void
   /** Someone started or stopped watching: the host's TV refreshes its list (#112). */
   onAudience?: () => void
+  /** The host switched costume selfies on or off (#150). */
+  onSelfies?: (allowed: boolean) => void
 }
 
 /**
@@ -72,7 +74,7 @@ export function hubErrorMessage(err: unknown): string {
 export function useParty<
   TStage extends { version: number } = StageView,
   TPlayer extends { version: number; stage: { version: number } } = PlayerView,
->({ code, token, watchStage = false, joinSeat = false, onRemoved, onCheer, onAudience }: Options) {
+>({ code, token, watchStage = false, joinSeat = false, onRemoved, onCheer, onAudience, onSelfies }: Options) {
   // The view types default to the murder mystery's. Another kind of game passes its own,
   // since every game's views carry a version number (and a player view includes the stage).
   const [stage, setStage] = useState<TStage | null>(null)
@@ -84,10 +86,10 @@ export function useParty<
   const [typing, setTyping] = useState<Record<string, string>>({})
   const connRef = useRef<HubConnection | null>(null)
   // The latest callbacks, read when a message arrives, so a new function from the page doesn't reconnect.
-  const handlers = useRef({ onRemoved, onCheer, onAudience })
+  const handlers = useRef({ onRemoved, onCheer, onAudience, onSelfies })
   useEffect(() => {
-    handlers.current = { onRemoved, onCheer, onAudience }
-  }, [onRemoved, onCheer, onAudience])
+    handlers.current = { onRemoved, onCheer, onAudience, onSelfies }
+  }, [onRemoved, onCheer, onAudience, onSelfies])
 
   useEffect(() => {
     let disposed = false
@@ -109,6 +111,7 @@ export function useParty<
     conn.on('removed', () => handlers.current.onRemoved?.())
     conn.on('cheer', (c: CheerEvent) => handlers.current.onCheer?.(c))
     conn.on('audience', () => handlers.current.onAudience?.())
+    conn.on('selfies', (allowed: boolean) => handlers.current.onSelfies?.(allowed))
     // Pieces can arrive out of order; the text only ever grows, so keep the longer one.
     conn.on('npcTyping', (e: NpcTypingEvent) =>
       setTyping((prev) => ((prev[e.interrogationId]?.length ?? 0) >= e.text.length ? prev : { ...prev, [e.interrogationId]: e.text })),

@@ -139,6 +139,9 @@ var joinsPerMinute = builder.Configuration.GetValue("RateLimits:JoinPerMinute", 
 // Sign-ups per hour per address. Registering can send a confirmation email, so without a limit an
 // open server could be used to spam inboxes. Ten an hour is plenty for a household of hosts.
 var registrationsPerHour = builder.Configuration.GetValue("RateLimits:RegisterPerHour", 10);
+// Checkouts, billing pages and "check my payment" per five minutes per address: each one calls Stripe, so a stuck
+// button can't run up thousands. Configurable for the billing tests, which buy a lot from one address.
+var billingPerFiveMinutes = builder.Configuration.GetValue("RateLimits:BillingPerFiveMinutes", 30);
 builder.Services.AddRateLimiter(o =>
 {
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -151,10 +154,9 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy(AuthEndpoints.RegisterRateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = registrationsPerHour, Window = TimeSpan.FromHours(1) }));
-    // Checkouts, billing pages and "check my payment": each one calls Stripe, so a stuck button can't run up thousands.
     o.AddPolicy(BillingEndpoints.RateLimit, http => RateLimitPartition.GetFixedWindowLimiter(
         http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-        _ => new FixedWindowRateLimiterOptions { PermitLimit = 30, Window = TimeSpan.FromMinutes(5) }));
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = billingPerFiveMinutes, Window = TimeSpan.FromMinutes(5) }));
 });
 
 // ---------------------------------------------------------------- JSON

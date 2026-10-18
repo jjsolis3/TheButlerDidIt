@@ -23,9 +23,28 @@ const STATUS: Record<NonNullable<AdminPaidRow['status']>, string> = {
   ending: 'Cancelled, paid until the end',
   pastDue: 'Payment failed, retrying',
   ended: 'Ended',
+  refunded: 'Refunded',
 }
 
 const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+
+/** The latest payment, and whether a game was started with it: what the refund policy asks (#147). */
+function LastPayment({ row }: { row: AdminPaidRow }) {
+  // Nothing paid yet (a subscription in its free days), or a payment from before this was recorded.
+  if (!row.periodStart) return <span className="text-muted">—</span>
+  const games = row.gamesSince ?? 0
+  return (
+    <>
+      <p>
+        {row.status === 'pastDue' ? 'Due' : 'Paid'} {day(row.periodStart)}
+      </p>
+      <p className="text-xs text-muted">
+        {games === 0 ? 'No games started since' : `${games} ${games === 1 ? 'game' : 'games'} started since`}
+        {row.refundableUntil && `; refundable until ${day(row.refundableUntil)}`}
+      </p>
+    </>
+  )
+}
 
 /** A line of the setup list: a mark and words, never colour alone (as on the Overview). */
 function Check({ ok, title, children }: { ok: boolean; title: string; children: ReactNode }) {
@@ -133,13 +152,14 @@ export default function AdminBilling() {
           ) : (
             // A wide table scrolls inside its own box on a phone; the page never scrolls sideways.
             <div className="relative overflow-x-auto rounded-xl border border-line bg-surface">
-              <table className="w-full min-w-[44rem] text-left text-sm" data-testid="billing-paid">
+              <table className="w-full min-w-[54rem] text-left text-sm" data-testid="billing-paid">
                 <thead className="text-xs tracking-widest text-muted uppercase">
                   <tr>
                     <th className="px-4 py-3 font-normal">Host</th>
                     <th className="px-3 py-3 font-normal">What</th>
                     <th className="px-3 py-3 font-normal">State</th>
                     <th className="px-3 py-3 font-normal">Until</th>
+                    <th className="px-3 py-3 font-normal">Last payment</th>
                     <th className="px-4 py-3 font-normal">
                       <span className="sr-only">Actions</span>
                     </th>
@@ -158,6 +178,9 @@ export default function AdminBilling() {
                       <td className="px-3 py-3">{row.status ? STATUS[row.status] : '—'}</td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         {row.renewsAt ? `renews ${day(row.renewsAt)}` : row.endsAt ? `${row.inEffect ? '' : 'ended '}${day(row.endsAt)}` : '—'}
+                      </td>
+                      <td className="px-3 py-3">
+                        <LastPayment row={row} />
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         {row.dashboardUrl && (
@@ -184,8 +207,9 @@ export default function AdminBilling() {
             </div>
           )}
           <p className="text-xs text-muted">
-            Sync reads a host's subscription from Stripe now, for when a webhook went missing. Refunds and plan changes are made in the Stripe dashboard
-            or by the host on Stripe's billing page.
+            Sync reads a host's subscription, and whether a running pass was refunded, from Stripe now, for when a webhook went missing. Refunds
+            and plan changes are made in the Stripe dashboard, or by the host on Stripe's billing page. A pass refunded in full ends at once; a
+            refunded subscription must be cancelled there too. “Last payment” says whether a game was started since, which the refund policy asks.
           </p>
         </section>
       )}

@@ -92,6 +92,7 @@ Environment settings are applied at every start-up and overwrite the same-named 
 
 - Every AI call is logged with its tokens, estimated cost, duration and which host it was for. See **Usage and cost** on the admin page.
 - Each host has a **monthly budget** (`AI_MONTHLY_BUDGET_USD`, default $25; `0` means unlimited). Once it's used up, AI features politely switch off until next month and the game carries on without them.
+- Each plan can have its own (`AI_BUDGET_TRIAL_USD`, `AI_BUDGET_PASS_USD`, `AI_BUDGET_SUBSCRIPTION_USD`), so a free trial can't spend what a subscriber does. A plan left blank uses the monthly budget, and a host with several plans at once gets the most generous. **Admin hub → AI** lists them under Usage.
 - Costs are estimates from the price list. A model with no price shows as $0 and is flagged on the admin page.
 - Voices and pictures are cached by their exact text and model, so a mystery's media is paid for once, however many parties play it. A mystery like Blackwood Manor needs about 65 voice clips and pictures in total, including one picture per clue card.
 - Rough guide with Claude: generating a mystery costs well under a couple of dollars; each NPC answer or hint costs a fraction of a cent to a few cents, depending on the model.

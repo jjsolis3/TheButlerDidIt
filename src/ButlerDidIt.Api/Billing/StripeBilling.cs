@@ -114,8 +114,10 @@ internal sealed class StripeBilling : IBillingProvider
         {
             try
             {
+                // The payment's charge too, for whether it was refunded (#147). A subscription's checkout has no payment
+                // of its own (its invoices do), and a free one none at all: both are simply never refunded here.
                 var session = await new Stripe.Checkout.SessionService(_client).GetAsync(sessionId,
-                    new Stripe.Checkout.SessionGetOptions { Expand = ["line_items"] }, cancellationToken: ct);
+                    new Stripe.Checkout.SessionGetOptions { Expand = ["line_items", "payment_intent.latest_charge"] }, cancellationToken: ct);
                 return new PaidCheckout(
                     session.Id,
                     session.CustomerId,
@@ -123,13 +125,27 @@ internal sealed class StripeBilling : IBillingProvider
                     session.Mode == "subscription" ? PlanKind.Subscription : PlanKind.Pass,
                     // A promotion code can make it free, which is as good as paid.
                     session.Status == "complete" && session.PaymentStatus is "paid" or "no_payment_required",
-                    (session.LineItems?.Data ?? []).Where(li => li.Price is not null).Select(li => new PaidItem(li.Price.Id, li.Price.ProductId)).ToList());
+                    (session.LineItems?.Data ?? []).Where(li => li.Price is not null).Select(li => new PaidItem(li.Price.Id, li.Price.ProductId)).ToList(),
+                    // Stripe's "refunded" is true only once the whole amount is back.
+                    session.PaymentIntent?.LatestCharge?.Refunded == true);
             }
             catch (StripeException ex) when (Missing(ex))
             {
                 return null;
             }
         });
+
+    public async Task<PaidCheckout?> CheckoutForPaymentAsync(string paymentId, CancellationToken ct)
+    {
+        var found = await CallAsync("find the payment's checkout", async () =>
+        {
+            var sessions = await new Stripe.Checkout.SessionService(_client).ListAsync(
+                new Stripe.Checkout.SessionListOptions { PaymentIntent = paymentId, Limit = 1 }, cancellationToken: ct);
+            return sessions.Data.FirstOrDefault()?.Id;
+        });
+        // Read on its own, with its line items and charge, exactly as when the host comes back from it.
+        return found is null ? null : await CheckoutSessionAsync(found, ct);
+    }
 
     public Task<PriceInfo?> PriceAsync(string priceId, CancellationToken ct) =>
         CallAsync("read the price", async () =>
@@ -167,12 +183,14 @@ internal sealed class StripeBilling : IBillingProvider
         // Stripe, so an event in another API version's shape, or one arriving out of order, can't mislead us.
         var json = JsonNode.Parse(payload) ?? throw new BillingSignatureException("The webhook is empty.");
         var obj = json["data"]?["object"];
-        var isCheckout = obj?["object"]?.GetValue<string>() == "checkout.session";
+        var kind = obj?["object"]?.GetValue<string>();
         return new BillingEvent(
             json["id"]?.GetValue<string>() ?? throw new BillingSignatureException("The webhook has no event id."),
             json["type"]?.GetValue<string>() ?? "",
             IdOf(obj?["customer"]),
-            isCheckout ? obj?["id"]?.GetValue<string>() : null);
+            kind == "checkout.session" ? obj?["id"]?.GetValue<string>() : null,
+            // A charge's events (charge.refunded) and a refund's both name the payment they belong to.
+            kind is "charge" or "refund" ? IdOf(obj?["payment_intent"]) : null);
     }
 
     public string? DashboardUrl(string? externalId, string? customerId)
@@ -182,7 +200,7 @@ internal sealed class StripeBilling : IBillingProvider
         return customerId is null ? null : $"{root}customers/{customerId}";
     }
 
-    /// <summary>A customer is an id in webhooks, or an object when expanded.</summary>
+    /// <summary>A customer (or payment) is an id in webhooks, or an object when expanded.</summary>
     private static string? IdOf(JsonNode? node) => node switch
     {
         JsonValue v when v.TryGetValue<string>(out var id) => id,

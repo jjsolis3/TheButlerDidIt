@@ -111,6 +111,7 @@ You can also deploy the app as a single Coolify **Application** (Build Pack: **D
 | `App__PublicUrl` | `https://your.domain` | The address used in emailed and invite links. |
 | `DataProtection__Store` | `Database` | Keeps the sign-in keys in PostgreSQL, so redeploys don't sign everyone out or make AI keys saved under **Admin hub → AI** unreadable. Keys already in `/data/keys` are copied in on the next start. |
 | `Plans__TrialDays` | `14` | Optional: how long a new host's free trial of both games lasts. Hosts who had an account before plans keep both games free. |
+| `Plans__AiBudgetUsd__Trial`, `…__Pass`, `…__Subscription` | e.g. `2`, `5`, `20` | Optional: each plan's own AI allowance per host a month, in dollars. A plan left out uses `Ai__MonthlyBudgetUsd`; `0` means no limit. A host with several plans at once gets the most generous, and one whose plan has ended keeps its allowance for a party still going; free access from the admin, and the admin, use `Ai__MonthlyBudgetUsd`. |
 | `Email__Host`, `Email__Port`, `Email__Username`, `Email__Password`, `Email__From` | as in *Optional: email* above | Optional. Add `Auth__RequireConfirmedEmail=true` once email works. |
 | `Media__MaxVideoMb` | `100` | Optional: the largest video a host can upload for an escape room or a mystery, in MB. |
 | `Media__UploadQuotaMb` | `2048` | Optional: how much each host can upload in all, for both games, in MB. The admin has no limit. |
@@ -315,7 +316,9 @@ Set `PUBLIC_URL` too: Stripe sends hosts back to that address after paying.
 ### 3. The webhook
 Stripe tells the site about payments by calling it. Under **Developers → Webhooks**, add an endpoint:
 - **URL:** `https://your.domain/api/billing/webhook`
-- **Events:** `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid` and `invoice.payment_failed`.
+- **Events:** `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed` and `charge.refunded`.
+
+  An endpoint made before `charge.refunded` was on this list needs it added (**Edit destination → Select events**), or a refunded party pass only ends when you press **Sync**.
 
 Copy its **signing secret** into `STRIPE_WEBHOOK_SECRET` and redeploy. The site refuses any webhook without a valid signature from that secret, so nobody else can fake a payment.
 
@@ -334,7 +337,7 @@ Under **Settings → Billing → Subscriptions and emails**, choose what happens
 2. As a host (not the admin, who never pays), open **Your account → Plans**, choose a plan and pay with Stripe's test card `4242 4242 4242 4242`, any future date and any CVC.
 3. You're sent back to the account page, which confirms the payment. **Plans & billing** shows the subscription and the webhook that arrived.
 
-If a webhook ever goes missing, the site still checks with Stripe when a renewal is overdue. You can also press **Sync** next to the host.
+If a webhook ever goes missing, the site still checks with Stripe when a renewal is overdue. You can also press **Sync** next to the host, which also finds a running pass that was refunded.
 
 ### 6. Going live
 1. Get the [terms, privacy and refund pages](#terms-privacy-and-refunds) ready: Stripe asks for them, and so does the law.
@@ -342,7 +345,11 @@ If a webhook ever goes missing, the site still checks with Stripe when a renewal
 3. In live mode, create the same products and prices, add the live webhook endpoint, and save the live customer portal.
 4. Swap in the live secret key, the live webhook secret and the live price ids, then redeploy.
 
-**Refunds** are made in the Stripe dashboard. Refunding a subscription's payment doesn't cancel it: cancel the subscription there as well, and the host's games end when it does. A refunded party pass runs out on its own within its hours (#147 would end it at once). The site's [refund policy](#terms-privacy-and-refunds) says when you give one.
+**Refunds** are made in the Stripe dashboard: open the payment, choose **Refund**, and refund the whole amount.
+- **A party pass** ends at once when Stripe tells the site (`charge.refunded`). A partial refund, as a goodwill gesture, leaves it running.
+- **A subscription:** refunding its payment doesn't cancel it. Cancel the subscription there as well (immediately, not at the period's end), and the host's games end when it does.
+
+The site's [refund policy](#terms-privacy-and-refunds) refunds a payment no game was started with, within the refund days. **Plans & billing** shows it for each payment: the **Last payment** column says when it was paid, how many games were started since, and until when it's refundable. A game counts from the moment it began (the evening begun, or the clock started), even if the host deleted the party afterwards; games from before this update count from when their party was made.
 
 ## Terms, privacy and refunds
 
@@ -378,7 +385,7 @@ Commit and redeploy to publish a change. To edit them on the server instead, mou
 **4. In Stripe:**
 - Under **Settings → Business → Public details**, add the addresses of your terms and privacy pages (`https://your.domain/terms`, `https://your.domain/privacy`): Stripe shows them on receipts and its pages.
 - **United States only:** the terms say hosts must live in the US. To refuse cards issued elsewhere, add a Radar rule such as `Block if :card_country: != 'US'` (**More → Radar → Rules**; custom rules may need Radar for Fraud Teams).
-- **Giving a refund:** see **Refunds** at the end of [Payments with Stripe](#payments-with-stripe). To check a payment was unused, **Admin hub → Hosts** shows when each host last made a party: if that's before the payment, nothing was started with it.
+- **Giving a refund:** see **Refunds** at the end of [Payments with Stripe](#payments-with-stripe). To check a payment was unused, **Admin hub → Plans & billing** shows how many games were started since each payment.
 
 ## Updating
 

@@ -54,7 +54,7 @@ public static class AccountEndpoints
         var group = app.MapGroup("/api/account").RequireAuthorization(AuthPolicies.Host);
 
         group.MapGet("/", async (ClaimsPrincipal principal, UserManager<AppUser> users, AppDbContext db, IEmailSender email,
-            IOptions<AiOptions> ai, BillingSetup billing, BillingService payments, TimeProvider clock, CancellationToken ct) =>
+            IOptions<AiOptions> ai, IOptions<PlansOptions> plans, BillingSetup billing, BillingService payments, TimeProvider clock, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -71,7 +71,8 @@ public static class AccountEndpoints
                 thisMonth.Where(x => x.Kind == GameKind.EscapeRoom).Sum(x => x.Count),
                 await parties.CountAsync(ct),
                 await DbAiBudget.SpentThisMonthAsync(db, user.Id, clock, ct),
-                ai.Value.MonthlyBudgetUsd);
+                // The allowance of the host's plan (#147), or the site's.
+                await AiAllowance.ForAsync(db, user.Id, now, plans.Value.AiBudgetUsd, ai.Value.MonthlyBudgetUsd, ct));
             var library = new AccountLibrary(
                 await parties.CountAsync(p => p.HiddenAt == null, ct),
                 await db.Scenarios.CountAsync(s => s.OwnerUserId == user.Id && s.ArchivedAt == null, ct),
@@ -233,7 +234,10 @@ public static class AccountEndpoints
                 Parties = parties, Mysteries = mysteries, EscapeRooms = rooms, Escapes = escapes, AiUsage = aiUsage,
                 // Trials, free access, subscriptions and passes (#100, #101). Payments themselves are at Stripe, on the invoices.
                 Plans = await db.AccessGrants.AsNoTracking().Where(g => g.UserId == user.Id).OrderBy(g => g.StartsAt)
-                    .Select(g => new { g.Kind, g.Games, g.StartsAt, g.EndsAt, g.RevokedAt, g.Status, g.RenewsAt, g.Note }).ToListAsync(ct),
+                    .Select(g => new { g.Kind, g.Games, g.StartsAt, g.EndsAt, g.RevokedAt, g.Status, g.RenewsAt, g.PeriodStart, g.Note }).ToListAsync(ct),
+                // When each game began (#147), which decides whether a payment can be refunded.
+                GamesStarted = await db.GameStarts.AsNoTracking().Where(s => s.HostUserId == user.Id).OrderBy(s => s.At)
+                    .Select(s => new { s.Kind, s.At }).ToListAsync(ct),
             };
             var json = JsonSerializer.SerializeToUtf8Bytes(export, new JsonSerializerOptions(GameJson.Options) { WriteIndented = true });
             return Results.File(json, "application/json", "butler-did-it-account.json");
@@ -293,6 +297,7 @@ public static class AccountEndpoints
                     .ExecuteUpdateAsync(s => s.SetProperty(f => f.HostUserId, "").SetProperty(f => f.Comment, (string?)null), ct);
                 await db.AiUsage.Where(u => u.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(u => u.HostUserId, ""), ct);
                 await db.AccessGrants.Where(g => g.UserId == user.Id).ExecuteDeleteAsync(ct);
+                await db.GameStarts.Where(s => s.HostUserId == user.Id).ExecuteDeleteAsync(ct);
                 await db.MediaJobs.Where(j => j.HostUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(j => j.HostUserId, ""), ct);
                 // A file the admin's copy of one of their rooms still uses stays for that copy, no longer theirs.
                 await db.MediaAssets.Where(a => a.OwnerUserId == user.Id).ExecuteUpdateAsync(s => s.SetProperty(a => a.OwnerUserId, (string?)null), ct);

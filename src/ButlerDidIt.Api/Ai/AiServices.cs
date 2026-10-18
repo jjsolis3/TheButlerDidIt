@@ -116,11 +116,12 @@ public sealed class DbAiUsageSink(IServiceScopeFactory scopes) : IAiUsageSink
     }
 }
 
-public sealed class DbAiBudget(AppDbContext db, IOptions<AiOptions> options, TimeProvider clock) : IAiBudget
+public sealed class DbAiBudget(AppDbContext db, IOptions<AiOptions> options, IOptions<ButlerDidIt.Api.Plans.PlansOptions> plans, TimeProvider clock) : IAiBudget
 {
     public async Task EnsureWithinBudgetAsync(string hostUserId, CancellationToken ct)
     {
-        var budget = options.Value.MonthlyBudgetUsd;
+        // The host's plan may have its own allowance (#147); otherwise the site's.
+        var budget = await ButlerDidIt.Api.Plans.AiAllowance.ForAsync(db, hostUserId, clock.GetUtcNow(), plans.Value.AiBudgetUsd, options.Value.MonthlyBudgetUsd, ct);
         if (budget <= 0) return;
         var spent = await SpentThisMonthAsync(db, hostUserId, clock, ct);
         if (spent >= budget)

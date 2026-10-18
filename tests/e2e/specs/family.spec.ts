@@ -7,6 +7,12 @@ const SHOTS = 'screenshots'
 mkdirSync(SHOTS, { recursive: true })
 const phone = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
 
+// A 1×1 red PNG: the smallest real image the server will accept as a selfie.
+const TINY_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==',
+  'base64',
+)
+
 async function joinAs(browser: Browser, code: string, name: string, character: RegExp) {
   const page = await (await browser.newContext(phone)).newPage()
   await page.goto(`/join/${code}`)
@@ -56,6 +62,25 @@ test('Family and Adult catalogs: a family pirate party from start to the first c
   const jo = await joinAs(browser, code, 'Jo', /Quartermaster Morgan Flint/)
   await joinAs(browser, code, 'Sam', /First Mate Grace O'Hara/)
   await joinAs(browser, code, 'Kit', /Cookie Pottage/)
+
+  // Costume selfies (#150): off at a Family party until the host says the parents are happy, then on every phone at once.
+  await expect(jo.getByLabel('Costume selfie')).toHaveCount(0)
+  const selfies = host.getByTestId('selfies')
+  await expect(selfies).toContainText('Costume selfies are off')
+  await expect(selfies.getByRole('button', { name: 'Turn selfies on' })).toBeDisabled()
+  await selfies.getByLabel("The children's parents are happy for them to share a photo").check()
+  await selfies.getByRole('button', { name: 'Turn selfies on' }).click()
+  await expect(selfies).toContainText('Costume selfies are on')
+  await jo.getByLabel('Costume selfie').setInputFiles({ name: 'costume.png', mimeType: 'image/png', buffer: TINY_PNG })
+  await expect(jo.getByRole('img', { name: 'Your costume selfie' })).toBeVisible()
+  await expect(host.getByRole('img', { name: "Jo's costume" }).first()).toBeVisible()
+  await jo.screenshot({ path: `${SHOTS}/79-family-selfie-phone.png` })
+  await selfies.screenshot({ path: `${SHOTS}/79-family-selfies-switch.png` })
+  // Off again: the selfie is gone from the TV and the phone, and so is the button.
+  await selfies.getByRole('button', { name: 'Turn selfies off' }).click()
+  await expect(host.getByRole('img', { name: "Jo's costume" })).toHaveCount(0)
+  await expect(jo.getByRole('img', { name: 'Your costume selfie' })).toHaveCount(0)
+  await expect(jo.getByLabel('Costume selfie')).toHaveCount(0)
 
   await host.getByRole('button', { name: 'Begin the evening' }).click()
   await host.getByRole('button', { name: 'Tap to begin the evening' }).click()

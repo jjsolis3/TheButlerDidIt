@@ -4,10 +4,11 @@
 
   A starting point, not legal advice: see the notes at the top of terms.md.
 
-  How to give a refund, in Stripe's dashboard: open the payment, choose Refund, and refund the whole amount. For a
-  subscription, also cancel it immediately (not at the end of the period), so the games end with the refund. The
-  site reads the cancellation from Stripe like any other change. To check "unused": Admin → Hosts shows when each
-  host last made a party. If that's before the payment, nothing was started with it.
+  How to give a refund, in Stripe's dashboard: open the payment, choose Refund, and refund the whole amount. A party
+  pass then ends at once: the site hears of the refund from Stripe (the charge.refunded webhook). For a subscription,
+  also cancel it immediately (not at the end of the period), so the games end with the refund. The site reads the
+  cancellation from Stripe like any other change. To check "unused": Admin → Plans & billing shows each host's last
+  payment, how many games were started since, and until when it's refundable.
 -->
 
 # Refund Policy
@@ -36,7 +37,7 @@ The refund goes back to the card you paid with. Your bank may take 5 to 10 busin
 
 ## What happens to your plan
 
-A refunded subscription ends when we refund it, and your account goes back to the games you'd have without it. A refunded party pass simply runs out at its usual time.
+A refunded subscription or party pass ends when we refund it, and your account goes back to the games you'd have without it.
 
 ## Cancelling instead
 

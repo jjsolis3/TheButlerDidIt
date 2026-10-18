@@ -129,6 +129,9 @@ public enum PaidStatus
 
     /// <summary>Over: cancelled, never paid, or given up on after failed payments.</summary>
     Ended,
+
+    /// <summary>A party pass whose payment was refunded in full (#147): it ended then, not at its usual time.</summary>
+    Refunded,
 }
 
 /// <summary>
@@ -172,6 +175,33 @@ public sealed class AccessGrantEntity
 
     /// <summary>When a subscription renews next; null when it won't (cancelled, payment failed, or a pass).</summary>
     public DateTimeOffset? RenewsAt { get; set; }
+
+    /// <summary>
+    /// When the time being paid for began (#147): a pass's payment, or the start of a subscription's current period
+    /// (its first payment or its last renewal). Refunds count from here, and so do the games the admin sees started
+    /// with it. Null for grants nobody paid for, and for a subscription still in its free days.
+    /// </summary>
+    public DateTimeOffset? PeriodStart { get; set; }
+}
+
+/// <summary>
+/// A game a host started (#147): a mystery's evening begun, or an escape room's clock started. The refund policy gives
+/// a payment back only if no game was started with it, and the admin checks that here. It's kept apart from the party
+/// because a host can delete an unfinished party, and the start still counts. Goes with the host's account.
+/// </summary>
+public sealed class GameStartEntity
+{
+    public Guid Id { get; set; }
+
+    [MaxLength(450)]
+    public required string HostUserId { get; set; }
+
+    public GameKind Kind { get; set; }
+
+    /// <summary>Not a foreign key: the record stays when the party is deleted.</summary>
+    public Guid PartyId { get; set; }
+
+    public DateTimeOffset At { get; set; }
 }
 
 /// <summary>
@@ -398,6 +428,16 @@ public sealed class Party
     /// already join the lobby; the host can switch it off, which also sends everyone watching away.
     /// </summary>
     public bool AllowSpectators { get; set; } = true;
+
+    /// <summary>
+    /// Whether guests can add a costume selfie (#150). A Family party's guests may be children, and a child's photo
+    /// needs a parent's OK (COPPA), so there they start off, and the host switching them on says they have it. Other
+    /// parties start with them on. Switching them off deletes the selfies already taken.
+    /// </summary>
+    public bool SelfiesAllowed { get; set; } = true;
+
+    /// <summary>When the host of a Family party switched selfies on, confirming the parents' OK (#150).</summary>
+    public DateTimeOffset? SelfiesConsentAt { get; set; }
 
     public List<Seat> Seats { get; set; } = [];
 }

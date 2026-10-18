@@ -9,6 +9,7 @@ using ButlerDidIt.Api.Parties;
 using ButlerDidIt.Escape.Engine;
 using ButlerDidIt.Game;
 using ButlerDidIt.Game.Engine;
+using ButlerDidIt.Game.Scenarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -119,7 +120,8 @@ public static class RecapEndpoints
 
     /// <summary>
     /// The escape recap, built from the saved game and the room (the projector leaves out anything that would spoil it).
-    /// Null if the room has since been deleted: the state alone doesn't hold the room's text.
+    /// Null if the room has since been deleted: the state alone doesn't hold the room's text. A Family party's recap has
+    /// no selfies (#150): its guests may be children, and a recap link can travel far beyond the party.
     /// </summary>
     private static async Task<EscapeRecapPage?> EscapePageAsync(Party party, AppDbContext db, EscapeCatalog rooms, DateTimeOffset now, CancellationToken ct)
     {
@@ -127,7 +129,9 @@ public static class RecapEndpoints
         var state = GameJson.Deserialize<EscapeState>(party.State);
         var art = await rooms.ArtAsync(db, room.Id, now, ct);
         var hostName = await db.Users.AsNoTracking().Where(u => u.Id == party.HostUserId).Select(u => u.DisplayName).FirstOrDefaultAsync(ct);
-        return new EscapeRecapPage(EscapeProjector.Recap(state, room, art), hostName ?? "The host", await EscapeResults.RankOfPartyAsync(db, room, party.Id, ct));
+        var recap = EscapeProjector.Recap(state, room, art);
+        if (party.ContentLevel == ContentRating.Family) recap = recap with { Team = [.. recap.Team.Select(p => p with { PhotoUrl = null })] };
+        return new EscapeRecapPage(recap, hostName ?? "The host", await EscapeResults.RankOfPartyAsync(db, room, party.Id, ct));
     }
 
     /// <summary>The built app's index.html; a bare page when the front end hasn't been built (some test runs).</summary>
@@ -172,12 +176,15 @@ public static class RecapEndpoints
         return System.Text.RegularExpressions.Regex.Replace(html, "<title>.*?</title>", _ => heading);
     }
 
+    /// <summary>The mystery's recap. As for escapes, a Family party's has no selfies (#150).</summary>
     private static async Task<RecapPage> PageAsync(Party party, AppDbContext db, ContentCatalog catalog, PartyService parties, CancellationToken ct)
     {
         var state = GameJson.Deserialize<GameState>(party.State);
         var scenario = await catalog.GetScenarioAsync(db, party.ScenarioId, ct);
         var hostName = await db.Users.AsNoTracking().Where(u => u.Id == party.HostUserId).Select(u => u.DisplayName).FirstOrDefaultAsync(ct);
-        return new RecapPage(ViewProjector.Recap(state, scenario, parties.Now), hostName ?? "The host", party.ScheduledFor ?? party.CreatedAt);
+        var recap = ViewProjector.Recap(state, scenario, parties.Now);
+        if (party.ContentLevel == ContentRating.Family) recap = recap with { Cast = [.. recap.Cast.Select(c => c with { PhotoUrl = null })] };
+        return new RecapPage(recap, hostName ?? "The host", party.ScheduledFor ?? party.CreatedAt);
     }
 
     /// <summary>16 random bytes (128 bits) from the cryptographic generator, as URL-safe text.</summary>

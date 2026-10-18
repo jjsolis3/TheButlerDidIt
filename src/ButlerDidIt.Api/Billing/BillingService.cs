@@ -219,6 +219,8 @@ public sealed class BillingService(
             grant.StartsAt = terms.StartsAt;
             grant.Status = terms.Status;
             grant.RenewsAt = terms.RenewsAt;
+            // Nothing is paid during a subscription's free days (#147): its first payment is when they end.
+            grant.PeriodStart = sub.Status == "trialing" ? null : sub.PeriodStart ?? terms.StartsAt;
             // Once a subscription is over, its access ends when it did, and an end already past never moves later.
             grant.EndsAt = terms.Status == PaidStatus.Ended && grant.EndsAt is { } had && had < terms.EndsAt ? had : terms.EndsAt;
         }
@@ -231,9 +233,12 @@ public sealed class BillingService(
     /// </summary>
     /// <param name="forUserId">When the host asks: only their own checkout counts.</param>
     /// <returns>The checkout, when it's the host's; null otherwise.</returns>
-    private async Task<PaidCheckout?> CheckoutFinishedAsync(string checkoutId, string? forUserId, CancellationToken ct)
+    private async Task<PaidCheckout?> CheckoutFinishedAsync(string checkoutId, string? forUserId, CancellationToken ct) =>
+        await CheckoutReadAsync(await Provider.CheckoutSessionAsync(checkoutId, ct), forUserId, ct);
+
+    /// <summary>A checkout as the provider has it now: its pass is given, or ended if it was refunded.</summary>
+    private async Task<PaidCheckout?> CheckoutReadAsync(PaidCheckout? checkout, string? forUserId, CancellationToken ct)
     {
-        var checkout = await Provider.CheckoutSessionAsync(checkoutId, ct);
         if (checkout?.CustomerId is not { } customer) return null;
         var userId = await db.Users.AsNoTracking().Where(u => u.BillingCustomerId == customer).Select(u => u.Id).FirstOrDefaultAsync(ct);
         if (userId is null || (forUserId is not null && forUserId != userId)) return null;
@@ -244,7 +249,20 @@ public sealed class BillingService(
     private async Task RecordPassAsync(PaidCheckout checkout, string userId, string customer, CancellationToken ct)
     {
         await using var _ = await locks.AcquireAsync(customer, ct);
-        if (await db.AccessGrants.AnyAsync(g => g.ExternalId == checkout.Id, ct)) return;
+        var had = await db.AccessGrants.FirstOrDefaultAsync(g => g.ExternalId == checkout.Id, ct);
+        if (checkout.Refunded)
+        {
+            // Refunded in full (#147): the pass ends now rather than at its usual time. One refunded before we heard
+            // it was paid (its webhook came late) is never given at all.
+            if (had is null || had.Status == PaidStatus.Refunded) return;
+            var at = clock.GetUtcNow();
+            had.Status = PaidStatus.Refunded;
+            if (had.EndsAt is null || had.EndsAt > at) had.EndsAt = at;
+            await db.SaveChangesAsync(ct);
+            log.LogInformation("Payments: checkout {CheckoutId} was refunded, so {UserId}'s party pass has ended.", checkout.Id, userId);
+            return;
+        }
+        if (had is not null) return;
 
         var games = await catalog.GamesForAsync(checkout.Items, PlanKind.Pass, ct);
         if (games is null)
@@ -259,7 +277,7 @@ public sealed class BillingService(
         {
             Id = Guid.NewGuid(), UserId = userId, Kind = GrantKind.Pass, Games = games.Value, StartsAt = now,
             EndsAt = now.AddHours(setup.Options.PassHours), Status = PaidStatus.Active, ExternalId = checkout.Id,
-            Note = "Party pass", CreatedAt = now,
+            Note = "Party pass", CreatedAt = now, PeriodStart = now,
         });
         await db.SaveChangesAsync(ct);
     }
@@ -284,6 +302,12 @@ public sealed class BillingService(
             if (evt.CheckoutId is { } checkout) await CheckoutFinishedAsync(checkout, null, ct);
             if (evt.CustomerId is { } customer) await SyncCustomerAsync(customer, ct);
         }
+        else if (evt.Type.StartsWith("charge.", StringComparison.Ordinal) && evt.PaymentId is { } payment)
+        {
+            // A refund (#147): a party pass bought with that payment ends now. Refunding a subscription needs nothing
+            // here: the admin cancels it too, and the cancellation is its own event.
+            await CheckoutReadAsync(await provider.CheckoutForPaymentAsync(payment, ct), null, ct);
+        }
 
         db.BillingEvents.Add(new BillingEventEntity
         {
@@ -298,6 +322,21 @@ public sealed class BillingService(
             return WebhookOutcome.Repeat; // another server handled the same event at the same moment
         }
         return WebhookOutcome.Handled;
+    }
+
+    /// <summary>
+    /// Reads again each of a customer's party passes that's still running (#147), so a refund whose webhook never
+    /// arrived still ends it. For the admin's Sync button: a pass lasts days, so there are hardly ever more than one.
+    /// </summary>
+    public async Task RecheckPassesAsync(string customerId, CancellationToken ct)
+    {
+        var userId = await db.Users.AsNoTracking().Where(u => u.BillingCustomerId == customerId).Select(u => u.Id).FirstOrDefaultAsync(ct);
+        if (userId is null) return;
+        var now = clock.GetUtcNow();
+        var running = await db.AccessGrants.AsNoTracking()
+            .Where(g => g.UserId == userId && g.Kind == GrantKind.Pass && g.ExternalId != null && g.Status != PaidStatus.Refunded && g.EndsAt > now)
+            .Select(g => g.ExternalId!).ToListAsync(ct);
+        foreach (var checkout in running) await CheckoutFinishedAsync(checkout, userId, ct);
     }
 
     /// <summary>

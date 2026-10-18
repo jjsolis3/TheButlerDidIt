@@ -52,7 +52,9 @@ public sealed record PartyInfo(
     // Which game the party plays, so the pages can show the right screens.
     GameKind Kind,
     // Whether people can watch the TV on their own devices (#112).
-    bool AllowSpectators);
+    bool AllowSpectators,
+    // Whether guests can add a costume selfie (#150): off at first for a Family party, until the host says the parents are OK.
+    bool SelfiesAllowed);
 
 public static class PartyEndpoints
 {
@@ -122,6 +124,7 @@ public static class PartyEndpoints
                 ScheduledFor = req.ScheduledFor,
                 DealAtStart = dealAtStart,
                 TailorWithAi = dealAtStart && req.TailorWithAi,
+                SelfiesAllowed = scenario.ContentRating != ContentRating.Family,
                 State = GameJson.Serialize(new GameState
                 {
                     Ai = await AiFeaturesFor(req.UseAi, ai, media, aiOptions.Value, ct),
@@ -166,6 +169,7 @@ public static class PartyEndpoints
                 ScenarioId = room.Id,
                 Mode = req.Mode,
                 ContentLevel = room.ContentRating,
+                SelfiesAllowed = room.ContentRating != ContentRating.Family,
                 Status = PartyStatus.Lobby,
                 CreatedAt = parties.Now,
                 UpdatedAt = parties.Now,
@@ -295,6 +299,6 @@ public static class PartyEndpoints
     {
         var game = (await modules.For(p.Kind).LoadAsync(db, p, ct)).Describe(isHost);
         return new PartyInfo(p.Code, game.ContentId, game.Title, game.ThemeSlug, p.Mode, p.ContentLevel, p.Status,
-            p.CreatedAt, p.ScheduledFor, game.PlayerCount, game.MaxPlayers, isHost, isHost && p.DealAtStart, p.Kind, p.AllowSpectators);
+            p.CreatedAt, p.ScheduledFor, game.PlayerCount, game.MaxPlayers, isHost, isHost && p.DealAtStart, p.Kind, p.AllowSpectators, p.SelfiesAllowed);
     }
 }

@@ -9,6 +9,7 @@ import { Portrait } from '../components/Portrait'
 import { RecapShare } from '../components/RecapShare'
 import { ClueCard, Countdown, FeedToasts, QrCode } from '../components/Scene'
 import { Button, ErrorText, StatusPill } from '../components/ui'
+import { SelfiesPanel } from '../components/SelfiesPanel'
 import { WatchersPanel } from '../components/WatchersPanel'
 import { api } from '../lib/api'
 import { stageGuide } from '../lib/guide'
@@ -76,6 +77,8 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
   const cheers = useCheers()
   // Bumped whenever someone starts or stops watching, so the host's list refreshes.
   const [audience, setAudience] = useState(0)
+  // Costume selfies on or off (#150), as the host last switched them, here or on another device.
+  const [selfies, setSelfies] = useState(info.selfiesAllowed)
   const { stage, status, fatal, invoke, typing } = useParty({
     code: info.code,
     token,
@@ -83,6 +86,7 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
     onRemoved: watcher?.onRemoved,
     onCheer: cheers.add,
     onAudience: info.isHost ? () => setAudience((n) => n + 1) : undefined,
+    onSelfies: setSelfies,
   })
   const [begun, setBegun] = useState(false)
   const [muted, setMuted] = useState(false)
@@ -184,6 +188,8 @@ export function StageScreen({ info, token, watcher }: { info: PartyInfo; token?:
                 begun={begun || stage.phase === 'lobby'}
                 soundOn={begun}
                 tv={tv}
+                selfies={selfies}
+                onSelfies={setSelfies}
                 onBegin={() => {
                   narrator.speak(' ', null, false)
                   setBegun(true)
@@ -251,6 +257,8 @@ function PhaseView({
   begun,
   soundOn,
   tv,
+  selfies,
+  onSelfies,
   onBegin,
 }: {
   stage: StageView
@@ -261,11 +269,16 @@ function PhaseView({
   soundOn: boolean
   /** The TV layout: everything on one screen (#129). */
   tv: boolean
+  /** Costume selfies are on (#150). */
+  selfies: boolean
+  onSelfies: (allowed: boolean) => void
   onBegin: () => void
 }) {
   switch (stage.phase) {
     case 'lobby':
-      return <LobbyView stage={stage} info={info} invoke={invoke} soundOn={soundOn} onEnableSound={onBegin} tv={tv} />
+      return (
+        <LobbyView stage={stage} info={info} invoke={invoke} soundOn={soundOn} onEnableSound={onBegin} tv={tv} selfies={selfies} onSelfies={onSelfies} />
+      )
     case 'castReveal':
       return <CastView stage={stage} />
     case 'prologue':
@@ -332,6 +345,8 @@ function LobbyView({
   soundOn,
   onEnableSound,
   tv,
+  selfies,
+  onSelfies,
 }: {
   stage: StageView
   info: PartyInfo
@@ -339,6 +354,8 @@ function LobbyView({
   soundOn: boolean
   onEnableSound: () => void
   tv: boolean
+  selfies: boolean
+  onSelfies: (allowed: boolean) => void
 }) {
   const joinUrl = `${window.location.origin}/join/${info.code}`
   const [error, setError] = useState<string | null>(null)
@@ -416,6 +433,7 @@ function LobbyView({
           </div>
         )}
         <ErrorText>{error}</ErrorText>
+        {info.isHost && <SelfiesPanel code={info.code} family={info.contentLevel === 'family'} allowed={selfies} onChange={onSelfies} />}
         {info.isHost && <MediaPanel code={info.code} />}
         {info.isHost && <KitPanel code={info.code} dealLater={info.dealAtStart} />}
         {stage.options.drinkingPrompts && <Cocktails themeSlug={stage.scenario.themeSlug} />}

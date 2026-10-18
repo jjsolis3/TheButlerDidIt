@@ -33,6 +33,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
     public DbSet<SiteSettingsEntity> SiteSettings => Set<SiteSettingsEntity>();
     public DbSet<BillingEventEntity> BillingEvents => Set<BillingEventEntity>();
     public DbSet<AlertEntity> Alerts => Set<AlertEntity>();
+    public DbSet<GameStartEntity> GameStarts => Set<GameStartEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -96,6 +97,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         b.Entity<BillingEventEntity>().HasIndex(e => e.ReceivedAt);
         b.Entity<BillingEventEntity>().HasIndex(e => new { e.Type, e.ReceivedAt });
         b.Entity<AlertEntity>().HasIndex(a => new { a.Kind, a.RaisedAt });
+        // The admin's billing tab counts one host's games since each payment (#147).
+        b.Entity<GameStartEntity>(e =>
+        {
+            e.HasIndex(x => new { x.HostUserId, x.At });
+            e.Property(x => x.Kind).HasConversion<string>().HasMaxLength(20);
+        });
         b.Entity<MediaAsset>().HasIndex(m => m.ContentHash).IsUnique();
         b.Entity<MediaAsset>().Property(m => m.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<MediaAsset>().HasIndex(m => m.PartyId);

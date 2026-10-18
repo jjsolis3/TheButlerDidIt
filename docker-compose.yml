@@ -31,6 +31,10 @@ services:
       # ---- AI game master (optional; see docs/ai-setup.md). You can also set all of
       # this up on the Admin -> AI page instead. Leave blank to skip.
       Ai__MonthlyBudgetUsd: "${AI_MONTHLY_BUDGET_USD:-25}"
+      # Each plan's own monthly AI allowance per host (#147); blank uses the budget above, 0 means no limit.
+      Plans__AiBudgetUsd__Trial: "${AI_BUDGET_TRIAL_USD:-}"
+      Plans__AiBudgetUsd__Pass: "${AI_BUDGET_PASS_USD:-}"
+      Plans__AiBudgetUsd__Subscription: "${AI_BUDGET_SUBSCRIPTION_USD:-}"
       Ai__Providers__0__Name: "${AI_PROVIDER_NAME:-}"
       Ai__Providers__0__Kind: "${AI_PROVIDER_KIND:-}"          # Anthropic | OpenAI | Gemini | Ollama
       Ai__Providers__0__ApiKey: "${AI_PROVIDER_API_KEY:-}"

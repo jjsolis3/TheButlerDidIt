@@ -384,6 +384,8 @@ export interface PartyInfo {
   kind: GameKind
   /** Whether people can watch the TV on their own devices (#112). */
   allowSpectators: boolean
+  /** Whether guests can add a costume selfie (#150): off at first for a Family party, until the host says the parents are OK */
+  selfiesAllowed: boolean
 }
 
 /** Someone watching the TV (#112): their token opens only the TV's view and the cheers. */
@@ -448,7 +450,7 @@ export interface AccessView {
 }
 
 // ---- Payments (#101, Billing/*.cs)
-export type PaidStatus = 'active' | 'trialing' | 'ending' | 'pastDue' | 'ended'
+export type PaidStatus = 'active' | 'trialing' | 'ending' | 'pastDue' | 'ended' | 'refunded'
 export type BillingPlan =
   | 'mysteriesMonthly'
   | 'mysteriesYearly'
@@ -535,6 +537,12 @@ export interface AdminPaidRow {
   renewsAt: string | null
   inEffect: boolean
   dashboardUrl: string | null
+  /** When its latest payment's time began (#147): a pass's payment, a subscription's last renewal */
+  periodStart: string | null
+  /** Games started with that payment, for the refund policy; null when that isn't known yet */
+  gamesSince: number | null
+  /** Until when the policy refunds that payment in full; null when it doesn't (used, too late, not paid) */
+  refundableUntil: string | null
 }
 
 /** What the sign-in page can offer on this server. */
@@ -774,6 +782,8 @@ export interface UsageGroup {
 
 export interface UsageReport {
   budgetUsd: number
+  /** Each plan's own monthly AI allowance (#147); null where the plan uses budgetUsd */
+  planBudgetsUsd: { trial: number | null; pass: number | null; subscription: number | null }
   since: string
   totalCostUsd: number
   byMonth: UsageGroup[]
