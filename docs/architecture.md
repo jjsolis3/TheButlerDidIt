@@ -149,6 +149,8 @@ The hub accepts both identities at once (`AuthPolicies.PartyMember`), so the hos
 - **Plans** are the nine slots in `BillingPrices` (each game and both, monthly and yearly, and passes); a slot with no price isn't sold. Amounts come from Stripe (`BillingCatalog`, cached 10 minutes), and a subscription on an older price of the same Stripe product keeps its games. The admin's **Plans & billing** tab flags a price that can't be sold as set up (missing, archived, wrong mode, wrong kind or interval).
 - **One subscription per host**; changes go through the portal, which prorates. Bought during the free trial, a subscription's first payment waits for the trial's end (`subscription_data.trial_end`).
 - **The renewal terms where the host agrees** (#103): next to the plans, and on Stripe's page by the pay button (`CheckoutRequest.Notice`, sent as Checkout's `custom_text.submit`): how the plan renews or ends, and links to the terms and refund policy.
+- **Refunds** (#147): a pass refunded in full ends at once (`PaidStatus.Refunded`). Stripe's `charge.refunded` names the payment intent; `CheckoutForPaymentAsync` finds the checkout it was made at, and the checkout, read fresh with its charge (`payment_intent.latest_charge`), says whether it's refunded. A pass refunded before its own webhook arrived is never given. The admin's Sync also re-reads running passes, for a refund whose webhook was lost. A refunded subscription needs nothing here: the admin cancels it too.
+- **Was a payment used?** (#147) The refund policy refunds a payment no game was started with. `GameStarts` records each game as it leaves the lobby (in the same save as the state, in `PartyRuntime.ChangeAsync`), apart from the party, which a host can delete. Each paid grant keeps its `PeriodStart` (a pass's payment, a subscription's current period), and `PaidAccess.UseOf` counts the host's starts from then until the grant ended, of the games it gives. The admin's tab shows them, with the date the refund runs out.
 
 **Terms, privacy and refunds** (`Legal/LegalPages.cs`, #103). `/terms`, `/privacy` and `/refunds` show Markdown files from `content/legal` (or `Legal:Folder`), through `GET /api/legal/{page}` (public):
 - **The owner edits words, not code.** Notes for the owner are HTML comments, stripped on the server, so they never reach a browser.
@@ -270,7 +272,7 @@ Only a mystery that passes is saved, as a `ScenarioEntity` with `Source = AiGene
 **Keys and costs:**
 - API keys are encrypted with ASP.NET Data Protection (`AiKeyProtector`) before they reach the database.
 - Every call is logged in `AiUsage` with tokens and an estimated cost from the admin's price list.
-- `DbAiBudget` refuses new calls once a host's monthly budget is used.
+- `DbAiBudget` refuses new calls once a host's monthly budget is used. Each plan can have its own (`Plans:AiBudgetUsd:Trial`, `:Pass`, `:Subscription`, #147; `AiAllowance`): a plan left out uses `Ai:MonthlyBudgetUsd`, and with several plans at once the most generous counts.
 
 **Tests without an API key:** the `Fake` provider (`FakeChatClient`) returns canned answers, keyed on the `TASK:` line every prompt starts with. It is only allowed when `Ai:AllowFakeProvider=true`, which the test suites and Playwright set.
 
@@ -338,6 +340,10 @@ Piper and Stable Diffusion are logged as free, like Ollama. "Test connection" on
 **Voiced NPC answers** are made on demand, after the answer text is stored: the stage shows the text immediately and plays the clip when it arrives (it waits a few seconds for it, then falls back to the browser's voice).
 
 **Costume selfies** (`POST /api/seat/photo`, seat token) are decoded and re-encoded with SkiaSharp. That drops every bit of metadata, including GPS location; the photo is turned upright and shrunk to 640 px. Only the URL goes into the game state (`SetPlayerPhoto`).
+- **Family parties start with them off** (#150, `Party.SelfiesAllowed`): their guests may be children, and a child's photo needs a parent's OK (COPPA). The host turns them on (`PUT /api/parties/{code}/selfies`), which at a Family party needs `parentsOk` and records `SelfiesConsentAt`. Other parties start with them on.
+- **The switch is checked under the party's lock**, as the upload saves the photo into the state, so no selfie gets in once they're off. Switching off clears every selfie through `SetPlayerPhoto` and deletes the files. Removing your own selfie always works.
+- **Phones learn it** from `PartyInfo.SelfiesAllowed` (read again after each reconnect) and the `selfies` hub message, and show the selfie card only while it's on.
+- **A Family party's recap has no selfies** (`RecapEndpoints`, both games): a recap link can travel far beyond the party.
 
 **The printable kit** (`/api/parties/{code}/kit/*.pdf`, host only) is drawn with QuestPDF: invitations with a QR code (QRCoder), name tags, character booklets (with secrets) and clue cards with a sealed solution.
 

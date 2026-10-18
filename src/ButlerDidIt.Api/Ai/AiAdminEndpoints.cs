@@ -32,7 +32,7 @@ public static class AiAdminEndpoints
     {
         // ---- Any host: what AI can I use, and how much have I spent?
         app.MapGet("/api/ai/status", async (ClaimsPrincipal principal, UserManager<AppUser> users, AppDbContext db,
-            IOptions<AiOptions> options, TimeProvider clock, CancellationToken ct) =>
+            IOptions<AiOptions> options, IOptions<ButlerDidIt.Api.Plans.PlansOptions> plans, TimeProvider clock, CancellationToken ct) =>
         {
             var user = await users.GetUserAsync(principal);
             if (user is null) return Results.Unauthorized();
@@ -40,7 +40,8 @@ public static class AiAdminEndpoints
             return Results.Ok(new AiStatus(
                 roles.Contains(AiRole.Storyteller), roles.Contains(AiRole.Actor), roles.Contains(AiRole.Inspector),
                 roles.Contains(AiRole.Voice), roles.Contains(AiRole.Illustrator),
-                options.Value.MonthlyBudgetUsd, await DbAiBudget.SpentThisMonthAsync(db, user.Id, clock, ct), user.IsAdmin));
+                await ButlerDidIt.Api.Plans.AiAllowance.ForAsync(db, user.Id, clock.GetUtcNow(), plans.Value.AiBudgetUsd, options.Value.MonthlyBudgetUsd, ct),
+                await DbAiBudget.SpentThisMonthAsync(db, user.Id, clock, ct), user.IsAdmin));
         }).RequireAuthorization(AuthPolicies.Host);
 
         // ---- Admin only
@@ -197,7 +198,8 @@ public static class AiAdminEndpoints
             return Results.NoContent();
         });
 
-        admin.MapGet("/usage", async (int? months, AppDbContext db, IOptions<AiOptions> options, TimeProvider clock, CancellationToken ct) =>
+        admin.MapGet("/usage", async (int? months, AppDbContext db, IOptions<AiOptions> options, IOptions<ButlerDidIt.Api.Plans.PlansOptions> plans,
+            TimeProvider clock, CancellationToken ct) =>
         {
             var now = clock.GetUtcNow();
             var since = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero).AddMonths(-(Math.Clamp(months ?? 3, 1, 24) - 1));
@@ -212,6 +214,8 @@ public static class AiAdminEndpoints
             return Results.Ok(new
             {
                 BudgetUsd = options.Value.MonthlyBudgetUsd,
+                // Each plan's own allowance (#147); null where the plan uses BudgetUsd.
+                PlanBudgetsUsd = plans.Value.AiBudgetUsd,
                 Since = since,
                 TotalCostUsd = rows.Sum(r => r.CostUsd),
                 ByMonth = Group(rows.GroupBy(r => r.At.ToString("yyyy-MM"))),

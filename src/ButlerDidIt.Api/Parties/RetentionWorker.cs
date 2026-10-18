@@ -77,6 +77,9 @@ public sealed class RetentionWorker(IServiceScopeFactory scopes, IOptions<Retent
             await db.BillingEvents.Where(e => e.ReceivedAt < cutoff).ExecuteDeleteAsync(ct);
             // The admin's alerts (#103), for the same reason.
             await db.Alerts.Where(a => a.RaisedAt < cutoff).ExecuteDeleteAsync(ct);
+            // When games began (#147) matters for refunds: a year's subscription and its refund days, with room to spare.
+            var startsCutoff = at.AddDays(-400);
+            await db.GameStarts.Where(s => s.At < startsCutoff).ExecuteDeleteAsync(ct);
         }
         return new Result(deleted, pruned, photos);
     }

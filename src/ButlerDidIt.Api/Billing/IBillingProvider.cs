@@ -31,6 +31,12 @@ public interface IBillingProvider
     /// <summary>A checkout as the provider has it now, or null when there's no such checkout.</summary>
     Task<PaidCheckout?> CheckoutSessionAsync(string sessionId, CancellationToken ct);
 
+    /// <summary>
+    /// The checkout a payment was made at, as the provider has it now (#147); null when the payment wasn't made at a
+    /// checkout (a subscription's renewal, say) or there's no such payment.
+    /// </summary>
+    Task<PaidCheckout?> CheckoutForPaymentAsync(string paymentId, CancellationToken ct);
+
     /// <summary>A price, or null when the provider has none with that id (a typo, or a price from the other mode).</summary>
     Task<PriceInfo?> PriceAsync(string priceId, CancellationToken ct);
 
@@ -84,7 +90,8 @@ public sealed record PaidItem(string PriceId, string? ProductId);
 /// <summary>A checkout as the provider has it now.</summary>
 /// <param name="ForUserId">Which host started it, as the checkout itself says.</param>
 /// <param name="Paid">True once the money is in: checkouts by bank transfer, say, complete before they're paid.</param>
-public sealed record PaidCheckout(string Id, string? CustomerId, string? ForUserId, PlanKind Kind, bool Paid, IReadOnlyList<PaidItem> Items);
+/// <param name="Refunded">True once its payment is refunded in full (#147). A partial refund (a goodwill gesture) isn't.</param>
+public sealed record PaidCheckout(string Id, string? CustomerId, string? ForUserId, PlanKind Kind, bool Paid, IReadOnlyList<PaidItem> Items, bool Refunded);
 
 /// <param name="Amount">In the currency's smallest unit (cents), as the provider gives it.</param>
 /// <param name="Interval">For a recurring price: "month", "year", and so on; null for a one-time price.</param>
@@ -92,7 +99,8 @@ public sealed record PriceInfo(string Id, string? ProductId, long? Amount, strin
 
 /// <summary>What a webhook says happened.</summary>
 /// <param name="CheckoutId">For a checkout's events, the checkout.</param>
-public sealed record BillingEvent(string Id, string Type, string? CustomerId, string? CheckoutId);
+/// <param name="PaymentId">For a payment's events (a charge refunded, #147), the payment: Stripe's payment intent.</param>
+public sealed record BillingEvent(string Id, string Type, string? CustomerId, string? CheckoutId, string? PaymentId);
 
 /// <summary>Something the host or admin can act on, with a message that says what.</summary>
 public class BillingException(string message, Exception? inner = null) : Exception(message, inner);

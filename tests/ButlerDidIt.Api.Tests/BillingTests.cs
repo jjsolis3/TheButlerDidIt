@@ -9,6 +9,7 @@ using ButlerDidIt.Api.Escape;
 using ButlerDidIt.Api.Plans;
 using ButlerDidIt.Game;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,6 +34,8 @@ public sealed class BillingFactory : ApiFactory
     protected override IEnumerable<(string Key, string Value)> ExtraSettings =>
     [
         ("Billing:Provider", "Fake"),
+        // Every test here buys from the same in-memory address.
+        ("RateLimits:BillingPerFiveMinutes", "10000"),
         ("Billing:Prices:MysteriesMonthly", "fake_mysteries_month_800"),
         ("Billing:Prices:BothMonthly", "fake_both_month_1200"),
         ("Billing:Prices:BothYearly", "fake_both_year_12000"),
@@ -178,7 +181,8 @@ public class BillingTests(BillingFactory app) : IClassFixture<BillingFactory>
         // Stripe keeps times in whole seconds.
         Assert.Equal((AccessPlan.Subscription, PaidStatus.Trialing, DateTimeOffset.FromUnixTimeSeconds(trialEnds.ToUnixTimeSeconds())),
             (access.Plan, access.Status, access.RenewsAt));
-        Assert.Single(await PaidGrantsAsync(id));
+        // Nothing paid yet, so nothing to refund (#147).
+        Assert.Null(Assert.Single(await PaidGrantsAsync(id)).PeriodStart);
     }
 
     [Fact]
@@ -364,6 +368,99 @@ public class BillingTests(BillingFactory app) : IClassFixture<BillingFactory>
         // Starting a game asks Stripe before saying no.
         Assert.Equal(HttpStatusCode.OK, (await StartEscapeAsync(host)).StatusCode);
         Assert.Equal(sub.PeriodEnd, (await AccessAsync(host)).RenewsAt);
+    }
+
+    // ---------------------------------------------------------------- refunds (#147)
+
+    [Fact]
+    public async Task A_refunded_party_pass_ends_at_once_and_one_refunded_before_it_was_recorded_is_never_given()
+    {
+        var (host, id) = await HostAsync();
+        var url = (await Read<RedirectView>(await BuyAsync(host, BillingPlan.EscapeRoomsPass))).Url;
+        await PayAsync(url);
+        Assert.True((await AccessAsync(host)).EscapeRooms);
+
+        // The admin refunds it in Stripe's dashboard, and Stripe says so.
+        var refund = app.Fake.Refund(CheckoutId(url))!;
+        Assert.Equal(HttpStatusCode.OK, (await SendWebhookAsync(refund)).StatusCode);
+        var access = await AccessAsync(host);
+        Assert.Equal((false, AccessPlan.TrialEnded), (access.EscapeRooms, access.Plan));
+        Assert.Contains("Choose a plan", await ProblemAsync(await StartEscapeAsync(host), HttpStatusCode.Forbidden));
+        var pass = (await PaidGrantsAsync(id)).Single();
+        Assert.Equal(PaidStatus.Refunded, pass.Status);
+        Assert.True(pass.EndsAt <= DateTimeOffset.UtcNow);
+
+        // Told again (a new event about the same refund), and the host back on the success page: still over, never moved.
+        await SendWebhookAsync(app.Fake.Refund(CheckoutId(url))!);
+        await host.PostAsJsonAsync("/api/billing/sync", new SyncRequest(CheckoutId(url)));
+        Assert.Equal(pass.EndsAt, (await PaidGrantsAsync(id)).Single().EndsAt);
+
+        // Paid, but the webhook saying so was lost, and then refunded: the host coming back later gets nothing.
+        var (late, lateId) = await HostAsync();
+        var lateUrl = (await Read<RedirectView>(await BuyAsync(late, BillingPlan.EscapeRoomsPass))).Url;
+        Assert.NotNull(app.Fake.Pay(CheckoutId(lateUrl)));
+        await SendWebhookAsync(app.Fake.Refund(CheckoutId(lateUrl))!);
+        await late.PostAsJsonAsync("/api/billing/sync", new SyncRequest(CheckoutId(lateUrl)));
+        Assert.Empty(await PaidGrantsAsync(lateId));
+        Assert.False((await AccessAsync(late)).EscapeRooms);
+    }
+
+    [Fact]
+    public async Task A_refund_whose_webhook_never_came_is_found_by_the_admins_sync()
+    {
+        var (host, id) = await HostAsync();
+        var url = (await Read<RedirectView>(await BuyAsync(host, BillingPlan.BothPass))).Url;
+        await PayAsync(url);
+        app.Fake.Refund(CheckoutId(url)); // its webhook is lost
+        Assert.True((await AccessAsync(host)).Mysteries);
+
+        var admin = await app.AdminAsync();
+        Assert.Equal(HttpStatusCode.NoContent, (await admin.PostAsync($"/api/admin/billing/hosts/{id}/sync", null)).StatusCode);
+        Assert.False((await AccessAsync(host)).Mysteries);
+        Assert.Equal(PaidStatus.Refunded, (await PaidGrantsAsync(id)).Single().Status);
+    }
+
+    [Fact]
+    public async Task The_admin_sees_whether_each_payment_was_used_even_once_its_party_is_deleted()
+    {
+        await app.AdminAsync();
+        var (host, cookie) = await app.RegisterHostAsync($"used{Guid.NewGuid():N}@example.com");
+        var id = (await Read<MeResponse>(await host.GetAsync("/api/auth/me"))).Id;
+        await EndTrialAsync(id);
+        var url = (await Read<RedirectView>(await BuyAsync(host, BillingPlan.EscapeRoomsPass))).Url;
+        await PayAsync(url);
+
+        var admin = await app.AdminAsync();
+        async Task<AdminPaidRow> RowAsync() => (await Read<AdminBillingView>(await admin.GetAsync("/api/admin/billing"))).Paid.Single(p => p.UserId == id);
+        var row = await RowAsync();
+        Assert.Equal(0, row.GamesSince);
+        Assert.InRange(row.RefundableUntil!.Value, DateTimeOffset.UtcNow.AddDays(14).AddMinutes(-5), DateTimeOffset.UtcNow.AddDays(14).AddMinutes(5));
+        Assert.Equal(row.StartsAt, row.PeriodStart);
+
+        // A party made and guests invited isn't a game started (the policy says so); the clock starting is.
+        var party = await Read<PartyInfo>(await StartEscapeAsync(host));
+        await app.CreateClient().PostAsJsonAsync($"/api/parties/{party.Code}/join", new JoinRequest("Ada"));
+        Assert.Equal(0, (await RowAsync()).GamesSince);
+        await using (var tv = await app.ConnectAsync(cookie: cookie))
+            await tv.InvokeAsync("EscapeStart", party.Code);
+        row = await RowAsync();
+        Assert.Equal((1, (DateTimeOffset?)null), (row.GamesSince, row.RefundableUntil));
+
+        // Deleting the unfinished party doesn't make the payment unused.
+        Assert.Equal(HttpStatusCode.NoContent, (await host.DeleteAsync($"/api/parties/{party.Code}")).StatusCode);
+        Assert.Equal(1, (await RowAsync()).GamesSince);
+        // It's in the host's data download, and goes with their account.
+        Assert.Contains("\"gamesStarted\": [", await host.GetStringAsync("/api/account/export"));
+        Assert.Equal(HttpStatusCode.NoContent, (await host.PostAsJsonAsync("/api/account/delete", new DeleteAccountRequest("password123"))).StatusCode);
+        using (var scope = app.Services.CreateScope())
+            Assert.False(await scope.ServiceProvider.GetRequiredService<AppDbContext>().GameStarts.AnyAsync(s => s.HostUserId == id));
+
+        // A subscription's payment is its current period's, as the provider has it.
+        var (subscriber, subscriberId) = await HostAsync();
+        await SubscribeAsync(subscriber);
+        var sub = app.Fake.SubscriptionsOf(await CustomerOfAsync(subscriberId)).Single();
+        var subRow = (await Read<AdminBillingView>(await admin.GetAsync("/api/admin/billing"))).Paid.Single(p => p.UserId == subscriberId);
+        Assert.Equal((sub.PeriodStart, 0), (subRow.PeriodStart!.Value, subRow.GamesSince!.Value));
     }
 
     // ---------------------------------------------------------------- leaving, and the admin

@@ -59,4 +59,25 @@ public static class PaidAccess
             PaidStatus.Ending => g.EndsAt > now,
             _ => false,
         };
+
+    /// <summary>
+    /// Whether a grant's latest payment was used, for the refund policy (#147): a payment is refunded in full within
+    /// <paramref name="refundDays"/> of being made if no game was started while it paid for the host's games. Counts
+    /// <paramref name="starts"/> (the host's) from the period's start until the grant ended, of the games it gives.
+    /// </summary>
+    /// <returns>Null when the grant has no payment to speak of yet (one from before this was recorded).</returns>
+    public static PaymentUse? UseOf(AccessGrantEntity g, IEnumerable<GameStartEntity> starts, int refundDays, DateTimeOffset now)
+    {
+        if (g.PeriodStart is not { } from) return null;
+        var games = starts.Count(s => s.At >= from && (g.EndsAt is null || s.At < g.EndsAt)
+            && g.Games.HasFlag(s.Kind == GameKind.EscapeRoom ? GameAccess.EscapeRooms : GameAccess.Mysteries));
+        // Only money that's in counts: not a subscription's free days, a renewal that failed, or one already given back.
+        var paid = (g.Status is PaidStatus.Active or PaidStatus.Ending) && (g.Kind is GrantKind.Pass or GrantKind.Subscription);
+        var until = from.AddDays(refundDays);
+        return new PaymentUse(games, paid && games == 0 && until > now ? until : null);
+    }
 }
+
+/// <param name="GamesStarted">Games started while the payment paid for them.</param>
+/// <param name="RefundableUntil">When the policy's full refund runs out; null when it doesn't apply (used, too late, not paid).</param>
+public sealed record PaymentUse(int GamesStarted, DateTimeOffset? RefundableUntil);

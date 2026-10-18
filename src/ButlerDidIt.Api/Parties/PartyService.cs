@@ -136,6 +136,9 @@ public sealed class PartyRuntime(
 
             party.ScenarioId = next.ContentId;
             party.State = next.Serialize();
+            // The game has begun (#147): kept for the refund policy, in the same save, so it can't be missed.
+            if (party.Status == PartyStatus.Lobby && next.Status != PartyStatus.Lobby)
+                db.GameStarts.Add(new GameStartEntity { Id = Guid.NewGuid(), HostUserId = party.HostUserId, Kind = party.Kind, PartyId = party.Id, At = now });
             party.Status = next.Status;
             party.NextDueAt = next.NextDueAt;
             party.UpdatedAt = now;

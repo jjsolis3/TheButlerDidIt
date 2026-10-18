@@ -80,6 +80,47 @@ public class PaidAccessTests
         Assert.False(PaidAccess.IsLiveSubscription(Grant(PaidStatus.Ended), Now));
         Assert.False(PaidAccess.IsLiveSubscription(new AccessGrantEntity { UserId = "u", Kind = GrantKind.Pass, Status = PaidStatus.Active }, Now));
     }
+
+    // ---------------------------------------------------------------- was a payment used? (#147)
+
+    private static AccessGrantEntity Paid(GrantKind kind, PaidStatus status, GameAccess games = GameAccess.Both, DateTimeOffset? ends = null) => new()
+    {
+        UserId = "host", Kind = kind, Status = status, Games = games, StartsAt = Now.AddDays(-3), PeriodStart = Now.AddDays(-3), EndsAt = ends,
+    };
+
+    private static GameStartEntity Start(GameKind kind, DateTimeOffset at) => new() { HostUserId = "host", Kind = kind, At = at };
+
+    [Fact]
+    public void An_unused_payment_is_refundable_for_the_refund_days_and_a_game_started_with_it_ends_that()
+    {
+        var pass = Paid(GrantKind.Pass, PaidStatus.Active, ends: Now.AddDays(1));
+        Assert.Equal(new PaymentUse(0, Now.AddDays(11)), PaidAccess.UseOf(pass, [], refundDays: 14, Now));
+        // A game from before the payment, or one the pass doesn't give, wasn't started with it.
+        var before = Start(GameKind.EscapeRoom, Now.AddDays(-4));
+        Assert.Equal(new PaymentUse(0, Now.AddDays(11)), PaidAccess.UseOf(Paid(GrantKind.Pass, PaidStatus.Active, GameAccess.Mysteries), [before, Start(GameKind.EscapeRoom, Now)], 14, Now));
+
+        var used = PaidAccess.UseOf(pass, [before, Start(GameKind.EscapeRoom, Now.AddDays(-1)), Start(GameKind.Mystery, Now)], 14, Now);
+        Assert.Equal(new PaymentUse(2, null), used);
+        // Too late, whatever was played.
+        Assert.Null(PaidAccess.UseOf(pass, [], 14, Now.AddDays(12))!.RefundableUntil);
+    }
+
+    [Fact]
+    public void Only_money_that_is_in_can_be_refunded_and_a_grants_games_stop_counting_when_it_ends()
+    {
+        // A subscription's free days, a renewal that failed, one over, a refunded pass: no payment to give back.
+        foreach (var status in new[] { PaidStatus.Trialing, PaidStatus.PastDue, PaidStatus.Ended, PaidStatus.Refunded })
+            Assert.Null(PaidAccess.UseOf(Paid(GrantKind.Subscription, status), [], 14, Now)!.RefundableUntil);
+        // Cancelled at the period's end is still paid for.
+        Assert.NotNull(PaidAccess.UseOf(Paid(GrantKind.Subscription, PaidStatus.Ending, ends: Now.AddDays(20)), [], 14, Now)!.RefundableUntil);
+
+        // A game after the pass ran out was started with something else.
+        var over = Paid(GrantKind.Pass, PaidStatus.Ended, ends: Now.AddDays(-1));
+        Assert.Equal(1, PaidAccess.UseOf(over, [Start(GameKind.Mystery, Now.AddDays(-2)), Start(GameKind.Mystery, Now)], 14, Now)!.GamesStarted);
+
+        // A grant from before payments were dated: nothing is known.
+        Assert.Null(PaidAccess.UseOf(new AccessGrantEntity { UserId = "host", Kind = GrantKind.Subscription, Status = PaidStatus.Active }, [], 14, Now));
+    }
 }
 
 /// <summary>What the admin is told about a plan's price (#101).</summary>

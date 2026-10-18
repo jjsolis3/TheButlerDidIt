@@ -46,6 +46,9 @@ public sealed record AdminBillingEventView(string Type, DateTimeOffset At);
 
 /// <summary>One subscription or pass, newest first.</summary>
 /// <param name="DashboardUrl">The subscription (or, for a pass, the customer) in the provider's dashboard.</param>
+/// <param name="PeriodStart">When its latest payment's time began (#147): a pass's payment, a subscription's last renewal.</param>
+/// <param name="GamesSince">Games started with that payment, for the refund policy; null when that isn't known yet.</param>
+/// <param name="RefundableUntil">Until when the policy refunds that payment in full; null when it doesn't (used, too late, not paid).</param>
 public sealed record AdminPaidRow(
     string UserId,
     string? DisplayName,
@@ -58,7 +61,10 @@ public sealed record AdminPaidRow(
     DateTimeOffset? EndsAt,
     DateTimeOffset? RenewsAt,
     bool InEffect,
-    string? DashboardUrl);
+    string? DashboardUrl,
+    DateTimeOffset? PeriodStart,
+    int? GamesSince,
+    DateTimeOffset? RefundableUntil);
 
 /// <summary>
 /// Payments (#101): what a host can buy, the way to the provider's payment and billing pages, the provider's
@@ -141,7 +147,8 @@ public static class BillingEndpoints
         // ---- The admin's tab.
         var admin = app.MapGroup("/api/admin/billing").RequireAuthorization(AuthPolicies.Host).AddEndpointFilter(AdminHostEndpoints.RequireAdmin);
 
-        admin.MapGet("/", async (bool? refresh, AppDbContext db, BillingSetup setup, BillingCatalog catalog, TimeProvider clock, CancellationToken ct) =>
+        admin.MapGet("/", async (bool? refresh, AppDbContext db, BillingSetup setup, BillingCatalog catalog, IOptions<ButlerDidIt.Api.Legal.LegalOptions> legal,
+            TimeProvider clock, CancellationToken ct) =>
         {
             if (refresh == true) catalog.Forget();
             var now = clock.GetUtcNow();
@@ -153,18 +160,24 @@ public static class BillingEndpoints
             var userIds = grants.Select(g => g.UserId).Distinct().ToList();
             var people = await db.Users.AsNoTracking().Where(u => userIds.Contains(u.Id))
                 .Select(u => new { u.Id, u.DisplayName, u.Email, u.BillingCustomerId }).ToDictionaryAsync(u => u.Id, ct);
+            // The games these hosts started since the oldest payment shown (#147), to tell the admin which payments were used.
+            var since = grants.Min(g => g.PeriodStart) ?? now;
+            var starts = (await db.GameStarts.AsNoTracking().Where(s => userIds.Contains(s.HostUserId) && s.At >= since).ToListAsync(ct))
+                .ToLookup(s => s.HostUserId);
             var paid = grants.Select(g =>
             {
                 var who = people.GetValueOrDefault(g.UserId);
+                var use = PaidAccess.UseOf(g, starts[g.UserId], legal.Value.RefundDays, now);
                 return new AdminPaidRow(g.UserId, who?.DisplayName, who?.Email, g.Kind, g.Games.HasFlag(GameAccess.Mysteries), g.Games.HasFlag(GameAccess.EscapeRooms),
-                    g.Status, g.StartsAt, g.EndsAt, g.RenewsAt, Access.InEffect(g, now), setup.Provider?.DashboardUrl(g.ExternalId, who?.BillingCustomerId));
+                    g.Status, g.StartsAt, g.EndsAt, g.RenewsAt, Access.InEffect(g, now), setup.Provider?.DashboardUrl(g.ExternalId, who?.BillingCustomerId),
+                    g.PeriodStart, use?.GamesStarted, use?.RefundableUntil);
             }).ToList();
             var o = setup.Options;
             return Results.Ok(new AdminBillingView(setup.Enabled, setup.Provider?.Name, setup.Provider?.LiveMode ?? false, setup.Provider?.CanVerifyWebhooks ?? false,
                 setup.Problem, o.PassHours, o.GraceDays, o.AutomaticTax, plans, last, await db.BillingEvents.CountAsync(e => e.ReceivedAt > weekAgo, ct), paid));
         });
 
-        // When a webhook went missing: read one host's subscriptions from the provider now.
+        // When a webhook went missing: read one host's subscriptions, and their running passes' refunds, from the provider now.
         admin.MapPost("/hosts/{id}/sync", async (string id, AppDbContext db, BillingService billing, CancellationToken ct) =>
         {
             var customer = await db.Users.AsNoTracking().Where(u => u.Id == id).Select(u => u.BillingCustomerId).FirstOrDefaultAsync(ct);
@@ -172,6 +185,7 @@ public static class BillingEndpoints
             try
             {
                 await billing.SyncCustomerAsync(customer, ct);
+                await billing.RecheckPassesAsync(customer, ct);
             }
             catch (BillingException ex)
             {

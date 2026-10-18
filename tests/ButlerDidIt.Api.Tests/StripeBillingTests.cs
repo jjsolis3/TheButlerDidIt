@@ -36,10 +36,15 @@ public class StripeBillingTests
         var now = DateTimeOffset.UtcNow;
         // An event in an old API version's shape is fine: only its ids are read.
         var evt = Stripe().ReadEvent(Event, EventUtility.GenerateSignatureHeader(Event, Secret, now.ToUnixTimeSeconds()), now);
-        Assert.Equal(new BillingEvent("evt_1", "customer.subscription.updated", "cus_1", null), evt);
+        Assert.Equal(new BillingEvent("evt_1", "customer.subscription.updated", "cus_1", null, null), evt);
 
         var checkout = """{"id":"evt_2","type":"checkout.session.completed","data":{"object":{"id":"cs_1","object":"checkout.session","customer":"cus_1"}}}""";
         Assert.Equal("cs_1", Stripe().ReadEvent(checkout, EventUtility.GenerateSignatureHeader(checkout, Secret, now.ToUnixTimeSeconds()), now).CheckoutId);
+
+        // A refund (#147): the charge's payment, which finds the checkout it was made at.
+        var refund = """{"id":"evt_3","type":"charge.refunded","data":{"object":{"id":"ch_1","object":"charge","customer":"cus_1","payment_intent":"pi_1","refunded":true}}}""";
+        Assert.Equal(new BillingEvent("evt_3", "charge.refunded", "cus_1", null, "pi_1"),
+            Stripe().ReadEvent(refund, EventUtility.GenerateSignatureHeader(refund, Secret, now.ToUnixTimeSeconds()), now));
     }
 
     [Fact]
@@ -106,6 +111,10 @@ public class StripeBillingTests
         var checkout = await stripe.CheckoutSessionAsync("cs_123", default);
         Assert.NotNull(checkout);
         Assert.StartsWith("cs_", checkout.Id);
+        // A refund's payment leads to the checkout it was made at, read with its charge (#147).
+        var refunded = await stripe.CheckoutForPaymentAsync("pi_123", default);
+        Assert.NotNull(refunded);
+        Assert.StartsWith("cs_", refunded.Id);
 
         var price = await stripe.PriceAsync("price_123", default);
         Assert.NotNull(price);

@@ -491,13 +491,31 @@ function UsageTable({ title, rows }: { title: string; rows: UsageReport['byRole'
   )
 }
 
+/** The plans that can have their own AI allowance (#147), and what to call them. */
+const PLAN_BUDGETS = [
+  ['trial', 'free trials'],
+  ['pass', 'party passes'],
+  ['subscription', 'subscriptions'],
+] as const satisfies readonly (readonly [keyof UsageReport['planBudgetsUsd'], string])[]
+
+const perMonth = (usd: number) => (usd > 0 ? `${money(usd)} per month` : 'unlimited')
+
 function Usage({ usage }: { usage: UsageReport }) {
   return (
     <section>
       <h2 className="font-display mb-1 text-2xl">4. Usage and cost</h2>
       <p className="mb-3 text-sm text-muted">
         {money(usage.totalCostUsd)} estimated since {new Date(usage.since).toLocaleDateString()}. Each host's budget:{' '}
-        {usage.budgetUsd > 0 ? `${money(usage.budgetUsd)} per month` : 'unlimited'} (set <code>Ai__MonthlyBudgetUsd</code>).
+        {perMonth(usage.budgetUsd)} (set <code>Ai__MonthlyBudgetUsd</code>)
+        {PLAN_BUDGETS.some(([key]) => usage.planBudgetsUsd[key] !== null) ? (
+          <>
+            , except{' '}
+            {PLAN_BUDGETS.filter(([key]) => usage.planBudgetsUsd[key] !== null)
+              .map(([key, label]) => `${label}: ${perMonth(usage.planBudgetsUsd[key]!)}`)
+              .join(', ')}
+          </>
+        ) : null}
+        . A plan can have its own (<code>Plans__AiBudgetUsd__Trial</code>, <code>__Pass</code>, <code>__Subscription</code>).
       </p>
       <div className="grid gap-3 md:grid-cols-2">
         <UsageTable title="By month" rows={usage.byMonth} />

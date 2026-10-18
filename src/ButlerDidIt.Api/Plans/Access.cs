@@ -9,6 +9,55 @@ public sealed class PlansOptions
 {
     /// <summary>How long a new host's free trial of both games lasts.</summary>
     public int TrialDays { get; set; } = 14;
+
+    /// <summary>Each plan's own monthly AI allowance (#147); a plan left out uses <c>Ai:MonthlyBudgetUsd</c>.</summary>
+    public PlanAiBudgets AiBudgetUsd { get; set; } = new();
+}
+
+/// <summary>
+/// A monthly AI allowance (US$) for each kind of plan, so a paying host can be given more than a trial. Null: the site's
+/// own budget (<c>Ai:MonthlyBudgetUsd</c>). 0 means no limit, as it does there.
+/// </summary>
+public sealed class PlanAiBudgets
+{
+    public decimal? Trial { get; set; }
+    public decimal? Pass { get; set; }
+    public decimal? Subscription { get; set; }
+}
+
+/// <summary>
+/// How much AI a host may use each month (#147). Pure, so it's tested without a database. Free access from the admin
+/// and the admin themselves get the site's budget. With several grants at once, say a subscription and a pass, the
+/// most generous counts: a host never gets less for having bought more. A host with no plan now (a trial over, a
+/// pass run out) may still have a party going from it, and keeps that last plan's allowance: a trial that's ended
+/// never gets more than a trial.
+/// </summary>
+public static class AiAllowance
+{
+    public static decimal For(bool isAdmin, IReadOnlyCollection<AccessGrantEntity> grants, DateTimeOffset now, PlanAiBudgets plans, decimal siteBudget)
+    {
+        if (isAdmin) return siteBudget;
+        var counted = grants.Where(g => Access.InEffect(g, now)).ToList();
+        if (counted.Count == 0)
+            counted = grants.Where(g => g.RevokedAt is null && g.StartsAt <= now).OrderByDescending(g => g.EndsAt).Take(1).ToList();
+        var budgets = counted.Select(g => g.Kind switch
+        {
+            GrantKind.Trial => plans.Trial ?? siteBudget,
+            GrantKind.Pass => plans.Pass ?? siteBudget,
+            GrantKind.Subscription => plans.Subscription ?? siteBudget,
+            _ => siteBudget,
+        }).ToList();
+        if (budgets.Count == 0) return siteBudget;
+        // 0 is "no limit", which beats any amount.
+        return budgets.Any(b => b <= 0) ? 0 : budgets.Max();
+    }
+
+    public static async Task<decimal> ForAsync(AppDbContext db, string userId, DateTimeOffset now, PlanAiBudgets plans, decimal siteBudget, CancellationToken ct)
+    {
+        var isAdmin = await db.Users.AsNoTracking().Where(u => u.Id == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync(ct);
+        var grants = isAdmin ? [] : await db.AccessGrants.AsNoTracking().Where(g => g.UserId == userId).ToListAsync(ct);
+        return For(isAdmin, grants, now, plans, siteBudget);
+    }
 }
 
 /// <summary>What a host's access is called on their pages. Code never decides anything from it; it checks the games.</summary>

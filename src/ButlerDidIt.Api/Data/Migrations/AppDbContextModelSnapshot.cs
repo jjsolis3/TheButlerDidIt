@@ -50,6 +50,9 @@ namespace ButlerDidIt.Api.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<DateTimeOffset?>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset?>("RenewsAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -512,6 +515,35 @@ namespace ButlerDidIt.Api.Data.Migrations
                     b.ToTable("EscapeRooms");
                 });
 
+            modelBuilder.Entity("ButlerDidIt.Api.Data.GameStartEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("At")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("HostUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<Guid>("PartyId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HostUserId", "At");
+
+                    b.ToTable("GameStarts");
+                });
+
             modelBuilder.Entity("ButlerDidIt.Api.Data.GenerationJobEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -817,6 +849,12 @@ namespace ButlerDidIt.Api.Data.Migrations
                         .HasColumnType("character varying(120)");
 
                     b.Property<DateTimeOffset?>("ScheduledFor")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("SelfiesAllowed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("SelfiesConsentAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("State")

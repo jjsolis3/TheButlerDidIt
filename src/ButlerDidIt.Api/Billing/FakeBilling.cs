@@ -71,10 +71,14 @@ public sealed partial class FakeBilling(TimeProvider clock) : IBillingProvider
     {
         lock (_gate)
         {
-            if (!_checkouts.TryGetValue(sessionId, out var c)) return Task.FromResult<PaidCheckout?>(null);
-            var r = c.Request;
-            return Task.FromResult<PaidCheckout?>(new PaidCheckout(c.Id, r.CustomerId, r.UserId, r.Kind, c.Paid, [new PaidItem(r.PriceId, Price(r.PriceId)?.ProductId)]));
+            return Task.FromResult<PaidCheckout?>(_checkouts.TryGetValue(sessionId, out var c) ? c.Read() : null);
         }
+    }
+
+    public Task<PaidCheckout?> CheckoutForPaymentAsync(string paymentId, CancellationToken ct)
+    {
+        lock (_gate)
+            return Task.FromResult<PaidCheckout?>(_checkouts.Values.FirstOrDefault(c => c.PaymentId == paymentId)?.Read());
     }
 
     public Task<PriceInfo?> PriceAsync(string priceId, CancellationToken ct) => Task.FromResult(Price(priceId));
@@ -98,8 +102,10 @@ public sealed partial class FakeBilling(TimeProvider clock) : IBillingProvider
         }
         var json = JsonNode.Parse(payload)!;
         var obj = json["data"]?["object"];
+        var kind = obj?["object"]?.GetValue<string>();
         return new BillingEvent(json["id"]!.GetValue<string>(), json["type"]!.GetValue<string>(), obj?["customer"]?.GetValue<string>(),
-            obj?["object"]?.GetValue<string>() == "checkout.session" ? obj["id"]?.GetValue<string>() : null);
+            kind == "checkout.session" ? obj!["id"]?.GetValue<string>() : null,
+            kind is "charge" or "refund" ? obj!["payment_intent"]?.GetValue<string>() : null);
     }
 
     public string? DashboardUrl(string? externalId, string? customerId) => null;
@@ -123,6 +129,8 @@ public sealed partial class FakeBilling(TimeProvider clock) : IBillingProvider
             if (!_checkouts.TryGetValue(checkoutId, out var c) || c.Paid) return null;
             c.Paid = true;
             var r = c.Request;
+            // A one-time payment is a payment intent at Stripe; a subscription's payments are its invoices'.
+            if (r.Kind == PlanKind.Pass) c.PaymentId = $"pi_fake_{++_next}";
             if (r.Kind == PlanKind.Subscription)
             {
                 var price = Price(r.PriceId)!;
@@ -141,6 +149,24 @@ public sealed partial class FakeBilling(TimeProvider clock) : IBillingProvider
             {
                 ["id"] = c.Id, ["object"] = "checkout.session", ["customer"] = r.CustomerId,
                 ["mode"] = r.Kind == PlanKind.Subscription ? "subscription" : "payment",
+            });
+        }
+    }
+
+    /// <summary>
+    /// The admin refunds a pass's payment in full, as in Stripe's dashboard (#147), and Stripe's <c>charge.refunded</c>
+    /// webhook comes back. Null when there's no such paid pass.
+    /// </summary>
+    public FakeWebhook? Refund(string checkoutId)
+    {
+        lock (_gate)
+        {
+            if (!_checkouts.TryGetValue(checkoutId, out var c) || c.PaymentId is null) return null;
+            c.Refunded = true;
+            return Event("charge.refunded", new JsonObject
+            {
+                ["id"] = $"ch_fake_{++_next}", ["object"] = "charge", ["customer"] = c.Request.CustomerId,
+                ["payment_intent"] = c.PaymentId, ["refunded"] = true,
             });
         }
     }
@@ -205,6 +231,14 @@ public sealed partial class FakeBilling(TimeProvider clock) : IBillingProvider
         public string Id { get; } = id;
         public CheckoutRequest Request { get; } = request;
         public bool Paid { get; set; }
+
+        /// <summary>A paid pass's payment (Stripe's payment intent).</summary>
+        public string? PaymentId { get; set; }
+
+        public bool Refunded { get; set; }
+
+        public PaidCheckout Read() =>
+            new(Id, Request.CustomerId, Request.UserId, Request.Kind, Paid, [new PaidItem(Request.PriceId, Price(Request.PriceId)?.ProductId)], Refunded);
     }
 }
 

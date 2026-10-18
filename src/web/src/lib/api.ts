@@ -217,6 +217,9 @@ export const api = {
   spectators: (code: string) => request<SpectatorList>('GET', `/api/parties/${encodeURIComponent(code)}/spectators`),
   removeSpectator: (code: string, id: string) => request<void>('DELETE', `/api/parties/${encodeURIComponent(code)}/spectators/${id}`),
   allowSpectators: (code: string, allow: boolean) => request<SpectatorList>('PUT', `/api/parties/${encodeURIComponent(code)}/spectators`, { allow }),
+  // Costume selfies on or off (#150). At a Family party, turning them on needs `parentsOk`.
+  allowSelfies: (code: string, allow: boolean, parentsOk: boolean) =>
+    request<{ allow: boolean }>('PUT', `/api/parties/${encodeURIComponent(code)}/selfies`, { allow, parentsOk }),
   // Escape rooms share their recap the same way (shareRecap / unshareRecap); only the page differs.
   escapeRecap: (code: string) => request<EscapeRecapSharing>('GET', `/api/parties/${encodeURIComponent(code)}/escape-recap`),
   publicEscapeRecap: (slug: string) => request<EscapeRecapPage>('GET', `/api/escape-recap/${encodeURIComponent(slug)}`),

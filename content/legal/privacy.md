@@ -43,8 +43,9 @@ The short version: we collect what the games need and little else. We don't sell
 ## Costume selfies
 
 - **Optional.** A guest can add a photo of their costume; nobody has to.
+- **Off at Family parties until the host turns them on.** Their guests may be children, so the host turns selfies on only once the children's parents are happy for them to share a photo, and we record when the host said so. Turning them off deletes the selfies taken so far.
 - **Cleaned before anyone sees it.** Our server makes a fresh, smaller copy of the photo and throws the original away. The copy carries none of the hidden information phones add to photos, such as where it was taken.
-- **Seen only at that party:** on the host's TV, on the phones at the party, and on the party's recap page if the host shares its link.
+- **Seen only at that party:** on the host's TV (and by anyone the host lets watch it), on the phones at the party, and, except at Family parties, on the party's recap page if the host shares its link.
 - **Yours to remove.** Remove it from your phone at any time, and it's deleted from our server straight away.
 - **Deleted automatically** {{FinishedPartyDays}} days after the party, or {{IdlePartyDays}} days after it was last used if it never finished.
 - **Never sent to an AI provider,** and never used for anything else.
@@ -60,7 +61,7 @@ The short version: we collect what the games need and little else. We don't sell
 
 ## Who else sees it
 
-**The people at your party.** Everyone at a party sees the names at that party, on the TV and on the phones. The host sees the guests' names and how the game went. Notes stay on their writer's phone. A recap page shows the names and selfies of that party to anyone the host gives its link to, and the host can stop sharing it at any time.
+**The people at your party.** Everyone at a party sees the names at that party, on the TV and on the phones. The host sees the guests' names and how the game went. Notes stay on their writer's phone. A recap page shows the names of that party, and its selfies unless it was a Family party, to anyone the host gives its link to, and the host can stop sharing it at any time.
 
 **The services that help us run the site.** Each gets only what its job needs, and may use it only to do that job for us:
 
@@ -92,11 +93,11 @@ When the site's AI features are on, the AI providers listed above receive the te
 
 - **Hosts must be 18 or older.** We don't knowingly let anyone younger create an account.
 - **Family games are made so that children can play as guests,** at a party run by an adult who invited them. Guests don't create accounts and never give us an email address.
-- **For children under 13, the adult in charge decides what's shared.** We suggest a nickname rather than a real name, and a costume selfie only with a parent's permission. Family games never ask guests to type comments.
+- **For children under 13, the adult in charge decides what's shared.** We suggest a nickname rather than a real name. At Family parties, costume selfies are off until the host confirms the children's parents are happy for them to share a photo, and a Family party's recap never shows them. Family games never ask guests to type comments.
 - **Everything a guest shares is deleted automatically,** as described above. A parent can ask us to delete it sooner: email {{ContactEmail}} with the party's code or the host's name.
 - If you think a child under 13 gave us personal information without a parent's permission, contact us and we'll delete it.
 
-<!-- REVIEW: COPPA. The site isn't aimed at children for sign-up, but Family games are meant for them as guests, and a photo of a child is "personal information" under COPPA. The design keeps it small (no accounts, nicknames, optional photos deleted automatically), but ask whether you need the host to confirm a parent's consent before a child's selfie, and whether this section is enough. -->
+<!-- REVIEW: COPPA. The site isn't aimed at children for sign-up, but Family games are meant for them as guests, and a photo of a child is "personal information" under COPPA. The design keeps it small (no accounts, nicknames, optional photos deleted automatically). At Family parties selfies are off until the host confirms the parents' OK (#150), and their recaps show no photos. Ask whether the host's word is enough, or whether consent must come from each parent ("verifiable parental consent"), and whether this section is enough. -->
 
 ## Your choices and rights
 
